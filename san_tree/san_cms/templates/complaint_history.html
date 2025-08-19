@@ -1,0 +1,98 @@
+{% extends 'index.html' %}
+{% load cms_menu_tags %} 
+{% load static %}
+
+{% block title %}
+All Complaints
+{% endblock %}
+
+{% block start %}
+<nav>{% cms_menu %}</nav>
+<link rel="stylesheet" href="{% static 'styles/common.css' %}" />
+
+<div class="container mt-5 py-3">
+    <div class="row py-3">
+      <div class="col-12 d-flex justify-content-between">
+        <div class="complaint-title">
+          <h3 style="color: #800000;">All Complaints</h3>
+        </div>
+        <div class="sort-complaint">
+          <form method="get" class="mb-3">
+            <label for="department">Filter:</label>
+            <select name="department" id="department" onchange="this.form.submit()" class="form-select w-auto d-inline-block">
+              <option value="">select</option>
+              {% for dept in departments %}
+                <option value="{{ dept.id }}" {% if selected_department == dept.id %}selected{% endif %}>
+                  {{ dept.name }}
+                </option>
+              {% endfor %}
+            </select>
+          </form>        
+        </div>
+      </div>
+        <div class="col-12 col-md-8 col-lg-6 w-100">
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                    <thead class="table-primary">
+                      <tr style="font-family: 'Open Sans', sans-serif;">
+                        <th scope="col">Complaint</th>
+                        <th scope="col">status</th>
+                        <th scope="col">Concern Department</th>
+                        <th scope="col">Raise Date</th>
+                        <th scope="col">Resolved Date</th>
+                        <th scope="col">View Details</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% if page_obj %}
+                        {% for complaints in page_obj %}
+                          <tr style="font-family: 'Poppins', sans-serif;">
+                            <td>{{complaints.complaint.complaint_type}}</td>
+                            <td>{{complaints.status_changed_to}}</td>
+                            <td>{{complaints.complaint.department}}</td>
+                            <td>{{complaints.complaint.created_at}}</td>
+                            {% if complaints.status_changed_to == 'Resolved' or complaints.status_changed_to == 'Cancelled' %}
+                            <td>{{complaints.timestamp}}</td>
+                            {% else %}
+                            <td>Not yet resolved!</td>
+                            {% endif %}
+                            <td><a href="{% url 'cms:overall_complaints_details' complaints.complaint.id %}">View</a></td>
+                          </tr>
+                        {% endfor %}
+                        <nav>
+                          <ul class="pagination">
+                            {% if page_obj.has_previous %}
+                              <li class="page-item">
+                                <a class="page-link" href="?{% if selected_department %}department={{ selected_department }}&{% endif %}page={{ page_obj.previous_page_number }}">Previous</a>
+                              </li>
+                            {% endif %}
+                      
+                            {% for num in page_obj.paginator.page_range %}
+                              {% if page_obj.number == num %}
+                                <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                              {% else %}
+                                <li class="page-item">
+                                  <a class="page-link" href="?{% if selected_department %}department={{ selected_department }}&{% endif %}page={{ num }}">{{ num }}</a>
+                                </li>
+                              {% endif %}
+                            {% endfor %}
+                      
+                            {% if page_obj.has_next %}
+                              <li class="page-item">
+                                <a class="page-link" href="?{% if selected_department %}department={{ selected_department }}&{% endif %}page={{ page_obj.next_page_number }}">Next</a>
+                              </li>
+                            {% endif %}
+                          </ul>
+                        </nav>
+                      {% else %}
+                        {% if selected_department %}
+                          <p>No complaints found for this department.</p>
+                        {% endif %}
+                      {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

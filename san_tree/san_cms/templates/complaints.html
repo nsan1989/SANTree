@@ -1,0 +1,102 @@
+{% extends 'index.html' %}
+{% load cms_menu_tags %} 
+{% load crispy_forms_tags %} 
+{% load static %}
+
+{% block title %}
+Complaints
+{% endblock %}
+
+{% block start %}
+<!--styles-->
+<style>
+  .card-title,
+  .complaint-form {
+    font-family: 'Poppins',sans-serif;
+  }
+</style>
+<!---------->
+
+<nav>{% cms_menu %}</nav>
+<link rel="stylesheet" href="{% static 'styles/complaints.css' %}" />
+
+<div class="container mt-5">
+    <div class="row d-flex flex-column align-items-center py-3">
+    <span style="width: auto;">
+      <div class="mb-3">
+        <a
+          href="javascript:history.back()"
+          class="d-flex align-items-center text-warning"
+          style="text-decoration: none"
+        >
+          <i class="fa-solid fa-arrow-left"></i>
+          &nbsp;back
+        </a>
+      </div>
+    </span>
+        <div class="col-md-6 col-lg-4">
+          <div class="card shadow-lg border-0 rounded-4">
+            <div class="card-body p-4">
+              <h4 class="card-title text-center mb-4">Complaint Form</h4>
+              <form class="complaint-form" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                {{ form|crispy }}
+                <div class="d-grid mt-4">
+                  <button type="submit" class="btn btn-lg" style="border: 1px solid #800000; color: #800000;">Submit</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+    </div>
+</div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+  $(document).ready(function () {
+    $('#id_department').change(function () {
+      const url = "{% url 'cms:ajax_load_complaint_types' %}";
+      const departmentId = $(this).val();
+
+      $.ajax({
+        url: url,
+        data: {
+          'department': departmentId
+        },
+        success: function (data) {
+          const complaintTypeSelect = $('#id_complaint_type');
+          complaintTypeSelect.empty();
+          complaintTypeSelect.append('<option value="">Select Complaint Type</option>');
+          data.forEach(function (item) {
+            complaintTypeSelect.append(`<option value="${item.id}">${item.name}</option>`);
+          });
+
+          if (data.length === 1) {
+            complaintTypeSelect.val(data[0].id);
+          }
+        }
+      });
+    });
+  });
+</script>
+<!--
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const complaintTypeField = document.getElementById('id_complaint_type');
+        const descriptionField = document.getElementById('id_description');
+
+        function toggleDescriptionField() {
+            const selectedOption = complaintTypeField.options[complaintTypeField.selectedIndex];
+            if (selectedOption && selectedOption.text.toLowerCase() === 'others') {
+                descriptionField.disabled = false;
+            } else {
+                descriptionField.disabled = true;
+                descriptionField.value = '';  
+            }
+        }
+
+        complaintTypeField.addEventListener('change', toggleDescriptionField);
+        toggleDescriptionField();
+    });
+</script>
+-->
+{% endblock %}

@@ -1,0 +1,175 @@
+{% extends 'index.html' %}
+{% load tms_menu_tags %}
+{% load timesince_extra %}
+{% load static %}
+
+{% block title %}
+    All Tasks
+{% endblock %}
+
+{% block start %}
+<link rel="stylesheet" href="{% static 'styles/san_tree.css' %}" />
+
+<style>
+    .all-tasks-title h1 {
+        font-family: 'Poppins', sans-serif;
+        color: wheat;
+    }
+    th {
+        font-family: 'Poppins', sans-serif;
+        font-size: 0.9rem;
+    }
+    tr {
+        font-family: 'Poppins', sans-serif;
+        font-size: 0.85rem;
+    }
+</style>
+
+    <nav>
+        {% tms_menu %}
+    </nav>
+    <div class="container mt-5">
+        <div class="d-flex flex-column">
+            <div class="all-tasks-title">
+                <h1 class="fw-bold">All Tasks</h1>
+            </div>
+            <div class="raised-tasks">
+                <p class="text-light">Assigned a new task&nbsp;<a class="text-warning" href="{% url 'tms:assigned_tasks' %}" style="text-decoration: none;">Assign Here.</a></p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 table-responsive">
+                <table class="table table-bordered">
+                    <thead class="table-dark">
+                        <tr>
+                            <th scope="col" style="width: 25%;">Title No.</th>
+                            <th scope="col" style="width: 25%;">Title</th>
+                            <th scope="col" style="width: 15%;">Status</th>
+                            <th scope="col" style="width: 15%;">Assigned To</th>
+                            <th scope="col" style="width: 15%;">Completed At</th>
+                            <th scope="col" style="width: 15%;">TAT</th>
+                            <th scope="col" style="width: 15%;">Update</th>
+                            <th scope="col" style="width: 15%;">Remarks</th>
+                            <th scope="col" style="width: 15%;">Details</th>
+                        </tr>
+                    </thead>
+                    <tbody class="table-primary">
+                        {% if tasks %}
+                            {% for task in tasks %}
+                            <tr>
+                                <td style="width: 25%;">{{task.tasks_number}}</td>
+                                <td style="width: 25%;">{{task.tasks_types}}</td>
+                                <td style="width: 15%;">{{task.status}}</td>
+                                <td style="width: 15%;">{{task.assigned_to}}</td>
+                                <td style="width: 15%;">{{task.completed_at}}</td>
+                                <td style="width: 15%;">{{ task.time_taken|duration_display }}</td>
+                                {% if task.status != 'Completed' %}
+                                <td>
+                                    <form method="POST" action="{% url 'tms:admin_update_task_status' task.id %}">
+                                        {% csrf_token %}
+                                        <select name="status" required>
+                                            <option value="">select</option>
+                                            <option value="Rejected" {% if task.status == 'Rejected' %} selected {% endif %}>Rejected</option>
+                                            <option value="Completed" {% if task.status == 'Completed' %} selected {% endif %}>Completed</option>
+                                        </select>
+                                        <button class="btn btn-sm btn-primary" type="submit">Update</button>
+                                    </form>
+                                </td>
+                                {% else %}
+                                <td>{{ task.status }}</td>
+                                {% endif %}
+
+                                <td class="text-center"><a class="open-modal" data-url="{% url 'tms:tasks_remarks' task.id %}"><i class="fa-solid fa-pen"></i></a></td>
+                                <td style="width: 15%;">
+                                    {% if task.id %}
+                                        <a href="{% url 'tms:admin_tasks_details' task.id %}"><i class="fa-solid fa-eye"></i></a>
+                                    {% else %}
+                                        <span>N/A</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                        <tr>
+                            <td colspan="9">No data available!</td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!--Modal Block-->
+<div class="modal fade" id="dynamicModal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-sm"> <!-- Adjust size as needed -->
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body w-100" id="modalBody">
+        <!-- Content loads here -->
+      </div>
+    </div>
+  </div>
+</div>
+<!--------------->
+
+<!--Open Modal Script-->
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const modalElement = document.getElementById('dynamicModal');
+  const modalBody = document.getElementById('modalBody');
+  document.querySelectorAll('.open-modal').forEach(function (el) {
+    el.addEventListener('click', function (e) {
+      e.preventDefault();
+      const url = this.getAttribute('data-url');
+
+      // Fetch content and show modal
+      fetch(url)
+        .then(response => response.text())
+        .then(html => {
+          modalBody.innerHTML = html;
+          const modal = new bootstrap.Modal(modalElement);
+          modal.show();
+
+          // Attach form handler AFTER modal content loads
+          const form = modalBody.querySelector('form');
+          if (form) {
+            form.addEventListener('submit', function (e) {
+              e.preventDefault();
+
+              const formData = new FormData(form);
+              fetch(form.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                  'X-Requested-With': 'XMLHttpRequest',
+                }
+              })
+              .then(response => {
+                // If redirected (success), reload or redirect
+                if (response.redirected) {
+                  window.location.href = response.url;
+                } else {
+                  return response.text().then(html => {
+                    modalBody.innerHTML = html; // re-render form if error
+                  });
+                }
+              })
+              .catch(error => {
+                modalBody.innerHTML = '<div class="alert alert-danger">Error submitting form.</div>';
+              });
+            });
+          }
+        })
+        .catch(error => {
+          modalBody.innerHTML = '<p>Error loading content.</p>';
+          const modal = new bootstrap.Modal(modalElement);
+          modal.show();
+        });
+    });
+  });
+});
+</script>
+{% endblock %}

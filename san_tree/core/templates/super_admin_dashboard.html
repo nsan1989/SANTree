@@ -1,0 +1,133 @@
+{% extends 'index.html' %} {% load static %} {% block title %} Dashboard {% endblock %} 
+{% block start %} {% now "U" as now %}
+<style>
+  .dashboard-title h1 {
+    font-family: 'Poppins', sans-serif;
+    color: wheat;
+    font-weight: bold;
+  }
+
+  .card {
+    min-height: 8rem;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(0, 0, 0, 0.4);
+    color: #fff;
+    font-family: "Poppins", sans-serif;
+    font-size: 0.85rem;
+  }
+
+  .col-title,
+  .chart-title {
+    font-family: "Poppins", sans-serif;
+    font-weight: bold;
+    color: #fff;
+  }
+
+  th {
+    font-family: "Poppins", sans-serif;
+    font-size: 1rem;
+  }
+
+  tr {
+    font-family: "Poppins", sans-serif;
+    font-size: 0.9rem;
+  }
+
+  a {
+    text-decoration: none;
+  }
+</style>
+
+<link rel="stylesheet" href="{% static 'styles/san_tree.css' %}" />
+
+<div class="container h-100">
+  <div class="flex-column mt-5 pt-3 mb-3">
+    <div class="dashboard-title">
+      <h1 class="mb-0">Dashboard</h1>
+    </div>
+    <div class="user-title">
+      <p class="mb-0">{{user.username}}</p>
+    </div>
+  </div>
+  <div class="row g-2 mb-3">
+    <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-3">
+      <div class="card shadow-sm">
+        <div class="card-title">
+          <h5>Total Users</h5>
+        </div>
+        <div class="card-content">
+          {{user}}
+        </div>
+        <div class="card-link">
+          <a class="text-warning" href="{% url 'all_users' %}" style="text-decoration: none;font-family: 'Poppins', sans-serif;">
+            View All
+          </a>
+        </div>
+      </div>
+    </div>
+    <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-3">
+      <div class="card shadow-sm">
+        <div class="card-title">
+          <h5>Total Departments</h5>
+        </div>
+        <div class="card-content">
+          {{dept}}
+        </div>
+        <div class="card-link">
+          <a class="text-warning" href="{% url 'all_departments' %}" style="text-decoration: none;font-family: 'Poppins', sans-serif;">
+            View All
+          </a>
+        </div>
+      </div>
+    </div>
+    <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-3">
+      <div class="card shadow-sm">
+        <div class="card-title">
+          <h5>Total Complaints</h5>
+        </div>
+        <div class="card-content">
+          {{comp}}
+        </div>
+        <div class="card-link">
+          <a class="text-warning" href="" style="text-decoration: none;font-family: 'Poppins', sans-serif;">
+            View All
+          </a>
+        </div>
+      </div>
+    </div>
+    <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-3">
+      <div class="card shadow-sm">
+        <div class="card-title">
+          <h5>Total Tasks</h5>
+        </div>
+        <div class="card-content">
+          {{task}}
+        </div>
+        <div class="card-link">
+          <a class="text-warning" href="" style="text-decoration: none;font-family: 'Poppins', sans-serif;">
+            View All
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row g-2 mb-3">
+    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6">
+      <img
+        class="img-fluid w-100 rounded-2"
+        src="{% url 'all_complaints_pie_chart' %}?v={{ now }}"
+        alt="Dept. Complaint Pie Chart"
+      />
+    </div>
+    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6">
+      <img
+        class="img-fluid w-100 rounded-2"
+        src="{% url 'all_tasks_pie_chart' %}?v={{ now }}"
+        alt="Dept. Complaint Pie Chart"
+      />
+    </div>
+  </div>
+</div>
+
+{% endblock %}

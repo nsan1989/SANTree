@@ -1,0 +1,51 @@
+{% extends 'index.html' %}
+{% load tms_menu_tags %}
+
+{% block title %}
+    Dashboard
+{% endblock %}
+
+{% block start %}
+<style>
+  .card {
+        font-family: 'Poppins', sans-serif;
+        background-color: rgba(0, 0, 0, 0.4);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border-radius: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        box-shadow: 
+            0 8px 32px rgba(0, 0, 0, 0.1),
+            inset 0 1px 0 rgba(255, 255, 255, 0.5),
+            inset 0 -1px 0 rgba(255, 255, 255, 0.1),
+            inset 0 0 20px 10px rgba(255, 255, 255, 1);
+        position: relative;
+        overflow: hidden;
+        color: #fff;
+    }
+    
+    ul {
+        margin: 0;
+        padding: 0;
+        list-style-type: none;
+        justify-content: start;
+    }
+</style>
+    <nav>
+        {% tms_menu %}
+    </nav>
+    <div class="container pt-5">
+  <div class="row d-flex justify-content-center mt-5">
+    <div class="col-md-6 col-12">
+      <div class="card shadow-lg p-3 rounded">
+        <ul class="row">
+          <li class="col-6 text-end fw-bold">NAME:</li><li class="col-6">{{profile.username}}</li>
+          <li class="col-6 text-end fw-bold">ROLE:</li><li class="col-6">{{profile.role}}</li>
+          <li class="col-6 text-end fw-bold">DEPARTMENT:</li><li class="col-6">{{profile.department}}</li>
+          <li class="col-6 text-end fw-bold">DESIGNATION:</li><li class="col-6">{{profile.designation}}</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

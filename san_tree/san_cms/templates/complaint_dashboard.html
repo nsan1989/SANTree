@@ -1,0 +1,140 @@
+{% extends 'index.html' %} {% load cms_menu_tags %} {% load static %} {% block title %} Dashboard {% endblock %} {% block start %} {% now "U" as now %}
+<style>
+  .dashboard-title h1{
+    font-family: 'Poppins', sans-serif;
+    color: wheat;
+    font-weight: bold;
+  }
+  .card {
+    background-color: rgba(0, 0, 0, 0.7);
+    color: #fff;
+    font-family: "Poppins", sans-serif;
+    font-size: 0.85rem;
+  }
+  .col-title,
+  .chart-title {
+    font-family: "Poppins", sans-serif;
+    font-weight: bold;
+    color: #fff;
+  }
+  th {
+    font-family: "Poppins", sans-serif;
+    font-size: 1rem;
+  }
+  tr {
+    font-family: "Poppins", sans-serif;
+    font-size: 0.9rem;
+  }
+</style>
+
+<link rel="stylesheet" href="{% static 'styles/san_tree.css' %}" />
+
+<nav>{% cms_menu %}</nav>
+
+<div class="container d-flex flex-column align-items-center h-100">
+  <div class="row w-100 mt-5 pt-3 mb-3">
+    <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 col-xs-8">
+      <div
+        class="dashboard-title"
+      >
+        <h1 class="m-0">Dashboard</h1>
+      </div>
+      <div
+        class="user-details d-flex flex-column"
+        style="font-family: 'Poppins, sans-serif'"
+      >
+        <h5 class="user-name m-0 fw-light text-light">
+          {{current_user.username}}
+        </h5>
+      </div>
+      <div class="row g-2 mt-2">
+        <div class="col-6">
+          <div class="card shadow-sm text-center py-2" style="min-height: 6rem;">
+            <div class="card-title fw-bold">Total Staff</div>
+            <div class="card-body">{{all_users}}</div>
+          </div>
+        </div>
+        <div class="col-6">
+          <div class="card shadow-sm text-center py-2" style="min-height: 6rem;">
+            <div class="card-title fw-bold">Total Complaints</div>
+            <div class="card-body">{{total_complaint}}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xs-4">
+      <div class="chart-title">Complaint Chart</div>
+      <div class="complaint-chart d-flex justify-content-center">
+        <img
+          class="img-fluid"
+          src="{% url 'cms:complaint_status_pie_chart' %}?v={{ now }}"
+          alt="Complaint Pie Chart"
+        />
+      </div>
+    </div>
+  </div>
+  <div class="row w-100">
+    <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 col-xs-8">
+      <div class="row g-2" style="height: 50vh; min-height: 50vh;">
+        <!--Engaged users-->
+        <div class="col-6 d-flex flex-column h-100 py-2">
+          <div class="col-title d-flex align-items-center">
+            <i class="fa-solid fa-circle" style="color: #eb0707"></i
+            >&nbsp;Engaged
+          </div>
+          <!-- Scrollable table wrapper with inherited height -->
+          <div class="table-responsive" style="height: 100%;overflow-y: auto">
+            <table class="table h-100">
+              <tbody class="table-primary">
+                {% if engage_user %} {% for engage_users in engage_user %}
+                <tr>
+                  <td>{{ engage_users.username }}</td>
+                </tr>
+                {% endfor %} {% else %}
+                <tr>
+                  <td colspan="1">No Staff!</td>
+                </tr>
+                {% endif %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <!--Vacant users-->
+        <div class="col-6 d-flex flex-column h-100 py-2">
+          <div class="col-title d-flex align-items-center">
+            <i class="fa-solid fa-circle" style="color: #4feb07;"></i
+            >&nbsp;Vacant
+          </div>
+          <!-- Scrollable table wrapper with inherited height -->
+          <div class="table-responsive" style="height: 100%;overflow-y: auto">
+            <table class="table h-100">
+              <tbody class="table-primary">
+                {% if vacant_user %} {% for vacant_users in vacant_user %}
+                <tr>
+                  <td>{{ vacant_users.username }}</td>
+                </tr>
+                {% endfor %} {% else %}
+                <tr>
+                  <td colspan="1">No Staff!</td>
+                </tr>
+                {% endif %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xs-4 flex-column mb-3">
+      <div class="chart-title">Users Chart</div>
+      <div class="user-chart d-flex justify-content-center">
+        <img
+          class="img-fluid"
+          src="{% url 'cms:user_status_pie_chart' %}?v={{ now }}"
+          alt="User Pie Chart"
+        />
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

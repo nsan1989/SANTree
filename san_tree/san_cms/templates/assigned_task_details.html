@@ -1,0 +1,113 @@
+{% extends 'index.html' %} {% load cms_menu_tags %} {% load static %} {% block title %} Assigned Tasks Details {% endblock %} {% block start %}
+
+<style>
+  .content-title h3 {
+    font-family: 'Poppins', sans-serif;
+    color: #fff;
+  }
+  ul {
+    font-family: 'Poppins', sans-serif;
+    color: #fff;
+  }
+  th {
+    font-family: 'Poppins', sans-serif;
+    font-weight: bold;
+    font-size: 1rem;
+  }
+  tr {
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.9rem;
+  }
+  .detail-title {
+    min-width: 8rem;
+    margin-bottom: 0.5rem;
+  }
+</style>
+
+<nav>{% cms_menu %}</nav>
+<link rel="stylesheet" href="{% static 'styles/common.css' %}" />
+
+<div class="container mt-5">
+  <div class="row py-3">
+    <div class="mb-3">
+      <a
+        href="javascript:history.back()"
+        class="col-12 d-flex align-items-center text-warning"
+        style="text-decoration: none"
+      >
+        <i class="fa-solid fa-arrow-left"></i>
+        &nbsp;back
+      </a>
+    </div>
+    <div class="col-12">
+      <div class="content-title">
+        <h3>Assigned Task Details</h3>
+      </div>
+    </div>
+    <div class="col-12">
+      {% if task %}
+      <ul
+        class="ps-0"
+        style="font-family: 'Poppins', sans-serif; font-size: 0.9rem"
+      >
+        <li class="d-flex">
+          <span class="fw-bold detail-title">Complaint:</span>&nbsp;
+          <p class="m-0">{{task.complaint.complaint_type}}</p>
+        </li>
+        <li class="d-flex">
+          <span class="fw-bold detail-title">Description:</span>&nbsp;
+          {% if task.complaint.description %}
+            <p class="m-0">{{task.complaint.description}}</p>
+          {% else %}
+            <p class="m-0">No Description!</p>
+          {% endif %}
+        </li>
+        <li class="d-flex">
+          <spna class="fw-bold detail-title">Location:</spna>&nbsp;
+          <p class="m-0">{{task.complaint.location}}</p>
+        </li>
+        <li class="d-flex">
+          <spna class="fw-bold detail-title">Status:</spna>&nbsp;
+          <p class="m-0">{{task.status_changed_to}}</p>
+        </li>
+        <li class="d-flex">
+          <spna class="fw-bold detail-title">Priority:</spna>&nbsp;
+          <p class="m-0">{{task.complaint.priority}}</p>
+        </li>
+      </ul>
+      {% else %}
+      <p>No task details found.</p>
+      {% endif %}
+    </div>
+    <div class="col-12">
+      <div class="content-title">
+        <h3>Remarks</h3>
+      </div>
+    </div>
+    <div class="col-12 table-responsive">
+      <table class="table table-bordered">
+        <thead class="table-primary">
+          <tr>
+            <th scope="col">Remark</th>
+            <th scope="col">Updated By</th>
+            <th scope="col">Created At</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% if remarks %} {% for remark in remarks %}
+          <tr>
+            <td>{{remark.remarks}}</td>
+            <td>{{remark.created_by}}</td>
+            <td>{{remark.created_at}}</td>
+          </tr>
+          {% endfor %} {% else %}
+          <tr>
+            <td colspan="3">No Remarks!</td>
+          </tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

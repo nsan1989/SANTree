@@ -1,0 +1,88 @@
+{% load static %} 
+
+{% block start %} 
+{% if request.user.is_authenticated %}
+<link rel="stylesheet" href="{% static 'styles/header.css' %}" />
+
+  <nav
+    class="navbar fixed-top px-3 shadow-sm py-0"
+    style="background-color: white;"
+  >
+    <div class="container-fluid p-0">
+        <div class="left-items d-flex align-items-center">
+          <!-- Toggle Button -->
+           {% if request.user.role != 'Super Admin' %}
+          <button class="btn me-2 p-1" id="menu-toggle">
+            <i
+              class="fa-solid fa-bars fa-lg"
+              style="color: #990000; background-color: transparent"
+            ></i>
+          </button>
+          {% endif %}
+          <!-- Brand -->
+           {% if request.user.role == 'Super Admin' %}
+          <a
+            class="navbar-brand ms-2 mb-0 h1 d-flex align-items-center fw-bold text-light"
+            href=""
+          >
+            <div class="d-none d-md-flex">
+              &nbsp;
+              <h5 class="fw-bold mb-0" style="color: #990000;font-family: 'Poppins', sans-serif;">Shija Management System</h5>
+            </div>
+            <img class="img-fluid d-md-none" src="{% static 'images/logo.png' %}" style="height: 48px;">
+          </a>
+          {% else %}
+          <a
+            class="navbar-brand ms-2 mb-0 h1 d-flex align-items-center fw-bold text-light"
+            href="{% url 'main_dashboard' %}"
+          >
+            <div class="d-none d-md-flex">
+              &nbsp;
+              <h5 class="fw-bold mb-0" style="color: #990000;font-family: 'Poppins', sans-serif;">Shija Management System</h5>
+            </div>
+            <img class="img-fluid d-md-none" src="{% static 'images/logo.png' %}" style="height: 48px;">
+          </a>
+          {% endif %}
+        </div>
+        <div class="right-items d-flex align-items-center">
+          {% if request.user.role != 'Super Admin' %}
+          <a class="nav-link text-light d-flex align-items-center" href="{% url 'main_dashboard' %}">
+            <i class="fa-solid fa-house" title="back to home page" style="font-size: 0.9rem; color: #990000;"></i>
+          </a>
+          {% else %}
+          <a class="nav-link text-light d-flex align-items-center" href="{% url 'super_admin' %}">
+            <i class="fa-solid fa-house" title="back to home page" style="font-size: 0.9rem; color: #990000;"></i>
+          </a>
+          {% endif %}
+          <form
+            method="POST"
+            action="{% url 'logout' %}"
+            class="text-center"
+          >
+            {% csrf_token %}
+            <button
+              type="submit"
+              class="btn d-flex align-items-center"
+              style="font-size: 0.9rem; color: #990000;"
+            >
+              <i class="fa-solid fa-right-from-bracket fa-lg" title="logout"></i>
+              <!--
+              <span class="d-none d-md-flex ms-2">Logout</span>
+              -->
+            </button>
+          </form>
+        </div>
+    </div>
+  </nav>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const toggleBtn = document.getElementById("menu-toggle");
+    const sidebar = document.getElementById("sidebar");
+    toggleBtn.addEventListener("click", function () {
+      sidebar.classList.toggle("expanded");
+      sidebar.classList.toggle("show-sidebar");
+    });
+  });
+</script>
+{% endif %} 
+{% endblock %}

@@ -1,0 +1,107 @@
+{% extends 'index.html' %}
+{% load tms_menu_tags %}
+{% load static %}
+
+{% block title %}
+    Tasks Details
+{% endblock %}
+
+{% block start %}
+
+    <style>
+        .tasks-details-title h3,
+        .remark-title h5 {
+            font-family: 'Poppins', sans-serif;
+            color: wheat;
+        }
+        th {
+            font-family: 'Poppins', sans-serif;
+            font-weight: bold;
+            font-size: 1rem;
+        }
+        tr {
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.9rem;
+        }
+    </style>
+
+    <nav>
+        {% tms_menu %} 
+    </nav>
+    <div class="container pt-5">
+        <div class="row pt-3">
+            <div>
+                <a
+        href="javascript:history.back()"
+        class="col-12 d-flex align-items-center text-warning"
+        style="text-decoration: none"
+      >
+        <i class="fa-solid fa-arrow-left"></i>
+        &nbsp;back
+      </a>
+            </div>
+            <div class="col-12 col-md-6 tasks-details-title">
+                <h3 class="fw-bold py-2">Tasks Details</h3>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 table-responsive">
+                <table class="table table-bordered">
+                    <thead class="table-dark">
+                        <tr>
+                            <th scope="col" style="width: 25%;">Task</th>
+                            <th scope="col" style="width: 15%;">Location</th>
+                            <th scope="col" style="width: 15%;">Created At</th>
+                            <th scope="col" style="width: 15%;">Completed At</th>
+                        </tr>
+                    </thead>
+                    <tbody class="table-primary">
+                        {% if tasks %}
+                        <tr>
+                            <td>{{tasks.tasks_types.name}}</td>
+                            <td>{{tasks.location}}</td>
+                            <td>{{tasks.created_at}}</td>
+                            <td>{{tasks.completed_at}}</td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <div class="remark-title">
+                    <h5>Remarks</h5>
+                </div>
+            </div>
+            <div class="col-12 table-responsive">
+                <table class="table table-bordered">
+                    <thead class="table-dark">
+                        <tr>
+                        <th scope="col">Remarks</th>
+                        <th scope="col">Attachment</th>
+                        <th scope="col">Created By</th>
+                        <th scope="col">Created At</th>
+                        </tr>
+                    </thead>
+                    <tbody class="table-primary">
+                        {% if remark %}
+                            {% for remarks in remark %}
+                            <tr>
+                            <td>{{remarks.remarks}}</td>
+                            <td>{{remarks.attachment}}</td>
+                            <td>{{remarks.created_by}}</td>
+                            <td>{{remarks.created_at}}</td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="4">No Remarks!</td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,180 @@
+{% extends 'index.html' %} {% load tms_menu_tags %} {% load static %} 
+{% block title %} Dashboard {% endblock %} {% block start %}
+<link rel="stylesheet" href="{% static 'styles/san_tree.css' %}" />
+
+<style>
+  .dashboard-title h1 {
+    font-family: 'Poppins', sans-serif;
+    color: wheat;
+  }
+  .card {
+    background-color: rgba(255, 255, 255, 0.2);
+    font-family: 'Poppins', sans-serif;
+  }
+  th {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1rem;
+    font-weight: bold;
+  }
+  tr {
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.9rem;
+  }
+  .open-title h5,
+  .completed-title h5 {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1rem;
+    font-weight: bold;
+  }
+  .open_content,
+  .completed_content {
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.9rem;
+  }
+</style>
+
+<nav>{% tms_menu %}</nav>
+<div class="container py-5 h-100">
+  <div class="row" style="min-height: 40vh;">
+    <div
+      class="col-xs-12 col-sm-12 col-md-8 col-lg-8 col-xl-8 d-flex flex-column"
+    >
+      <div class="dashboard-title">
+        <h1 class="fw-bold py-2 mb-0">Dashboard</h1>
+      </div>
+      <div
+        class="user-details d-flex flex-column"
+        style="font-family: 'Poppins, sans-serif'"
+      >
+        <h5 class="user-name m-0 fw-light text-light">
+          {{current_user.username}}
+        </h5>
+      </div>
+      <div class="dashboard-card">
+        <div class="row py-3 g-2">
+          <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4">
+            <div
+              class="card shadow-lg h-100 d-flex flex-column justify-content-center align-items-center"
+              style="min-height: 8rem;"
+            >
+              <div class="card-title fw-bold">Created Tasks</div>
+              <div class="card-content">{{created_tasks}}</div>
+            </div>
+          </div>
+          <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4">
+            <div
+              class="card shadow-lg h-100 d-flex flex-column justify-content-center align-items-center"
+              style="min-height: 8rem;"
+            >
+              <div class="card-title fw-bold">Completed Tasks</div>
+              <div class="card-content">{{comp_tasks}}</div>
+            </div>
+          </div>
+          <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4">
+            <div
+              class="card shadow-lg h-100 d-flex flex-column justify-content-center align-items-center"
+              style="min-height: 8rem;"
+            >
+              <div class="card-title fw-bold">Total Users</div>
+              <div class="card-content">{{tot_users}}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div
+      class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 ps-3 pt-2 d-none d-md-flex"
+      style="min-height: 32vh"
+    >
+      <div class="card ps-2 h-100 w-100">
+        <div class="open-title py-2">
+          <h5>Open Tasks</h5>
+        </div>
+        <div class="open_content">
+          {% if request.user.role == 'User' %} {% if staff_open %} 
+          {% for tasks in staff_open %} {{tasks.tasks_types}} {% endfor %} {% else %}
+          <p>Currently, there isn't any tasks!</p>
+          {% endif %} {% else %} {% if incharge_open %} 
+          {% for tasks in incharge_open %} {{tasks.tasks_types}} {% endfor %} {% else %}
+          <p>Currently, there isn't any tasks!</p>
+          {% endif %} {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row" style="height: 40vh; min-height: 40vh;">
+    <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 col-xl-8">
+      <div class="row g-2 " style="height: 40vh; min-height: 40vh;">
+        <!--Engaged users-->
+        <div class="col-6 d-flex flex-column h-100">
+          <div class="col-title mb-2 d-flex align-items-center"><i class="fa-solid fa-circle" style="color: #eb0707;"></i>&nbsp;Engaged Users</div>
+          <div class="table-responsive" style="height: 100%;overflow-y: auto;">
+            <table class="table h-100">
+              <thead class="table-dark">
+                <tr>
+                  <th scope="col">Staff Name</th>
+                </tr>
+              </thead>
+              <tbody class="table-primary">
+                {% if engage %} {% for engage in engage %}
+                <tr>
+                  <td>{{engage.username}}</td>
+                </tr>
+                {% endfor %} {% else %}
+                <tr>
+                  <td colspan="2">No Staff!</td>
+                </tr>
+                {% endif %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <!--Vacant users-->
+        <div class="col-6 d-flex flex-column h-100">
+          <div class="col-title mb-2"><i class="fa-solid fa-circle" style="color: #4feb07;"></i>&nbsp;Vacant Users</div>
+          <div class="table-responsive" style="height: 100%;overflow-y: auto;">
+            <table class="table h-100">
+              <thead class="table-dark">
+                <tr>
+                  <th scope="col">Staff Name</th>
+                </tr>
+              </thead>
+              <tbody class="table-primary">
+                {% if vacant %} {% for vacant in vacant %}
+                <tr>
+                  <td>{{vacant.username}}</td>
+                </tr>
+                {% endfor %} {% else %}
+                <tr>
+                  <td colspan="2">No Staff!</td>
+                </tr>
+                {% endif %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div
+      class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 ps-3 pt-2 d-none d-md-flex"
+      style="min-height: 32vh"
+    >
+      <div class="card ps-2 h-100 w-100">
+        <div class="completed-title py-2">
+          <h5>Completed Tasks</h5>
+        </div>
+        <div class="completed_content">
+          {% if request.user.role == 'User' %} {% if staff_completed %} 
+          {% for tasks in staff_completed %} {{tasks.tasks_types}} {% endfor %} 
+          {% else %}
+          <p>Currently, there isn't any tasks!</p>
+          {% endif %} {% else %} {% if Incharge_completed %} 
+          {% for tasks in Incharge_completed %} {{tasks.tasks_types}} {% endfor %} {% else %}
+          <p>Currently, there isn't any tasks!</p>
+          {% endif %} {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

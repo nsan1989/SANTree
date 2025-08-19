@@ -1,0 +1,115 @@
+{% extends 'index.html' %} 
+{% load crispy_forms_tags %} 
+{% load static %}
+
+{% block title %} 
+Register
+{% endblock %} 
+
+{% block start %}
+
+<style>
+  .register-title h4,
+  .register-title small {
+    font-family: "Poppins", sans-serif;
+  }
+  form {
+    font-family: "Poppins", sans-serif;
+    font-weight: lighter;
+  }
+  a, p {
+    font-size: 0.9rem;
+    font-family: "Poppins", sans-serif;
+    text-decoration: none;
+  }
+  .text-danger,
+  .text-light {
+    font-family: 'Poppins', sans-serif;
+  }
+</style>
+
+<link rel="stylesheet" href="{% static 'styles/common.css' %}" />
+
+<div class="container d-flex justify-content-center align-items-center h-100">
+  <div class="row rounded shadow-lg w-100 p-4 glass-card">
+    <div class="col-sm-12 col-md-8 d-none d-md-flex justify-content-center">
+      <img src="../../static/images/home-image.svg" class="img-fluid" alt="Login Image" style="width: 35vw; height: auto;" >
+    </div>
+    <div class="col-sm-12 col-md-4 d-flex flex-column align-items-center justify-content-center">
+      <div class="register-title text-center">
+        <h4 class="fw-bold mb-0">Welcome</h4>
+        <small>Please fill in the details below.</small>
+      </div>
+      <div class="register-form w-100 my-4 py-3">
+        {% if messages %} 
+          {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} text-center">
+              {{ message }}
+            </div>
+          {% endfor %} 
+        {% endif %}
+        <form method="post">
+          {% csrf_token %} 
+          <!-- Username -->
+          <div class="row">
+            <div class="col-md-6">
+              {{ form.username|as_crispy_field }}
+            </div>
+            <div class="col-md-6">
+              {{ form.employee_id|as_crispy_field }}
+            </div>
+          </div>
+          <!-- Email -->
+          <div class="row">
+            <div class="col-md-12">
+              {{ form.email|as_crispy_field }}
+            </div>
+          </div>
+          <!-- Department & Designation -->
+          <div class="row">
+            <div class="col-md-6">
+              {{ form.department|as_crispy_field }}
+            </div>
+            <div class="col-md-6">
+              {{ form.designation|as_crispy_field }}
+            </div>
+          </div>
+          <!-- Password1 & Password2 -->
+          <div class="row">
+            <div class="col-md-6">
+              {{ form.password1|as_crispy_field }}
+            </div>
+            <div class="col-md-6">
+              {{ form.password2|as_crispy_field }}
+            </div>
+          </div>
+          <div class="login-link d-grid gap-2 mt-3">
+            <button type="submit" class="btn btn-md btn-primary">Register</button>
+          </div>
+        </form>
+      </div>
+        <div class="login-link text-center">
+          <small>Already registered?&nbsp;<a class="text-warning" href="{% url 'login' %}"> Log In</a></small>
+        </div>
+        <!--
+        <div class="reset-link mt-3 text-center">
+          <small>Forgot password?&nbsp;<a href="" >Reset Here</a></small>
+        </div>
+        -->
+      </div>
+    </div>
+  </div>
+  <div class="row w-100 d-flex justify-content-center m-0">
+    <div class="col-12 d-flex justify-content-center">
+      <small class="text-danger text-center"
+        >&#42;For any technical issue write us at - mis.shija2025@gmail.com</small
+      >
+    </div>
+    <div class="col-12 d-flex justify-content-center pb-2">
+      <small class="text-light"
+        >Design & Developed by MIS Department</small
+      >
+    </div>
+  </div>
+</div>
+{% endblock %}

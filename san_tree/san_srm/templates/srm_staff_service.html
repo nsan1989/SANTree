@@ -1,0 +1,24 @@
+{% extends 'index.html' %}
+{% load srm_menu_tags %}
+{% load timesince_extra %}
+{% load static %}
+
+{% block title %}
+    Service Requested
+{% endblock %}
+
+{% block start %}
+    <nav>
+        {% srm_menu %}
+    </nav>
+    <div class="container mt-5">
+        <div class="d-flex flex-column">
+            <div class="all-tasks-title">
+                <h1 class="fw-bold">All Service</h1>
+            </div>
+            <div class="raised-tasks">
+                <p class="text-light">Assigned a new task&nbsp;<a class="text-warning" href="" style="text-decoration: none;">Assign Here.</a></p>
+            </div>
+        </div>
+    </div>
+{% endblock %}

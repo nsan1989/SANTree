@@ -1,0 +1,244 @@
+{% extends 'index.html' %} 
+{% load cms_menu_tags %}
+{% load time_extra %}
+{% load static %}
+
+{% block title %} 
+Assigned Complaint 
+{% endblock %}
+
+{% block start %}
+
+<style>
+  .content-title h3 {
+    font-family: 'Poppins', sans-serif;
+    color: wheat;
+    font-weight: bold;
+  }
+  th {
+    font-family: 'Poppins', sans-serif;
+    font-weight: bold;
+    font-size: 0.85rem;
+  }
+  tr {
+    font-family: 'Poppins',sans-serif;
+    font-size: 0.85rem;
+  }
+</style>
+
+<nav>{% cms_menu %}</nav>
+<link rel="stylesheet" href="{% static 'styles/assigned_complaint.css' %}" />
+
+<div class="container mt-5">
+  <div class="row py-3">
+    <div class="col-12">
+      <div class="content-title">
+        <h3>Review Complaints</h3>
+      </div>
+    </div>
+    
+{% if messages %}
+{% for message in messages %}
+  <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+{% endfor %}
+{% endif %}
+    <div class="col-12 table-responsive">
+      <table class="table table-bordered">
+        <thead class="table-info">
+          <tr style="font-family: 'Open Sans', sans-serif;">
+            <th scope="col">Created By</th>
+            <th scope="col">Complaint</th>
+            <th scope="col">Location</th>
+            <th scope="col">Status</th>
+            <th scope="col">Priority</th>
+            <th scope="col">Created At</th>
+            <th scope="col">Update Status</th>
+            <th scope="col">Remark</th>
+            <th scope="col">Details</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% if page_obj %}
+          {% for complaints in page_obj %}
+            <tr style="font-family: 'Poppins', sans-serif;">
+              <td>{{complaints.complaint.created_by.department}}</td>
+              <td>{{complaints.complaint.complaint_type}}</td>
+              <td>{{complaints.complaint.location}}</td>
+              <td>{{complaints.complaint.status}}</td>
+              <td>{{complaints.complaint.priority}}</td>
+              <td>{{complaints.complaint.created_at}}</td>
+              {% if complaints.complaint.assigned_to == request.user %}
+                {% if complaints.complaint.status != 'Cancelled' and complaints.complaint.status != 'Resolved' %}
+                <td>
+                  <form method="POST" action="{% url 'cms:review_complaint_update_status' complaints.complaint.id %}">
+                    {% csrf_token %}
+                    <select name="status" required>
+                      <option value="">select</option>
+                      <option value="Open" {% if complaints.status == 'Open' %} selected {% endif %}>Open</option>
+                      <option value="Rejected" {% if complaints.status == 'Rejected' %} selected {% endif %}>Rejected</option>
+                    </select>
+                    <button class="btn btn-sm btn-primary" type="submit">Update</button>
+                  </form>
+                </td>
+                {% elif complaints.complaint.status != 'Review' %}
+                <td>
+                  <form method="POST" action="{% url 'cms:review_complaint_update_status' complaints.complaint.id %}">
+                    {% csrf_token %}
+                    <select name="status" required>
+                      <option value="">select</option>
+                      <option value="Rejected" {% if complaints.status == 'Rejected' %} selected {% endif %}>Rejected</option>
+                      <option value="Resolved" {% if complaints.status == 'Resolved' %} selected {% endif %}>Resolved</option>
+                    </select>
+                    <button class="btn btn-sm btn-primary" type="submit">Update</button>
+                  </form>
+                </td>
+                {% else %}
+                <td>--</td>
+                {% endif %}
+                {% else %}
+                <td>--</td>
+              {% endif %}
+              <!--Remark Part-->
+              {% if complaints.complaint.status == 'Resolved' %}
+              <td class="text-center">--</td>
+              {% else %}
+              <td class="text-center">
+                <a class="open-modal" data-url="{% url 'cms:complaints_remarks' complaints.id %}">
+                  <i class="fa-solid fa-pen" title="add remark"></i>
+                </a>
+              </td>
+              {% endif %}
+              <!--------------->
+              <!--View Details Part-->
+              <td>
+                <a href="{% url 'cms:review_complaint_details' complaints.complaint.id %}" style="text-decoration: none;">
+                  <i class="fa-solid fa-eye" title="view details"></i>
+                </a>
+              </td>
+              <!--------------------->
+            </tr>
+          {% endfor %}
+          {% else %}
+          <tr>
+            <td colspan="11">No complaints to review!</td>
+          </tr>
+          {% endif %}
+          <div class="d-flex justify-content-between">
+            <nav>
+            <ul class="pagination">
+              {% if page_obj.has_previous %}
+                <li class="page-item">
+                  <a class="page-link" href="?{% if selected_department %}department={{ selected_department }}&{% endif %}page={{ page_obj.previous_page_number }}">Previous</a>
+                </li>
+              {% endif %}
+        
+              {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                  <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                {% else %}
+                  <li class="page-item">
+                    <a class="page-link" href="?{% if selected_department %}department={{ selected_department }}&{% endif %}page={{ num }}">{{ num }}</a>
+                  </li>
+                {% endif %}
+              {% endfor %}
+        
+              {% if page_obj.has_next %}
+                <li class="page-item">
+                  <a class="page-link" href="?{% if selected_department %}department={{ selected_department }}&{% endif %}page={{ page_obj.next_page_number }}">Next</a>
+                </li>
+              {% endif %}
+            </ul>
+          </nav>
+          <div class="export-button d-flex align-items-center">
+            <form method="get" action="{% url 'cms:export_tasks_excel' %}" class="export-form" style="display: flex; align-items: center; gap: 8px; font-size: 0.875rem;">
+              <div class="form-group px-2" style="display: flex; flex-direction: column;">
+                <input type="date" id="start_date" name="start_date" class="form-control form-control-sm" style="max-width: 140px;" required>
+              </div>
+              <div class="form-group px-2" style="display: flex; flex-direction: column;">
+                <input type="date" id="end_date" name="end_date" class="form-control form-control-sm" style="max-width: 140px;" required>
+              </div>
+            </form>
+            <a class="btn btn-sm btn-primary ms-2" href="{% url 'cms:export_tasks_excel' %}" style="text-decoration: none;">
+              <i class="fa-solid fa-up-right-from-square"></i>
+              &nbsp;export
+            </a>
+          </div>
+          </div>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+<!--Modal Block-->
+<div class="modal fade" id="dynamicModal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-sm"> <!-- Adjust size as needed -->
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body w-100" id="modalBody">
+        <!-- Content loads here -->
+      </div>
+    </div>
+  </div>
+</div>
+<!--------------->
+
+<!--Open Modal Script-->
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const modalElement = document.getElementById('dynamicModal');
+  const modalBody = document.getElementById('modalBody');
+  document.querySelectorAll('.open-modal').forEach(function (el) {
+    el.addEventListener('click', function (e) {
+      e.preventDefault();
+      const url = this.getAttribute('data-url');
+
+      // Fetch content and show modal
+      fetch(url)
+        .then(response => response.text())
+        .then(html => {
+          modalBody.innerHTML = html;
+          const modal = new bootstrap.Modal(modalElement);
+          modal.show();
+
+          // Attach form handler AFTER modal content loads
+          const form = modalBody.querySelector('form');
+          if (form) {
+            form.addEventListener('submit', function (e) {
+              e.preventDefault();
+
+              const formData = new FormData(form);
+              fetch(form.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                  'X-Requested-With': 'XMLHttpRequest',
+                }
+              })
+              .then(response => {
+                // If redirected (success), reload or redirect
+                if (response.redirected) {
+                  window.location.href = response.url;
+                } else {
+                  return response.text().then(html => {
+                    modalBody.innerHTML = html; // re-render form if error
+                  });
+                }
+              })
+              .catch(error => {
+                modalBody.innerHTML = '<div class="alert alert-danger">Error submitting form.</div>';
+              });
+            });
+          }
+        })
+        .catch(error => {
+          modalBody.innerHTML = '<p>Error loading content.</p>';
+          const modal = new bootstrap.Modal(modalElement);
+          modal.show();
+        });
+    });
+  });
+});
+</script>
+{% endblock %}

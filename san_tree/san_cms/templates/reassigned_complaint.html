@@ -1,0 +1,38 @@
+{% load crispy_forms_tags %} 
+
+{% block start %}
+<!--styles-->
+<style>
+  .card-title,
+  #reassignForm {
+    font-family: 'Poppins', sans-serif;
+  }
+</style>
+<!---------->
+
+<div class="container mt-5">
+  <div class="row d-flex justify-content-center py-3">
+      <div class="col-md-6 col-lg-4 w-100">
+        <div class="card shadow-lg border-0 rounded-4">
+          <div class="card-body p-2">
+            <h4 class="card-title text-center mb-4">Reassigned To</h4>
+            <form id="reassignForm" method="post" action="{% url 'cms:reassign_complaints' complaint.id %}">
+              {% csrf_token %} {{ form|crispy }}
+
+              <div class="d-grid mt-4">
+                <button
+                  type="submit"
+                  class="btn btn-lg"
+                  style="border: 1px solid #800000; color: #800000"
+                >
+                  Submit
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+  </div>
+</div>
+
+{% endblock %}
