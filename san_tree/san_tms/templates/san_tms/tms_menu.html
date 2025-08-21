@@ -15,7 +15,9 @@
       <a href="{{ item.url }}" class="d-flex text-decoration-none" style="color: #990000;">
         <div class="col-3 d-flex align-items-center ps-2">
           {% if item.icon %}
-          <span class="icon" style="color: #990000;"> {{ item.icon|safe }} </span>
+          <span class="icon" style="color: #990000;"> 
+            {{ item.icon|safe }}
+          </span>
           {% endif %}
         </div>
         <div class="col-9 d-flex align-items-center">

@@ -56,7 +56,7 @@ My Tasks
               <td>{{ task.status }}</td>
               <td>{{ task.completed_at }}</td>
               <td>{{ task.time_taken|duration_display }}</td>
-              {% if task.status != 'Waiting' %}
+              {% if task.status != 'Waiting' and task.status != 'Completed' %}
               <td class="text-center"><a class="open-modal" data-url="{% url 'tms:tasks_remarks' task.id %}"><i class="fa-solid fa-pen"></i></a></td>
               {% else %}
               <td>--</td>

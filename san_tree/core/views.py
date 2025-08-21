@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404
 from accounts.models import Departments, CustomUsers
-from san_cms.models import Complaint
+from san_cms.models import Complaint, ComplaintRemarks
 from san_tms.models import Tasks
 from django.db.models import Q
 from django.http import JsonResponse
@@ -305,6 +305,43 @@ def UserView(request):
     view_name = request.resolver_match.view_name
     if view_name == "all_users" and user_role == 'Super Admin':
         return render(request, 'users.html', context)
+    raise PermissionDenied("You are not authorized to view this page.")
+
+# Complaints View.
+def ComplaintView(request):
+    user = request.user
+    all_complaint = Complaint.objects.all()
+    paginator = Paginator(all_complaint, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    try:
+        user_role = user.role
+    except:
+        raise PermissionDenied("User profile not found")
+    context = {
+        'page_obj': page_obj
+    }
+    view_name = request.resolver_match.view_name
+    if view_name == "all_complaints" and user_role == 'Super Admin':
+        return render(request, 'super_admin_complaints.html', context)
+    raise PermissionDenied("You are not authorized to view this page.")
+
+# Complaints Details View.
+def ComplaintDetailView(request, id):
+    user = request.user
+    try:
+        user_role = user.role
+    except:
+        raise PermissionDenied("User profile not found")
+    selected_comp = get_object_or_404(Complaint, id=id)
+    remark = ComplaintRemarks.objects.filter(complaint_id=id)
+    context = {
+        'complaint': selected_comp,
+        'remarks': remark,
+    }
+    view_name = request.resolver_match.view_name
+    if view_name == "complaint_detail" and user_role == 'Super Admin':
+        return render(request, 'complaints_details.html', context)
     raise PermissionDenied("You are not authorized to view this page.")
 
 # Push Notification.

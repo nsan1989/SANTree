@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import MainDashboard, TrackView, SuperAdminDashboard, DepartmentView, DepartmentDetails, DeptComplaintPieChart, DeptTaskPieChart, AllComplaintPieChart, AllTasksPieChart, UserView
+from .views import *
 
 urlpatterns = [
     path('super_admin_dashboard/', SuperAdminDashboard, name='super_admin'),
@@ -12,4 +12,6 @@ urlpatterns = [
     path('dept_task_pie_chart/<int:id>/', DeptTaskPieChart, name='dept_task_pie_chart'),
     path('all_complaints_pie_chart/', AllComplaintPieChart, name='all_complaints_pie_chart'),
     path('all_tasks_pie_chart/', AllTasksPieChart, name='all_tasks_pie_chart'),
+    path('super_admin_dashboard/all_complaints/', ComplaintView, name='all_complaints'),
+    path('super_admin_dashboard/all_complaints/<int:id>/complaint_detail/', ComplaintDetailView, name='complaint_detail'),
 ]
