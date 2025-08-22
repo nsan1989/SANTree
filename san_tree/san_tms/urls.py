@@ -1,5 +1,7 @@
 from django.urls import path
-from .views import TaskProfile, TaskDashboard, AllTasks, MyTasks, TasksView, TasksDetails, UpdateStatus, load_tasks_types, load_tasks_staffs, RemarkComplaint, StaffDashboard, TasksPieChart, AllTasksDetails
+from .views import *
+
+app_name = "tms"
 
 urlpatterns = [
     path('tasks_admin/dashboard/', TaskDashboard, name='admin_dashboard'),

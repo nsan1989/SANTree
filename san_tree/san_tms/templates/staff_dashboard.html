@@ -1,4 +1,4 @@
-{% extends 'index.html' %} {% load tms_menu_tags %} {% load static %} 
+{% extends 'index.html' %} {% load static %} 
 {% block title %} Dashboard {% endblock %} {% block start %}
 <link rel="stylesheet" href="{% static 'styles/san_tree.css' %}" />
 
@@ -38,8 +38,7 @@
   }
 </style>
 
-<nav>{% tms_menu %}</nav>
-<div class="container py-5 h-100">
+<div class="container">
   <div class="row" style="min-height: 40vh;">
     <div
       class="col-xs-12 col-sm-12 col-md-8 col-lg-8 col-xl-8 d-flex flex-column"
@@ -112,7 +111,7 @@
         <div class="chart-title py-2">
           <h5>Task Chart</h5>
         </div>
-        <div class="chart-content">
+        <div class="chart-content w-100">
             <img
               class="img-fluid rounded-2"
               src="{% url 'tms:all_tasks_pie_chart' %}?v={{ now }}"

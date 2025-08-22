@@ -1,5 +1,7 @@
 from django.urls import path
-from .views import ComplaintView, AllComplaintsView, AssignedComplaint, StaffUpdateComplaintStatus, AdminUpdateComplaintStatus, CancelComplaint, load_complaint_types, ComplaintDetails, ComplainHistory, ReviewComplaints, ReviewComplaintDetails, ReviewComplaintUpdateView, AssignedComplaintDetails, ReassignedComplaintView, ReassignDepartmentView, AssignedTasks, AssignedTaskDetails, RemarksComplaint, AdminComplaintDashboard, UserComplaintDashboard, ComplaintProfile, TasksExport, user_status_pie_chart, complaint_status_pie_chart, raise_complaint_pie_chart, assign_complaint_pie_chart
+from .views import *
+
+app_name = "cms"
 
 urlpatterns = [
     path('incharge/dashboard/', AdminComplaintDashboard, name='admin_dashboard'),

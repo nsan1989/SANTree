@@ -5,17 +5,23 @@
 <link rel="stylesheet" href="{% static 'styles/header.css' %}" />
 
   <nav
-    class="navbar fixed-top px-3 shadow-sm py-0"
+    class="navbar shadow-sm py-0"
     style="background-color: white;"
   >
     <div class="container-fluid p-0">
         <div class="left-items d-flex align-items-center">
           <!-- Toggle Button -->
-           {% if request.user.role != 'Super Admin' %}
+           {% if request.user.role != 'Super Admin' and request.resolver_match.url_name != 'main_dashboard'  %}
           <button class="btn me-2 p-1" id="menu-toggle">
             <i
               class="fa-solid fa-bars fa-lg"
+              id="menu-bars"
               style="color: #990000; background-color: transparent"
+            ></i>
+            <i 
+            class="fa-solid fa-x fa-lg d-none"
+            id="menu-x"
+            style="color: #990000; background-color: transparent"
             ></i>
           </button>
           {% endif %}
@@ -40,7 +46,6 @@
               &nbsp;
               <h5 class="fw-bold mb-0" style="color: #990000;font-family: 'Poppins', sans-serif;">Shija Management System</h5>
             </div>
-            <img class="img-fluid d-md-none" src="{% static 'images/logo.png' %}" style="height: 48px;">
           </a>
           {% endif %}
         </div>
@@ -78,10 +83,21 @@
   document.addEventListener("DOMContentLoaded", function () {
     const toggleBtn = document.getElementById("menu-toggle");
     const sidebar = document.getElementById("sidebar");
-    toggleBtn.addEventListener("click", function () {
-      sidebar.classList.toggle("expanded");
-      sidebar.classList.toggle("show-sidebar");
-    });
+    const mainContent = document.getElementById("main-content");
+    const menuBars = document.getElementById("menu-bars");
+    const menuX = document.getElementById("menu-x");
+
+    if (toggleBtn) {
+      toggleBtn.addEventListener("click", function () {
+        // Toggle sidebar and main content
+        sidebar.classList.toggle("expanded");
+        mainContent.classList.toggle("shifted");
+
+        // Toggle icons
+        menuBars.classList.toggle("d-none");
+        menuX.classList.toggle("d-none");
+      });
+    }
   });
 </script>
 {% endif %} 

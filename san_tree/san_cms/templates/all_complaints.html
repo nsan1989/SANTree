@@ -1,5 +1,4 @@
 {% extends 'index.html' %} 
-{% load cms_menu_tags %} 
 {% load time_extra %}
 {% load static %}
 
@@ -17,19 +16,18 @@ Complaint
   }
   th {
     font-family: 'Poppins', sans-serif;
-    font-size: 0.85rem;
+    font-size: 1rem;
     font-weight: bold;
   }
   td {
     font-family: 'Poppins', sans-serif;
-    font-size: 0.85rem;
+    font-size: 0.9rem;
   }
 </style>
 
-<nav>{% cms_menu %}</nav>
 <link rel="stylesheet" href="{% static 'styles/common.css' %}" />
 
-<div class="container mt-5">
+<div class="container">
   <div class="row py-3">
     <div class="col-12 d-flex flex-column align-items-start">
       <div class="content-title mb-2 mb-md-0">
@@ -50,7 +48,6 @@ Complaint
       <table class="table table-bordered">
         <thead class="table-info">
           <tr style="font-family:'Open Sans', sans-serif; font-size: 1rem;">
-            <th scope="col">Complaint No.</th>
             <th scope="col">Department</th>
             <th scope="col">Created On</th>
             <th scope="col">Status</th>
@@ -59,19 +56,18 @@ Complaint
             <th scope="col">Updated At</th>
             <th scope="col">Completed At</th>
             <th scope="col">TAT</th>
-            <th scope="col">Details</th>
+            <th scope="col">View Details</th>
           </tr>
         </thead>
         <tbody>      
           {% if page_obj %}
           {% for complaint in page_obj %}
           <tr style="font-family:'Poppins', sans-serif; font-size: 0.9rem;">
-            <td>{{complaint.complaint.complaint_number}}</td>
             <td>{{complaint.complaint.department}}</td>
             <td>{{complaint.complaint.created_at}}</td>
             <td>{{complaint.complaint.status}}</td>
             {% if complaint.status_changed_to != 'Cancelled' %}
-            {% if complaint.complaint.status != 'In Progress' and complaint.complaint.status != 'Resolved' and complaint.complaint.status != 'Closed' and complaint.complaint.status != 'Rejected' and complaint.complaint.status != 'Halt' and complaint.complaint.status != 'Review'  %}
+            {% if complaint.complaint.status != 'In Progress' and complaint.complaint.status != 'Resolved' and complaint.complaint.status != 'Closed'  %}
             <td>
               <form method="POST" action="{% url 'cms:cancel_complaint' complaint.id %}">
                 {% csrf_token %}
@@ -100,7 +96,7 @@ Complaint
           {% endfor %}
           {% else %}
           <tr>
-            <td colspan="10">No complaints have been raised!</td>
+            <td colspan="9">No complaints have been raised!</td>
           </tr>
           {% endif %}
           <nav>

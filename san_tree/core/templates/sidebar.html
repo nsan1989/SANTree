@@ -1,0 +1,56 @@
+{% load static %}
+{% block start %}
+<!--style-->
+<style>
+  ul {
+    list-style-type: none;
+    padding-left: 0;
+    margin: 0;
+  }
+  .sidebar_menu li {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+  }
+  .sidebar_menu li a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    color: inherit;
+  }
+  .sidebar .menu-label {
+    opacity: 0;
+    visibility: hidden;
+    width: 0;
+    overflow: hidden;
+    transition: opacity 0.2s ease, width 0.2s ease;
+  }
+  .sidebar.expanded .menu-label {
+    opacity: 1;
+    visibility: visible;
+    width: auto;
+  }
+</style>
+<!--------->
+<!-- sidebar.html -->
+<div id="sidebar-content" class="sidebar-content h-100">
+  <ul class="sidebar_menu">
+    <li class="demo-item">
+      <a href="#" style="width: 10rem;">
+        <img class="img-fluid" src="{% static 'images/logo.png' %}" style="height: 32px;width: 2rem;">
+        <span class="menu-label fw-bold" style="color: #990000;">SSMS</span>
+      </a>
+    </li>
+
+    {% for item in sidebar_menu %}
+    <li class="{% if request.resolver_match.url_name == item.view_name %}active{% endif %}">
+      <a href="{% url item.url_name %}" style="width: 10rem;">
+        <i style="color: #990000;width: 2rem;display: flex;justify-content: center;" class="{{ item.icon }}"></i>
+        <span style="color: #990000;" class="menu-label">{{ item.name }}</span>
+      </a>
+    </li>
+    {% endfor %}
+  </ul>
+</div>
+{% endblock %}
