@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404
 from accounts.models import Departments, CustomUsers
-from san_cms.models import Complaint, ComplaintRemarks
-from san_tms.models import Tasks
+from san_cms.models import Complaint, ComplaintRemarks, ComplaintType
+from san_tms.models import Tasks, TasksRemarks, TasksTypes
 from django.db.models import Q
 from django.http import JsonResponse
 from django.core.exceptions import PermissionDenied
@@ -17,6 +17,9 @@ from django.core.paginator import Paginator
 from django.conf import settings
 from webpush import send_user_notification
 import json
+from .forms import *
+from django.contrib import messages
+from django.core.exceptions import ValidationError
 
 # Home View.
 def Home(request):
@@ -291,16 +294,35 @@ def AllTasksPieChart(request):
 # Users View.
 def UserView(request):
     user = request.user
-    all_users = CustomUsers.objects.all()
-    paginator = Paginator(all_users, 10)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
     try:
         user_role = user.role
     except:
         raise PermissionDenied("User profile not found")
+    
+    reg_dept = Departments.objects.all()
+    department_id = request.GET.get("department")
+    all_status = CustomUsers._meta.get_field("status").choices
+    status_value = request.GET.get("status")
+
+    all_users = CustomUsers.objects.all()
+
+    if department_id:
+        all_users = all_users.filter(department_id=department_id)
+
+    if status_value:
+        all_users = all_users.filter(status=status_value)
+
+
+    paginator = Paginator(all_users, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+
     context = {
-        'page_obj': page_obj
+        'page_obj': page_obj,
+        'dept': reg_dept,
+        'status': all_status,
+        'selected_department': department_id,
     }
     view_name = request.resolver_match.view_name
     if view_name == "all_users" and user_role == 'Super Admin':
@@ -310,17 +332,35 @@ def UserView(request):
 # Complaints View.
 def ComplaintView(request):
     user = request.user
-    all_complaint = Complaint.objects.all()
-    paginator = Paginator(all_complaint, 10)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
     try:
         user_role = user.role
     except:
         raise PermissionDenied("User profile not found")
+
+    reg_dept = Departments.objects.all()
+    dept_id = request.GET.get("department")
+    all_status = Complaint._meta.get_field("status").choices
+    status_value = request.GET.get("status")
+
+    all_complaint = Complaint.objects.all()
+
+    if dept_id:
+        all_complaint = all_complaint.filter(department_id = dept_id)
+
+    if status_value:
+        all_complaint = all_complaint.filter(status = status_value)
+
+    paginator = Paginator(all_complaint, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
     context = {
-        'page_obj': page_obj
+        'page_obj': page_obj,
+        'dept': reg_dept,
+        'status': all_status,
+        'selected_dept': dept_id,
     }
+
     view_name = request.resolver_match.view_name
     if view_name == "all_complaints" and user_role == 'Super Admin':
         return render(request, 'super_admin_complaints.html', context)
@@ -344,6 +384,61 @@ def ComplaintDetailView(request, id):
         return render(request, 'complaints_details.html', context)
     raise PermissionDenied("You are not authorized to view this page.")
 
+# Tasks View.
+def TaskView(request):
+    user = request.user
+    try:
+        user_role = user.role
+    except:
+        raise PermissionDenied("User profile not found")
+
+    reg_dept = Departments.objects.all()
+    dept_id = request.GET.get("department")
+    all_status = Tasks._meta.get_field("status").choices
+    status_value = request.GET.get("status")
+
+    all_task = Tasks.objects.all()
+
+    if dept_id:
+        all_task = all_task.filter(department_id = dept_id)
+
+    if status_value:
+        all_task = all_task.filter(status = status_value)
+
+    paginator = Paginator(all_task, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    context = {
+        'page_obj': page_obj,
+        'dept': reg_dept,
+        'status': all_status,
+        'selected_dept': dept_id,
+    }
+
+    view_name = request.resolver_match.view_name
+    if view_name == "all_tasks" and user_role == 'Super Admin':
+        return render(request, 'super_admin_tasks.html', context)
+    raise PermissionDenied("You are not authorized to view this page.")
+
+# Tasks Details View.
+def TaskDetailView(request, id):
+    user = request.user
+    try:
+        user_role = user.role
+    except:
+        raise PermissionDenied("User profile not found")
+    selected_comp = get_object_or_404(Tasks, id=id)
+    remark = TasksRemarks.objects.filter(tasks_id=id)
+    context = {
+        'task': selected_comp,
+        'remarks': remark,
+    }
+    view_name = request.resolver_match.view_name
+    if view_name == "task_detail" and user_role == 'Super Admin':
+        return render(request, 'task_detail.html', context)
+    raise PermissionDenied("You are not authorized to view this page.")
+
 # Push Notification.
 def send_notification(request):
     payload = {
@@ -353,3 +448,65 @@ def send_notification(request):
     }
     send_user_notification(user=request.user, payload=json.dumps(payload), ttl=1000)
     return JsonResponse({'status': 'success'})
+
+# Add Department View
+def AddDepartmentView(request):
+    if request.method == 'POST':
+        form = AddDepartmentForm(request.POST)
+        if form.is_valid():
+            register_dept = form.save(commit=False)
+            try:
+                register_dept.save()
+                messages.success(request, f'Department "{register_dept.name}" added successfully!')
+            except ValidationError as e:
+                messages.error(request, e.message)
+        else:
+            messages.error(request, 'Please correct the errors below.')
+    else:
+        form = AddDepartmentForm()
+
+    return render(request, 'add_department.html', {'form': form})
+
+# Add Complaint Type View.
+def AddComplaintTypeView(request):
+    if request.method == 'POST':
+        form = AddComplaintType(request.POST)
+        if form.is_valid():
+            comp_type = form.save(commit=False)
+            
+            # use "exists" instead of reusing comp_type
+            exists = ComplaintType.objects.filter(
+                name__iexact=comp_type.name,
+                department=comp_type.department
+            ).exists()
+
+            if exists:
+                messages.error(request, 'Complaint type already exists!')
+            else:
+                comp_type.save()
+                messages.success(request, 'Complaint type added successfully!')
+        else:
+            messages.error(request, 'Please correct the errors below.')
+    else:
+        form = AddComplaintType()
+
+    return render(request, 'add_complaint_type.html', {'form': form})
+
+# Add Tasks Type View.
+def AddTaskTypeView(request):
+    if request.method == 'POST':
+        form = AddTaskType(request.POST)
+        if form.is_valid():
+            task_type = form.save(commit=False)
+            exists = TasksTypes.objects.filter(name__iexact = task_type.name, department__name__iexact = task_type.department).exists()
+            if exists:
+                messages.error(request, 'Task type already exist!')
+            else:
+                task_type.save()
+                messages.success(request, 'Task type added successfully!')
+        else:
+            messages.error(request, 'Please correct the errors below.')
+    else:
+        form = AddComplaintType()
+
+    return render(request, 'add_tasks_type.html', {'form': form})

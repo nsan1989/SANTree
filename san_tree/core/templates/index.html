@@ -39,6 +39,7 @@
       width: 60px;
       height: 100vh;
       overflow-x: hidden;
+      background-color: #fff;
     }
 
     .sidebar.expanded {
@@ -59,8 +60,8 @@
     }
 
     .main-content .content-body {
-      margin-top: 50px;
-      height: calc(100vh - 50px);
+      margin-top: 60px;
+      height: calc(100vh - 60px);
       overflow-y: auto;
     }
 
@@ -80,6 +81,7 @@
 
       .main-content {
         margin-left: 0;
+        margin-top: 0;
       }
 
       .main-content>header,
@@ -91,8 +93,8 @@
   </style>
   <!----------->
   <div class="layout d-flex">
-    {% if request.user.is_authenticated and request.resolver_match.url_name != 'main_dashboard' %}
-    <div id="sidebar" class="sidebar bg-light">
+    {% if request.user.is_authenticated and request.user.role != 'Super Admin' and request.resolver_match.url_name != 'main_dashboard' %}
+    <div id="sidebar" class="sidebar">
       <div id="sidebar-content" class="sidebar-content h-100">
         {% include 'sidebar.html' %}
       </div>

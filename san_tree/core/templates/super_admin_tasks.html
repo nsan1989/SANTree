@@ -2,13 +2,13 @@
 {% load static %}
 
 {% block title %}
-Complaints
+Tasks
 {% endblock %}
 
 {% block start %}
 <!--styles-->
 <style>
-    .complaints-title {
+    .tasks-title {
         font-family: 'Poppins', sans-serif;
         font-weight: bold;
         color: wheat;
@@ -40,8 +40,8 @@ Complaints
         </span>
         <div class="col-12 d-flex justify-content-between">
             <div class="left-content">
-                <div class="complaints-title mb-3">
-                    <h3 class="mb-0">Complaints</h3>
+                <div class="tasks-title mb-3">
+                    <h3 class="mb-0 fw-bold">Tasks</h3>
                 </div>
             </div>
             <div class="right-content d-flex justify-content-between">
@@ -51,7 +51,7 @@ Complaints
                         status
                     </button>
                     <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="{% url 'all_complaints' %}">All</a></li>
+                        <li><a class="dropdown-item" href="{% url 'all_tasks' %}">All</a></li>
                         {% for value, label in status %}
                         <li><a class="dropdown-item" href="?status={{ value }}">{{ label }}</a></li>
                         {% endfor %}
@@ -63,7 +63,7 @@ Complaints
                         sort by
                     </button>
                     <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="{% url 'all_complaints' %}">All</a></li>
+                        <li><a class="dropdown-item" href="{% url 'all_tasks' %}">All</a></li>
                         {% for depts in dept %}
                         <li><a class="dropdown-item" href="?department={{ depts.id }}">{{ depts.name }}</a></li>
                         {% endfor %}
@@ -75,36 +75,28 @@ Complaints
             <table class="table">
                 <thead class="table-dark">
                     <tr>
-                        <th scope="col">Complaint No.</th>
-                        <th scope="col">Complaint Title</th>
-                        <th scope="col">Department</th>
-                        <th scope="col">Raised By</th>
+                        <th scope="col">Task No.</th>
+                        <th scope="col">Task Title</th>
                         <th scope="col">Status</th>
                         <th scope="col">Edit</th>
                     </tr>
                 </thead>
                 <tbody class="table-primary">
                     {% if page_obj %}
-                    {% for comp in page_obj %}
+                    {% for task in page_obj %}
                         <tr>
                             <td>
-                                <a href="">{{ comp.complaint_number }}</a>
+                                <a href="">{{ task.tasks_number }}</a>
                             </td>
                             <td>
-                                <a href="">{{ comp.complaint_type }}</a>
+                                <a href="">{{ task.tasks_types }}</a>
                             </td>
                             <td>
-                                <a href="">{{ comp.department.name }}</a>
-                            </td>
-                            <td>
-                                <a href="">{{ comp.created_by }}</a>
-                            </td>
-                            <td>
-                                <a href="">{{ comp.status }}</a>
+                                <a href="">{{ task.status }}</a>
                             </td>
                             <td class="d-flex justify-content-around">
                                 <div class="view-details">
-                                    <a href="{% url 'complaint_detail' comp.id %}">
+                                    <a href="{% url 'task_detail' task.id %}">
                                         <i title="View Details" class="fa-solid fa-eye" style="color: #990000;"></i>
                                     </a>
                                 </div>
@@ -116,7 +108,7 @@ Complaints
                         <td 
                         colspan="6"
                         style="font-family: 'Poppins', sans-serif; font-size: 0.8rem;"
-                        >No Complaints Found!</td>
+                        >No Tasks Found!</td>
                     </tr>
                     {% endif %}
                 </tbody>

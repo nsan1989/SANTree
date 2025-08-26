@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block title %}
-Department Detail
+Task Detail
 {% endblock %}
 
 {% block start %}
@@ -40,7 +40,7 @@ Department Detail
 	<div class="row pt-3">
         <span style="width: auto;">
             <div class="mb-3">
-                <a href="{% url 'all_complaints' %}" class="d-flex align-items-center text-warning"
+                <a href="{% url 'all_tasks' %}" class="d-flex align-items-center text-warning"
                     style="text-decoration: none">
                     <i class="fa-solid fa-arrow-left"></i>
                     &nbsp;back
@@ -49,7 +49,7 @@ Department Detail
         </span>
         <div class="col-12">
             <div class="department-title mb-3">
-                <h3 class="mb-0">{{complaint.complaint_type}}</h3>
+                <h3 class="mb-0">{{task.tasks_types}}</h3>
             </div>
         </div>
     </div>
@@ -58,27 +58,19 @@ Department Detail
     		<ul class="ps-0">
     			<li>
     				<span class="detail-title">Complaint No.</span>
-    				<p>{{complaint.complaint_number}}</p>
+    				<p>{{task.tasks_number}}</p>
     			</li>
     			<li>
     				<span class="detail-title">Status</span>
-    				<p>{{complaint.status}}</p>
+    				<p>{{task.status}}</p>
     			</li>
     			<li>
     				<span class="detail-title">Location</span>
-    				<p>{{complaint.location}}</p>
+    				<p>{{task.location}}</p>
     			</li>
     			<li>
     				<span class="detail-title">Priority</span>
-    				<p>{{complaint.priority}}</p>
-    			</li>
-    			<li>
-    				<span class="detail-title">Concern Dept.</span>
-    				<p>{{complaint.department}}</p>
-    			</li>
-				<li>
-    				<span class="detail-title">Raised By</span>
-    				<p>{{complaint.created_by}}</p>
+    				<p>{{task.priority}}</p>
     			</li>
     		</ul>
     	</div>
@@ -92,7 +84,8 @@ Department Detail
     			<table class="table">
 				  <thead class="table-dark">
 				    <tr>
-				      <th scope="col">remark</th>
+				      <th scope="col">Remark</th>
+                      <th scope="col">Status</th>
 				    </tr>
 				  </thead>
 				  <tbody class="table-info">

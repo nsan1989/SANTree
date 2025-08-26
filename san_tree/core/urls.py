@@ -14,4 +14,9 @@ urlpatterns = [
     path('all_tasks_pie_chart/', AllTasksPieChart, name='all_tasks_pie_chart'),
     path('super_admin_dashboard/all_complaints/', ComplaintView, name='all_complaints'),
     path('super_admin_dashboard/all_complaints/<int:id>/complaint_detail/', ComplaintDetailView, name='complaint_detail'),
+    path('super_admin_dashboard/all_tasks/', TaskView, name='all_tasks'),
+    path('super_admin_dashboard/all_tasks/<int:id>/task_detail/', TaskDetailView, name='task_detail'),
+    path('add_department/', AddDepartmentView, name='add_department'),
+    path('add_complaint_type/', AddComplaintTypeView, name='add_complaint_type'),
+    path('add_task_type/', AddTaskTypeView, name='add_task_type'),
 ]

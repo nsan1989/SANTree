@@ -27,20 +27,22 @@ Departments
     }
 </style>
 <!---------->
-<div class="container">
-    <div class="row mt-5 pt-3">
+<div class="container-fluid">
+    <div class="row pt-3">
         <span style="width: auto;">
             <div class="mb-3">
-                <a href="javascript:history.back()" class="d-flex align-items-center text-warning"
+                <a href="{% url 'super_admin' %}" class="d-flex align-items-center text-warning"
                     style="text-decoration: none">
                     <i class="fa-solid fa-arrow-left"></i>
                     &nbsp;back
                 </a>
             </div>
         </span>
-        <div class="col-12">
-            <div class="departments-title mb-3">
-                <h3 class="mb-0">All Departments</h3>
+        <div class="col-12 d-flex justify-content-between">
+            <div class="left-content">
+                <div class="departments-title mb-3">
+                    <h3 class="mb-0">Departments</h3>
+                </div>
             </div>
         </div>
         <div class="col-12">
@@ -48,6 +50,7 @@ Departments
                 <thead class="table-dark">
                     <tr>
                         <th scope="col">Department Name</th>
+                        <th scope="col">Detail</th>
                     </tr>
                 </thead>
                 <tbody class="table-primary">
@@ -55,13 +58,18 @@ Departments
                     {% for dept in page_obj %}
                     <tr>
                         <td>
-                            <a href="{% url 'department_detail' dept.id %}">{{ dept.name }}</a>
+                            <a href="">{{ dept.name }}</a>
+                        </td>
+                        <td>
+                            <a href="{% url 'department_detail' dept.id %}">
+                                <i title="View Details" class="fa-solid fa-eye" style="color: #990000;"></i>
+                            </a>
                         </td>
                     </tr>
                     {% endfor %}
                     {% else %}
                     <tr>
-                        <td>No Department Found!</td>
+                        <td colspan="100%">No Department Found!</td>
                     </tr>
                     {% endif %}
                 </tbody>
@@ -75,31 +83,32 @@ Departments
     <ul class="pagination justify-content-center">
 
         {% if page_obj.has_previous %}
-            <li class="page-item">
-                <a class="page-link" href="?page=1" aria-label="First">&laquo;</a>
-            </li>
-            <li class="page-item">
-                <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Previous">&lsaquo;</a>
-            </li>
+        <li class="page-item">
+            <a class="page-link" href="?page=1" aria-label="First">&laquo;</a>
+        </li>
+        <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Previous">&lsaquo;</a>
+        </li>
         {% else %}
-            <li class="page-item disabled"><span class="page-link">&laquo;</span></li>
-            <li class="page-item disabled"><span class="page-link">&lsaquo;</span></li>
+        <li class="page-item disabled"><span class="page-link">&laquo;</span></li>
+        <li class="page-item disabled"><span class="page-link">&lsaquo;</span></li>
         {% endif %}
 
         <li class="page-item active"><span class="page-link">{{ page_obj.number }}</span></li>
 
         {% if page_obj.has_next %}
-            <li class="page-item">
-                <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Next">&rsaquo;</a>
-            </li>
-            <li class="page-item">
-                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}" aria-label="Last">&raquo;</a>
-            </li>
+        <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Next">&rsaquo;</a>
+        </li>
+        <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}" aria-label="Last">&raquo;</a>
+        </li>
         {% else %}
-            <li class="page-item disabled"><span class="page-link">&rsaquo;</span></li>
-            <li class="page-item disabled"><span class="page-link">&raquo;</span></li>
+        <li class="page-item disabled"><span class="page-link">&rsaquo;</span></li>
+        <li class="page-item disabled"><span class="page-link">&raquo;</span></li>
         {% endif %}
-        
+
     </ul>
 </nav>
+
 {% endblock %}
