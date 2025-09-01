@@ -1,5 +1,5 @@
-PWA_APP_NAME = 'SMS'
-PWA_APP_DESCRIPTION = 'Shija Management System Software'
+PWA_APP_NAME = 'SSMS'
+PWA_APP_DESCRIPTION = 'Shija Service Management System'
 PWA_APP_THEME_COLOR = '#990000'
 PWA_APP_BACKGROUND_COLOR = '#ffffff'
 PWA_APP_DISPLAY = 'standalone'

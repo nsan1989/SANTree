@@ -30,8 +30,8 @@ Register
 
 <link rel="stylesheet" href="{% static 'styles/common.css' %}" />
 
-<div class="container d-flex justify-content-center align-items-center">
-  <div class="row rounded shadow-lg w-100 glass-card" style="padding: 2px 0px;">
+<div class="container d-flex flex-column justify-content-center align-items-center h-100">
+  <div class="row rounded shadow-lg w-100 glass-card mb-3" style="padding: 8px 0px;">
     <div class="col-sm-12 col-md-8 d-none d-md-flex justify-content-center">
       <img src="../../static/images/home-image.svg" class="img-fluid" alt="Login Image" style="width: 35vw; height: auto;" >
     </div>
@@ -91,12 +91,6 @@ Register
         <div class="login-link text-center">
           <small>Already registered?&nbsp;<a class="text-warning" href="{% url 'login' %}"> Log In</a></small>
         </div>
-        <!--
-        <div class="reset-link mt-3 text-center">
-          <small>Forgot password?&nbsp;<a href="" >Reset Here</a></small>
-        </div>
-        -->
-      </div>
     </div>
   </div>
   <div class="row w-100 d-flex justify-content-center m-0">

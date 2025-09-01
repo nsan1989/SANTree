@@ -31,14 +31,14 @@
     .layout {
       display: flex;
       width: 100%;
-      height: 100vh;
-      overflow: hidden;
+      height: 100%;
     }
 
     .sidebar {
       width: 60px;
       height: 100vh;
-      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
       background-color: #fff;
     }
 
@@ -47,25 +47,28 @@
     }
 
     .main-content {
+      width: calc(100% - 60px);
+      height: 100%;
+      display: flex;
+      flex-direction: column;
       flex-grow: 1;
       transition: margin-left 0.3s ease;
       overflow-x: auto;
     }
 
-    .main-content>header,
     #header {
-      position: fixed;
+      position: sticky;
       width: 100%;
-      transition: all 0.3s ease;
+      height: 60px;
     }
 
-    .main-content .content-body {
-      margin-top: 60px;
-      height: calc(100vh - 60px);
+    .content-body {
+      width: 100%;
+      height: calc(100% - 60px);
       overflow-y: auto;
     }
 
-    @media (max-width: 768px) {
+    @media (max-width: 767.98px) {
       .sidebar {
         position: fixed;
         left: 0;
@@ -101,10 +104,11 @@
     </div>
     {% endif %}
     <div id="main-content" class="main-content">
-      <header id="header">
+      {% if request.resolver_match.url_name != 'home' and request.resolver_match.url_name != 'login' and request.resolver_match.url_name != 'register' %}
+      <div id="header">
         {% include 'header.html' %}
-      </header>
-
+      </div>
+      {% endif %}
       <div class="content-body">
         {% block start %}
         {% endblock %}
@@ -123,6 +127,21 @@
   <script>
     const publicKey = "{{ vapid_key }}";
     subscribeToPush(publicKey);
+    document.addEventListener("DOMContentLoaded", function () {
+    const header = document.getElementById("header");
+    const contentBody = document.querySelector(".content-body");
+
+    if (contentBody) {
+      if (header) {
+        // ✅ If header exists → subtract its height
+        const headerHeight = header.offsetHeight;
+        contentBody.style.height = `calc(100% - ${headerHeight}px)`;
+      } else {
+        // ✅ If no header → take full height
+        contentBody.style.height = "100%";
+      }
+    }
+  });
   </script>
 
 </body>
