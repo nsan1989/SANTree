@@ -12,7 +12,7 @@ class ServiceTypes(models.Model):
 
     def __str__(self):
         return f'{self.name} {self.department}'
-
+    
 # Status Choices.
 STATUS_CHOICES = (
     ('open', 'Open'),
@@ -33,6 +33,7 @@ class Service(models.Model):
     service_number = models.CharField(max_length=20, unique=True, blank=True)
     service_type = models.ForeignKey(ServiceTypes, on_delete=models.SET_NULL, null=True, blank=True)
     location = models.ForeignKey(Location, related_name='service_locations', on_delete=models.SET_NULL, null=True, blank=True)
+    priority = models.CharField(max_length=20, choices=PRIORITY_CHOICES, default='Low')
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Open')
     created_by = models.ForeignKey(CustomUsers, related_name='srm_created_service', on_delete=models.CASCADE)
     assigned_to = models.ForeignKey(CustomUsers, related_name='srm_assigned_service', on_delete=models.SET_NULL, null=True, blank=True)

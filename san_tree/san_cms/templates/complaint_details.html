@@ -15,11 +15,11 @@
   }
   th {
     font-family: 'Poppins', sans-serif;
-    font-size: 1rem;
+    font-size: 0.9rem;
   }
   td {
     font-family: 'Poppins', sans-serif;
-    font-size: 0.9rem;
+    font-size: 0.8rem;
   }
   .detail-title {
     min-width: 8rem;
@@ -29,7 +29,7 @@
 
 <link rel="stylesheet" href="{% static 'styles/complaint_details.css' %}" />
 
-<div class="container">
+<div class="container-fluid">
   <div class="row py-3">
     <div class="mb-3">
       <a
@@ -56,6 +56,10 @@
         <li class="d-flex">
           <span class="fw-bold detail-title">Complaint:</span>&nbsp;
           <p class="m-0">{{complaint.complaint.complaint_type}}</p>
+        </li>
+        <li class="d-flex">
+          <span class="fw-bold detail-title">Location:</span>&nbsp;
+          <p class="m-0">{{complaint.complaint.location}}</p>
         </li>
         <li class="d-flex">
           <span class="fw-bold detail-title">Description:</span>&nbsp;

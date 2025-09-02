@@ -22,7 +22,7 @@ MENU_STRUCTURE = {
         ],
         'user': [
             {"name": "Dashboard", "url_name": "tms:staff_dashboard", "view_name":"TaskDashboard", "icon": "fa-solid fa-chart-line"},
-            {"name": "My Tasks", "url_name": "tms:my_tasks", "view_name":"MyTasks", "icon": "fa-solid fa-person-circle-exclamation"},
+            {"name": "Tasks", "url_name": "tms:my_tasks", "view_name":"MyTasks", "icon": "fa-solid fa-person-circle-exclamation"},
             {"name": "Profile", "url_name": "tms:staff_profile", "view_name":"TaskProfile", "icon": "fa-regular fa-circle-user"},
         ]
     },
@@ -33,8 +33,8 @@ MENU_STRUCTURE = {
             {"name": "Profile", "url_name": "srm:admin_profile", "view_name":"ProfileView", "icon": "fa-regular fa-circle-user"},
         ],
         'user': [
-            {"name": "Dashboard", "url_name": "srm:admin_dashboard", "view_name":"StaffDashboard", "icon": "fa-solid fa-chart-line"},
-            {"name": "Tasks", "url_name": "srm:staff_service", "view_name":"AllServiceView", "icon": "fa-solid fa-wheelchair"},
+            {"name": "Dashboard", "url_name": "srm:staff_dashboard", "view_name":"StaffDashboard", "icon": "fa-solid fa-chart-line"},
+            {"name": "Service", "url_name": "srm:staff_service", "view_name":"AllServiceView", "icon": "fa-solid fa-wheelchair"},
             {"name": "Profile", "url_name": "srm:staff_profile", "view_name":"ProfileView", "icon": "fa-regular fa-circle-user"},
         ]
     },

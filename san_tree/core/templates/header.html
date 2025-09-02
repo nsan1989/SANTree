@@ -11,42 +11,41 @@
     <div class="container-fluid p-0">
         <div class="left-items d-flex align-items-center">
           <!-- Toggle Button -->
-           {% if request.user.role != 'Super Admin' and request.resolver_match.url_name != 'main_dashboard'  %}
-          <button class="btn me-2 p-1" id="menu-toggle">
-            <i
-              class="fa-solid fa-bars-staggered"
-              id="menu-bars"
+          {% if request.user.role != 'Super Admin' and request.resolver_match.url_name != 'main_dashboard'  %}
+            <button class="btn" id="menu-toggle">
+              <i
+                class="fa-solid fa-bars-staggered"
+                id="menu-bars"
+                style="color: #990000; background-color: transparent"
+              ></i>
+              <i 
+              class="fa-solid fa-x fa-lg d-none"
+              id="menu-x"
               style="color: #990000; background-color: transparent"
-            ></i>
-            <i 
-            class="fa-solid fa-x fa-lg d-none"
-            id="menu-x"
-            style="color: #990000; background-color: transparent"
-            ></i>
-          </button>
+              ></i>
+            </button>
           {% endif %}
           <!-- Brand -->
            {% if request.user.role == 'Super Admin' %}
-          <a
-            class="navbar-brand ms-2 mb-0 h1 d-flex align-items-center fw-bold text-light"
-            href=""
-          >
-            <div class="d-none d-md-flex">
-              &nbsp;
-              <h5 class="fw-bold mb-0" style="color: #990000;font-family: 'Poppins', sans-serif;">Shija Management System</h5>
-            </div>
-            <img class="img-fluid d-md-none" src="{% static 'images/logo.png' %}" style="height: 48px;">
-          </a>
+            <a
+              class="navbar-brand ms-2 mb-0 h1 d-flex align-items-center fw-bold text-light"
+              href=""
+            >
+              <div class="d-none d-md-flex">
+                &nbsp;
+                <h5 class="fw-bold mb-0" style="color: #990000;font-family: 'Poppins', sans-serif;">Shija Management System</h5>
+              </div>
+              <img class="img-fluid d-md-none" src="{% static 'images/logo.png' %}" style="height: 48px;">
+            </a>
           {% else %}
-          <a
-            class="navbar-brand ms-2 mb-0 h1 d-flex align-items-center fw-bold text-light"
-            href="{% url 'main_dashboard' %}"
-          >
-            <div class="d-none d-md-flex">
-              &nbsp;
-              <h5 class="fw-bold mb-0" style="color: #990000;font-family: 'Poppins', sans-serif;">Shija Management System</h5>
-            </div>
-          </a>
+            <a
+              class="navbar-brand mb-0 h1 d-flex align-items-center fw-bold text-light"
+              href="{% url 'main_dashboard' %}"
+            >
+              <div class="d-none d-md-flex">
+                <h5 class="fw-bold mb-0" style="color: #990000;font-family: 'Poppins', sans-serif;">Shija Management System</h5>
+              </div>
+            </a>
           {% endif %}
         </div>
         <div class="right-items d-flex align-items-center">

@@ -1,0 +1,76 @@
+{% extends 'index.html' %} {% load crispy_forms_tags %}
+{% load static %} {% block title %} Assigned Tasks {% endblock %} {% block start %}
+
+<style>
+  .task-form{
+    font-family: 'Poppins', sans-serif;
+  }
+</style>
+
+<div class="container">
+  <div
+    class="row d-flex flex-column justify-content-center align-items-center pt-3 px-3"
+  >
+  <span style="width: auto;">
+      <div class="mb-3">
+        <a
+          href="{% url 'srm:staff_dashboard' %}"
+          class="d-flex align-items-center text-warning"
+          style="text-decoration: none"
+        >
+          <i class="fa-solid fa-arrow-left"></i>
+          &nbsp;back
+        </a>
+      </div>
+    </span>
+    <div class="col-12 col-md-5 card shadow-lg p-3">
+      <form class="task-form" method="post">
+        {% csrf_token %} {{ form|crispy }}
+        <div class="d-grid mt-4">
+          <button type="submit" class="btn btn-primary btn-lg">Submit</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+  $(document).ready(function () {
+    $("#id_department").change(function () {
+      const departmentId = $(this).val();
+
+      // Load task types
+      $.ajax({
+        url: "{% url 'tms:ajax_load_tasks_types' %}",
+        data: { department: departmentId },
+        success: function (data) {
+          const taskSelect = $("#id_tasks_types");
+          taskSelect.empty();
+          taskSelect.append('<option value="">Select Task Type</option>');
+          data.forEach((item) =>
+            taskSelect.append(
+              `<option value="${item.id}">${item.name}</option>`
+            )
+          );
+        },
+      });
+
+      // Load staff
+      $.ajax({
+        url: "{% url 'tms:ajax_load_staff' %}",
+        data: { department: departmentId },
+        success: function (data) {
+          const staffSelect = $("#id_assigned_to");
+          staffSelect.empty();
+          staffSelect.append('<option value="">Select Staff</option>');
+          data.forEach((item) =>
+            staffSelect.append(
+              `<option value="${item.id}">${item.username}</option>`
+            )
+          );
+        },
+      });
+    });
+  });
+</script>
+{% endblock %}

@@ -98,6 +98,7 @@ def StaffDashboard(request):
     completed = Tasks.objects.filter(status='Completed').all().count()
     in_progress = Tasks.objects.filter(status='In Progress').all().count()
     context = {
+        'current_user': user,
         'assigned_tasks': staff_tasks,
         'complete': completed,
         'progress': in_progress

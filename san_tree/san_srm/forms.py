@@ -9,10 +9,19 @@ class ServiceForm(forms.ModelForm):
         fields = [
             'service_type',
             'location',
+            'priority'
         ]
         labels = {
             'service_type': 'Service'
         }
+
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)
+        super(ServiceForm, self).__init__(*args, **kwargs)
+
+        self.fields['service_type'].required = True
+
+        self.fields['location'].required = True
 
 # Service Remarks.
 class ServiceRemark(forms.ModelForm):

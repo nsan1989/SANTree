@@ -14,15 +14,19 @@ def AdminDashboard(request):
     except:
         raise PermissionDenied("User profile not found")
     dept_users = CustomUsers.objects.filter(department = user.department).exclude(role='Admin')
+    user_count = dept_users.count()
     vacant_users = dept_users.filter(status = 'vacant')
+    vacant = vacant_users.count()
     engaged_users = dept_users.filter(status = 'engaged')
-    all_user = dept_users.count()
+    engage = engaged_users.count()
     services = Service.objects.filter(assigned_to__department = user.department).all().count()
     context = {
         'current_user': user,
-        'all_users': all_user,
+        'all_users': user_count,
         'engage_user': engaged_users,
+        'engaged': engage,
         'vacant_user': vacant_users,
+        'vacants': vacant,
         'total_service': services,
     }
     view_name = request.resolver_match.view_name
@@ -38,9 +42,15 @@ def StaffDashboard(request):
     except:
         raise PermissionDenied("User profile not found")
     services = Service.objects.filter(assigned_to = user).all().count()
+    open_service = Service.objects.filter(assigned_to = user, status = 'Completed').count()
+    progress_service = Service.objects.filter(assigned_to = user, status = 'In Progress').count()
+    completed_service = Service.objects.filter(assigned_to = user, status = 'Completed').count()
     context = {
         'current_user': user,
         'total_service': services,
+        'open_serv': open_service,
+        'prog_serv': progress_service,
+        'comp_serv': completed_service
     }
     view_name = request.resolver_match.view_name
     if view_name == "srm:staff_dashboard" and user_role == 'User':

@@ -3,17 +3,25 @@
 {% load static %}
 
 {% block title %}
-    Service Requested
+    Service
 {% endblock %}
 
 {% block start %}
-    <div class="container mt-5">
+
+    <style>
+        .all-tasks-title h1 {
+            font-family: 'Poppins', sans-serif;
+            color: wheat;
+        }
+        .raised-tasks p {
+            font-family: 'Poppins', sans-serif;
+        }
+    </style>
+
+    <div class="container-fluid">
         <div class="d-flex flex-column">
             <div class="all-tasks-title">
-                <h1 class="fw-bold">All Service</h1>
-            </div>
-            <div class="raised-tasks">
-                <p class="text-light">Assigned a new task&nbsp;<a class="text-warning" href="" style="text-decoration: none;">Assign Here.</a></p>
+                <h1 class="fw-bold mb-0">All Service</h1>
             </div>
         </div>
     </div>

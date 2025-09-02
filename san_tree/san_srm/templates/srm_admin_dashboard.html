@@ -1,10 +1,84 @@
-{% extends 'index.html' %} 
+{% extends 'index.html' %}
 {% load static %}
 
-{% block title %} 
+{% block title %}
 Dashboard
-{% endblock %} 
+{% endblock %}
 
 {% block start %}
 
+<style>
+    .dashboard-title {
+        color: wheat;
+    }
+    .card {
+        background-color: rgba(0, 0, 0, 0.6);
+    }
+    .card-title {
+        font-family: 'poppins', sans-serif;
+        font-size: 1rem;
+        color: #fff;
+    }
+    .card-body p {
+        font-family: 'poppins', sans-serif;
+        font-size: 0.9rem;
+        font-weight: bold;
+        color: #fff;
+    }
+</style>
+
+<div class="container-fluid">
+    <div class="row mb-3">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6">
+            <div class="dashboard-title">
+                <h1 class="fw-bold mb-0">Welcome</h1>
+                <p class="mb-0">{{current_user.username}}</p>
+            </div>
+        </div>
+        {% if current_user.department.name != 'General Duty Assistant' and current_user.department.name != 'GDA' and current_user.role == 'Admin' %}
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6">
+            <div class="service-request-form">
+                <p class="mb-0 text-light">
+                    Request a service &nbsp;<a class="text-warning fw-bold" href="{% url 'srm:request_service' %}"
+                        style="text-decoration: none;">click here.</a>
+                </p>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    <div class="row d-flex mb-3 g-2">
+        <div class="col-xs -12 col-sm-12 col-mb-3 col-lg-3 col-xl-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h5 class="card-title">Total Service</h5>
+                    <p>{{total_service}}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-xs -12 col-sm-12 col-mb-3 col-lg-3 col-xl-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h5 class="card-title">Total Users</h5>
+                    <p>{{all_users}}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-xs -12 col-sm-12 col-mb-3 col-lg-3 col-xl-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h5 class="card-title">Engage Users</h5>
+                    <p>{{engaged}}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-xs -12 col-sm-12 col-mb-3 col-lg-3 col-xl-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h5 class="card-title">Vacant Users</h5>
+                    <p>{{vacants}}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

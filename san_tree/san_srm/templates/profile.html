@@ -6,6 +6,11 @@ Dashboard
 
 {% block start %}
 <style>
+    .profile-title h1 {
+      font-family: 'Poppins', sans-serif;
+      color: wheat;
+    }
+
     .card {
         font-family: 'Poppins', sans-serif;
         background-color: rgba(0, 0, 0, 0.4);
@@ -31,8 +36,13 @@ Dashboard
     }
 </style>
 
-<div class="container pt-5">
-  <div class="row d-flex justify-content-center mt-5">
+<div class="container">
+  <div class="row">
+    <div class="col-12 profile-title">
+      <h1 class="fw-bold">My Profile</h1>
+    </div>
+  </div>
+  <div class="row d-flex justify-content-center">
     <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6">
       <div class="card shadow-lg p-3 rounded">
         <ul class="row">

@@ -122,11 +122,13 @@ def UserComplaintDashboard(request):
         user_role = user.role
     except:
         raise PermissionDenied("User profile not found")
+    total_comp = Complaint.objects.filter(created_by = user, assigned_to = user).all().count()
     create_comp = Complaint.objects.filter(created_by = user).all()
     assign_comp = Complaint.objects.filter(assigned_to = user).all()
     create_count = create_comp.count()
     assign_count = assign_comp.count()
     context = {
+        'total': total_comp,
         'current_user': user,
         'raised': create_count,
         'assigned': assign_count,
