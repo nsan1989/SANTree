@@ -103,16 +103,21 @@ def SuperAdminDashboard(request):
 # Departments View.
 def DepartmentView(request):
     user = request.user
-    all_department = Departments.objects.all()
-    paginator = Paginator(all_department, 10)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
     try:
         user_role = user.role
     except:
         raise PermissionDenied("User profile not found")
+    query = request.GET.get('q', '')
+    if query:
+        all_department = Departments.objects.filter(name__icontains=query)
+    else:
+        all_department = Departments.objects.all()
+    paginator = Paginator(all_department, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
     context = {
-        'page_obj': page_obj
+        'page_obj': page_obj,
+        'query': query,
     }
     view_name = request.resolver_match.view_name
     if view_name == "all_departments" and user_role == 'Super Admin':
