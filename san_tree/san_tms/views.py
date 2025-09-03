@@ -155,7 +155,7 @@ def TasksView(request):
                     form.add_error('task_type', 'Please select a task type.')
                     return render(request, 'raised_tasks.html', {'form', form})
             if assigned_user:
-                if assigned_user.status == 'vacant':
+                if assigned_user.status.strip().lower() == 'vacant':
                     new_task.assigned_to = assigned_user
                     assigned_user.status = 'engaged'
                     assigned_user.save()
