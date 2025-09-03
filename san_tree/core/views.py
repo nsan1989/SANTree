@@ -222,6 +222,40 @@ def DepartmentDetails(request, id):
         return render(request, 'department_details.html', context)
     raise PermissionDenied("You are not authorized to view this page.")
 
+# Department Complaints
+def DepartmentComplaints(request, id):
+    user = request.user
+    try:
+        user_role = user.role
+    except:
+        raise PermissionDenied("User profile not found")
+    selected_dept = get_object_or_404(Departments, id=id)
+    dept_comp = Complaint.objects.filter(department=selected_dept).all()
+    context = {
+        'complaints': dept_comp
+    }
+    view_name = request.resolver_match.view_name
+    if view_name == "department_complaints" and user_role == 'Super Admin':
+        return render(request, 'department_complaint.html', context)
+    raise PermissionDenied("You are not authorized to view this page.")
+
+# Department Tasks
+def DepartmentTasks(request, id):
+    user = request.user
+    try:
+        user_role = user.role
+    except:
+        raise PermissionDenied("User profile not found")
+    selected_dept = get_object_or_404(Departments, id=id)
+    dept_task = Tasks.objects.filter(department=selected_dept).all()
+    context = {
+        'tasks': dept_task
+    }
+    view_name = request.resolver_match.view_name
+    if view_name == "department_tasks" and user_role == 'Super Admin':
+        return render(request, 'department_task.html', context)
+    raise PermissionDenied("You are not authorized to view this page.")
+
 # All Complaint Pie Chart.
 def AllComplaintPieChart(request):
     user = request.user

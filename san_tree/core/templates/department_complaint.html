@@ -1,0 +1,78 @@
+{% extends 'index.html' %}
+{% load static %}
+
+{% block title %}
+Department Complaint
+{% endblock %}
+
+{% block start %}
+
+<style>
+    .complaint-title h1 {
+        color: wheat;
+    }
+    th {
+        font-family: 'Poppins', sans-serif;
+        font-size: 0.9rem;
+    }
+    td {
+        font-family: 'Poppins', sans-serif;
+        font-size: 0.85rem;
+    }
+</style>
+
+<div class="container-fluid">
+    <div class="row py-3">
+        <span style="width: auto;">
+            <div class="mb-3">
+                <a href="javascript:history.back()" class="d-flex align-items-center text-warning"
+                    style="text-decoration: none">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    &nbsp;back
+                </a>
+            </div>
+        </span>
+    </div>
+    <div class="row mb-3">
+        <div class="complaint-title">
+            <h1 class="fw-bold">Department Complaints</h1>
+        </div>
+    </div>
+    <div class="row mb-3">
+        <div class="col-12 table-responsive">
+            <table class="table table-bordered">
+                <thead class="table-dark">
+                    <tr>
+                        <th scope="col">Complaint No.</th>
+                        <th scope="col">Complaint Type</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">Location</th>
+                        <th scope="col">Raised By</th>
+                        <th scope="col">Concern Dept.</th>
+                        <th scope="col">Created On</th>
+                    </tr>
+                </thead>
+                <tbody class="table-info">
+                    {% if complaints %}
+                        {% for comp in complaints %}
+                            <tr>
+                                <td>{{comp.complaint_number}}</td>
+                                <td>{{comp.complaint_type}}</td>
+                                <td>{{comp.status}}</td>
+                                <td>{{comp.location}}</td>
+                                <td>{{comp.created_by}}</td>
+                                <td>{{comp.department}}</td>
+                                <td>{{comp.created_at}}</td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
+                    <tr>
+                        <td colspan="100%">No complaints found!</td>
+                    </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -49,6 +49,9 @@ class Tasks(models.Model):
     completed_at = models.DateTimeField(null=True, blank=True)
     waiting_time = models.DateTimeField(auto_now=True)
     attachment = models.ImageField(upload_to=task_image_path, null=True, blank=True)
+    
+    def _str_(self):
+        return str(self.tasks_types)
 
     @property
     def time_taken(self):
@@ -93,9 +96,6 @@ class Tasks(models.Model):
         if is_new and not self.tasks_number:
             self.tasks_number = f"TMS{self.id}"
             Tasks.objects.filter(pk=self.pk).update(tasks_number=self.tasks_number)
-
-    def _str_(self):
-        return str(self.tasks_types)
     
 def task_remark_image_path(instance, filename):
     filename = os.path.basename(filename)  

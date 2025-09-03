@@ -22,10 +22,13 @@ Department Detail
     font-family: "Poppins", sans-serif;
     font-size: 0.85rem;
   }
+  .card-link a {
+    text-decoration: none;
+  }
 </style>
 <!---------->
 
-<div class="container">
+<div class="container-fluid">
     <div class="row pt-3">
         <span style="width: auto;">
             <div class="mb-3">
@@ -51,6 +54,9 @@ Department Detail
                 <div class="card-content">
                     {{comp}}
                 </div>
+                <div class="card-link">
+                    <a class="text-warning" href="{% url 'department_complaints' select_dept.id %}">View All</a>
+                </div>
             </div>
         </div>
         <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4">
@@ -60,6 +66,9 @@ Department Detail
                 </div>
                 <div class="card-content">
                     {{task}}
+                </div>
+                <div class="card-link">
+                    <a class="text-warning" href="{% url 'department_tasks' select_dept.id %}">View All</a>
                 </div>
             </div>
         </div>
