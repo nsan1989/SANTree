@@ -4,6 +4,11 @@
     box-sizing: border-box;
   }
 
+footer {
+    text-align: center;
+    padding: 0px 5px;
+}
+
 html, body, #root {
     height: 100%;
     margin: 0;
@@ -11,11 +16,6 @@ html, body, #root {
     display: flex;
     flex-direction: column;
     scroll-behavior: smooth;
-}
-
-footer {
-    text-align: center;
-    padding: 0px 5px;
 }
 
 body {

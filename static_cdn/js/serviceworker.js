@@ -21,16 +21,47 @@ self.addEventListener('fetch', event => {
     event.respondWith(fetch(event.request));
 });
 
-// Push Notifications
+// Push event - receives notification payload from server
 self.addEventListener('push', function (e) {
-    const data = e.data?.json() || { title: 'Default title', body: 'No payload' };
+    console.log('[Service Worker] Push received');
+
+    let data = {};
+    try {
+        data = e.data.json();
+    } catch (err) {
+        data = { title: "Notification", body: e.data.text() };
+    }
 
     const options = {
         body: data.body,
         icon: '/static/images/icons/192X192.png',
+        badge: '/static/images/icons/192X192.png', // optional: smaller monochrome icon
+        data: {
+            url: data.url || '/',   // navigate when clicked
+            extra: data.extra || {} // you can send additional info
+        }
     };
 
     e.waitUntil(
         self.registration.showNotification(data.title, options)
+    );
+});
+
+// Handle notification click (open dashboard, complaint, or task page)
+self.addEventListener('notificationclick', function (event) {
+    event.notification.close();
+    const targetUrl = event.notification.data.url || '/';
+
+    event.waitUntil(
+        clients.matchAll({ type: 'window', includeUncontrolled: true }).then(windowClients => {
+            for (let client of windowClients) {
+                if (client.url.includes(targetUrl) && 'focus' in client) {
+                    return client.focus();
+                }
+            }
+            if (clients.openWindow) {
+                return clients.openWindow(targetUrl);
+            }
+        })
     );
 });
