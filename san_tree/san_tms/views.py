@@ -146,6 +146,7 @@ def TasksView(request):
             new_task.created_by = request.user
             department = form.cleaned_data.get('department')
             task_type = form.cleaned_data.get('tasks_types')
+            assigned_user = form.cleaned_data.get('assigned_to')
             if not task_type:
                 types = TasksTypes.objects.filter(department=department)
                 if types.count() == 1:
@@ -153,11 +154,14 @@ def TasksView(request):
                 elif types.count() > 1 and types == 'others':
                     form.add_error('task_type', 'Please select a task type.')
                     return render(request, 'raised_tasks.html', {'form', form})
-            assigned_user = CustomUsers.objects.filter(department=department, role='User').first()
             if assigned_user:
-                new_task.assigned_to = assigned_user
-                assigned_user.status = 'engaged'
-                assigned_user.save()
+                if assigned_user.status == 'vacant':
+                    new_task.assigned_to = assigned_user
+                    assigned_user.status = 'engaged'
+                    assigned_user.save()
+                else:
+                    form.add_error('assigned_to', f"{assigned_user.username} is not vacant.")
+                    return render(request, 'raised_tasks.html', {'form': form})
             new_task.save()
             return redirect('tms:tasks')
     else:
