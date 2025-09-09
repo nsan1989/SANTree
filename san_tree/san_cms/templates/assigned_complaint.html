@@ -25,18 +25,22 @@ Assigned Complaint
     font-family: 'Poppins', sans-serif;
     font-size: 0.9rem;
   }
+
+  td a {
+    cursor: pointer;
+  }
 </style>
 
 <link rel="stylesheet" href="{% static 'styles/assigned_complaint.css' %}" />
 
-<div class="container mt-5">
+<div class="container-fluid">
   <div class="row py-3">
     <div class="col-12">
       <div class="content-title">
         <h3>Assigned Complaints</h3>
       </div>
     </div>
-    <div class="d-flex justify-content-between">
+    <div class="d-flex justify-content-between mb-3">
       <nav>
         <ul class="pagination">
           {% if page_obj.has_previous %}
@@ -98,7 +102,7 @@ Assigned Complaint
             <th scope="col">Created At</th>
             <th scope="col">Updated At</th>
             <th scope="col">TAT</th>
-            <th scope="col">Update Status</th>
+            <th scope="col">Status</th>
             <th scope="col">Handover</th>
             <th scope="col">Remark</th>
             <th scope="col">Details</th>
@@ -117,18 +121,17 @@ Assigned Complaint
             <td>Not yet updated!</td>
             {% endif %}
             <td>{{ complaints.complaint.time_taken|duration_display }}</td>
-            {% if complaints.complaint.assigned_to == request.user %}
+            {% if complaints.complaint.assigned_to == request.user or complaints.complaint.status == 'Review' %}
             {% if complaints.complaint.status != 'Cancelled' and complaints.complaint.status != 'Resolved' %}
             <td>
               <form method="POST" action="{% url 'cms:admin_update_complaint_status' complaints.complaint.id %}">
                 {% csrf_token %}
                 <select name="status" required>
                   <option value="">select</option>
-                  <option value="In Progress" {% if complaints.status=='In Progress' %} selected {% endif %}>In Progress
-                  </option>
-                  <option value="Resolved" {% if complaints.status=='Resolved' %} selected {% endif %}>Resolved</option>
+                  <option value="In Progress" {% if complaints.status == 'In Progress' %} selected {% endif %}>In Progress</option>
+                  <option value="Resolved" {% if complaints.status == 'Resolved' %} selected {% endif %}>Resolved</option>
                 </select>
-                <button class="btn btn-sm btn-primary" type="submit">Update</button>
+                <button class="btn btn-sm btn-primary mt-2" type="submit">Update</button>
               </form>
             </td>
             {% else %}
@@ -140,9 +143,15 @@ Assigned Complaint
             {% if complaints.complaint.status == 'Resolved' %}
             <td class="text-center">--</td>
             {% else %}
-            <td class="text-center"><a class="open-modal"
-                data-url="{% url 'cms:reassign_complaints' complaints.id %}"><i
-                  class="fa-solid fa-handshake-simple"></i></a></td>
+            <td class="text-center">
+              <a class="open-modal" data-url="{% url 'cms:reassign_complaints' complaints.id %}">
+                <i class="fa-solid fa-handshake-simple"></i>
+              </a>
+              &nbsp;&nbsp;&nbsp;
+              <a class="open-modal" data-url="{% url 'cms:reassign_departments' complaints.id %}">
+                <i class="fa-solid fa-building"></i>
+              </a>
+            </td>
             {% endif %}
             {% if complaints.complaint.status == 'Resolved' %}
             <td class="text-center">--</td>

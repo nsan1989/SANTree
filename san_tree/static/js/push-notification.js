@@ -1,24 +1,9 @@
 function subscribeToPush(publicKey) {
-    if (!('serviceWorker' in navigator)) {
-        console.warn('❌ Service workers are not supported.');
-        return;
-    }
-
-    if (!('PushManager' in window)) {
-        console.warn('❌ Push messaging is not supported.');
-        return;
-    }
 
     Notification.requestPermission().then(function(permission) {
-//        console.log('🔔 Notification permission:', permission);
-        if (permission !== 'granted') {
-            alert('⚠️ Push notification permission was denied.');
-            return;
-        }
 
         navigator.serviceWorker.register('/static/js/serviceworker.js')
             .then(function(registration) {
-//                console.log('✅ Service Worker registered:', registration);
 
                 return registration.pushManager.subscribe({
                     userVisibleOnly: true,
@@ -26,7 +11,6 @@ function subscribeToPush(publicKey) {
                 });
             })
             .then(function(subscription) {
-//                console.log('📨 Push subscription object:', subscription);
 
                 // Send to server
                 return fetch('/webpush/save_information/', {
@@ -56,7 +40,12 @@ function urlBase64ToUint8Array(base64String) {
     const padding = '='.repeat((4 - base64String.length % 4) % 4);
     const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
     const rawData = atob(base64);
-    return new Uint8Array([...rawData].map(char => char.charCodeAt(0)));
+    const outputArray = new Uint8Array(rawData.length);
+
+    for (let i = 0; i < rawData.length; ++i) {
+        outputArray[i] = rawData.charCodeAt(i);
+    }
+    return outputArray;
 }
 
 // Helper for CSRF token

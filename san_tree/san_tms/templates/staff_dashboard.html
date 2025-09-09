@@ -68,7 +68,7 @@
               style="min-height: 8rem;"
               >
               <div class="card-title fw-bold">Completed Tasks</div>
-              <div class="card-content">{{complete}}</div>
+              <div class="card-content">{{comp_count}}</div>
             </div>
           </div>
           <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4">
@@ -77,7 +77,7 @@
               style="min-height: 8rem;"
               >
               <div class="card-title fw-bold">Progress Tasks</div>
-              <div class="card-content">{{progress}}</div>
+              <div class="card-content">{{pro_count}}</div>
             </div>
           </div>
         </div>
@@ -92,13 +92,13 @@
           <h5>Open Tasks</h5>
         </div>
         <div class="open_content">
-          {% if request.user.role == 'User' %} {% if staff_open %} 
-          {% for tasks in staff_open %} {{tasks.tasks_types}} {% endfor %} {% else %}
-          <p>Currently, there isn't any tasks!</p>
-          {% endif %} {% else %} {% if incharge_open %} 
-          {% for tasks in incharge_open %} {{tasks.tasks_types}} {% endfor %} {% else %}
-          <p>Currently, there isn't any tasks!</p>
-          {% endif %} {% endif %}
+          {% if open %}
+            {% for open_tasks in open %}
+              {{open_tasks.tasks_types}}
+            {% endfor %}
+          {% else %}
+            <small>Currently, there isn't any open tasks!</small>
+          {% endif %}
         </div>
       </div>
     </div>
@@ -125,14 +125,13 @@
           <h5>Completed Tasks</h5>
         </div>
         <div class="completed_content">
-          {% if request.user.role == 'User' %} {% if staff_completed %} 
-          {% for tasks in staff_completed %} {{tasks.tasks_types}} {% endfor %} 
+          {% if complete %}
+            {% for completed in complete %}
+              {{completed.tasks_types}}
+            {% endfor %}
           {% else %}
-          <p>Currently, there isn't any tasks!</p>
-          {% endif %} {% else %} {% if Incharge_completed %} 
-          {% for tasks in Incharge_completed %} {{tasks.tasks_types}} {% endfor %} {% else %}
-          <p>Currently, there isn't any tasks!</p>
-          {% endif %} {% endif %}
+            <small>Currently, there isn't any open tasks!</small>
+          {% endif %}
         </div>
       </div>
     </div>

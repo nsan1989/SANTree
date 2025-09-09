@@ -20,6 +20,7 @@ plot_lock = Lock()
 from django.utils import timezone
 from datetime import timedelta
 import datetime
+from accounts.models import ENGAGED, VACANT
 
 # Admin Complaint Dashboard view.
 def AdminComplaintDashboard(request):
@@ -407,6 +408,12 @@ def AssignedComplaint(request):
          )
         ).order_by('complaint__created_at')
     
+    # Halt the open tasks if it exceeds 24hr.
+    for complaint in complaints:
+        if complaint.complaint.status == 'Open' and complaint.complaint.created_at < datetime.now() - timedelta(hours=24):
+            complaint.complaint.status = 'Halt'
+            complaint.complaint.save()
+    
     # Vacant the user if it exceeds the assign duration.
     now = timezone.now()
     reassigned = ReassignedComplaint.objects.all()
@@ -418,7 +425,7 @@ def AssignedComplaint(request):
             r.complaint.status = 'Halt'
             r.complaint.save()
             new_user = r.reassigned_to
-            if new_user.status != 'vacant':
+            if new_user.status.strip().lower() != 'vacant':
                 new_user.status = 'vacant'
                 new_user.save()
 
@@ -472,7 +479,6 @@ def StaffUpdateComplaintStatus(request, id):
         new_status = request.POST.get('status')
         if new_status == 'Review':
             complaint.changed_by = request.user
-            complaint.complaint.assigned_to = dept_admin
             complaint.status_changed_to = new_status
             complaint.complaint.status = new_status
             complaint.complaint.save()
@@ -510,18 +516,22 @@ def AdminUpdateComplaintStatus(request, id):
             complaint.changed_by = user
             complaint.status_changed_to = new_status
             complaint.complaint.status = new_status
-            complaint.complaint.save()
-            complaint.save()
 
             if new_status == 'In Progress':
-                complaint.complaint.assigned_to.status = 'engaged'
-                complaint.complaint.assigned_to.save()
+                if complaint.complaint.assigned_to.status.strip().lower() != 'engaged':
+                    complaint.complaint.assigned_to.status ='engaged'
+                    print(complaint.complaint.assigned_to.status)
+                    complaint.complaint.assigned_to.save()
             elif new_status == 'Resolved':
-                complaint.complaint.assigned_to.status = 'vacant'
-                complaint.complaint.assigned_to.save()
+                if complaint.complaint.assigned_to.status.strip().lower() != 'vacant':
+                    complaint.complaint.assigned_to.status = 'vacant'
+                    print(complaint.complaint.assigned_to.status)
+                    complaint.complaint.assigned_to.save()
 
             complaint.complaint.save()
             complaint.save()
+
+            print("Final status in DB:", complaint.complaint.assigned_to.status)
 
             messages.success(request, "Status updated successfully.")
     view_name = request.resolver_match.view_name

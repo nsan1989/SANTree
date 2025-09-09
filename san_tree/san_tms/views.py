@@ -95,13 +95,19 @@ def StaffDashboard(request):
     except AttributeError:
         raise PermissionDenied("User profile not found.")
     staff_tasks = Tasks.objects.filter(assigned_to = user).all().count()
-    completed = Tasks.objects.filter(status='Completed').all().count()
-    in_progress = Tasks.objects.filter(status='In Progress').all().count()
+    open = Tasks.objects.filter(status='Open').all()
+    completed = Tasks.objects.filter(status='Completed').all()
+    complete_count = completed.count()
+    in_progress = Tasks.objects.filter(status='In Progress').all()
+    progress_count = in_progress.count()
     context = {
         'current_user': user,
         'assigned_tasks': staff_tasks,
+        'open': open,
         'complete': completed,
-        'progress': in_progress
+        'comp_count': complete_count,
+        'progress': in_progress,
+        'pro_count': progress_count
     }
     view_name = request.resolver_match.view_name
     if view_name == "tms:staff_dashboard" and user_role == 'User':

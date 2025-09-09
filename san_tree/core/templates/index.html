@@ -120,13 +120,7 @@
     integrity="sha384-j1CDi7MgGQ12Z7Qab0qlWQ/Qqz24Gc6BM0thvEMVjHnfYGF0rmFCozFSxQBxwHKO"
     crossorigin="anonymous"></script>
 
-  <!-- ✅ Load your script first -->
-  <script src="{% static 'js/push-notification.js' %}"></script>
-
-  <!-- ✅ Then call the function -->
   <script>
-    const publicKey = "{{ vapid_key }}";
-    subscribeToPush(publicKey);
     document.addEventListener("DOMContentLoaded", function () {
     const header = document.getElementById("header");
     const contentBody = document.querySelector(".content-body");

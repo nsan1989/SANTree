@@ -1,9 +1,10 @@
 from django.db import models
-from accounts.models import CustomUsers, Departments, Location
+from accounts.models import CustomUsers, Departments
 from PIL import Image
 from io import BytesIO
 from django.core.files.base import ContentFile
 import os
+from django.core.exceptions import ValidationError
 
 # Service Model.
 class ServiceTypes(models.Model):
@@ -12,6 +13,39 @@ class ServiceTypes(models.Model):
 
     def __str__(self):
         return f'{self.name} {self.department}'
+    
+# Block Model.
+class Blocks(models.Model):
+    name = models.CharField(max_length=100)
+
+    # Method to define string representation of an object.
+    def __str__(self):
+        return self.name
+    
+    def save(self, *args, **kwargs):
+        # Check for duplicate block names (case-insensitive)
+        if Blocks.objects.filter(name__iexact=self.name).exclude(pk=self.pk).exists():
+            raise ValidationError(f"A block with the name '{self.name}' already exists.")
+        super().save(*args, **kwargs)
+
+    class Meta:
+        ordering = ['name']
+
+# Location Model.
+class ServiceLocation(models.Model):
+    block = models.ForeignKey(Blocks, related_name='service_block', on_delete=models.CASCADE)
+    name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.name
+    
+    def save(self, *args, **kwargs):
+        if ServiceLocation.objects.filter(name__iexact=self.name, block=self.block).exclude(pk=self.pk).exists():
+            raise ValidationError(f"A location with the name '{self.name}+{self.block}' already exists.")
+        super().save(*args, **kwargs)
+        
+    class Meta:
+        ordering = ['name']
     
 # Status Choices.
 STATUS_CHOICES = (
@@ -28,17 +62,45 @@ PRIORITY_CHOICES = (
     ('low', 'Low')
 )
 
-# Service Model.
+# Shift Types.
+SHIFT_CHOICES = (
+    ('morning', 'Morning'),
+    ('evening', 'Evening'),
+    ('day', 'Day'),
+    ('night', 'Night'),
+)
+
+# Shift Model.
+class ShiftSchedule(models.Model):
+    shift_type = models.CharField(max_length=20, choices=SHIFT_CHOICES, default='Morning')
+    shift_location = models.ForeignKey(ServiceLocation, related_name='shift_locationss', on_delete=models.CASCADE)
+    shift_staffs = models.ForeignKey(
+        CustomUsers, 
+        related_name='shift_staff', 
+        on_delete=models.CASCADE,
+        limit_choices_to=(models.Q(department__name="GDA") | models.Q(department__name="General Duty Assistant")) & models.Q(role='User'),
+        )
+    start_time = models.DateTimeField()
+    end_time = models.DateTimeField()
+
+    def __str__(self):
+        return f"{self.shift_staffs} - {self.shift_type} ({self.start_time:%Y-%m-%d})"
+
+# Request Service Model.
 class Service(models.Model):
     service_number = models.CharField(max_length=20, unique=True, blank=True)
     service_type = models.ForeignKey(ServiceTypes, on_delete=models.SET_NULL, null=True, blank=True)
-    location = models.ForeignKey(Location, related_name='service_locations', on_delete=models.SET_NULL, null=True, blank=True)
+    from_location = models.ForeignKey(ServiceLocation, related_name='service_from', on_delete=models.SET_NULL, null=True, blank=True)
+    to_location = models.ForeignKey(ServiceLocation, related_name='service_to', on_delete=models.SET_NULL, null=True, blank=True)
     priority = models.CharField(max_length=20, choices=PRIORITY_CHOICES, default='Low')
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Open')
+    assigned_to = models.ForeignKey(ShiftSchedule, related_name='srm_service_staff', on_delete=models.SET_NULL, null=True, blank=True)
     created_by = models.ForeignKey(CustomUsers, related_name='srm_created_service', on_delete=models.CASCADE)
-    assigned_to = models.ForeignKey(CustomUsers, related_name='srm_assigned_service', on_delete=models.SET_NULL, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     completed_at = models.DateTimeField(null=True, blank=True)
+    
+    def __str__(self):
+        return str(self.service_type)
 
     @property
     def time_taken(self):
@@ -48,13 +110,74 @@ class Service(models.Model):
     
     def save(self, *args, **kwargs):
         is_new = self.pk is None
-        # Assign tasks number only once when new
+        super().save(*args, **kwargs) 
+        # Assign service number only once when new
         if is_new and not self.service_number:
             self.service_number = f"SRM{self.id}"
             Service.objects.filter(pk=self.pk).update(service_number=self.service_number)
 
+# Service Request Queue Model.
+class ServiceRequestQueue(models.Model):
+    service_request = models.ForeignKey(Service, related_name='service_queue' ,on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return str(self.service_request.id)
+    
+    class Meta:
+        ordering = ['created_at']
+    
+# Service Remarks Image Path. 
+def generate_service_image_path(instance, filename):
+    filename = os.path.basename(filename)  
+    return f'service_remark_images/{filename}'
+    
+# Generate Service Model.
+class GenerateService(models.Model):
+    generate_number = models.CharField(max_length=20, unique=True, blank=True)
+    service_type = models.ForeignKey(ServiceTypes, on_delete=models.SET_NULL, null=True, blank=True)
+    from_location = models.ForeignKey(ServiceLocation, related_name='generate_from', on_delete=models.SET_NULL, null=True, blank=True)
+    to_location = models.ForeignKey(ServiceLocation, related_name='generate_to', on_delete=models.SET_NULL, null=True, blank=True)
+    generate_by = models.ForeignKey(ShiftSchedule, related_name='srm_generate_service', on_delete=models.CASCADE)
+    generate_at = models.DateTimeField(auto_now_add=True)
+    completed_at = models.DateTimeField(null=True, blank=True)
+    attachment = models.ImageField(upload_to=generate_service_image_path, null=True, blank=True)
+
     def __str__(self):
         return str(self.service_type)
+    
+    # Compress image before saving
+    def save(self, *args, **kwargs):
+        is_new = self.pk is None
+        image_changed = False
+
+        # Check if attachment has changed (only for existing object)
+        if self.pk:
+            old_attachment = Service.objects.get(pk=self.pk).attachment
+            if self.attachment and self.attachment != old_attachment:
+                image_changed = True
+        else:
+            image_changed = bool(self.attachment)
+
+        # Compress image before saving
+        if self.attachment and image_changed:
+            try:
+                img = Image.open(self.attachment)
+                if img.mode in ("RGBA", "P"):
+                    img = img.convert("RGB")
+
+                output = BytesIO()
+                img.save(output, format='JPEG', quality=70)
+                output.seek(0)
+
+                # Keep original file name
+                self.attachment = ContentFile(output.read(), name=self.attachment.name)
+
+            except Exception as e:
+                print("Image compression error:", e)
+
+        # Save instance
+        super().save(*args, **kwargs)
 
 # Service Remarks Image Path. 
 def service_remark_image_path(instance, filename):

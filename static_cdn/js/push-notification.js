@@ -16,7 +16,7 @@ function subscribeToPush(publicKey) {
             return;
         }
 
-        navigator.serviceWorker.register('/sw.js')
+        navigator.serviceWorker.register('/static/js/serviceworker.js')
             .then(function(registration) {
 //                console.log('✅ Service Worker registered:', registration);
 

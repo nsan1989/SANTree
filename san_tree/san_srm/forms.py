@@ -1,14 +1,15 @@
 from django import forms
-from .models import Service, ServiceRemarks, ServiceTypes
+from .models import *
 from accounts.models import CustomUsers
 
-# Service Form.
+# Requested Service Form.
 class ServiceForm(forms.ModelForm):
     class Meta:
         model = Service
         fields = [
             'service_type',
-            'location',
+            'from_location',
+            'to_location',
             'priority'
         ]
         labels = {
@@ -21,7 +22,35 @@ class ServiceForm(forms.ModelForm):
 
         self.fields['service_type'].required = True
 
-        self.fields['location'].required = True
+        self.fields['from_location'].required = True
+
+        self.fields['to_location'].required = True
+
+# Generated Service Form.
+class ServiceGenerateForm(forms.ModelForm):
+    class Meta:
+        model = GenerateService
+        fields = [
+            'service_type',
+            'from_location',
+            'to_location',
+            'attachment'
+        ]
+        labels = {
+            'service_type': 'Service'
+        }
+
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)
+        super(ServiceGenerateForm, self).__init__(*args, **kwargs)
+
+        self.fields['service_type'].required = True
+
+        self.fields['from_location'].required = True
+
+        self.fields['to_location'].required = True
+
+        self.fields['attachment'].required = True
 
 # Service Remarks.
 class ServiceRemark(forms.ModelForm):

@@ -86,6 +86,11 @@
     const menuBars = document.getElementById("menu-bars");
     const menuX = document.getElementById("menu-x");
 
+    sidebar.classList.add("expanded");
+    mainContent.classList.add("shifted");
+    menuBars.classList.add("d-none");
+    menuX.classList.remove("d-none");
+
     if (toggleBtn) {
       toggleBtn.addEventListener("click", function () {
         // Toggle sidebar and main content

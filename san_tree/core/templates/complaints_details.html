@@ -97,11 +97,11 @@ Department Detail
 				  </thead>
 				  <tbody class="table-info">
 				    {% if remarks %}
+				        {% for remark in remarks %}
 				        <tr>
-				            {% for remark in remarks %}
-				                <td>{{ remark.remarks }}</td>
-				            {% endfor %}
+				            <td>{{ remark.remarks }}</td>
 				        </tr>
+				        {% endfor %}
 				    {% else %}
 				        <tr>
 				            <td colspan="100%">No Remarks!</td>

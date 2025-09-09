@@ -25,6 +25,10 @@ Complaint
     font-family: 'Poppins', sans-serif;
     font-size: 0.8rem;
   }
+
+  td a {
+    cursor: pointer;
+  }
 </style>
 
 <div class="container-fluid">
@@ -128,7 +132,7 @@ Complaint
                     <option value="">select</option>
                     <option value="Review" {% if complaints.status == 'Review' %} selected {% endif %}>Review</option>
                   </select>
-                  <button class="btn btn-primary" type="submit">Update</button>
+                  <button class="btn btn-sm btn-primary mt-2" type="submit">Update</button>
                 </form>
             </td>
             {% else %}
