@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'crispy_bootstrap5',
     'pwa',
     'webpush',
+    'structlog',
     'core',
     'accounts',
     'san_tms',

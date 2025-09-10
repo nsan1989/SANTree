@@ -87,6 +87,7 @@ Dashboard
             </div>
         </div>
     </div>
+    {% if request.user.department.name == 'GDA' or request.user.department.name == 'General Duty Assistant' %}
     <div class="row">
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6">
             <div class="row">
@@ -112,8 +113,8 @@ Dashboard
                                         {{shift.shift_location.name}} <br />
                                         {{shift.shift_location.block}}
                                     </td>
-                                    <td>{{shift.start_time}}</td>
-                                    <td>{{shift.end_time}}</td>
+                                    <td>{{ shift.start_time|date:"H:i" }}</td>
+                                    <td>{{ shift.end_time|date:"H:i" }}</td>
                                 </tr>
                                 {% endfor %}
                             {% else %}
@@ -128,5 +129,6 @@ Dashboard
         </div>
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6"></div>
     </div>
+    {% endif %}
 </div>
 {% endblock %}

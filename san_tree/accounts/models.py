@@ -9,8 +9,8 @@ USER = 'User'
 INCHARGE = 'In Charge'
 STAFF = 'Staff'
 
-ENGAGED = 'Engaged'
-VACANT = 'Vacant'
+ENGAGED = 'engaged'
+VACANT = 'vacant'
 
 # Role Choices.
 ROLE_CHOICES = (
@@ -27,8 +27,8 @@ DESIGNATION_CHOICES = [
 
 # Status Choices.
 STATUS_CHOICES = (
-    (ENGAGED, 'engaged'),
-    (VACANT, 'vacant'),
+    (ENGAGED, 'Engaged'),
+    (VACANT, 'Vacant'),
 )
 
 # Department Model.
@@ -61,7 +61,7 @@ class Location(models.Model):
 # User Model.
 class CustomUsers(AbstractUser):
     role = models.CharField(max_length=25, choices=ROLE_CHOICES, default='user')
-    status = models.CharField(max_length=25, choices=STATUS_CHOICES, default='vacant', null=True, blank=True)
+    status = models.CharField(max_length=25, choices=STATUS_CHOICES, default=VACANT, null=True, blank=True)
     department = models.ForeignKey(Departments, on_delete=models.SET_NULL, null=True, blank=True)
     designation = models.CharField(max_length=25, choices=DESIGNATION_CHOICES, default='staff')
     employee_id = models.CharField(max_length=20, unique=True, default='EMP_ID')

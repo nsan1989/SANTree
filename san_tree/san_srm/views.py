@@ -8,7 +8,11 @@ from django.http import JsonResponse
 from django.core.paginator import Paginator
 from django.contrib import messages
 from django.utils import timezone
+from datetime import timedelta
+import datetime
+import structlog
 
+log = structlog.get_logger()
 now = timezone.now()
 
 # Admin Dashboard view.
@@ -24,7 +28,7 @@ def AdminDashboard(request):
     vacant = vacant_users.count()
     engaged_users = dept_users.filter(status = 'engaged')
     engage = engaged_users.count()
-    services = Service.objects.filter(assigned_to__department = user.department).all().count()
+    services = Service.objects.filter(assigned_to__shift_staffs__department__name= user.department).all().count()
     context = {
         'current_user': user,
         'all_users': user_count,
@@ -41,6 +45,8 @@ def AdminDashboard(request):
 
 # Staff Dashboard View.
 def StaffDashboard(request):
+    today = timezone.localdate()
+    tomorrow = today + timedelta(days=1)
     user = request.user
     try:
         user_role = user.role
@@ -50,7 +56,11 @@ def StaffDashboard(request):
     open_service = Service.objects.filter(assigned_to__shift_staffs = user, status = 'Completed').count()
     progress_service = Service.objects.filter(assigned_to__shift_staffs = user, status = 'In Progress').count()
     completed_service = Service.objects.filter(assigned_to__shift_staffs = user, status = 'Completed').count()
-    my_shift = ShiftSchedule.objects.filter(shift_staffs = user).all()
+    my_shift = ShiftSchedule.objects.filter(
+        shift_staffs = user, 
+        start_time__gte=today, 
+        end_time__lt=tomorrow
+        ).all()
     context = {
         'current_user': user,
         'total_service': services,
@@ -98,6 +108,7 @@ def ServiceView(request):
         if form.is_valid():
             new_service = form.save(commit=False)
             new_service.created_by = request.user
+            new_service.status = 'Open'
             new_service.save()
 
             if new_service.pk is None:
@@ -105,15 +116,15 @@ def ServiceView(request):
 
             assigned = False
             for staff in provider_staff:
-                if staff.status == 'vacant':
+                if staff.status == 'vacant' or staff.status == 'Vacant':
                     schedule = ShiftSchedule.objects.filter(
                         shift_staffs=staff,
                         start_time__lte=now,
                         end_time__gte=now
                         ).first()
-
                     if schedule:
                         new_service.assigned_to = schedule
+                        new_service.status = 'In Progress'
                         new_service.save()
                         staff.status = 'engaged'
                         staff.save()
@@ -131,6 +142,28 @@ def ServiceView(request):
     context = {'form': form}
     return render(request, 'service_request.html', context)
 
+# Free up the staff when service is completed.
+def free_up_staff(service):
+    try:
+        prog_service = Service.objects.filter(status='In Progress').all()
+        if prog_service.exists():
+            for service in prog_service:
+                if service.created_at <= timezone.now() - timedelta(minutes=3):
+                    staff = service.assigned_to.shift_staffs
+                    if staff and staff.status == 'engaged':
+                        staff.status = 'vacant'
+                        staff.save()
+                        
+                        service.status = 'Waiting'
+                        service.save()
+                    
+                    assign_service_from_queue(staff)
+                else:
+                    messages.error("Service is not completed or has no assigned staff.")
+        pass
+    except Exception as e:
+        log.error("Error freeing up staff", error=str(e))
+
 # Assigned Service to the vacant staff from the queue.
 def assign_service_from_queue(vacant_staff):
     try:
@@ -143,8 +176,9 @@ def assign_service_from_queue(vacant_staff):
             vacant_staff.status = 'engaged'
             vacant_staff.save()
             next_service_request.delete()
+        pass
     except Exception as e:
-        print(f"Error assigning service from queue: {e}")
+        log.error("Error freeing up staff", error=str(e))
 
 # Service Genearte View.
 def GenerateServiceView(request):

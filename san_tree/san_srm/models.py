@@ -5,6 +5,7 @@ from io import BytesIO
 from django.core.files.base import ContentFile
 import os
 from django.core.exceptions import ValidationError
+from django.utils import timezone
 
 # Service Model.
 class ServiceTypes(models.Model):
@@ -85,6 +86,13 @@ class ShiftSchedule(models.Model):
 
     def __str__(self):
         return f"{self.shift_staffs} - {self.shift_type} ({self.start_time:%Y-%m-%d})"
+    
+    def save(self, *args, **kwargs):
+        if self.start_time and timezone.is_naive(self.start_time):
+            self.start_time = timezone.make_aware(self.start_time, timezone.get_current_timezone())
+        if self.end_time and timezone.is_naive(self.end_time):
+            self.end_time = timezone.make_aware(self.end_time, timezone.get_current_timezone())
+        super().save(*args, **kwargs)
 
 # Request Service Model.
 class Service(models.Model):
