@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.db.models import Q
 from django.core.exceptions import PermissionDenied
 from .models import *
@@ -52,10 +52,14 @@ def StaffDashboard(request):
         user_role = user.role
     except:
         raise PermissionDenied("User profile not found")
-    services = Service.objects.filter(assigned_to__shift_staffs = user).all().count()
-    open_service = Service.objects.filter(assigned_to__shift_staffs = user, status = 'Completed').count()
-    progress_service = Service.objects.filter(assigned_to__shift_staffs = user, status = 'In Progress').count()
-    completed_service = Service.objects.filter(assigned_to__shift_staffs = user, status = 'Completed').count()
+    created_services = Service.objects.filter(created_by = user).all().count()
+    open_created_service = Service.objects.filter(created_by = user, status = 'Open').count()
+    progress_created_service = Service.objects.filter(created_by = user, status = 'In Progress').count()
+    completed_created_service = Service.objects.filter(created_by = user, status = 'Completed').count()
+    assign_service = Service.objects.filter(assigned_to__shift_staffs = user).all().count()
+    open_assign_service = Service.objects.filter(assigned_to__shift_staffs = user, status = 'Open').count()
+    progress_assign_service = Service.objects.filter(assigned_to__shift_staffs = user, status = 'In Progress').count()
+    completed_assign_service = Service.objects.filter(assigned_to__shift_staffs = user, status = 'Completed').count()
     my_shift = ShiftSchedule.objects.filter(
         shift_staffs = user, 
         start_time__gte=today, 
@@ -63,10 +67,14 @@ def StaffDashboard(request):
         ).all()
     context = {
         'current_user': user,
-        'total_service': services,
-        'open_serv': open_service,
-        'prog_serv': progress_service,
-        'comp_serv': completed_service,
+        'total_created_service': created_services,
+        'open_created_serv': open_created_service,
+        'prog_created_serv': progress_created_service,
+        'comp_created_serv': completed_created_service,
+        'total_assign_service': assign_service,
+        'open_assign_serv': open_assign_service,
+        'prog_assign_serv': progress_assign_service,
+        'comp_assign_serv': completed_assign_service,
         'shifts': my_shift,
     }
     view_name = request.resolver_match.view_name
@@ -131,9 +139,11 @@ def ServiceView(request):
                         assigned = True
                         break
                     else:
-                        messages.error(f"No shift schedule found for staff {staff}")
+                        messages.error(request, f"No shift schedule found for staff {staff}")
 
             if not assigned:
+                new_service.status = 'Waiting'
+                new_service.save()
                 ServiceRequestQueue.objects.create(service_request=new_service)
             
             return redirect('srm:staff_dashboard')
@@ -142,8 +152,8 @@ def ServiceView(request):
     context = {'form': form}
     return render(request, 'service_request.html', context)
 
-# Free up the staff when service is completed.
-def free_up_staff(service):
+# Free up the staff when exceeds timestamp.
+def free_up_staff():
     try:
         prog_service = Service.objects.filter(status='In Progress').all()
         if prog_service.exists():
@@ -154,15 +164,37 @@ def free_up_staff(service):
                         staff.status = 'vacant'
                         staff.save()
                         
-                        service.status = 'Waiting'
+                        service.status = 'Pending'
                         service.save()
-                    
                     assign_service_from_queue(staff)
-                else:
-                    messages.error("Service is not completed or has no assigned staff.")
         pass
     except Exception as e:
         log.error("Error freeing up staff", error=str(e))
+
+# Free up the staff when service is completed.
+def free_up_completed_staff(request, id):
+    user = request.user
+    try:
+        user_role = user.role
+    except:
+        raise PermissionDenied("User Profile not found.")
+    service = get_object_or_404(Service, id=id)
+    if request.method == 'POST':
+        if user_role == 'User' and service.assigned_to.shift_staffs == user:
+            new_status = request.POST.get('status')
+            if new_status == 'Completed':
+                service.status = new_status
+                service.assigned_to.shift_staffs.status = 'vacant'
+                service.assigned_to.shift_staffs.save()
+                service.save()
+
+                messages.success(request, "Service status updated successfully.")
+                assign_service_from_queue(service.assigned_to.shift_staffs)
+                return redirect('srm:staff_service')
+    view_name = request.resolver_match.view_name
+    if view_name == "srm:staff_update_service_status" and user_role == 'User':
+        return redirect('srm:staff_service')
+    raise PermissionDenied("You are not authorized to perform this action.")
 
 # Assigned Service to the vacant staff from the queue.
 def assign_service_from_queue(vacant_staff):
@@ -171,7 +203,7 @@ def assign_service_from_queue(vacant_staff):
         if next_service_request:
             service = next_service_request.service_request
             service.assigned_to = ShiftSchedule.objects.filter(shift_staffs=vacant_staff).first()
-            service.status = 'Open'
+            service.status = 'In Progress'
             service.save()
             vacant_staff.status = 'engaged'
             vacant_staff.save()
@@ -195,16 +227,21 @@ def GenerateServiceView(request):
     return render(request, 'service_generate.html', context)
 
 # All Service View.
-def AllServiceView(request):
+def RequestServiceView(request):
     user = request.user
     try:
         user_role = user.role
     except:
         raise PermissionDenied("User profile not found")
-    new_service = Service.objects.filter(created_by = user).order_by('-created_at')
+    request_service = Service.objects.filter(created_by = user).order_by('-created_at')
+    assign_service = Service.objects.filter(assigned_to__shift_staffs = user).order_by('-created_at')
     page_number = request.GET.get('page')
-    paginator = Paginator(new_service, 10) 
-    page_obj = paginator.get_page(page_number)
+    if user.department.name in ['GDA', 'General Duty Assistant']:
+        paginator = Paginator(assign_service, 10) 
+        page_obj = paginator.get_page(page_number)
+    else:
+        paginator = Paginator(request_service, 10) 
+        page_obj = paginator.get_page(page_number)
     context = {
         'page_obj': page_obj
     }
@@ -214,4 +251,40 @@ def AllServiceView(request):
     if view_name == "srm:staff_service" and user_role == 'User':
         return render(request, 'srm_staff_service.html', context)
     raise PermissionDenied("You are not authorized to view this page.")
-    
+
+# Shift Schedule View.
+def ShiftSchedules(request):
+    user = request.user
+    try:
+        user_role = user.role
+    except:
+        raise PermissionDenied("User profile not found")
+    schedules = ShiftSchedule.objects.filter(shift_staffs__department=user.department)
+    page_number = request.GET.get('page')
+    paginator = Paginator(schedules, 10) 
+    page_obj = paginator.get_page(page_number)
+    context = {
+        'page_obj': page_obj
+    }
+    view_name = request.resolver_match.view_name
+    if view_name == "srm:schedule" and user_role == 'Admin':
+        return render(request, 'shift_schedule.html', context)
+    raise PermissionDenied("You are not authorized to view this page.")
+
+# Shift Schedule Form View.
+def ShiftScheduleView(request):
+    if request.method == 'POST':
+        form = ShiftScheduleForm(request.POST, user=request.user)
+        if form.is_valid():
+            new_schedule = form.save(commit=False)
+            new_schedule.created_by = request.user
+            new_schedule.save()
+            messages.success(request, "Shift schedule created successfully.")
+            return redirect('srm:schedule')
+    else:
+        form = ShiftScheduleForm(user=request.user)
+    context = {
+        'form': form,
+    }
+    return render(request, 'schedule.html', context)
+

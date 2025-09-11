@@ -28,6 +28,7 @@ Service
 </style>
 
 <div class="container-fluid">
+    {% if request.user.department.name != 'GDA' and request.user.department.name != 'General Duty Assistant' %}
     <div class="row mb-3">
         <div class="col-12 d-flex flex-column">
             <div class="all-tasks-title">
@@ -42,7 +43,7 @@ Service
             <ul class="pagination">
               {% if page_obj.has_previous %}
                 <li class="page-item">
-                  <a class="page-link" href="?{% if selected_department %}department={{ selected_department }}&{% endif %}page={{ page_obj.previous_page_number }}">Previous</a>
+                  <a class="page-link" href="page={{ page_obj.previous_page_number }}">Previous</a>
                 </li>
               {% endif %}
               {% for num in page_obj.paginator.page_range %}
@@ -50,14 +51,14 @@ Service
                   <li class="page-item active"><span class="page-link">{{ num }}</span></li>
                 {% else %}
                   <li class="page-item">
-                    <a class="page-link" href="?{% if selected_department %}department={{ selected_department }}&{% endif %}page={{ num }}">{{ num }}</a>
+                    <a class="page-link" href="page={{ num }}">{{ num }}</a>
                   </li>
                 {% endif %}
               {% endfor %}
         
               {% if page_obj.has_next %}
                 <li class="page-item">
-                  <a class="page-link" href="?{% if selected_department %}department={{ selected_department }}&{% endif %}page={{ page_obj.next_page_number }}">Next</a>
+                  <a class="page-link" href="page={{ page_obj.next_page_number }}">Next</a>
                 </li>
               {% endif %}
             </ul>
@@ -102,5 +103,98 @@ Service
             </table>
         </div>
     </div>
+    {% else %}
+    <div class="row mb-3">
+        <div class="col-12 d-flex flex-column">
+            <div class="all-tasks-title">
+                <h1 class="fw-bold mb-0">Requested Service</h1>
+                <p>All the service requested to you!</p>
+            </div>
+        </div>
+    </div>
+    <div class="row mb-3">
+        <div class="col-12">
+            <nav>
+            <ul class="pagination">
+              {% if page_obj.has_previous %}
+                <li class="page-item">
+                  <a class="page-link" href="?{% if selected_department %}department={{ selected_department }}&{% endif %}page={{ page_obj.previous_page_number }}">Previous</a>
+                </li>
+              {% endif %}
+              {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                  <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                {% else %}
+                  <li class="page-item">
+                    <a class="page-link" href="?{% if selected_department %}department={{ selected_department }}&{% endif %}page={{ num }}">{{ num }}</a>
+                  </li>
+                {% endif %}
+              {% endfor %}
+        
+              {% if page_obj.has_next %}
+                <li class="page-item">
+                  <a class="page-link" href="?{% if selected_department %}department={{ selected_department }}&{% endif %}page={{ page_obj.next_page_number }}">Next</a>
+                </li>
+              {% endif %}
+            </ul>
+          </nav>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12 table-responsive">
+            <table class="table">
+                <thead class="table-dark">
+                    <tr>
+                        <th scope="col">Service No.</th>
+                        <th scope="col">Service Type</th>
+                        <th scope="col">Requested By</th>
+                        <th scope="col">From</th>
+                        <th scope="col">To</th>
+                        <th scope="col">Priority</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">Update Status</th>
+                    </tr>
+                </thead>
+                <tbody class="table-info">
+                    {% if page_obj %}
+                        {% for service in page_obj %}
+                            <tr>
+                                <td>{{service.service_number}}</td>
+                                <td>{{service.service_type}}</td>
+                                <td>{{service.created_by}}</td>
+                                <td>{{service.from_location}}</td>
+                                <td>{{service.to_location}}</td>
+                                <td>{{service.priority}}</td>
+                                <td>{{service.status}}</td>
+                                {% if service.status != 'Completed' %}
+                                <td>
+                                  <form method="POST" action="{% url 'srm:staff_update_service_status' service.id %}">
+                                    {% csrf_token %}
+                                    <select name="status" required>
+                                      <option value="">select</option>
+                                      <option value="Completed" {% if service.status == 'Completed' %} selected {% endif %}>Completed</option>
+                                    </select>
+                                    <button class="btn btn-sm btn-primary mt-2" type="submit">Update</button>
+                                  </form>
+                                </td>
+                                {% else %}
+                                <td>
+                                  <span class="text-success">No action needed</span>
+                                </td>
+                                {% endif %}
+                            </tr>
+                        {% endfor %}
+                    {% else %}
+                    <tr>
+                        <td colspan="100%">
+                            No service have been requested yet!
+                        </td>
+                    </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %} 
 </div>
 {% endblock %}

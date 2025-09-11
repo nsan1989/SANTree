@@ -6,6 +6,7 @@ from django.core.files.base import ContentFile
 import os
 from django.core.exceptions import ValidationError
 from django.utils import timezone
+from accounts.models import Location
 
 # Service Model.
 class ServiceTypes(models.Model):
@@ -31,28 +32,13 @@ class Blocks(models.Model):
 
     class Meta:
         ordering = ['name']
-
-# Location Model.
-class ServiceLocation(models.Model):
-    block = models.ForeignKey(Blocks, related_name='service_block', on_delete=models.CASCADE)
-    name = models.CharField(max_length=100)
-
-    def __str__(self):
-        return self.name
-    
-    def save(self, *args, **kwargs):
-        if ServiceLocation.objects.filter(name__iexact=self.name, block=self.block).exclude(pk=self.pk).exists():
-            raise ValidationError(f"A location with the name '{self.name}+{self.block}' already exists.")
-        super().save(*args, **kwargs)
-        
-    class Meta:
-        ordering = ['name']
     
 # Status Choices.
 STATUS_CHOICES = (
     ('open', 'Open'),
     ('in_progress', 'In Progress'),
     ('waiting', 'Waiting'),
+    ('pending', 'Pending'),
     ('completed', 'Completed'),
 )
 
@@ -74,7 +60,7 @@ SHIFT_CHOICES = (
 # Shift Model.
 class ShiftSchedule(models.Model):
     shift_type = models.CharField(max_length=20, choices=SHIFT_CHOICES, default='Morning')
-    shift_location = models.ForeignKey(ServiceLocation, related_name='shift_locationss', on_delete=models.CASCADE)
+    shift_block = models.ForeignKey(Blocks, related_name='shift_blocks', on_delete=models.CASCADE, default=None)
     shift_staffs = models.ForeignKey(
         CustomUsers, 
         related_name='shift_staff', 
@@ -98,8 +84,9 @@ class ShiftSchedule(models.Model):
 class Service(models.Model):
     service_number = models.CharField(max_length=20, unique=True, blank=True)
     service_type = models.ForeignKey(ServiceTypes, on_delete=models.SET_NULL, null=True, blank=True)
-    from_location = models.ForeignKey(ServiceLocation, related_name='service_from', on_delete=models.SET_NULL, null=True, blank=True)
-    to_location = models.ForeignKey(ServiceLocation, related_name='service_to', on_delete=models.SET_NULL, null=True, blank=True)
+    service_block = models.ForeignKey(Blocks, related_name='service_blocks', on_delete=models.SET_NULL, null=True, blank=True)
+    from_location = models.ForeignKey(Location, related_name='service_from', on_delete=models.SET_NULL, null=True, blank=True)
+    to_location = models.ForeignKey(Location, related_name='service_to', on_delete=models.SET_NULL, null=True, blank=True)
     priority = models.CharField(max_length=20, choices=PRIORITY_CHOICES, default='Low')
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Open')
     assigned_to = models.ForeignKey(ShiftSchedule, related_name='srm_service_staff', on_delete=models.SET_NULL, null=True, blank=True)
@@ -144,8 +131,8 @@ def generate_service_image_path(instance, filename):
 class GenerateService(models.Model):
     generate_number = models.CharField(max_length=20, unique=True, blank=True)
     service_type = models.ForeignKey(ServiceTypes, on_delete=models.SET_NULL, null=True, blank=True)
-    from_location = models.ForeignKey(ServiceLocation, related_name='generate_from', on_delete=models.SET_NULL, null=True, blank=True)
-    to_location = models.ForeignKey(ServiceLocation, related_name='generate_to', on_delete=models.SET_NULL, null=True, blank=True)
+    from_location = models.ForeignKey(Location, related_name='generate_from', on_delete=models.SET_NULL, null=True, blank=True)
+    to_location = models.ForeignKey(Location, related_name='generate_to', on_delete=models.SET_NULL, null=True, blank=True)
     generate_by = models.ForeignKey(ShiftSchedule, related_name='srm_generate_service', on_delete=models.CASCADE)
     generate_at = models.DateTimeField(auto_now_add=True)
     completed_at = models.DateTimeField(null=True, blank=True)

@@ -29,12 +29,18 @@ MENU_STRUCTURE = {
     'srm': {
         'admin': [
             {"name": "Dashboard", "url_name": "srm:admin_dashboard", "view_name":"AdminDashboard", "icon": "fa-solid fa-chart-line"},
-            {"name": "Tasks", "url_name": "srm:admin_service", "view_name":"AllServiceView", "icon": "fa-solid fa-wheelchair"},
+            {"name": "Schedule", "url_name": "srm:schedule", "view_name":"ShiftSchedule", "icon": "fa-solid fa-calender-days"},
+            {"name": "Service", "url_name": "srm:admin_service", "view_name":"AllServiceView", "icon": "fa-solid fa-wheelchair"},
             {"name": "Profile", "url_name": "srm:admin_profile", "view_name":"ProfileView", "icon": "fa-regular fa-circle-user"},
         ],
         'user': [
             {"name": "Dashboard", "url_name": "srm:staff_dashboard", "view_name":"StaffDashboard", "icon": "fa-solid fa-chart-line"},
-            {"name": "Service", "url_name": "srm:staff_service", "view_name":"AllServiceView", "icon": "fa-solid fa-wheelchair"},
+            {
+                "name": "Service", 
+                "url_name": "srm:staff_service", 
+                "view_name":"AllServiceView", 
+                "icon": "fa-solid fa-wheelchair"
+            },
             {"name": "Profile", "url_name": "srm:staff_profile", "view_name":"ProfileView", "icon": "fa-regular fa-circle-user"},
         ]
     },

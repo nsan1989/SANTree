@@ -23,6 +23,16 @@ Dashboard
         color: #fff;
         min-height: 8rem;
     }
+    .card-body {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+    .card-body h5 {
+        font-size: 1rem;
+        font-weight: 600;
+    }
 </style>
 
 <div class="container-fluid">
@@ -53,40 +63,77 @@ Dashboard
         </div>
         {% endif %}
     </div>
+    {% if request.user.department.name == 'GDA' or request.user.department.name == 'General Duty Assistant' %}
     <div class="row mb-3">
         <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-3 p-2">
             <div class="card text-center">
                 <div class="card-body">
-                    <h5>Service Requested</h5>
-                    <p>{{total_service}}</p>
+                    <h5>Request</h5>
+                    <p>{{total_assign_service}}</p>
                 </div>
             </div>
         </div>
         <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-3 p-2">
             <div class="card text-center">
                 <div class="card-body">
-                    <h5>Open Service</h5>
-                    <p>{{open_serv}}</p>
+                    <h5>Open</h5>
+                    <p>{{open_assign_serv}}</p>
                 </div>
             </div>
         </div>
         <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-3 p-2">
             <div class="card text-center">
                 <div class="card-body">
-                    <h5>Progress Service</h5>
-                    <p>{{prog_serv}}</p>
+                    <h5>Progress</h5>
+                    <p>{{prog_assign_serv}}</p>
                 </div>
             </div>
         </div>
         <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-3 p-2">
             <div class="card text-center">
                 <div class="card-body">
-                    <h5>Completed Service</h5>
-                    <p>{{comp_serv}}</p>
+                    <h5>Completed</h5>
+                    <p>{{comp_assign_serv}}</p>
                 </div>
             </div>
         </div>
     </div>
+    {% else %}
+    <div class="row mb-3">
+        <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-3 p-2">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h5>Created</h5>
+                    <p>{{total_created_service}}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-3 p-2">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h5>Open</h5>
+                    <p>{{open_created_serv}}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-3 p-2">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h5>Progress</h5>
+                    <p>{{prog_created_serv}}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-3 p-2">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h5>Completed</h5>
+                    <p>{{comp_created_serv}}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
     {% if request.user.department.name == 'GDA' or request.user.department.name == 'General Duty Assistant' %}
     <div class="row">
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6">
