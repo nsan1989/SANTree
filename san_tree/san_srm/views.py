@@ -22,7 +22,9 @@ def AdminDashboard(request):
         user_role = user.role
     except:
         raise PermissionDenied("User profile not found")
-    dept_users = CustomUsers.objects.filter(department = user.department).exclude(role='Admin')
+    dept_users = CustomUsers.objects.filter(
+        Q(department__name='GDA') | Q(department__name='General Duty Assistant')
+        ).exclude(role='Admin')
     user_count = dept_users.count()
     vacant_users = dept_users.filter(status = 'vacant')
     vacant = vacant_users.count()
@@ -82,23 +84,6 @@ def StaffDashboard(request):
         return render(request, 'srm_staff_dashboard.html', context)
     raise PermissionDenied("You are not authorized to view this page.")
 
-# Profile View.
-def ProfileView(request):
-    user = request.user
-    try:
-        user_role = user.role
-    except:
-        PermissionDenied("User profile not found.")
-    context = {
-        'profile': user,
-    }
-    view_name = request.resolver_match.view_name
-    if view_name == "srm:staff_profile" and user_role == 'User':
-        return render(request, 'profile.html', context)
-    if view_name == "srm:admin_profile" and user_role == 'Admin':
-        return render(request, 'profile.html', context)
-    raise PermissionDenied("You are not authorized to view this page.")
-
 # Load Service Types.
 def load_service_types(request):
     department_id = request.GET.get('department')
@@ -146,7 +131,10 @@ def ServiceView(request):
                 new_service.save()
                 ServiceRequestQueue.objects.create(service_request=new_service)
             
-            return redirect('srm:staff_dashboard')
+            if request.user.role == 'Admin':
+                return redirect('srm:admin_dashboard')
+            else:
+                return redirect('srm:staff_dashboard')
     else:
         form = ServiceForm(user=request.user)
     context = {'form': form}
@@ -253,13 +241,15 @@ def RequestServiceView(request):
     raise PermissionDenied("You are not authorized to view this page.")
 
 # Shift Schedule View.
-def ShiftSchedules(request):
+def ShiftSchedules(request): 
     user = request.user
     try:
         user_role = user.role
     except:
         raise PermissionDenied("User profile not found")
-    schedules = ShiftSchedule.objects.filter(shift_staffs__department=user.department)
+    schedules = ShiftSchedule.objects.filter(
+        Q(shift_staffs__department__name='GDA') | Q(shift_staffs__department__name='General Duty Assistant')
+        )
     page_number = request.GET.get('page')
     paginator = Paginator(schedules, 10) 
     page_obj = paginator.get_page(page_number)

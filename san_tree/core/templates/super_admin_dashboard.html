@@ -37,13 +37,31 @@
   a {
     text-decoration: none;
   }
+
+  .add-department small a:hover,
+  .add-complaint small a:hover,
+  .add-task small a:hover,
+  .add-location small a:hover,
+  .add-service small a:hover,
+  .add-block small a:hover {
+    background-color: rgba(255, 193, 7, 0.6);
+    text-decoration: none;
+  }
+
+  .card-link a {
+    color: orange;
+  }
+
+  .card-link a:hover {
+    color: green;
+  }
 </style>
 
 <link rel="stylesheet" href="{% static 'styles/san_tree.css' %}" />
 
 <div class="container-fluid h-100">
   <div class="row mb-3">
-    <div class="col-xs-16 col-sm-12 col-md-4 col-lg-4 col-xl-4 mb-2">
+    <div class="col-12">
       <div class="dashboard-title">
         <h1 class="mb-0">Dashboard</h1>
       </div>
@@ -51,38 +69,72 @@
         <p class="mb-0">{{user.username}}</p>
       </div>
     </div>
-    <div class="col-xs-16 col-sm-12 col-md-8 col-lg-8 col-xl-8 d-flex align-items-center justify-content-center">
-      <div class="row w-100 d-flex align-items-center">
-        <div class="col-4 p-1">
-          <div class="add-department">
-            <small>
-              <a class="open-modal text-warning d-flex align-items-center justify-content-center border border-warning rounded" href="#" data-url="{% url 'add_department' %}">
-                <i class="fa-solid fa-plus fa-sm"></i>
-                &nbsp; <small>add dept.</small>
-              </a>
-            </small>
-          </div>
-        </div>
-        <div class="col-4 p-1">
-          <div class="add-complaint">
-            <small>
-              <a class="open-modal text-warning d-flex align-items-center justify-content-center border border-warning rounded" href="#" data-url="{% url 'add_complaint_type' %}">
-                <i class="fa-solid fa-plus fa-sm"></i>
-                &nbsp; <small>add comp.</small>
-              </a>
-            </small>
-          </div>
-        </div>
-        <div class="col-4 p-1">
-          <div class="add-task">
-            <small>
-              <a class="open-modal text-warning d-flex align-items-center justify-content-center border border-warning rounded" href="#" data-url="{% url 'add_task_type' %}">
-                <i class="fa-solid fa-plus fa-sm"></i>
-                &nbsp; <small>add task</small>
-              </a>
-            </small>
-          </div>
-        </div>
+  </div>
+  <div class="row mb-3 px-2">
+    <div class="col-2 p-1">
+      <div class="add-department">
+        <small>
+          <a class="open-modal text-warning d-flex align-items-center justify-content-center border border-warning rounded"
+            href="#" data-url="{% url 'add_department' %}">
+            <i class="fa-solid fa-plus fa-sm"></i>
+            &nbsp; <small>add dept.</small>
+          </a>
+        </small>
+      </div>
+    </div>
+    <div class="col-2 p-1">
+      <div class="add-complaint">
+        <small>
+          <a class="open-modal text-warning d-flex align-items-center justify-content-center border border-warning rounded"
+            href="#" data-url="{% url 'add_complaint_type' %}">
+            <i class="fa-solid fa-plus fa-sm"></i>
+            &nbsp; <small>add comp.</small>
+          </a>
+        </small>
+      </div>
+    </div>
+    <div class="col-2 p-1">
+      <div class="add-task">
+        <small>
+          <a class="open-modal text-warning d-flex align-items-center justify-content-center border border-warning rounded"
+            href="#" data-url="{% url 'add_task_type' %}">
+            <i class="fa-solid fa-plus fa-sm"></i>
+            &nbsp; <small>add task</small>
+          </a>
+        </small>
+      </div>
+    </div>
+    <div class="col-2 p-1">
+      <div class="add-location">
+        <small>
+          <a class="open-modal text-warning d-flex align-items-center justify-content-center border border-warning rounded"
+            href="#" data-url="{% url 'add_location' %}">
+            <i class="fa-solid fa-plus fa-sm"></i>
+            &nbsp; <small>add Loc.</small>
+          </a>
+        </small>
+      </div>
+    </div>
+    <div class="col-2 p-1">
+      <div class="add-service">
+        <small>
+          <a class="open-modal text-warning d-flex align-items-center justify-content-center border border-warning rounded"
+            href="#" data-url="{% url 'add_service_type' %}">
+            <i class="fa-solid fa-plus fa-sm"></i>
+            &nbsp; <small>add serv.</small>
+          </a>
+        </small>
+      </div>
+    </div>
+    <div class="col-2 p-1">
+      <div class="add-block">
+        <small>
+          <a class="open-modal text-warning d-flex align-items-center justify-content-center border border-warning rounded"
+            href="#" data-url="{% url 'add_block' %}">
+            <i class="fa-solid fa-plus fa-sm"></i>
+            &nbsp; <small>add blocks</small>
+          </a>
+        </small>
       </div>
     </div>
   </div>
@@ -96,7 +148,7 @@
           {{user}}
         </div>
         <div class="card-link">
-          <a class="text-warning" href="{% url 'all_users' %}"
+          <a href="{% url 'all_users' %}"
             style="text-decoration: none;font-family: 'Poppins', sans-serif;">
             View All
           </a>
@@ -112,7 +164,7 @@
           {{dept}}
         </div>
         <div class="card-link">
-          <a class="text-warning" href="{% url 'all_departments' %}"
+          <a href="{% url 'all_departments' %}"
             style="text-decoration: none;font-family: 'Poppins', sans-serif;">
             View All
           </a>
@@ -128,7 +180,7 @@
           {{comp}}
         </div>
         <div class="card-link">
-          <a class="text-warning" href="{% url 'all_complaints' %}"
+          <a href="{% url 'all_complaints' %}"
             style="text-decoration: none;font-family: 'Poppins', sans-serif;">
             View All
           </a>
@@ -144,7 +196,7 @@
           {{task}}
         </div>
         <div class="card-link">
-          <a class="text-warning" href="{% url 'all_tasks' %}"
+          <a href="{% url 'all_tasks' %}"
             style="text-decoration: none;font-family: 'Poppins', sans-serif;">
             View All
           </a>

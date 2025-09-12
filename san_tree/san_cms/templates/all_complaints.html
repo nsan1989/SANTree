@@ -89,7 +89,17 @@ Complaint
         <tbody>      
           {% if page_obj %}
           {% for complaint in page_obj %}
-          <tr>
+          <tr
+            {% if complaint.complaint.status == 'In Progress' %}
+              class="table-warning"
+            {% elif complaint.complaint.status == 'Resolved' %}
+              class="table-success"
+            {% elif complaint.complaint.status == 'Closed' %}
+              class="table-secondary"
+            {% elif complaint.complaint.status == 'Cancelled' %}
+              class="table-danger"
+            {% endif %}
+          >
             <td>{{complaint.complaint.department}}</td>
             <td>{{complaint.complaint.created_at}}</td>
             <td>{{complaint.complaint.status}}</td>

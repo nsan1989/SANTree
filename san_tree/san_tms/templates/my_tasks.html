@@ -47,7 +47,17 @@ My Tasks
           </thead>
           <tbody class="table-primary">
             {% if tasks %} {% for task in tasks %}
-            <tr>
+            <tr
+              {% if task.status == 'Completed' %}
+              class="table-success"
+              {% elif task.status == 'In Progress' %}
+              class="table-warning"
+              {% elif task.status == 'Waiting' %}
+              class="table-secondary"
+              {% elif task.status == 'Cancelled' %}
+              class="table-danger"
+              {% endif %}
+            >
               <td>{{ task.tasks_number}}</td>
               <td>{{ task.tasks_types.name }}</td>
               <td>{{ task.location }}</td>

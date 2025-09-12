@@ -549,3 +549,69 @@ def AddTaskTypeView(request):
         form = AddComplaintType()
 
     return render(request, 'add_tasks_type.html', {'form': form})
+
+# Add Location View.
+def AddLocationView(request):
+    if request.method == 'POST':
+        form = AddLocationForm(request.POST)
+        if form.is_valid():
+            location = form.save(commit=False)
+            exists = Location.objects.filter(name__iexact=location.name).exists()
+            if exists:
+                messages.error(request, 'Location already exist!')
+            else:
+                location.save()
+                messages.success(request, 'Location added successfully!')
+        else:
+            messages.error(request, 'Please correct the errors below.')
+    else:
+        form = AddLocationForm()
+
+    return render(request, 'add_location.html', {'form': form})
+
+# Add Service Type View.
+def AddServiceTypeView(request):
+    if request.method == 'POST':
+        form = AddServiceTypeForm(request.POST)
+        if form.is_valid():
+            service_type = form.save(commit=False)
+            exists = ServiceTypes.objects.filter(name__iexact=service_type.name).exists()
+            if exists:
+                messages.error(request, 'Service type already exist!')
+            else:
+                service_type.save()
+                messages.success(request, 'Service type added successfully!')
+        else:
+            messages.error(request, 'Please correct the errors below.')
+    else:
+        form = AddServiceTypeForm()
+
+    return render(request, 'add_service.html', {'form': form})
+
+# Add Block View.
+def AddBlockView(request):
+    if request.method == 'POST':
+        form = AddBlockForm(request.POST)
+        if form.is_valid():
+            block = form.save(commit=False)
+            exists = Blocks.objects.filter(name__iexact=block.name).exists()
+            if exists:
+                messages.error(request, 'Block already exist!')
+            else:
+                block.save()
+                messages.success(request, 'Block added successfully!')
+        else:
+            messages.error(request, 'Please correct the errors below.')
+    else:
+        form = AddBlockForm()
+
+    return render(request, 'add_block.html', {'form': form})
+
+# Profile View.
+def ProfileView(request):
+    user = request.user
+    context = {
+        'user': user,
+    }
+    return render(request, 'profile.html', context)
+    

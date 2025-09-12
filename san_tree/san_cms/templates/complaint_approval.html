@@ -58,7 +58,10 @@ Assigned Complaint
         <tbody>
           {% if page_obj %}
           {% for complaints in page_obj %}
-            <tr style="font-family: 'Poppins', sans-serif;">
+            <tr 
+            style="font-family: 'Poppins', sans-serif;"
+            class="{% if complaints.complaint.status == 'Cancelled' %}table-danger{% elif complaints.complaint.status == 'Resolved' %}table-success{% elif complaints.complaint.status == 'Halt' %}table-warning{% endif %}"
+            >
               <td>{{complaints.complaint.created_by.department}}</td>
               <td>{{complaints.complaint.complaint_type}}</td>
               <td>{{complaints.complaint.location}}</td>

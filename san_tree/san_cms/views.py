@@ -18,8 +18,7 @@ import io
 from threading import Lock
 plot_lock = Lock()
 from django.utils import timezone
-from datetime import timedelta
-import datetime
+from datetime import datetime, timedelta
 from accounts.models import ENGAGED, VACANT
 
 # Admin Complaint Dashboard view.
@@ -410,7 +409,7 @@ def AssignedComplaint(request):
     
     # Halt the open tasks if it exceeds 24hr.
     for complaint in complaints:
-        if complaint.complaint.status == 'Open' and complaint.complaint.created_at < datetime.now() - timedelta(hours=24):
+        if complaint.complaint.status == 'Open' and complaint.complaint.created_at < timezone.now() - timedelta(hours=24):
             complaint.complaint.status = 'Halt'
             complaint.complaint.save()
     
@@ -739,23 +738,6 @@ def RemarksComplaint(request, complaint_id):
         'complaint': complaint
     }
     return render(request, 'remarks.html', context)
-
-# Complaint Profile View.
-def ComplaintProfile(request):
-    user = request.user
-    try:
-        user_role = user.role
-    except:
-        PermissionDenied("User profile not found.")
-    context = {
-        'profile': user,
-    }
-    view_name = request.resolver_match.view_name
-    if view_name == "cms:staff_profile" and user_role == 'User':
-        return render(request, 'complaint_profile.html', context)
-    if view_name == "cms:admin_profile" and user_role == 'Admin':
-        return render(request, 'complaint_profile.html', context)
-    raise PermissionDenied("You are not authorized to view this page.")
 
 # Excel Export.
 def TasksExport(request):

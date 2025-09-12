@@ -96,7 +96,7 @@
   </style>
   <!----------->
   <div class="layout d-flex">
-    {% if request.user.is_authenticated and request.user.role != 'Super Admin' and request.resolver_match.url_name != 'main_dashboard' %}
+    {% if request.user.is_authenticated and request.user.role != 'Super Admin' and request.resolver_match.url_name != 'main_dashboard' and request.resolver_match.url_name != 'profile' %}
     <div id="sidebar" class="sidebar">
       <div id="sidebar-content" class="sidebar-content h-100">
         {% include 'sidebar.html' %}

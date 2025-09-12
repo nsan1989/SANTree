@@ -48,7 +48,8 @@
             </a>
           {% endif %}
         </div>
-        <div class="right-items d-flex align-items-center">
+        <div class="right-items d-flex px-3">
+          <div>
           {% if request.user.role != 'Super Admin' %}
           <a class="nav-link text-light d-flex align-items-center" href="{% url 'main_dashboard' %}">
             <i class="fa-solid fa-house" title="back to home page" style="font-size: 0.9rem; color: #990000;"></i>
@@ -58,6 +59,15 @@
             <i class="fa-solid fa-house" title="back to home page" style="font-size: 0.9rem; color: #990000;"></i>
           </a>
           {% endif %}
+          </div>
+          <div class="px-3">
+          {% if request.user.role != 'Super Admin' %}
+          <a class="nav-link text-light d-flex align-items-center" href="{% url 'profile' %}">
+            <i class="fa-solid fa-user" title="Profile" style="font-size: 0.9rem; color: #990000;"></i>
+          </a>
+          {% endif %}
+          </div>
+          <div>
           <form
             method="POST"
             action="{% url 'logout' %}"
@@ -66,15 +76,16 @@
             {% csrf_token %}
             <button
               type="submit"
-              class="btn d-flex align-items-center"
+              class="btn d-flex align-items-center p-0"
               style="font-size: 0.9rem; color: #990000;"
             >
-              <i class="fa-solid fa-right-from-bracket fa-lg" title="logout"></i>
+              <i class="fa-solid fa-right-from-bracket" title="logout"></i>
               <!--
               <span class="d-none d-md-flex ms-2">Logout</span>
               -->
             </button>
           </form>
+          </div>
         </div>
     </div>
   </nav>
@@ -85,11 +96,6 @@
     const mainContent = document.getElementById("main-content");
     const menuBars = document.getElementById("menu-bars");
     const menuX = document.getElementById("menu-x");
-
-    sidebar.classList.add("expanded");
-    mainContent.classList.add("shifted");
-    menuBars.classList.add("d-none");
-    menuX.classList.remove("d-none");
 
     if (toggleBtn) {
       toggleBtn.addEventListener("click", function () {

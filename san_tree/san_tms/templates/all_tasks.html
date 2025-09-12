@@ -52,7 +52,13 @@
                     <tbody class="table-primary">
                         {% if tasks %}
                             {% for task in tasks %}
-                            <tr>
+                            <tr
+                                {% if task.status == 'Completed' %}
+                                    class="table-success"
+                                {% elif task.status == 'Rejected' %}
+                                    class="table-danger"
+                                {% endif %}
+                            >
                                 <td style="width: 25%;">{{task.tasks_number}}</td>
                                 <td style="width: 25%;">{{task.tasks_types}}</td>
                                 <td style="width: 15%;">{{task.status}}</td>

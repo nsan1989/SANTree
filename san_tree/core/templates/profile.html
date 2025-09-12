@@ -1,0 +1,64 @@
+{% extends 'index.html' %} 
+{% load static %} 
+
+{% block title %} Home {% endblock %} 
+
+{% block start %}
+
+<style>
+    .profile-container {
+        background-color: rgba(0, 0, 0, 0.6);
+        color: #fff;
+    }
+    .profile-title {
+        text-align: right;
+        font-family: 'Poppins', sans-serif;
+        font-size: 0.9rem;
+        font-weight: bold;
+    }
+    ul {
+        list-style-type: none;
+    }
+    .profile-content {
+        font-family: 'Poppins', sans-serif;
+        font-size: 0.9rem;
+    }
+</style>
+
+<div class="container-fluid">
+    <div class="mb-3">
+      <a
+        href="javascript:history.back()"
+        class="col-12 d-flex align-items-center justify-content-center text-warning"
+        style="text-decoration: none"
+      >
+        <i class="fa-solid fa-arrow-left"></i>
+        &nbsp;back
+      </a>
+    </div>
+    <div class="row d-flex justify-content-center">
+        <div class="col-auto">
+            <div class="profile-container d-flex justify-content-between rounded p-3">
+                <div class="profile-title">
+                    <ul class="d-flex flex-column" style="max-width: auto;">
+                        <li>Username&nbsp;:</li>
+                        <li>Department&nbsp;:</li>
+                        <li>Designation&nbsp;:</li>
+                        <li>Employee ID&nbsp;:</li>
+                        <li>Email&nbsp;:</li>
+                    </ul>
+                </div>
+                <div class="profile-content">
+                    <ul class="d-flex flex-column ps-2" style="max-width: auto;">
+                        <li>{{ user.username }}</li>
+                        <li>{{ user.department }}</li>
+                        <li>{{ user.designation }}</li>
+                        <li>{{ user.employee_id }}</li>
+                        <li>{{ user.email }}</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

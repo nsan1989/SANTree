@@ -116,7 +116,9 @@ Complaint
         <tbody>
           {% if page_obj %}
           {% for task in page_obj %}
-          <tr>
+          <tr
+            class="{% if task.complaint.status == 'Cancelled' %}table-danger{% elif task.complaint.status == 'Resolved' %}table-success{% elif task.complaint.status == 'Halt' %}table-warning{% endif %}"
+          >
             <td>{{task.complaint.complaint_number}}</td>
             <td>{{task.complaint.created_by.department}}</td>
             <td>{{task.complaint.complaint_type}}</td>

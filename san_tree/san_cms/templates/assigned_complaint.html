@@ -111,7 +111,10 @@ Assigned Complaint
         <tbody>
           {% if page_obj %}
           {% for complaints in page_obj %}
-          <tr style="font-family: 'Poppins', sans-serif;">
+          <tr 
+          style="font-family: 'Poppins', sans-serif;"
+          class="{% if complaints.complaint.status == 'In Progress' %}table-warning{% elif complaints.complaint.status == 'Resolved' %}table-success{% elif complaints.complaint.status == 'Cancelled' %}table-danger{% elif complaints.complaint.status == 'Review' %}table-info{% endif %}"
+          >
             <td>{{complaints.complaint.status}}</td>
             <td>{{complaints.complaint.priority}}</td>
             <td>{{complaints.complaint.created_at}}</td>

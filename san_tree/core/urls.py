@@ -21,4 +21,8 @@ urlpatterns = [
     path('add_department/', AddDepartmentView, name='add_department'),
     path('add_complaint_type/', AddComplaintTypeView, name='add_complaint_type'),
     path('add_task_type/', AddTaskTypeView, name='add_task_type'),
+    path('add_location/', AddLocationView, name='add_location'),
+    path('add_service_type/', AddServiceTypeView, name='add_service_type'),
+    path('add_block/', AddBlockView, name='add_block'),
+    path('profile/', ProfileView, name='profile'),
 ]

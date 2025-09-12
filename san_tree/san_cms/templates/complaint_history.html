@@ -33,7 +33,16 @@ All Complaints
             <div class="table-responsive">
                 <table class="table table-bordered table-hover">
                     <thead class="table-primary">
-                      <tr style="font-family: 'Open Sans', sans-serif;">
+                      <tr 
+                      style="font-family: 'Open Sans', sans-serif;"
+                      {% if service.status == "pending" %}
+                        class="table-danger"
+                      {% elif service.status == "waiting" %}
+                        class="table-warning"
+                      {% elif service.status == "completed" %}
+                        class="table-success"
+                      {% endif %}
+                      >
                         <th scope="col">Complaint</th>
                         <th scope="col">status</th>
                         <th scope="col">Concern Department</th>

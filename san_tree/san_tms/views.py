@@ -113,23 +113,6 @@ def StaffDashboard(request):
     if view_name == "tms:staff_dashboard" and user_role == 'User':
         return render(request, 'staff_dashboard.html', context)
 
-# Task Profile View.
-def TaskProfile(request):
-    user = request.user
-    try:
-        user_role = user.role
-    except:
-        PermissionDenied("User profile not found.")
-    context = {
-        'profile': user,
-    }
-    view_name = request.resolver_match.view_name
-    if view_name == "tms:staff_profile" and user_role == 'User':
-        return render(request, 'tasks_profile.html', context)
-    if view_name == "tms:admin_profile" and user_role == 'Admin':
-        return render(request, 'tasks_profile.html', context)
-    raise PermissionDenied("You are not authorized to view this page.")
-
 # Load Task Types.
 def load_tasks_types(request):
     department_id = request.GET.get('department')

@@ -31,7 +31,5 @@ urlpatterns = [
     path('admin_update_complaint_status/<int:id>/', AdminUpdateComplaintStatus, name='admin_update_complaint_status'),
     path('cancel_complaint/<int:id>/', CancelComplaint, name='cancel_complaint'),
     path('ajax/load-complaint-types/', load_complaint_types, name='ajax_load_complaint_types'),
-    path('incharge/profile/', ComplaintProfile, name='admin_profile'),
-    path('staff/profile/', ComplaintProfile, name='staff_profile'),
     path('export/excel/', TasksExport, name='export_tasks_excel'),
 ]
