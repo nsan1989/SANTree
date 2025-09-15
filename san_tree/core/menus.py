@@ -25,7 +25,7 @@ MENU_STRUCTURE = {
     'srm': {
         'admin': [
             {"name": "Dashboard", "url_name": "srm:admin_dashboard", "view_name":"AdminDashboard", "icon": "fa-solid fa-chart-line"},
-            {"name": "Schedule", "url_name": "srm:schedule", "view_name":"ShiftSchedule", "icon": "fa-solid fa-calender"},
+            {"name": "Schedule", "url_name": "srm:schedule", "view_name":"ShiftSchedule", "icon": "fa-solid fa-calendar-days"},
             {"name": "Service", "url_name": "srm:admin_service", "view_name":"AllServiceView", "icon": "fa-solid fa-wheelchair"}
         ],
         'user': [

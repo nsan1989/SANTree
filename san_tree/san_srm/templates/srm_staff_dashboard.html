@@ -33,6 +33,14 @@ Dashboard
         font-size: 1rem;
         font-weight: 600;
     }
+    .shift-title h3 {
+        font-family: 'Poppins', sans-serif;
+        color: wheat;
+    }
+    th, td {
+        font-family: 'Poppins', sans-serif;
+        font-size: 0.9rem;
+    }
 </style>
 
 <div class="container-fluid">
@@ -138,8 +146,8 @@ Dashboard
     <div class="row">
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6">
             <div class="row">
-                <div class="col-12">
-                    <h3 class="fw-bold">Shift Schedule</h3>
+                <div class="col-12 shift-title mb-2">
+                    <h3>Shift Schedule</h3>
                 </div>
                 <div class="col-12 table-responsive">
                     <table class="table">
@@ -156,10 +164,7 @@ Dashboard
                                 {% for shift in shifts %}
                                 <tr>
                                     <td>{{shift.shift_type}}</td>
-                                    <td>
-                                        {{shift.shift_location.name}} <br />
-                                        {{shift.shift_location.block}}
-                                    </td>
+                                    <td>{{shift.shift_block}} </td>
                                     <td>{{ shift.start_time|date:"H:i" }}</td>
                                     <td>{{ shift.end_time|date:"H:i" }}</td>
                                 </tr>
