@@ -39,6 +39,7 @@ STATUS_CHOICES = (
     ('in_progress', 'In Progress'),
     ('waiting', 'Waiting'),
     ('pending', 'Pending'),
+    ('on hold', 'On Hold'),
     ('completed', 'Completed'),
 )
 
@@ -71,7 +72,7 @@ class ShiftSchedule(models.Model):
     end_time = models.DateTimeField()
 
     def __str__(self):
-        return f"{self.shift_staffs} - {self.shift_type} ({self.start_time:%Y-%m-%d})"
+        return f"{self.shift_staffs} - {self.shift_type}"
     
     def save(self, *args, **kwargs):
         if self.start_time and timezone.is_naive(self.start_time):

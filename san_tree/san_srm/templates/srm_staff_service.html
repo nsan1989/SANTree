@@ -89,6 +89,8 @@ Service
                               class="table-warning"
                             {% elif service.status|lower == "completed" %}
                               class="table-success"
+                            {% elif service.status|lower == "on hold" %}
+                              class="table-info"
                             {% endif %}
                             >
                                 <td>{{service.service_number}}</td>
@@ -173,6 +175,8 @@ Service
                               class="table-warning"
                             {% elif service.status|lower == "completed" %}
                               class="table-success"
+                            {% elif service.status|lower == "on hold" %}
+                              class="table-info"
                             {% endif %}
                             >
                                 <td>{{service.service_number}}</td>
@@ -182,13 +186,14 @@ Service
                                 <td>{{service.to_location}}</td>
                                 <td>{{service.priority}}</td>
                                 <td>{{service.status}}</td>
-                                {% if service.status != 'Completed' %}
+                                {% if service.status != 'Completed' and service.status != 'Pending' %}
                                 <td>
                                   <form method="POST" action="{% url 'srm:staff_update_service_status' service.id %}">
                                     {% csrf_token %}
                                     <select name="status" required>
                                       <option value="">select</option>
                                       <option value="Completed" {% if service.status == 'Completed' %} selected {% endif %}>Completed</option>
+                                      <option value="On Hold" {% if service.status == 'On Hold' %} selected {% endif %}>On Hold</option>
                                     </select>
                                     <button class="btn btn-sm btn-primary mt-2" type="submit">Update</button>
                                   </form>

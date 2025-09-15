@@ -175,10 +175,17 @@ def free_up_completed_staff(request, id):
                 service.assigned_to.shift_staffs.status = 'vacant'
                 service.assigned_to.shift_staffs.save()
                 service.save()
-
                 messages.success(request, "Service status updated successfully.")
                 assign_service_from_queue(service.assigned_to.shift_staffs)
                 return redirect('srm:staff_service')
+            elif new_status == 'On Hold':
+                service.status = new_status
+                service.assigned_to.shift_staffs.status = 'engaged'
+                service.assigned_to.shift_staffs.save()
+                service.save()
+                messages.success(request, "Service status updated successfully.")
+                return redirect('srm:staff_service')
+            
     view_name = request.resolver_match.view_name
     if view_name == "srm:staff_update_service_status" and user_role == 'User':
         return redirect('srm:staff_service')
@@ -278,3 +285,21 @@ def ShiftScheduleView(request):
     }
     return render(request, 'schedule.html', context)
 
+# Free up the staff if service status is 'On Hold' and exceeds timestamp.
+def free_up_onhold_staff():
+    try:
+        onhold_service = Service.objects.filter(status='On Hold').all()
+        if onhold_service.exists():
+            for service in onhold_service:
+                if service.created_at <= timezone.now() - timedelta(minutes=3):
+                    staff = service.assigned_to.shift_staffs
+                    if staff and staff.status == 'engaged':
+                        staff.status = 'vacant'
+                        staff.save()
+                        
+                        service.status = 'Pending'
+                        service.save()
+                    assign_service_from_queue(staff)
+        pass
+    except Exception as e:
+        log.error("Error freeing up staff", error=str(e))
