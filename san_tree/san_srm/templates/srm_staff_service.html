@@ -25,6 +25,10 @@ Service
         font-family: 'Poppins', sans-serif;
         font-size: 0.85rem;
     }
+    .status-pending > td   { background-color: #990000; color: white; }
+    .status-waiting > td  { background-color: #ff9900; color: #000; }
+    .status-completed > td { background-color: #003300; color: #fff; }
+    .status-onhold  > td  { background-color: #d2d2d2; color: #000; }
 </style>
 
 <div class="container-fluid">
@@ -68,7 +72,7 @@ Service
     <div class="row">
         <div class="col-12 table-responsive">
             <table class="table">
-                <thead class="table-dark">
+                <thead class="table-info">
                     <tr>
                         <th scope="col">Service No.</th>
                         <th scope="col">Service Type</th>
@@ -84,13 +88,13 @@ Service
                         {% for service in page_obj %}
                             <tr
                             {% if service.status|lower == "pending" %}
-                              class="table-danger"
+                              class="status-pending"
                             {% elif service.status|lower == "waiting" %}
-                              class="table-warning"
+                              class="status-waiting"
                             {% elif service.status|lower == "completed" %}
-                              class="table-success"
+                              class="status-completed"
                             {% elif service.status|lower == "on hold" %}
-                              class="table-info"
+                              class="status-onhold"
                             {% endif %}
                             >
                                 <td>{{service.service_number}}</td>
@@ -170,13 +174,13 @@ Service
                         {% for service in page_obj %}
                             <tr
                             {% if service.status|lower == "pending" %}
-                              class="table-danger"
+                              class="status-pending"
                             {% elif service.status|lower == "waiting" %}
-                              class="table-warning"
+                              class="status-waiting"
                             {% elif service.status|lower == "completed" %}
-                              class="table-success"
+                              class="status-completed"
                             {% elif service.status|lower == "on hold" %}
-                              class="table-info"
+                              class="status-onhold"
                             {% endif %}
                             >
                                 <td>{{service.service_number}}</td>

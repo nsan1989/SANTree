@@ -29,6 +29,11 @@ Complaint
   td a {
     cursor: pointer;
   }
+
+  .status-resolved > td { background-color: #003300; color: white; }
+  .status-progress > td { background-color: #ff6600; color: white; }
+  .status-closed > td { background-color: #666666; color: white; }
+  .status-cancelled > td { background-color: #cc0000; color: white; }
 </style>
 
 <div class="container-fluid">
@@ -101,14 +106,14 @@ Complaint
       <table class="table table-bordered">
         <thead class="table-primary">
           <tr>
-            <th scope="col">Complaint Number</th>
+            <th scope="col">Complaint No.</th>
             <th scope="col">Created By</th>
             <th scope="col">Complaint</th>
             <th scope="col">Location</th>
             <th scope="col">Priority</th>
             <th scope="col">Status</th>
             <th scope="col">Created At</th>
-            <th scope="col">Update Status</th>
+            <th scope="col">Status</th>
             <th scope="col">Remarks</th>
             <th scope="col">Details</th>
           </tr>
@@ -117,7 +122,15 @@ Complaint
           {% if page_obj %}
           {% for task in page_obj %}
           <tr
-            class="{% if task.complaint.status == 'Cancelled' %}table-danger{% elif task.complaint.status == 'Resolved' %}table-success{% elif task.complaint.status == 'Halt' %}table-warning{% endif %}"
+            {% if task.complaint.status == 'In Progress' %}
+              class="status-progress"
+            {% elif task.complaint.status == 'Resolved' %}
+              class="status-resolved"
+            {% elif task.complaint.status == 'Closed' %}
+              class="status-closed"
+            {% elif task.complaint.status == 'Cancelled' %}
+              class="status-cancelled"
+            {% endif %}
           >
             <td>{{task.complaint.complaint_number}}</td>
             <td>{{task.complaint.created_by.department}}</td>

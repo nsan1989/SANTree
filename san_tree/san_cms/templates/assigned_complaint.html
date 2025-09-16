@@ -34,66 +34,74 @@ Assigned Complaint
 <link rel="stylesheet" href="{% static 'styles/assigned_complaint.css' %}" />
 
 <div class="container-fluid">
-  <div class="row py-3">
+  <div class="row">
     <div class="col-12">
       <div class="content-title">
         <h3>Assigned Complaints</h3>
       </div>
     </div>
-    <div class="d-flex justify-content-between mb-3">
+  </div>
+  <div class="row mb-2">
+    <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 mb-2">
       <nav>
-        <ul class="pagination">
-          {% if page_obj.has_previous %}
-          <li class="page-item">
-            <a class="page-link"
-              href="?{% if selected_department %}department={{ selected_department }}&{% endif %}page={{ page_obj.previous_page_number }}">Previous</a>
-          </li>
-          {% endif %}
+          <ul class="pagination">
+            {% if page_obj.has_previous %}
+            <li class="page-item">
+              <a class="page-link"
+                href="page={{ page_obj.previous_page_number }}">Previous</a>
+            </li>
+            {% endif %}
 
-          {% for num in page_obj.paginator.page_range %}
-          {% if page_obj.number == num %}
-          <li class="page-item active"><span class="page-link">{{ num }}</span></li>
-          {% else %}
-          <li class="page-item">
-            <a class="page-link"
-              href="?{% if selected_department %}department={{ selected_department }}&{% endif %}page={{ num }}">{{ num
-              }}</a>
-          </li>
-          {% endif %}
-          {% endfor %}
+            {% for num in page_obj.paginator.page_range %}
+            {% if page_obj.number == num %}
+            <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+            {% else %}
+            <li class="page-item">
+              <a class="page-link"
+                href="page={{ num }}">{{ num
+                }}</a>
+            </li>
+            {% endif %}
+            {% endfor %}
 
-          {% if page_obj.has_next %}
-          <li class="page-item">
-            <a class="page-link"
-              href="?{% if selected_department %}department={{ selected_department }}&{% endif %}page={{ page_obj.next_page_number }}">Next</a>
-          </li>
-          {% endif %}
-        </ul>
+            {% if page_obj.has_next %}
+            <li class="page-item">
+              <a class="page-link"
+                href="page={{ page_obj.next_page_number }}">Next</a>
+            </li>
+            {% endif %}
+          </ul>
       </nav>
-      <div class="export-button d-flex align-items-center">
-        <form method="get" action="{% url 'cms:export_tasks_excel' %}" class="export-form"
-          style="display: flex; align-items: center; gap: 8px; font-size: 0.875rem;">
-          <div class="form-group px-2" style="display: flex; flex-direction: column;">
-            <input type="date" id="start_date" name="start_date" class="form-control form-control-sm"
-              style="max-width: 140px;" required>
-          </div>
-          <div class="form-group px-2" style="display: flex; flex-direction: column;">
-            <input type="date" id="end_date" name="end_date" class="form-control form-control-sm"
-              style="max-width: 140px;" required>
+    </div>
+    <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 col-xl-8 d-flex justify-content-end align-items-center">
+        <form method="get" action="{% url 'cms:export_tasks_excel' %}" class="export-form">
+          <div class="row d-flex gap-2">
+            <div class="col-auto">
+              <div class="form-group" style="display: flex; flex-direction: column;">
+                <input type="date" id="start_date" name="start_date" class="form-control form-control-sm"
+                style="max-width: 140px;" required>
+              </div>
+            </div>
+            <div class="col-auto">
+              <div class="form-group" style="display: flex; flex-direction: column;">
+                <input type="date" id="end_date" name="end_date" class="form-control form-control-sm"
+                style="max-width: 140px;" required>
+              </div>
+            </div>
           </div>
         </form>
         <a class="btn btn-sm btn-primary ms-2" href="{% url 'cms:export_tasks_excel' %}" style="text-decoration: none;">
           <i class="fa-solid fa-up-right-from-square"></i>
           &nbsp;export
         </a>
-      </div>
     </div>
-    {% if messages %}
+  </div>
+  {% if messages %}
     {% for message in messages %}
     <div class="alert alert-{{ message.tags }}">{{ message }}</div>
     {% endfor %}
-    {% endif %}
-    <div class="col-12 table-responsive">
+  {% endif %}
+  <div class="col-12 table-responsive">
       <table class="table table-bordered">
         <thead class="table-info">
           <tr style="font-family: 'Open Sans', sans-serif;">
@@ -173,7 +181,6 @@ Assigned Complaint
           {% endif %}
         </tbody>
       </table>
-    </div>
   </div>
 </div>
 <!--Modal Block-->

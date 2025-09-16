@@ -22,6 +22,10 @@
         font-family: 'Poppins', sans-serif;
         font-size: 0.85rem;
     }
+    .status-completed > td { background-color: #003300; color: #fff; }
+    .status-progress > td { background-color: #ff6600; color: #000; }
+    .status-waiting > td { background-color: #808080; color: #fff; }
+    .status-cancelled > td { background-color: #cc0000; color: #fff; }
 </style>
 
     <div class="container-fluid">
@@ -36,7 +40,7 @@
         <div class="row">
             <div class="col-12 table-responsive">
                 <table class="table table-bordered">
-                    <thead class="table-dark">
+                    <thead class="table-info">
                         <tr>
                             <th scope="col" style="width: 25%;">Title No.</th>
                             <th scope="col" style="width: 25%;">Title</th>
@@ -54,9 +58,13 @@
                             {% for task in tasks %}
                             <tr
                                 {% if task.status == 'Completed' %}
-                                    class="table-success"
-                                {% elif task.status == 'Rejected' %}
-                                    class="table-danger"
+                                class="status-completed"
+                                {% elif task.status == 'In Progress' %}
+                                class="status-progress"
+                                {% elif task.status == 'Waiting' %}
+                                class="status-waiting"
+                                {% elif task.status == 'Cancelled' %}
+                                class="status-cancelled"
                                 {% endif %}
                             >
                                 <td style="width: 25%;">{{task.tasks_number}}</td>
