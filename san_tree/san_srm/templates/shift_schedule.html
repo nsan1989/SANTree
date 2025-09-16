@@ -35,7 +35,7 @@ tr {
     <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6" id="page-title">
       <h1>Shift Schedules</h1>
     </div>
-    {% if request.user.department.name == 'GDA' and request.user.role == 'Admin' %}
+    {% if request.user.department.name == 'GDA' and request.user.role == 'Admin' or request.user.department.name == 'General Duty Assistant' and request.user.role == 'Admin' %}
     <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6">
       <div class="schedule-link">
         Set Schedules 
@@ -75,7 +75,7 @@ tr {
   <div class="row">
     <div class="col-12 table-responsive">
         <table class="table">
-          <thead class="table-dark">
+          <thead class="table-danger">
             <tr>
               <th scope="col">Emp. Name</th>
               <th scope="col">Shift</th>
@@ -86,7 +86,7 @@ tr {
           <tbody>
             {% if page_obj %}
             {% for schedule in page_obj %}
-            <tr class="table-info">
+            <tr class="table-light">
               <td>{{schedule.shift_staffs}}</td>
               <td>{{schedule.shift_type}}</td>
               <td>{{schedule.shift_block}}</td>

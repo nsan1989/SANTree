@@ -30,6 +30,7 @@ MENU_STRUCTURE = {
         ],
         'user': [
             {"name": "Dashboard", "url_name": "srm:staff_dashboard", "view_name":"StaffDashboard", "icon": "fa-solid fa-chart-line"},
+            {"name": "Schedule", "url_name": "srm:schedule", "view_name":"ShiftSchedule", "icon": "fa-solid fa-calendar-days"},
             {"name": "Service", "url_name": "srm:staff_service", "view_name":"AllServiceView", "icon": "fa-solid fa-wheelchair"}
         ]
     },

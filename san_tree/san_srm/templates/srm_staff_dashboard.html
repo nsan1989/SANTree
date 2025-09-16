@@ -41,6 +41,10 @@ Dashboard
         font-family: 'Poppins', sans-serif;
         font-size: 0.9rem;
     }
+    .chart-title h3 {
+        font-family: 'Poppins', sans-serif;
+        color: wheat;
+    }
 </style>
 
 <div class="container-fluid">
@@ -143,7 +147,7 @@ Dashboard
     </div>
     {% endif %}
     {% if request.user.department.name == 'GDA' or request.user.department.name == 'General Duty Assistant' %}
-    <div class="row">
+    <div class="row mb-3">
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6">
             <div class="row">
                 <div class="col-12 shift-title mb-2">
@@ -182,5 +186,17 @@ Dashboard
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6"></div>
     </div>
     {% endif %}
+    <div class="row">
+        <div class="col-6 p-2">
+            <div class="chart-title mb-2">
+                <h3>Service Pie Chart</h3>
+            </div>
+            <img
+              class="img-fluid rounded-2 w-100"
+              src="{% url 'srm:service_pie_chart' %}?v={{ now }}"
+              alt="Complaint Pie Chart"
+            />
+        </div>
+    </div>
 </div>
 {% endblock %}

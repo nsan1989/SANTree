@@ -14,4 +14,5 @@ urlpatterns = [
     path('staff/dashboard/service/<int:id>/update_status/', free_up_completed_staff, name='staff_update_service_status'),
     path('incharge/all_services/', RequestServiceView, name='admin_service'),
     path('staff/all_services/', RequestServiceView, name='staff_service'),
+    path('service_pie_chart/', ServicePieChart, name='service_pie_chart')
 ]

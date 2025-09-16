@@ -11,9 +11,54 @@ from django.utils import timezone
 from datetime import timedelta
 import datetime
 import structlog
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+import io
+from threading import Lock
+plot_lock = Lock()
+from django.http import HttpResponse
 
 log = structlog.get_logger()
 now = timezone.now()
+
+# Tasks Pie Chart
+def ServicePieChart(request):
+    open_serv = Service.objects.filter(status = 'Open', created_by = request.user).count()
+    prog_serv = Service.objects.filter(status = 'In Progress', created_by = request.user).count()
+    wait_serv = Service.objects.filter(status = 'Waiting', created_by = request.user).count()
+    pen_serv = Service.objects.filter(status = 'Pending', created_by = request.user).count()
+    hold_serv = Service.objects.filter(status = 'On Hold', created_by = request.user).count()
+    comp_serv = Service.objects.filter(status = 'Completed', created_by = request.user).count()
+    if open_serv + prog_serv + wait_serv + pen_serv + hold_serv + comp_serv == 0:
+        labels = ['No Data']
+        sizes = [1]
+        colors = ['#d3d3d3']
+    else:
+        raw_data = [
+            ('Open', open_serv, '#cccccc'),
+            ('In Progress', prog_serv, '#ff6600'),
+            ('Waiting', wait_serv, "#ff9900"),
+            ('Pending', pen_serv, "#990000"),
+            ('On Hold', hold_serv, "#993300"),
+            ('Completed', comp_serv, '#003300')
+            ]
+    
+        filtered_data = [(label, size, color) for label, size, color in raw_data if size > 0]
+        labels, sizes, colors = zip(*filtered_data)
+
+    buffer = io.BytesIO()
+
+    with plot_lock:
+        bg_color = (0, 0, 0, 0.4)
+        fig, ax = plt.subplots(figsize=(4, 2), facecolor=bg_color) 
+        ax.pie(sizes, labels=labels, autopct='%1.1f%%', colors=colors, startangle=90, textprops={'color': 'white'})
+        ax.axis('equal')
+        plt.savefig(buffer, format='png', facecolor=fig.get_facecolor())
+        plt.close(fig)
+    
+    buffer.seek(0)
+    return HttpResponse(buffer.read(), content_type='image/png')
 
 # Admin Dashboard view.
 def AdminDashboard(request):
@@ -255,8 +300,8 @@ def ShiftSchedules(request):
     except:
         raise PermissionDenied("User profile not found")
     schedules = ShiftSchedule.objects.filter(
-        Q(shift_staffs__department__name='GDA') | Q(shift_staffs__department__name='General Duty Assistant')
-        )
+    Q(shift_staffs__department__name__in=['GDA', 'General Duty Assistant'])
+    ).order_by("-id")
     page_number = request.GET.get('page')
     paginator = Paginator(schedules, 10) 
     page_obj = paginator.get_page(page_number)
@@ -265,6 +310,8 @@ def ShiftSchedules(request):
     }
     view_name = request.resolver_match.view_name
     if view_name == "srm:schedule" and user_role == 'Admin':
+        return render(request, 'shift_schedule.html', context)
+    if view_name == "srm:schedule" and user_role == 'User':
         return render(request, 'shift_schedule.html', context)
     raise PermissionDenied("You are not authorized to view this page.")
 

@@ -83,7 +83,12 @@
           <!-- Scrollable table wrapper with inherited height -->
           <div class="table-responsive" style="height: 100%;overflow-y: auto">
             <table class="table h-100">
-              <tbody class="table-primary">
+              <thead class="table-danger">
+                <tr>
+                  <td class="fw-bold">Staff Name</td>
+                </tr>
+              </thead>
+              <tbody class="table-light">
                 {% if engage_user %} {% for engage_users in engage_user %}
                 <tr>
                   <td>{{ engage_users.username }}</td>
@@ -106,7 +111,12 @@
           <!-- Scrollable table wrapper with inherited height -->
           <div class="table-responsive" style="height: 100%;overflow-y: auto">
             <table class="table h-100">
-              <tbody class="table-primary">
+              <thead class="table-danger">
+                <tr>
+                  <td class="fw-bold">Staff Name</td>
+                </tr>
+              </thead>
+              <tbody class="table-light">
                 {% if vacant_user %} {% for vacant_users in vacant_user %}
                 <tr>
                   <td>{{ vacant_users.username }}</td>

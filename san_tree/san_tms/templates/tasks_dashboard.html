@@ -110,12 +110,12 @@
           <div class="col-title mb-2 d-flex align-items-center"><i class="fa-solid fa-circle" style="color: #eb0707;"></i>&nbsp;Engaged Users</div>
           <div class="table-responsive" style="height: 100%;overflow-y: auto;">
             <table class="table h-100">
-              <thead class="table-dark">
+              <thead class="table-danger">
                 <tr>
                   <th scope="col">Staff Name</th>
                 </tr>
               </thead>
-              <tbody class="table-primary">
+              <tbody class="table-light">
                 {% if engage %} {% for engage in engage %}
                 <tr>
                   <td>{{engage.username}}</td>
@@ -134,12 +134,12 @@
           <div class="col-title mb-2"><i class="fa-solid fa-circle" style="color: #4feb07;"></i>&nbsp;Vacant Users</div>
           <div class="table-responsive" style="height: 100%;overflow-y: auto;">
             <table class="table h-100">
-              <thead class="table-dark">
+              <thead class="table-danger">
                 <tr>
                   <th scope="col">Staff Name</th>
                 </tr>
               </thead>
-              <tbody class="table-primary">
+              <tbody class="table-light">
                 {% if vacant %} {% for vacant in vacant %}
                 <tr>
                   <td>{{vacant.username}}</td>
