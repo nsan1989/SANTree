@@ -43,7 +43,8 @@ def MainDashboard(request):
         )
     new_task = staff_new_task.all().count()
     staff_new_serv = Service.objects.filter(
-        assigned_to__shift_staffs = user
+        assigned_to__shift_staffs = user, 
+        status='In Progress'
     )
     new_serv = staff_new_serv.all().count()
     context = {

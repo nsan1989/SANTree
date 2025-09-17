@@ -19,6 +19,7 @@ from threading import Lock
 plot_lock = Lock()
 from django.http import HttpResponse
 from .forms import ServiceRemarkForm
+from django.db.models import OuterRef, Subquery
 
 log = structlog.get_logger()
 now = timezone.now()
@@ -276,6 +277,13 @@ def RequestServiceView(request):
         raise PermissionDenied("User profile not found")
     request_service = Service.objects.filter(created_by = user).order_by('-created_at')
     assign_service = Service.objects.filter(assigned_to__shift_staffs = user).order_by('-created_at')
+    latest_remark_subquery = ServiceRemarks.objects.filter(service=OuterRef('pk')).order_by('-created_at')
+    request_service = request_service.annotate(
+        latest_remark_text=Subquery(latest_remark_subquery.values('remarks')[:1])
+    )
+    assign_service = assign_service.annotate(
+        latest_remark_text=Subquery(latest_remark_subquery.values('remarks')[:1])
+    )
     page_number = request.GET.get('page')
     if user.department.name in ['GDA', 'General Duty Assistant']:
         paginator = Paginator(assign_service, 10) 
@@ -366,11 +374,14 @@ def ServiceRemark(request, id):
 
             if request.user.role == 'User':
                 return redirect('srm:staff_service')
+            else:
+                return redirect('srm:all_services')
 
     else:
         form = ServiceRemarkForm()
     context = {
-        'form': form
+        'form': form,
+        'service': service,
     }
     return render(request, 'srm_remarks.html', context)
 

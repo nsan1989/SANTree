@@ -23,8 +23,6 @@ self.addEventListener('fetch', event => {
 
 // Push event - receives notification payload from server
 self.addEventListener('push', function (e) {
-    console.log('[Service Worker] Push received');
-
     let data = {};
     try {
         data = e.data.json();
