@@ -56,7 +56,7 @@ class ServiceGenerateForm(forms.ModelForm):
         self.fields['attachment'].required = True
 
 # Service Remarks.
-class ServiceRemark(forms.ModelForm):
+class ServiceRemarkForm(forms.ModelForm):
     class Meta:
         model = ServiceRemarks
         fields = ['remarks', 'attachment']

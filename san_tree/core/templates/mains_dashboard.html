@@ -244,6 +244,7 @@
 <script>
   const showComplaintAlert = "{{ show_alert|default:'0' }}";
   const showTaskAlert = "{{ show_alert_tms|default:'0' }}";
+  const showServiceAlert = "{{ show_alert_srm|default:'0' }}";
 
   if ('serviceWorker' in navigator && 'PushManager' in window && Notification.permission === 'granted') {
     navigator.serviceWorker.ready.then(registration => {
@@ -256,6 +257,12 @@
       if (showTaskAlert > 0) {
         registration.showNotification("New Task", {
           body: `You have ${showTaskAlert} new task notification(s).`,
+          icon: "/static/images/icons/192X192.png"
+        });
+      }
+      if (showServiceAlert > 0) {
+        registration.showNotification("New Service", {
+          body: `You have ${showServiceAlert} new service notification(s).`,
           icon: "/static/images/icons/192X192.png"
         });
       }

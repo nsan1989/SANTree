@@ -74,6 +74,10 @@
           <p class="m-0">{{complaint.status_changed_to}}</p>
         </li>
         <li class="d-flex">
+          <spna class="fw-bold detail-title">Assigned To:</spna>&nbsp;
+          <p class="m-0">{{complaint.complaint.assigned_to}}</p>
+        </li>
+        <li class="d-flex">
           <spna class="fw-bold detail-title">Attachment:</spna>&nbsp;
           {% if complaint.complaint.attachment %}
             <img src="{{ complaint.complaint.attachment.url }}" alt="Complaint Attachment" style="max-width: 20vw; height: 16vh;" />

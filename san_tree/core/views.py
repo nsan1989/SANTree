@@ -2,6 +2,7 @@ from django.shortcuts import render, get_object_or_404
 from accounts.models import Departments, CustomUsers
 from san_cms.models import Complaint, ComplaintRemarks, ComplaintType
 from san_tms.models import Tasks, TasksRemarks, TasksTypes
+from san_srm.models import Service
 from django.db.models import Q
 from django.http import JsonResponse
 from django.core.exceptions import PermissionDenied
@@ -41,9 +42,14 @@ def MainDashboard(request):
         (Q(status='Open'))
         )
     new_task = staff_new_task.all().count()
+    staff_new_serv = Service.objects.filter(
+        assigned_to__shift_staffs = user
+    )
+    new_serv = staff_new_serv.all().count()
     context = {
         'show_alert': new_comp,
         'show_alert_tms': new_task,
+        'show_alert_srm': new_serv
     }
     return render(request, 'mains_dashboard.html', context)
 

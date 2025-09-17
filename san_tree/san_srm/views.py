@@ -18,6 +18,7 @@ import io
 from threading import Lock
 plot_lock = Lock()
 from django.http import HttpResponse
+from .forms import ServiceRemarkForm
 
 log = structlog.get_logger()
 now = timezone.now()
@@ -350,3 +351,26 @@ def free_up_onhold_staff():
         pass
     except Exception as e:
         log.error("Error freeing up staff", error=str(e))
+
+# Service Remark View
+def ServiceRemark(request, id):
+    service = get_object_or_404(Service, id=id)
+    if request.method == 'POST':
+        form = ServiceRemarkForm(request.POST, request.FILES)
+        if form.is_valid():
+            remark = form.save(commit=False)
+            remark.service = service
+            remark.remarks = form.cleaned_data.get('remarks')
+            remark.created_by = request.user
+            remark.save()
+
+            if request.user.role == 'User':
+                return redirect('srm:staff_service')
+
+    else:
+        form = ServiceRemarkForm()
+    context = {
+        'form': form
+    }
+    return render(request, 'srm_remarks.html', context)
+
