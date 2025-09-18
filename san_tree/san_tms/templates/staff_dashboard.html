@@ -1,4 +1,4 @@
-{% extends 'index.html' %} {% load static %} 
+{% extends 'index.html' %} {% load static %}
 {% block title %} Dashboard {% endblock %} {% block start %}
 <link rel="stylesheet" href="{% static 'styles/san_tree.css' %}" />
 
@@ -8,133 +8,187 @@
     font-family: 'Poppins', sans-serif;
     color: wheat;
   }
+
   .card {
     background-color: rgba(0, 0, 0, 0.4);
     font-family: 'Poppins', sans-serif;
     color: white;
   }
+
+  .card:hover {
+    background-color: maroon;
+    color: white;
+  }
+
   th {
     font-family: 'Poppins', sans-serif;
     font-size: 1rem;
     font-weight: bold;
   }
+
   tr {
     font-family: 'Poppins', sans-serif;
     font-size: 0.9rem;
   }
+
   .open-title h5,
   .completed-title h5 {
     font-family: 'Poppins', sans-serif;
     font-size: 1rem;
     font-weight: bold;
   }
+
   .open_content,
   .completed_content {
     font-family: 'Poppins', sans-serif;
     font-size: 0.9rem;
   }
+
+  .card-wrapper {
+    min-height: 15rem;
+    background-color: rgba(0, 0, 0, 0.4);
+    font-family: 'Poppins', sans-serif;
+    color: white;
+  }
+
+  Form {
+    font-family: 'Poppins', sans-serif;
+  }
 </style>
 
 <div class="container-fluid">
-  <div class="row" style="min-height: 40vh;">
-    <div
-      class="col-xs-12 col-sm-12 col-md-8 col-lg-8 col-xl-8 d-flex flex-column"
-    >
+  <div class="row">
+    <div class="col-xs-12 col-sm-12 col-md-9 col-lg-9 col-xl-9">
       <div class="dashboard-title">
         <h1 class="fw-bold mb-0">Welcome</h1>
       </div>
-      <div
-        class="user-details d-flex flex-column"
-        style="font-family: 'Poppins, sans-serif'"
-      >
+      <div class="user-details d-flex flex-column mb-3" style="font-family: 'Poppins, sans-serif'">
         <h5 class="user-name m-0 fw-light text-light">
           {{current_user.username}}
         </h5>
       </div>
-      <div class="dashboard-card">
-        <div class="row py-3 g-2">
-          <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4">
-            <div
-              class="card shadow-lg h-100 d-flex flex-column justify-content-center align-items-center"
-              style="min-height: 8rem;"
-              >
-              <div class="card-title fw-bold">Assigned Tasks</div>
-              <div class="card-content">{{assigned_tasks}}</div>
-            </div>
+      <div class="row">
+        <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-3 p-2">
+          <div class="card shadow-lg h-100 d-flex flex-column justify-content-center align-items-center"
+            style="min-height: 8rem;">
+            <div class="card-title fw-bold">Assigned Tasks</div>
+            <div class="card-content">{{assigned_tasks}}</div>
           </div>
-          <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4">
-            <div
-              class="card shadow-lg h-100 d-flex flex-column justify-content-center align-items-center"
-              style="min-height: 8rem;"
-              >
-              <div class="card-title fw-bold">Completed Tasks</div>
-              <div class="card-content">{{comp_count}}</div>
-            </div>
+        </div>
+        <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-3 p-2">
+          <div class="card shadow-lg h-100 d-flex flex-column justify-content-center align-items-center"
+            style="min-height: 8rem;">
+            <div class="card-title fw-bold">Completed Tasks</div>
+            <div class="card-content">{{comp_count}}</div>
           </div>
-          <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4">
-            <div
-              class="card shadow-lg h-100 d-flex flex-column justify-content-center align-items-center"
-              style="min-height: 8rem;"
-              >
-              <div class="card-title fw-bold">Progress Tasks</div>
-              <div class="card-content">{{pro_count}}</div>
-            </div>
+        </div>
+        <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-3 p-2">
+          <div class="card shadow-lg h-100 d-flex flex-column justify-content-center align-items-center"
+            style="min-height: 8rem;">
+            <div class="card-title fw-bold">Progress Tasks</div>
+            <div class="card-content">{{pro_count}}</div>
+          </div>
+        </div>
+        <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-3 p-2">
+          <div class="card shadow-lg h-100 d-flex flex-column justify-content-center align-items-center"
+            style="min-height: 8rem;">
+            <div class="card-title fw-bold">Open Tasks</div>
+            <div class="card-content">{{open_count}}</div>
           </div>
         </div>
       </div>
-    </div>
-    <div
-      class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 ps-3 pt-2 d-none d-md-flex"
-      style="min-height: 32vh"
-    >
-      <div class="card ps-2 h-100 w-100">
-        <div class="open-title py-2">
-          <h5>Open Tasks</h5>
-        </div>
-        <div class="open_content">
-          {% if open %}
-            {% for open_tasks in open %}
-              {{open_tasks.tasks_types}}
-            {% endfor %}
-          {% else %}
-            <small>Currently, there isn't any open tasks!</small>
-          {% endif %}
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="row" style="height: 40vh; min-height: 40vh;">
-    <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 col-xl-8">
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6">
         <div class="chart-title py-2">
           <h5>Task Chart</h5>
         </div>
-        <div class="chart-content w-100">
-            <img
-              class="img-fluid rounded-2"
-              src="{% url 'tms:all_tasks_pie_chart' %}?v={{ now }}"
-              alt="Complaint Pie Chart"
-            />
+        <!-- Filter form -->
+        <form method="get" class="row g-2 align-items-end mb-3">
+          <div class="col-auto">
+            <label for="start_date" class="form-label small mb-1">Start</label>
+            <input type="date" id="start_date" name="start_date" class="form-control form-control-sm"
+              value="{{ request.GET.start_date }}">
+          </div>
+
+          <div class="col-auto">
+            <label for="end_date" class="form-label small mb-1">End</label>
+            <input type="date" id="end_date" name="end_date" class="form-control form-control-sm"
+              value="{{ request.GET.end_date }}">
+          </div>
+
+          <div class="col-auto">
+            <button type="submit" class="btn btn-primary btn-sm">
+              Filter
+            </button>
+          </div>
+        </form>
+        <div class="chart-content">
+          <img class="img-fluid rounded-2 w-100"
+            src="{% url 'tms:all_tasks_pie_chart' %}?start_date={{ request.GET.start_date }}&end_date={{ request.GET.end_date }}&v={{ now }}"
+            alt="Tasks Pie Chart" />
         </div>
+      </div>
     </div>
-    <div
-      class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 ps-3 pt-2 d-none d-md-flex"
-      style="min-height: 32vh"
-    >
-      <div class="card ps-2 h-100 w-100">
-        <div class="completed-title py-2">
-          <h5>Completed Tasks</h5>
-        </div>
-        <div class="completed_content">
-          {% if complete %}
-            {% for completed in complete %}
-              {{completed.tasks_types}}
+    <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-3">
+      <div class="open-card p-2">
+        <div class="card-wrapper p-2 rounded">
+          <div class="open-title py-2">
+            <h5>Open Tasks</h5>
+          </div>
+          <div class="open_content">
+            {% if open %}
+            {% for open_tasks in open %}
+            <small>{{open_tasks.tasks_types}}</small>
             {% endfor %}
-          {% else %}
+            {% else %}
             <small>Currently, there isn't any open tasks!</small>
-          {% endif %}
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      <div class="complete-card p-2">
+        <div class="card-wrapper p-2 rounded">
+          <div class="completed-title py-2">
+            <h5>Completed Tasks</h5>
+          </div>
+          <div class="completed_content">
+            {% if complete %}
+            {% for comp in complete %}
+            <small>{{comp.tasks_types}}</small>
+            {% endfor %}
+            {% else %}
+            <small>Currently, there isn't any complete tasks!</small>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      <div class="progress-card p-2">
+        <div class="card-wrapper p-2 rounded">
+          <div class="progress-title py-2">
+            <h5>Progress Tasks</h5>
+          </div>
+          <div class="progress_content">
+            {% if progress %}
+            {% for prog in progress %}
+            <small>{{prog.tasks_types}}</small>
+            {% endfor %}
+            {% else %}
+            <small>Currently, there isn't any progress tasks!</small>
+            {% endif %}
+          </div>
         </div>
       </div>
     </div>
   </div>
 </div>
+
+<script>
+  document.getElementById('task-chart-filters').addEventListener('submit', function (e) {
+    e.preventDefault();
+    const params = new URLSearchParams(new FormData(this));
+    params.append('v', Date.now());
+    const chart = document.getElementById('task-chart-img');
+    chart.src = `{% url 'tms:all_tasks_pie_chart' %}?${params.toString()}`;
+  });
+</script>
+
 {% endblock %}

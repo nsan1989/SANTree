@@ -16,39 +16,60 @@ import io
 from threading import Lock
 plot_lock = Lock()
 from django.http import HttpResponse
+from django.utils.dateparse import parse_date
+from datetime import datetime
 
 # Tasks Pie Chart
 def TasksPieChart(request):
-    open_tasks = Tasks.objects.filter(status = 'Open').count()
-    in_progress = Tasks.objects.filter(status = 'In Progress').count()
-    waiting = Tasks.objects.filter(status = 'Waiting').count()
-    completed = Tasks.objects.filter(status = 'Completed').count()
-    if open_tasks + in_progress + waiting + completed == 0:
+    # --- date filter ---
+    start_date = request.GET.get('start_date')
+    end_date = request.GET.get('end_date')
+
+    tasks = Tasks.objects.all()
+
+    if start_date and end_date:
+        try:
+            start = datetime.strptime(start_date, "%Y-%m-%d")
+            end = datetime.strptime(end_date, "%Y-%m-%d") + timedelta(days=1)
+            tasks = tasks.filter(created_at__range=[start, end])
+        except ValueError:
+            pass
+
+    # --- counts by status ---
+    open_count = tasks.filter(status='Open').count()
+    progress_count = tasks.filter(status='In Progress').count()
+    waiting_count = tasks.filter(status='Waiting').count()
+    review_count = tasks.filter(status='Review').count()
+    completed_count = tasks.filter(status='Completed').count()
+
+    if open_count + progress_count + waiting_count + review_count + completed_count == 0:
         labels = ['No Data']
         sizes = [1]
         colors = ['#d3d3d3']
     else:
         raw_data = [
-            ('Open', open_tasks, '#eb0707'),
-            ('Progress', in_progress, '#ebd807'),
-            ('Waiting', waiting, "#07bdeb"),
-            ('Completed', completed, '#4feb07')
-            ]
-    
-        filtered_data = [(label, size, color) for label, size, color in raw_data if size > 0]
-        labels, sizes, colors = zip(*filtered_data)
+            ('Open', open_count, '#eb0707'),
+            ('In Progress', progress_count, '#ebd807'),
+            ('Waiting', waiting_count, "#07bdeb"),
+            ('Review', review_count, "#ff9900"),
+            ('Completed', completed_count, '#4feb07'),
+        ]
+        filtered = [(l, s, c) for l, s, c in raw_data if s > 0]
+        labels, sizes, colors = zip(*filtered)
 
+    # --- draw pie chart ---
     buffer = io.BytesIO()
+    fig, ax = plt.subplots(figsize=(4, 2), facecolor=(0, 0, 0, 0.4))
+    wedges, texts, autotexts = ax.pie(
+        sizes, labels=labels, autopct='%1.1f%%', colors=colors,
+        startangle=90, textprops={'color': 'white'}
+    )
+    ax.axis('equal')
 
-    with plot_lock:
-        bg_color = (0, 0, 0, 0.4)
-        fig, ax = plt.subplots(figsize=(4, 2), facecolor=bg_color) 
-        ax.pie(sizes, labels=labels, autopct='%1.1f%%', colors=colors, startangle=90, textprops={'color': 'white'})
-        ax.axis('equal')
-        plt.savefig(buffer, format='png', facecolor=fig.get_facecolor())
-        plt.close(fig)
-    
+    plt.savefig(buffer, format='png', facecolor=fig.get_facecolor(), transparent=True)
+    plt.close(fig)
     buffer.seek(0)
+
     return HttpResponse(buffer.read(), content_type='image/png')
 
 # Task Dashboard view.
@@ -94,20 +115,36 @@ def StaffDashboard(request):
         user_role = user.role
     except AttributeError:
         raise PermissionDenied("User profile not found.")
-    staff_tasks = Tasks.objects.filter(assigned_to = user).all().count()
-    open = Tasks.objects.filter(status='Open').all()
-    completed = Tasks.objects.filter(status='Completed').all()
+    tasks = Tasks.objects.filter(assigned_to = user)
+    
+    start_date = request.GET.get('start_date')
+    end_date = request.GET.get('end_date')
+
+    if start_date and end_date:
+        try:
+            start = datetime.strptime(start_date, "%Y-%m-%d")
+            end = datetime.strptime(end_date, "%Y-%m-%d") + timedelta(days=1)
+            tasks = tasks.filter(created_at__range=(start, end))
+        except ValueError:
+            pass
+
+    staff_tasks = tasks.count()
+    open = tasks.filter(status='Open')
+    open_count = open.count()
+    completed = tasks.filter(status='Completed')
     complete_count = completed.count()
-    in_progress = Tasks.objects.filter(status='In Progress').all()
+    in_progress = tasks.filter(status='In Progress')
     progress_count = in_progress.count()
     context = {
+        'tasks': tasks.order_by('-created_at'),
         'current_user': user,
         'assigned_tasks': staff_tasks,
         'open': open,
+        'open_count': open_count,
         'complete': completed,
         'comp_count': complete_count,
         'progress': in_progress,
-        'pro_count': progress_count
+        'pro_count': progress_count,
     }
     view_name = request.resolver_match.view_name
     if view_name == "tms:staff_dashboard" and user_role == 'User':

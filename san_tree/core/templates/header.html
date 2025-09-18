@@ -1,94 +1,71 @@
-{% load static %} 
+{% load static %}
 
-{% block start %} 
+{% block start %}
 {% if request.user.is_authenticated %}
 <link rel="stylesheet" href="{% static 'styles/header.css' %}" />
 
-  <nav
-    class="navbar shadow-sm py-0"
-    style="background-color: white;"
-  >
-    <div class="container-fluid p-0">
-        <div class="left-items d-flex align-items-center">
-          <!-- Toggle Button -->
-          {% if request.user.role != 'Super Admin' and request.resolver_match.url_name != 'main_dashboard'  %}
-            <button class="btn" id="menu-toggle">
-              <i
-                class="fa-solid fa-bars-staggered"
-                id="menu-bars"
-                style="color: #990000; background-color: transparent"
-              ></i>
-              <i 
-              class="fa-solid fa-x fa-lg d-none"
-              id="menu-x"
-              style="color: #990000; background-color: transparent"
-              ></i>
-            </button>
-          {% endif %}
-          <!-- Brand -->
-           {% if request.user.role == 'Super Admin' %}
-            <a
-              class="navbar-brand ms-2 mb-0 h1 d-flex align-items-center fw-bold text-light"
-              href=""
-            >
-              <div class="d-none d-md-flex">
-                &nbsp;
-                <h5 class="fw-bold mb-0" style="color: #990000;font-family: 'Poppins', sans-serif;">Shija Service Management System</h5>
-              </div>
-              <img class="img-fluid d-md-none" src="{% static 'images/logo.png' %}" style="height: 48px;">
-            </a>
-          {% else %}
-            <a
-              class="navbar-brand mb-0 h1 d-flex align-items-center fw-bold text-light"
-              href="{% url 'main_dashboard' %}"
-            >
-              <div class="d-none d-md-flex ps-3">
-                <h5 class="fw-bold mb-0" style="color: #990000;font-family: 'Poppins', sans-serif;">Shija Service Management System</h5>
-              </div>
-            </a>
-          {% endif %}
+<nav class="navbar shadow-sm py-0" style="background-color: white;">
+  <div class="container-fluid p-0">
+    <div class="left-items d-flex align-items-center">
+      <!-- Toggle Button -->
+      {% if request.user.role != 'Super Admin' and request.resolver_match.url_name != 'main_dashboard' %}
+      <button class="btn" id="menu-toggle">
+        <i class="fa-solid fa-bars-staggered" id="menu-bars" style="color: #990000; background-color: transparent"></i>
+        <i class="fa-solid fa-x fa-lg d-none" id="menu-x" style="color: #990000; background-color: transparent"></i>
+      </button>
+      {% endif %}
+      <!-- Brand -->
+      {% if request.user.role == 'Super Admin' %}
+      <a class="navbar-brand ms-2 mb-0 h1 d-flex align-items-center fw-bold text-light" href="">
+        <div class="d-none d-md-flex">
+          &nbsp;
+          <h5 class="fw-bold mb-0" style="color: #990000;font-family: 'Poppins', sans-serif;">Shija Service Management
+            System</h5>
         </div>
-        <div class="right-items d-flex px-3">
-          <div>
-          {% if request.user.role != 'Super Admin' %}
-          <a class="nav-link text-light d-flex align-items-center" href="{% url 'main_dashboard' %}">
-            <i class="fa-solid fa-house" title="back to home page" style="font-size: 0.9rem; color: #990000;"></i>
-          </a>
-          {% else %}
-          <a class="nav-link text-light d-flex align-items-center" href="{% url 'super_admin' %}">
-            <i class="fa-solid fa-house" title="back to home page" style="font-size: 0.9rem; color: #990000;"></i>
-          </a>
-          {% endif %}
-          </div>
-          <div class="px-3">
-          {% if request.user.role != 'Super Admin' %}
-          <a class="nav-link text-light d-flex align-items-center" href="{% url 'profile' %}">
-            <i class="fa-solid fa-user" title="Profile" style="font-size: 0.9rem; color: #990000;"></i>
-          </a>
-          {% endif %}
-          </div>
-          <div>
-          <form
-            method="POST"
-            action="{% url 'logout' %}"
-            class="text-center"
-          >
-            {% csrf_token %}
-            <button
-              type="submit"
-              class="btn d-flex align-items-center p-0"
-              style="font-size: 0.9rem; color: #990000;"
-            >
-              <i class="fa-solid fa-right-from-bracket" title="logout"></i>
-              <!--
+        <img class="img-fluid d-md-none" src="{% static 'images/logo.png' %}" style="height: 48px;">
+      </a>
+      {% else %}
+      <a class="navbar-brand mb-0 h1 d-flex align-items-center fw-bold text-light" href="{% url 'main_dashboard' %}">
+        <div class="d-none d-md-flex ps-3">
+          <h5 class="fw-bold mb-0" style="color: #990000;font-family: 'Poppins', sans-serif;">Shija Service Management
+            System</h5>
+        </div>
+      </a>
+      {% endif %}
+    </div>
+    <div class="right-items d-flex px-3">
+      <div>
+        {% if request.user.role != 'Super Admin' %}
+        <a class="nav-link text-light d-flex align-items-center" href="{% url 'main_dashboard' %}">
+          <i class="fa-solid fa-house" title="back to home page" style="font-size: 0.9rem; color: #990000;"></i>
+        </a>
+        {% else %}
+        <a class="nav-link text-light d-flex align-items-center" href="{% url 'super_admin' %}">
+          <i class="fa-solid fa-house" title="back to home page" style="font-size: 0.9rem; color: #990000;"></i>
+        </a>
+        {% endif %}
+      </div>
+      <div class="px-3">
+        {% if request.user.role != 'Super Admin' %}
+        <a class="nav-link text-light d-flex align-items-center" href="{% url 'profile' %}">
+          <i class="fa-solid fa-user" title="Profile" style="font-size: 0.9rem; color: #990000;"></i>
+        </a>
+        {% endif %}
+      </div>
+      <div>
+        <form method="POST" action="{% url 'logout' %}" class="text-center">
+          {% csrf_token %}
+          <button type="submit" class="btn d-flex align-items-center p-0" style="font-size: 0.9rem; color: #990000;">
+            <i class="fa-solid fa-right-from-bracket" title="logout"></i>
+            <!--
               <span class="d-none d-md-flex ms-2">Logout</span>
               -->
-            </button>
-          </form>
-          </div>
-        </div>
+          </button>
+        </form>
+      </div>
     </div>
-  </nav>
+  </div>
+</nav>
 <script>
   document.addEventListener("DOMContentLoaded", function () {
     const toggleBtn = document.getElementById("menu-toggle");
@@ -97,18 +74,23 @@
     const menuBars = document.getElementById("menu-bars");
     const menuX = document.getElementById("menu-x");
 
+    if (window.innerWidth >= 768) {
+      sidebar.classList.add("expanded");
+      mainContent.classList.add("shifted");
+      menuBars?.classList.add("d-none");
+      menuX?.classList.remove("d-none");
+    }
+
     if (toggleBtn) {
       toggleBtn.addEventListener("click", function () {
-        // Toggle sidebar and main content
         sidebar.classList.toggle("expanded");
         mainContent.classList.toggle("shifted");
-
-        // Toggle icons
-        menuBars.classList.toggle("d-none");
-        menuX.classList.toggle("d-none");
+        menuBars?.classList.toggle("d-none");
+        menuX?.classList.toggle("d-none");
       });
     }
   });
 </script>
-{% endif %} 
+
+{% endif %}
 {% endblock %}

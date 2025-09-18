@@ -146,8 +146,9 @@ Dashboard
         </div>
     </div>
     {% endif %}
-    {% if request.user.department.name == 'GDA' or request.user.department.name == 'General Duty Assistant' %}
+    
     <div class="row mb-3">
+        {% if request.user.department.name == 'GDA' or request.user.department.name == 'General Duty Assistant' %}
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6">
             <div class="row">
                 <div class="col-12 shift-title mb-2">
@@ -183,11 +184,8 @@ Dashboard
                 </div>
             </div>
         </div>
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6"></div>
-    </div>
-    {% endif %}
-    <div class="row">
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 p-2">
+        {% endif %}
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6">
             <div class="chart-title mb-2">
                 <h3>Service Pie Chart</h3>
             </div>
