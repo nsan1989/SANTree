@@ -2,25 +2,24 @@ from django.shortcuts import render, get_object_or_404
 from accounts.models import Departments, CustomUsers
 from san_cms.models import Complaint, ComplaintRemarks, ComplaintType
 from san_tms.models import Tasks, TasksRemarks, TasksTypes
-from san_srm.models import Service
-from django.db.models import Q
 from django.http import JsonResponse
 from django.core.exceptions import PermissionDenied
 from django.http import JsonResponse
 from django.http import HttpResponse
 import matplotlib
+from django.conf import settings
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import io
 from threading import Lock
 plot_lock = Lock()
 from django.core.paginator import Paginator
-from django.conf import settings
-from webpush import send_user_notification
 import json
 from .forms import *
 from django.contrib import messages
 from django.core.exceptions import ValidationError
+from webpush.models import SubscriptionInfo
+import json
 
 # Home View.
 def Home(request):
@@ -31,28 +30,9 @@ def Home(request):
 
 # Main Dashboard View
 def MainDashboard(request):
-    user = request.user
-    staff_new_comp = Complaint.objects.filter(
-        Q(assigned_to = user) &
-        (Q(status='In Progress') | Q(status='Open'))
-        )
-    new_comp = staff_new_comp.all().count()
-    staff_new_task = Tasks.objects.filter(
-        Q(assigned_to = user) &
-        (Q(status='Open'))
-        )
-    new_task = staff_new_task.all().count()
-    staff_new_serv = Service.objects.filter(
-        assigned_to__shift_staffs = user, 
-        status='In Progress'
-    )
-    new_serv = staff_new_serv.all().count()
-    context = {
-        'show_alert': new_comp,
-        'show_alert_tms': new_task,
-        'show_alert_srm': new_serv
-    }
-    return render(request, 'mains_dashboard.html', context)
+    return render(request, 'mains_dashboard.html', {
+        "WEBPUSH_PUBLIC_KEY": settings.WEBPUSH_SETTINGS["VAPID_PUBLIC_KEY"]
+    })
 
 # Track 
 def TrackView(request):
@@ -485,16 +465,6 @@ def TaskDetailView(request, id):
         return render(request, 'task_detail.html', context)
     raise PermissionDenied("You are not authorized to view this page.")
 
-# Push Notification.
-def send_notification(request):
-    payload = {
-        "head": "New Update!",
-        "body": "You've got a new message.",
-        "icon": "/static/icons/icon-192x192.png",
-    }
-    send_user_notification(user=request.user, payload=json.dumps(payload), ttl=1000)
-    return JsonResponse({'status': 'success'})
-
 # Add Department View
 def AddDepartmentView(request):
     if request.method == 'POST':
@@ -621,4 +591,26 @@ def ProfileView(request):
         'user': user,
     }
     return render(request, 'profile.html', context)
-    
+
+# Save User Subscription Info
+def save_information(request):
+    if request.method != "POST" or not request.user.is_authenticated:
+        return JsonResponse({"status": "error"}, status=403)
+
+    data = json.loads(request.body)
+
+    browser = request.META.get('HTTP_USER_AGENT', '')[:100]
+    user_agent = request.META.get('HTTP_USER_AGENT', '')[:500]
+
+    SubscriptionInfo.objects.update_or_create(
+        endpoint=data["endpoint"],
+        defaults={
+            "p256dh": data["keys"]["p256dh"],
+            "auth": data["keys"]["auth"],
+            "browser": browser,
+            "user_agent": user_agent
+        }
+    )
+
+    return JsonResponse({"status": "success"})
+

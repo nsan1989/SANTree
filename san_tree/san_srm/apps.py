@@ -6,5 +6,4 @@ class SanSrmConfig(AppConfig):
     name = 'san_srm'
 
     def ready(self):
-        from .scheduler import start
-        start()
+        import san_srm.signals

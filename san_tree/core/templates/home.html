@@ -79,12 +79,5 @@
     </div>
   </div>
 </div>
-<!-- ✅ Load your script first -->
-  <script src="{% static 'js/push-notification.js' %}"></script>
-
-  <script>
-    const publicKey = "{{ vapid_key|escapejs }}".trim();
-    subscribeToPush(publicKey);
-  </script>
 
 {% endblock %}

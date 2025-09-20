@@ -1,6 +1,6 @@
 // serviceworker.js
 
-// Install event
+// PWA Install event
 self.addEventListener('install', event => {
     console.log('[Service Worker] Installed');
     // Optionally skip waiting

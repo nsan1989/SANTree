@@ -44,7 +44,8 @@
   .add-location small a:hover,
   .add-service small a:hover,
   .add-block small a:hover {
-    background-color: rgba(255, 193, 7, 0.6);
+    background-color: rgba(44, 129, 4, 0.6);
+    color: white;
     text-decoration: none;
   }
 
@@ -55,6 +56,7 @@
   .card-link a:hover {
     color: green;
   }
+
 </style>
 
 <link rel="stylesheet" href="{% static 'styles/san_tree.css' %}" />
@@ -74,7 +76,7 @@
     <div class="col-2 p-1">
       <div class="add-department">
         <small>
-          <a class="open-modal text-warning d-flex align-items-center justify-content-center border border-warning rounded"
+          <a class="open-modal text-warning d-flex align-items-center justify-content-center btn btn-warning text-light rounded"
             href="#" data-url="{% url 'add_department' %}">
             <i class="fa-solid fa-plus fa-sm"></i>
             &nbsp; <small>add dept.</small>

@@ -4,3 +4,7 @@ from django.apps import AppConfig
 class SanTmsConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
     name = 'san_tms'
+
+    def ready(self):
+        import san_tms.signals
+        

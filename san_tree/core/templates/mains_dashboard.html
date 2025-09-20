@@ -153,32 +153,6 @@
       </div>
     </div>
   </div>
-  <!--
-  <div class="row">
-    {% if show_alert %}
-    <div class="alert alert-warning alert-dismissible fade show" role="alert">
-      <strong>You have {{show_alert}} new complaint notification.</strong>
-      <button
-        type="button"
-        class="btn-close"
-        data-bs-dismiss="alert"
-        aria-label="Close"
-      ></button>
-    </div>
-     {% endif %}
-     {% if show_alert_tms %}
-    <div class="alert alert-warning alert-dismissible fade show" role="alert">
-      <strong>You have {{show_alert_tms}} new task notification.</strong>
-      <button
-        type="button"
-        class="btn-close"
-        data-bs-dismiss="alert"
-        aria-label="Close"
-      ></button>
-    </div>
-     {% endif %}
-  </div>
-  -->
 </div>
 
 <!-- Modal -->
@@ -241,36 +215,12 @@
   });
 </script>
 
-<script>
-  const showComplaintAlert = "{{ show_alert|default:'0' }}";
-  const showTaskAlert = "{{ show_alert_tms|default:'0' }}";
-  const showServiceAlert = "{{ show_alert_srm|default:'0' }}";
+<!-- ✅ Load your script first -->
+  <script src="{% static 'js/push-notification.js' %}"></script>
 
-  if ('serviceWorker' in navigator && 'PushManager' in window && Notification.permission === 'granted') {
-    navigator.serviceWorker.ready.then(registration => {
-      if (showComplaintAlert > 0) {
-        registration.showNotification("New Complaint", {
-          body: `You have ${showComplaintAlert} new complaint notification(s).`,
-          icon: "/static/images/icons/192X192.png"
-        });
-      }
-      if (showTaskAlert > 0) {
-        registration.showNotification("New Task", {
-          body: `You have ${showTaskAlert} new task notification(s).`,
-          icon: "/static/images/icons/192X192.png"
-        });
-      }
-      if (showServiceAlert > 0) {
-        registration.showNotification("New Service", {
-          body: `You have ${showServiceAlert} new service notification(s).`,
-          icon: "/static/images/icons/192X192.png"
-        });
-      }
-    });
-  } else {
-    console.log('Push not supported or permission not granted.');
-  }
-</script>
-
+  <script>
+    const publicKey = "{{ WEBPUSH_PUBLIC_KEY|escapejs }}".trim();
+    subscribeToPush(publicKey);
+  </script>
 
 {% endblock %}

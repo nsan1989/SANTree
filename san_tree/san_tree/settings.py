@@ -44,9 +44,9 @@ INSTALLED_APPS = [
     'structlog',
     'core',
     'accounts',
-    'san_tms',
-    'san_cms',
-    'san_srm',
+    'san_tms.apps.SanTmsConfig',
+    'san_cms.apps.SanCmsConfig',
+    'san_srm.apps.SanSrmConfig',
 ]
 
 MIDDLEWARE = [
@@ -172,7 +172,7 @@ DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 # Web Push Settings
 WEBPUSH_SETTINGS = {
-    "VAPID_PUBLIC_KEY": "BLpokGdgGtNEm4-VHSsUhu0Z7gRJulpnjdfmAgQcBdmWPMevWvXYZUqZQE0hGLNOcG7zX8hwCfsUzQtZYuw_m2s",
-    "VAPID_PRIVATE_KEY": "-8tpkUdnLzVhZzFiC4JZoMkTUGqkpfjyC9zfRY-pC_g",
+    "VAPID_PUBLIC_KEY": "BKOA9k7roz79cDnYCEDOP7jMWYPLOv7nlK7-H717V7b8muRL7caXVWpkSQNq1tQEpSTjTZLKOO_KtAf_HthSDRA",
+    "VAPID_PRIVATE_KEY": "p2OzkyI9cuqFc_p2OikmXEwvWeNq-EWohroFSV6DBzA",
     "VAPID_ADMIN_EMAIL": "mis.shija2025@gmail.com"
 }

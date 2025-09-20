@@ -1,17 +1,25 @@
 function subscribeToPush(publicKey) {
+    console.log("subscribeToPush called");
 
     Notification.requestPermission().then(function(permission) {
+        if (permission !== "granted") {
+            console.error("Notification permission denied");
+            return;
+        }
 
         navigator.serviceWorker.register('/static/js/serviceworker.js')
-            .then(function(registration) {
+            .then(registration => {
+                return navigator.serviceWorker.ready;
+            })
+            .then(registration => {
 
                 return registration.pushManager.subscribe({
                     userVisibleOnly: true,
                     applicationServerKey: urlBase64ToUint8Array(publicKey)
                 });
             })
-            .then(function(subscription) {
-
+            .then(subscription => {
+                console.log("Subscription created:", subscription);
                 // Send to server
                 return fetch('/webpush/save_information/', {
                     method: 'POST',

@@ -29,7 +29,6 @@ urlpatterns = [
     path('cms/', include(('san_cms.urls', 'san_cms'), namespace='cms')),
     path('srm/', include(('san_srm.urls', 'san_srm'), namespace='srm')),
     path('', include('pwa.urls')),
-    path('webpush/', include('webpush.urls')),
 ]
 
 if settings.DEBUG:

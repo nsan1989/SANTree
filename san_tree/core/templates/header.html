@@ -45,7 +45,7 @@
         </a>
         {% endif %}
       </div>
-      <div class="px-3">
+      <div>
         {% if request.user.role != 'Super Admin' %}
         <a class="nav-link text-light d-flex align-items-center" href="{% url 'profile' %}">
           <i class="fa-solid fa-user" title="Profile" style="font-size: 0.9rem; color: #990000;"></i>

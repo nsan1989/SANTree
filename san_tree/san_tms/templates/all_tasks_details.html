@@ -32,7 +32,7 @@
         class="col-12 d-flex align-items-center text-warning"
         style="text-decoration: none"
       >
-        <i class="fa-solid fa-arrow-left"></i>
+        <i class="fa-solid fa-arrow-left text-warning"></i>
         &nbsp;back
       </a>
             </div>
@@ -43,7 +43,7 @@
         <div class="row">
             <div class="col-12 table-responsive">
                 <table class="table table-bordered">
-                    <thead class="table-dark">
+                    <thead class="table-danger">
                         <tr>
                             <th scope="col" style="width: 25%;">Task</th>
                             <th scope="col" style="width: 15%;">Location</th>
@@ -72,7 +72,7 @@
             </div>
             <div class="col-12 table-responsive">
                 <table class="table table-bordered">
-                    <thead class="table-dark">
+                    <thead class="table-danger">
                         <tr>
                         <th scope="col">Remarks</th>
                         <th scope="col">Attachment</th>
@@ -85,7 +85,11 @@
                             {% for remarks in remark %}
                             <tr>
                             <td>{{remarks.remarks}}</td>
-                            <td>{{remarks.attachment}}</td>
+                            {% if remarks.attachment %}
+                                <td>{{remarks.attachment}}</td>
+                            {% else %}
+                                <td>No attachment!</td>
+                            {% endif %}
                             <td>{{remarks.created_by}}</td>
                             <td>{{remarks.created_at}}</td>
                             </tr>
