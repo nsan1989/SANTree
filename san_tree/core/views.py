@@ -18,7 +18,7 @@ import json
 from .forms import *
 from django.contrib import messages
 from django.core.exceptions import ValidationError
-from webpush.models import SubscriptionInfo
+from webpush.models import SubscriptionInfo, PushInformation
 import json
 
 # Home View.
@@ -602,7 +602,7 @@ def save_information(request):
     browser = request.META.get('HTTP_USER_AGENT', '')[:100]
     user_agent = request.META.get('HTTP_USER_AGENT', '')[:500]
 
-    SubscriptionInfo.objects.update_or_create(
+    sub_info, created = SubscriptionInfo.objects.update_or_create(
         endpoint=data["endpoint"],
         defaults={
             "p256dh": data["keys"]["p256dh"],
@@ -612,5 +612,10 @@ def save_information(request):
         }
     )
 
-    return JsonResponse({"status": "success"})
+    PushInformation.objects.get_or_create(
+        user=request.user,
+        group=None,
+        subscription=sub_info,
+    )
 
+    return JsonResponse({"status": "success"})

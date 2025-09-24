@@ -1,35 +1,48 @@
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from django.contrib.auth.models import User
 from webpush import send_user_notification
-from webpush.models import SubscriptionInfo
-
+from webpush.models import SubscriptionInfo, PushInformation
+from accounts.models import CustomUsers
 from .models import Tasks
 
 def send_push_notification(username, title, message):
-    """Helper to send push notification to a specific username."""
-    subscriptions = SubscriptionInfo.objects.filter(webpush_info=username)
-    print(f"Found {subscriptions.count()} subscriptions for {username}")
+
+    try:
+        user_obj = CustomUsers.objects.get(username=username)
+    except CustomUsers.DoesNotExist:
+        return
+
+    push_infos = PushInformation.objects.filter(user=user_obj)
+
+    subscriptions = [pi.subscription for pi in push_infos]
+
     for sub in subscriptions:
         try:
-            user_obj = User.objects.get(username=sub.webpush_info)
-            print(f"Sending notification to {user_obj.username}")
             payload = {
                 "head": title,
                 "body": message,
                 "icon": "/static/images/icons/192X192.png"
             }
             send_user_notification(user=user_obj, payload=payload, ttl=1000)
-        except User.DoesNotExist:
-            print(f"User not found for subscription {sub.endpoint}")
-            continue
+        except Exception as e:
+            print(f"Failed to send to subscription {sub.endpoint}: {e}")
+
 
 @receiver(post_save, sender=Tasks)
 def task_notification(sender, instance, created, **kwargs):
+
     if created and instance.assigned_to:
-        send_push_notification(
-            username=instance.assigned_to.username,
-            title="New Task Assigned",
-            message=f"You have a new task: {instance.title}"
-        )
-        
+
+        try:
+            user_obj = CustomUsers.objects.get(username=instance.assigned_to.username)
+            push_infos = PushInformation.objects.filter(user=user_obj)
+            subscriptions = [pi.subscription for pi in push_infos]
+            for sub in subscriptions:
+                payload = {
+                    "head": "New Task Assigned",
+                    "body": f"You have a new task: {instance.tasks_types}",
+                    "icon": "/static/images/icons/192X192.png"
+                }
+                send_user_notification(user=user_obj, payload=payload, ttl=1000)
+        except CustomUsers.DoesNotExist:
+            print(f"User {instance.assigned_to.username} does not exist.")

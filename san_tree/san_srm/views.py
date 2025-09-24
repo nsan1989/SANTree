@@ -386,3 +386,4 @@ def ServiceRemark(request, id):
     }
     return render(request, 'srm_remarks.html', context)
 
+# Generate Service Request View.

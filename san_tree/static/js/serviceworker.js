@@ -23,12 +23,15 @@ self.addEventListener('fetch', event => {
 
 // Push event - receives notification payload from server
 self.addEventListener('push', function (e) {
+    console.log("Push event received!", e.data ? e.data.text() : "no data");
     let data = {};
     try {
         data = e.data.json();
     } catch (err) {
         data = { title: "Notification", body: e.data.text() };
     }
+
+    console.log("Parsed data:", data);
 
     const options = {
         body: data.body,

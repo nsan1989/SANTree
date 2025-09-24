@@ -21,5 +21,4 @@ def start():
         replace_existing=True,
     )
     scheduler.start()
-    print("Scheduler started!")
     atexit.register(lambda: scheduler.shutdown())
