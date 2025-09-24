@@ -135,6 +135,7 @@ class GenerateService(models.Model):
     from_location = models.ForeignKey(Location, related_name='generate_from', on_delete=models.SET_NULL, null=True, blank=True)
     to_location = models.ForeignKey(Location, related_name='generate_to', on_delete=models.SET_NULL, null=True, blank=True)
     generate_by = models.ForeignKey(ShiftSchedule, related_name='srm_generate_service', on_delete=models.CASCADE)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='In Progress')
     generate_at = models.DateTimeField(auto_now_add=True)
     completed_at = models.DateTimeField(null=True, blank=True)
     attachment = models.ImageField(upload_to=generate_service_image_path, null=True, blank=True)

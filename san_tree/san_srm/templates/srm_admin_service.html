@@ -3,70 +3,101 @@
 {% load static %}
 
 {% block title %}
-    Service Requested
+Service Requested
 {% endblock %}
 
 {% block start %}
 
-    <style>
-        .service-title h1 {
-            color: wheat;
-            font-family: 'Poppins',sans-serif;
-        }
-        th, tr {
-            font-family: 'Poppins',sans-serif;
-        }
-        th {
-            font-size: 0.9rem;
-        }
-        tr {
-            font-size: 0.85rem;
-        }
-    </style>
+<style>
+    .service-title h1 {
+        color: wheat;
+        font-family: 'Poppins', sans-serif;
+    }
 
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-12">
-                <div class="service-title">
+    th,
+    tr {
+        font-family: 'Poppins', sans-serif;
+    }
+
+    th {
+        font-size: 0.9rem;
+    }
+
+    tr {
+        font-size: 0.85rem;
+    }
+</style>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="service-title">
                 <h1 class="fw-bold mb-3">All Service</h1>
-            </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col table-responsive">
-                <table class="table table-hover table-bordered">
-                    <thead class="table-danger">
-                        <tr>
-                            <th scope="col">Service Type</th>
-                            <th scope="col">Assigned To</th>
-                            <th scope="col">Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% if page_obj %}
-                        {% for service in page_obj %}
-                        <tr
-                            {% if service.status|lower == 'completed' %}
-                                class="table-success"
-                            {% elif service.status|lower == 'in-progress' %}
-                                class="table-warning"
-                            {% elif service.status|lower == 'pending' %}
-                                class="table-info"
-                            {% endif %}
-                        >
-                            <td>{{ service.service_type }}</td>
-                            <td>{{ service.assigned_to }}</td>
-                            <td>{{ service.status }}</td>
-                        <tr>
-                        {% endfor %} 
-                        {% else %}
-                        <tr>
-                            <td colspan="3">No services found.</td>
-                        </tr>
-                        {% endif %}    
-                    </tbody>    
-                </table>    
             </div>
         </div>
     </div>
+    <div class="row mb-3">
+        <div class="col-12">
+            <nav>
+                <ul class="pagination">
+                    {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+                    </li>
+                    {% endif %}
+                    {% for num in page_obj.paginator.page_range %}
+                    {% if page_obj.number == num %}
+                    <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                    {% else %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                    </li>
+                    {% endif %}
+                    {% endfor %}
+
+                    {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col table-responsive">
+            <table class="table table-hover table-bordered">
+                <thead class="table-danger">
+                    <tr>
+                        <th scope="col">Service Type</th>
+                        <th scope="col">Assigned To</th>
+                        <th scope="col">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if page_obj %}
+                    {% for service in page_obj %}
+                    <tr {% if service.status|lower == 'completed' %} 
+                            class="table-success" 
+                        {% elif service.status|lower == 'in-progress' %} 
+                            class="table-warning" 
+                        {% elif service.status|lower == 'pending' %} 
+                            class="table-info" 
+                        {% endif %}
+                    >
+                        <td>{{ service.service_type }}</td>
+                        <td>{{ service.assigned_to }}</td>
+                        <td>{{ service.status }}</td>
+                    <tr>
+                        {% endfor %}
+                        {% else %}
+                    <tr>
+                        <td colspan="3">No services found.</td>
+                    </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
 {% endblock %}

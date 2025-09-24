@@ -76,25 +76,4 @@ Complaints
     });
   });
 </script>
-<!--
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const complaintTypeField = document.getElementById('id_complaint_type');
-        const descriptionField = document.getElementById('id_description');
-
-        function toggleDescriptionField() {
-            const selectedOption = complaintTypeField.options[complaintTypeField.selectedIndex];
-            if (selectedOption && selectedOption.text.toLowerCase() === 'others') {
-                descriptionField.disabled = false;
-            } else {
-                descriptionField.disabled = true;
-                descriptionField.value = '';  
-            }
-        }
-
-        complaintTypeField.addEventListener('change', toggleDescriptionField);
-        toggleDescriptionField();
-    });
-</script>
--->
 {% endblock %}

@@ -106,9 +106,9 @@ def StaffDashboard(request):
     progress_created_service = Service.objects.filter(created_by = user, status = 'In Progress').count()
     completed_created_service = Service.objects.filter(created_by = user, status = 'Completed').count()
     assign_service = Service.objects.filter(assigned_to__shift_staffs = user).all().count()
-    open_assign_service = Service.objects.filter(assigned_to__shift_staffs = user, status = 'Open').count()
     progress_assign_service = Service.objects.filter(assigned_to__shift_staffs = user, status = 'In Progress').count()
     completed_assign_service = Service.objects.filter(assigned_to__shift_staffs = user, status = 'Completed').count()
+    service_generated_by = GenerateService.objects.filter(generate_by__shift_staffs = user).count()
     my_shift = ShiftSchedule.objects.filter(
         shift_staffs = user, 
         start_time__gte=today, 
@@ -121,10 +121,10 @@ def StaffDashboard(request):
         'prog_created_serv': progress_created_service,
         'comp_created_serv': completed_created_service,
         'total_assign_service': assign_service,
-        'open_assign_serv': open_assign_service,
         'prog_assign_serv': progress_assign_service,
         'comp_assign_serv': completed_assign_service,
         'shifts': my_shift,
+        'generate': service_generated_by,
     }
     view_name = request.resolver_match.view_name
     if view_name == "srm:staff_dashboard" and user_role == 'User':
@@ -261,9 +261,21 @@ def GenerateServiceView(request):
         form = ServiceGenerateForm(request.POST, request.FILES, user=request.user)
         if form.is_valid():
             new_service = form.save(commit=False)
-            new_service.created_by = request.user
-            new_service.save()
-            return redirect()
+            shift_schedule = ShiftSchedule.objects.filter(shift_staffs=request.user).first()
+
+            if shift_schedule:
+                new_service.generate_by = shift_schedule
+                new_service.save()
+
+                new_service.generate_by.shift_staffs.status = 'engaged'
+                new_service.generate_by.shift_staffs.save()
+
+                messages.success(request, "Service generated successfully!")
+                return redirect('staff_dashboard')
+            else:
+                messages.error(request, "There was an error with the form submission.")
+        else:
+            messages.error(request, "There was an error with the form submission.")
     else:
         form = ServiceGenerateForm(user=request.user)
     context = {'form': form}
@@ -385,5 +397,3 @@ def ServiceRemark(request, id):
         'service': service,
     }
     return render(request, 'srm_remarks.html', context)
-
-# Generate Service Request View.

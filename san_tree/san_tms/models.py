@@ -50,7 +50,7 @@ class Tasks(models.Model):
     waiting_time = models.DateTimeField(auto_now=True)
     attachment = models.ImageField(upload_to=task_image_path, null=True, blank=True)
     
-    def _str_(self):
+    def __str__(self):
         return str(self.tasks_types)
 
     @property

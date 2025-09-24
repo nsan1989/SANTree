@@ -18,6 +18,7 @@ plot_lock = Lock()
 from django.http import HttpResponse
 from django.utils.dateparse import parse_date
 from datetime import datetime
+from django.core.paginator import Paginator
 
 # Tasks Pie Chart
 def TasksPieChart(request):
@@ -205,8 +206,11 @@ def AllTasks(request):
     new_tasks = Tasks.objects.filter(
         Q(created_by = user)
     )
+    page_number = request.GET.get('page')
+    paginator = Paginator(new_tasks, 10)
+    page_obj = paginator.get_page(page_number)
     context = {
-        'tasks': new_tasks
+        'page_obj': page_obj
     }
     view_name = request.resolver_match.view_name
     if view_name == "tms:tasks" and user_role == 'Admin':
@@ -225,6 +229,10 @@ def MyTasks(request):
         Q(assigned_to = user)
     )
 
+    page_number = request.GET.get('page')
+    paginator = Paginator(my_tasks, 10)
+    page_obj = paginator.get_page(page_number)
+
     for tasks in my_tasks:
         if tasks.status == 'Waiting':
             current_time = timezone.now()
@@ -236,7 +244,7 @@ def MyTasks(request):
         tasks.save()
 
     context = {
-        'tasks': my_tasks
+        'page_obj': page_obj
     }
     view_name = request.resolver_match.view_name
     if view_name == "tms:my_tasks" and user_role == 'User':

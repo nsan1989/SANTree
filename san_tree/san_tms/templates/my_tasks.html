@@ -33,6 +33,38 @@ My Tasks
       <h1 class="fw-bold py-2">My Tasks</h1>
     </div>
   </div>
+  <div class="row mb-2">
+    <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 mb-2">
+      <nav>
+          <ul class="pagination">
+            {% if page_obj.has_previous %}
+            <li class="page-item">
+              <a class="page-link"
+                href="?page={{ page_obj.previous_page_number }}">Previous</a>
+            </li>
+            {% endif %}
+
+            {% for num in page_obj.paginator.page_range %}
+            {% if page_obj.number == num %}
+            <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+            {% else %}
+            <li class="page-item">
+              <a class="page-link"
+                href="?page={{ num }}">{{ num }}</a>
+            </li>
+            {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+            <li class="page-item">
+              <a class="page-link"
+                href="?page={{ page_obj.next_page_number }}">Next</a>
+            </li>
+            {% endif %}
+          </ul>
+      </nav>
+    </div>
+  </div>
   <div class="row">
     <div class="col-12 task-table">
       <div class="table-responsive">
@@ -50,7 +82,7 @@ My Tasks
             </tr>
           </thead>
           <tbody class="table-primary">
-            {% if tasks %} {% for task in tasks %}
+            {% if page_obj %} {% for task in page_obj %}
             <tr
               {% if task.status == 'Completed' %}
               class="status-completed"
