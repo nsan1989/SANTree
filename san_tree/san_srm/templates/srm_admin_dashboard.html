@@ -11,36 +11,45 @@ Dashboard
     .dashboard-title {
         color: wheat;
     }
+
     .card {
         background-color: rgba(0, 0, 0, 0.6);
         min-height: 6rem;
     }
+
     .card-title {
         font-family: 'poppins', sans-serif;
         font-size: 1rem;
         color: #fff;
     }
+
     .card-body p {
         font-family: 'poppins', sans-serif;
         font-size: 0.9rem;
         font-weight: bold;
         color: #fff;
     }
+
     .table-title h4 {
         font-family: 'poppins', sans-serif;
         font-size: 1rem;
         font-weight: bold;
         color: wheat;
     }
-    th, tr {
+
+    th,
+    tr {
         font-family: 'Poppins', sans-serif;
     }
+
     th {
         font-size: 0.9rem;
     }
+
     tr {
         font-size: 0.8rem;
     }
+
     .chart-title h3 {
         font-family: 'poppins', sans-serif;
         color: wheat;
@@ -100,59 +109,60 @@ Dashboard
             </div>
         </div>
     </div>
-    <div class="row mb-3">
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6">
+    <div class="row mb-3 user-tables">
+        <!-- Engage User -->
+        <div class="col-12 col-md-6 h-100">
             <div class="col-title d-flex align-items-center table-title mb-2">
-                <i class="fa-solid fa-circle fa-sm" style="color: #eb0707"></i>
-                &nbsp;&nbsp;
-                <h4>Engage User</h4>
+                <i class="fa-solid fa-circle fa-sm text-danger"></i>
+                <h4 class="ms-2 mb-0">Engage User</h4>
             </div>
-            <div class="col-table table-responsive">
+            <div class="col-table">
                 <table class="table">
                     <thead class="table-danger">
                         <tr>
-                        <th scope="col">Username</th>
+                            <th scope="col">Username</th>
                         </tr>
                     </thead>
                     <tbody class="table-light">
                         {% if engage_user %}
                         {% for engage in engage_user %}
                         <tr>
-                        <td>{{engage.username}}</td>
+                            <td>{{ engage.username }}</td>
                         </tr>
                         {% endfor %}
                         {% else %}
                         <tr>
-                            <td colspan="3">No engage users!</td>
+                            <td>No engage users!</td>
                         </tr>
                         {% endif %}
                     </tbody>
                 </table>
             </div>
         </div>
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6">
+
+        <!-- Vacant User -->
+        <div class="col-12 col-md-6 h-100">
             <div class="col-title d-flex align-items-center table-title mb-2">
-                <i class="fa-solid fa-circle fa-sm" style="color: #4feb07"></i>
-                &nbsp;
-                <h4>Vacant User</h4>
+                <i class="fa-solid fa-circle fa-sm text-success"></i>
+                <h4 class="ms-2 mb-0">Vacant User</h4>
             </div>
-            <div class="col-table table-responsive">
+            <div class="col-table">
                 <table class="table">
                     <thead class="table-danger">
                         <tr>
-                        <th scope="col">Username</th>
+                            <th scope="col">Username</th>
                         </tr>
                     </thead>
                     <tbody class="table-light">
                         {% if vacant_user %}
                         {% for vacant in vacant_user %}
                         <tr>
-                        <td>{{vacant.username}}</td>
+                            <td>{{ vacant.username }}</td>
                         </tr>
                         {% endfor %}
                         {% else %}
                         <tr>
-                            <td colspan="3">No vacant users!</td>
+                            <td>No vacant users!</td>
                         </tr>
                         {% endif %}
                     </tbody>
@@ -160,17 +170,15 @@ Dashboard
             </div>
         </div>
     </div>
+
     <div class="row mb-3">
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6">
             <div class="chart-title mb-2">
                 <h3>Service Chart</h3>
             </div>
             <div class="chart-content">
-                <img
-                class="img-fluid rounded-2 w-100"
-                src="{% url 'srm:service_pie_chart' %}?v={{ now }}"
-                alt="Complaint Pie Chart"
-                />
+                <img class="img-fluid rounded-2 w-100" src="{% url 'srm:service_pie_chart' %}?v={{ now }}"
+                    alt="Complaint Pie Chart" />
             </div>
         </div>
     </div>

@@ -271,9 +271,10 @@ def GenerateServiceView(request):
                 new_service.generate_by.shift_staffs.save()
 
                 messages.success(request, "Service generated successfully!")
-                return redirect('staff_dashboard')
+                return redirect('srm:staff_dashboard')
             else:
                 messages.error(request, "There was an error with the form submission.")
+                return redirect('srm:staff_dashboard')
         else:
             messages.error(request, "There was an error with the form submission.")
     else:

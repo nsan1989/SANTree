@@ -215,12 +215,4 @@
   });
 </script>
 
-<!-- ✅ Load your script first -->
-  <script src="{% static 'js/push-notification.js' %}"></script>
-
-  <script>
-    const publicKey = "{{ WEBPUSH_PUBLIC_KEY|escapejs }}".trim();
-    subscribeToPush(publicKey);
-  </script>
-
 {% endblock %}

@@ -30,9 +30,7 @@ def Home(request):
 
 # Main Dashboard View
 def MainDashboard(request):
-    return render(request, 'mains_dashboard.html', {
-        "WEBPUSH_PUBLIC_KEY": settings.WEBPUSH_SETTINGS["VAPID_PUBLIC_KEY"]
-    })
+    return render(request, 'mains_dashboard.html')
 
 # Track 
 def TrackView(request):

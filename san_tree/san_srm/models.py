@@ -148,6 +148,11 @@ class GenerateService(models.Model):
         is_new = self.pk is None
         image_changed = False
 
+        # Assign service number only once when new
+        if is_new and not self.generate_number:
+            self.generate_number = f"GSN{self.id}"
+            Service.objects.filter(pk=self.pk).update(service_number=self.generate_number)
+
         # Check if attachment has changed (only for existing object)
         if self.pk:
             old_attachment = Service.objects.get(pk=self.pk).attachment
