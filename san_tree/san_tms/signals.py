@@ -19,7 +19,7 @@ def send_push_notification(username, title, message):
     for sub in subscriptions:
         try:
             payload = {
-                "head": title,
+                "title": title,
                 "body": message,
                 "icon": "/static/images/icons/192X192.png"
             }
@@ -28,21 +28,12 @@ def send_push_notification(username, title, message):
             print(f"Failed to send to subscription {sub.endpoint}: {e}")
 
 
+# ----- Tasks -----
 @receiver(post_save, sender=Tasks)
-def task_notification(sender, instance, created, **kwargs):
-
+def tasks_notification(sender, instance, created, **kwargs):
     if created and instance.assigned_to:
-
-        try:
-            user_obj = CustomUsers.objects.get(username=instance.assigned_to.username)
-            push_infos = PushInformation.objects.filter(user=user_obj)
-            subscriptions = [pi.subscription for pi in push_infos]
-            for sub in subscriptions:
-                payload = {
-                    "head": "New Task Assigned",
-                    "body": f"You have a new task: {instance.tasks_types}",
-                    "icon": "/static/images/icons/192X192.png"
-                }
-                send_user_notification(user=user_obj, payload=payload, ttl=1000)
-        except CustomUsers.DoesNotExist:
-            print(f"User {instance.assigned_to.username} does not exist.")
+        send_push_notification(
+            username=instance.assigned_to.username,
+            title="New Service Assigned",
+            message=f"You have a new service: {instance.tasks_types}"
+        )

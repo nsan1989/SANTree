@@ -14,8 +14,24 @@ function urlBase64ToUint8Array(base64String) {
   return outputArray;
 }
 
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let cookie of cookies) {
+            cookie = cookie.trim();
+            if (cookie.startsWith(name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
 
 function subscribeToPush(publicKey) {
+    console.log(publicKey)
     console.log(Notification.permission); 
     Notification.requestPermission().then(function(permission) {
         if (permission !== "granted") {

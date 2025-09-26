@@ -20,6 +20,7 @@ plot_lock = Lock()
 from django.http import HttpResponse
 from .forms import ServiceRemarkForm
 from django.db.models import OuterRef, Subquery
+from django.contrib.auth.decorators import login_required
 
 log = structlog.get_logger()
 now = timezone.now()
@@ -114,6 +115,41 @@ def StaffDashboard(request):
         start_time__gte=today, 
         end_time__lt=tomorrow
         ).all()
+    if request.method == 'POST':
+        form = ServiceGenerateForm(request.POST, request.FILES, user=request.user)
+        if form.is_valid():
+            new_service = form.save(commit=False)
+            shift_schedule = ShiftSchedule.objects.filter(shift_staffs=request.user).first()
+
+            if shift_schedule:
+                new_service.generate_by = shift_schedule
+                new_service.save()
+
+                if request.headers.get("x-requested-with") == "XMLHttpRequest":
+                    return JsonResponse({
+                        "success": True,
+                        "id": new_service.id,
+                        "generate_number": new_service.generate_number,
+                        "service_type": str(new_service.service_type),
+                        "from_location": str(new_service.from_location),
+                        "to_location": str(new_service.to_location),
+                        "status": new_service.status,
+                        "generate_at": new_service.generate_at.strftime("%Y-%m-%d %H:%M"),
+                    })
+
+                messages.success(request, "Service generated successfully!")
+                return redirect('srm:staff_dashboard')
+            else:
+                if request.headers.get("x-requested-with") == "XMLHttpRequest":
+                    return JsonResponse({"success": False, "error": "Shift schedule not found"}, status=400)
+                messages.error(request, "Shift schedule not found")
+                return redirect('srm:staff_dashboard')
+        else:
+            if request.headers.get("x-requested-with") == "XMLHttpRequest":
+                return JsonResponse({"success": False, "errors": form.errors}, status=400)
+            messages.error(request, "Invalid form")
+    else:
+        form = ServiceGenerateForm(user=request.user)
     context = {
         'current_user': user,
         'total_created_service': created_services,
@@ -125,6 +161,8 @@ def StaffDashboard(request):
         'comp_assign_serv': completed_assign_service,
         'shifts': my_shift,
         'generate': service_generated_by,
+        "show_action_buttons": user.status == "engaged",
+        "form": form
     }
     view_name = request.resolver_match.view_name
     if view_name == "srm:staff_dashboard" and user_role == 'User':
@@ -282,6 +320,22 @@ def GenerateServiceView(request):
     context = {'form': form}
     return render(request, 'service_generate.html', context)
 
+# All Generated Service
+def AllGeneratedService(request):
+    user = request.user
+    try:
+        user_role = user.role
+    except:
+        raise PermissionDenied("User profile not found")
+    generate_serv = GenerateService.objects.filter(generate_by__shift_staffs = user).order_by('generate_at')
+    context = {
+        'generate': generate_serv
+    }
+    view_name = request.resolver_match.view_name
+    if view_name == "srm:all_generate_service" and user_role == 'User':
+        return render(request, 'all_generate_service.html', context)
+    raise PermissionDenied("You are not authorized to view this page.")
+
 # All Service View.
 def RequestServiceView(request):
     user = request.user
@@ -398,3 +452,13 @@ def ServiceRemark(request, id):
         'service': service,
     }
     return render(request, 'srm_remarks.html', context)
+
+@login_required
+def UpdateUserStatus(request):
+    if request.method == "POST":
+        status = request.POST.get("status")
+        user = request.user
+        user.status = status  # assuming you have a 'status' field on your user model
+        user.save()
+        return JsonResponse({"success": True, "status": user.status})
+    return JsonResponse({"success": False})

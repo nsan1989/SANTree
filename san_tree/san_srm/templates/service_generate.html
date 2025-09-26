@@ -24,7 +24,7 @@
       </div>
     </span>
     <div class="col-12 col-md-5 card shadow-lg p-3">
-      <form class="task-form" method="post" enctype="multipart/form-data">
+      <form id="generateServiceForm" class="task-form" method="post" enctype="multipart/form-data">
         {% csrf_token %} {{ form|crispy }}
         <div class="d-grid mt-4">
           <button type="submit" class="btn btn-primary btn-lg">Submit</button>

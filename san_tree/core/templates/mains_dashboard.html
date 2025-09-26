@@ -173,6 +173,15 @@
     </div>
   </div>
 </div>
+  
+<!-- ✅ Load your script first -->
+  <script src="{% static 'js/push-notification.js' %}"></script>
+
+  <script>
+    const publicKey = "{{ vapid_key |escapejs }}".trim();
+    console.log("VAPID Public Key:", publicKey); 
+    subscribeToPush(publicKey);
+  </script>
 
 <script>
   document.getElementById('universal-track-form').addEventListener('submit', function (e) {

@@ -39,7 +39,7 @@ def TaskGmailHandler(sender, instance, created, **kwargs):
 def ServiceGmailHandler(sender, instance, created, **kwargs):
     if created and instance.assigned_to.shift_staffs:
         subject = "New complaint assigned"
-        message = f"Helle {instance.assigned_to.shift_staffs}, \n\nA new complaint has been assigned to you"
+        message = f"Hello! {instance.assigned_to.shift_staffs}, \n\nA new complaint has been assigned to you."
         send_mail(
             subject,
             message,

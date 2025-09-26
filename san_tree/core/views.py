@@ -23,14 +23,14 @@ import json
 
 # Home View.
 def Home(request):
-    context = {
-        'vapid_key': settings.WEBPUSH_SETTINGS['VAPID_PUBLIC_KEY']
-    }
-    return render(request, 'home.html', context)
+    return render(request, 'home.html')
 
 # Main Dashboard View
 def MainDashboard(request):
-    return render(request, 'mains_dashboard.html')
+    context = {
+        'vapid_key': settings.WEBPUSH_SETTINGS['VAPID_PUBLIC_KEY']
+    }
+    return render(request, 'mains_dashboard.html', context)
 
 # Track 
 def TrackView(request):

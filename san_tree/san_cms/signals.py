@@ -24,7 +24,7 @@ def send_push_notification(username, title, message):
     for sub in subscriptions:
         try:
             payload = {
-                "head": title,
+                "title": title,
                 "body": message,
                 "icon": "/static/images/icons/192X192.png"
             }

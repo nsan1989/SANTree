@@ -23,7 +23,7 @@ def send_push_notification(username, title, message):
     for sub in subscriptions:
         try:
             payload = {
-                "head": title,
+                "title": title,
                 "body": message,
                 "icon": "/static/images/icons/192X192.png"
             }
@@ -35,9 +35,9 @@ def send_push_notification(username, title, message):
 # ----- Services -----
 @receiver(post_save, sender=Service)
 def service_notification(sender, instance, created, **kwargs):
-    if created and instance.assigned_to:
+    if created and instance.assigned_to.shift_staffs:
         send_push_notification(
-            username=instance.assigned_to.username,
+            username=instance.assigned_to.shift_staffs.username,
             title="New Service Assigned",
             message=f"You have a new service: {instance.service_type}"
         )

@@ -37,30 +37,13 @@
     font-family: 'Poppins', sans-serif;
   }
 
-  i {
-    width: 2rem;
-    color: #990000;
-    transition: color 0.3s ease, transform 0.3s ease;
-  }
-
-  span {
-    color: #990000;
-    transition: color 0.3s ease, transform 0.3s ease;
-  }
-
-  i:hover,
-  span:hover {
-    color: green;
-    transform: scale(1.1);
-  }
-
 </style>
 <!--------->
 <!-- sidebar.html -->
 <div id="sidebar-content" class="sidebar-content h-100">
   <ul class="sidebar_menu">
     <li class="demo-item d-flex justify-content-between">
-      <a href="#" style="width: 10rem;">
+      <a href="#" style="width: 10rem;color: #990000;">
         <img class="img-fluid" src="{% static 'images/logo.png' %}" style="height: 32px;width: 2rem;">
         <span class="menu-label fw-bold">SSMS</span>
       </a>
@@ -69,8 +52,8 @@
     {% for item in sidebar_menu %}
     <li class="{% if request.resolver_match.url_name == item.view_name %}active{% endif %}">
       <a href="{% url item.url_name %}" style="width: 10rem;">
-        <i style="display: flex;justify-content: center;" class="{{ item.icon }}"></i>
-        <span class="menu-label">{{ item.name }}</span>
+        <i style="display: flex;justify-content: center;color: #990000;" class="{{ item.icon }} px-2"></i>
+        <span style="color: #990000;" class="menu-label">{{ item.name }}</span>
       </a>
     </li>
     {% endfor %}

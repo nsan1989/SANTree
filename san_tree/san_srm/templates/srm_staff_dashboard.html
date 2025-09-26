@@ -1,4 +1,5 @@
 {% extends 'index.html' %}
+{% load crispy_forms_tags %}
 {% load static %}
 
 {% block title %}
@@ -12,10 +13,12 @@ Dashboard
         font-family: 'Poppins', sans-serif;
         color: wheat;
     }
+
     .dashboard-title p {
         font-family: 'Poppins', sans-serif;
         color: #fff;
     }
+
     .card {
         background-color: rgba(0, 0, 0, 0.4);
         font-family: 'Poppins', sans-serif;
@@ -23,27 +26,38 @@ Dashboard
         color: #fff;
         min-height: 8rem;
     }
+
     .card-body {
         display: flex;
         flex-direction: column;
         justify-content: center;
         align-items: center;
     }
+
     .card-body h5 {
         font-size: 1rem;
         font-weight: 600;
     }
+
     .shift-title h3 {
         font-family: 'Poppins', sans-serif;
         color: wheat;
     }
-    th, td {
+
+    th,
+    td {
         font-family: 'Poppins', sans-serif;
         font-size: 0.9rem;
     }
+
     .chart-title h3 {
         font-family: 'Poppins', sans-serif;
         color: wheat;
+    }
+
+    .generated_service_link {
+        text-decoration: none;
+        font-family: 'Poppins', sans-serif;
     }
 </style>
 
@@ -66,11 +80,20 @@ Dashboard
         </div>
         {% else %}
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 d-flex align-items-center">
-            <div class="service-generate-form">
-                <p class="mb-0 text-light">
-                    Generate a service &nbsp;<a class="text-warning fw-bold" href="{% url 'srm:generate_service' %}"
-                        style="text-decoration: none;">click here.</a>
-                </p>
+            <div class="service-generate-btn d-flex align-items-center">
+                <small class="text-light">Generate a service</small>
+                &nbsp;
+                {% if show_action_buttons %}
+                <div id="actionButtons">
+                    <button id="completeBtn" class="btn btn-sm btn-success me-2">Complete</button>
+                    <button id="holdBtn" class="btn btn-sm btn-secondary">Hold</button>
+                </div>
+                <button id="generateBtn" type="button" class="btn btn-sm btn-warning"
+                    style="display:none;">Generate</button>
+                {% else %}
+                <button id="generateBtn" type="button" class="btn btn-sm btn-warning">Generate</button>
+                <div id="actionButtons" style="margin-top:10px;"></div>
+                {% endif %}
             </div>
         </div>
         {% endif %}
@@ -105,10 +128,11 @@ Dashboard
             <div class="card text-center">
                 <div class="card-body">
                     <h5>Generate</h5>
-                    <p>{{geerate}}</p>
+                    <p class="m-0 p-0">{{generate}}</p>
                 </div>
                 <div class="card-link">
-                    
+                    <a class="generated_service_link text-warning" href="{% url 'srm:all_generate_service' %}">view
+                        all</a>
                 </div>
             </div>
         </div>
@@ -149,7 +173,7 @@ Dashboard
         </div>
     </div>
     {% endif %}
-    
+
     <div class="row mb-3">
         {% if request.user.department.name == 'GDA' or request.user.department.name == 'General Duty Assistant' %}
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6">
@@ -169,18 +193,18 @@ Dashboard
                         </thead>
                         <tbody class="table-info">
                             {% if shifts %}
-                                {% for shift in shifts %}
-                                <tr>
-                                    <td>{{shift.shift_type}}</td>
-                                    <td>{{shift.shift_block}} </td>
-                                    <td>{{ shift.start_time|date:"H:i" }}</td>
-                                    <td>{{ shift.end_time|date:"H:i" }}</td>
-                                </tr>
-                                {% endfor %}
+                            {% for shift in shifts %}
+                            <tr>
+                                <td>{{shift.shift_type}}</td>
+                                <td>{{shift.shift_block}} </td>
+                                <td>{{ shift.start_time|date:"H:i" }}</td>
+                                <td>{{ shift.end_time|date:"H:i" }}</td>
+                            </tr>
+                            {% endfor %}
                             {% else %}
-                                <tr>
-                                    <td colspan="100%" class="text-center">No shifts assigned.</td>
-                                </tr>
+                            <tr>
+                                <td colspan="100%" class="text-center">No shifts assigned.</td>
+                            </tr>
                             {% endif %}
                         </tbody>
                     </table>
@@ -192,12 +216,77 @@ Dashboard
             <div class="chart-title mb-2">
                 <h3>Service Pie Chart</h3>
             </div>
-            <img
-              class="img-fluid rounded-2 w-100"
-              src="{% url 'srm:service_pie_chart' %}?v={{ now }}"
-              alt="Complaint Pie Chart"
-            />
+            <img class="img-fluid rounded-2 w-100" src="{% url 'srm:service_pie_chart' %}?v={{ now }}"
+                alt="Complaint Pie Chart" />
         </div>
     </div>
 </div>
+
+<script>
+
+    document.addEventListener("DOMContentLoaded", () => {
+        const generateBtn = document.getElementById("generateBtn");
+        const completeBtn = document.getElementById("completeBtn");
+        const holdBtn = document.getElementById("holdBtn");
+        const btnContainer = document.getElementById("actionButtons");
+        const generateServiceForm = document.getElementById("generateServiceForm");
+        let timeOutId = null;
+
+        const updateStatusOnServer = (newStatus) => {
+            fetch("{% url 'srm:update_status' %}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                    "X-CSRFToken": "{{ csrf_token }}"
+                },
+                body: `status=${newStatus}`
+            });
+        };
+
+        if (generateBtn) {
+            generateBtn.addEventListener("click", () => {
+                updateStatusOnServer("engaged");
+
+                // Start 30-minute timer (30*60*1000 ms)
+                timeoutId = setTimeout(() => {
+                    resetToVacant();
+                }, 30 * 60 * 1000);
+
+                // Hide Generate button
+                generateBtn.style.display = "none";
+
+                // Show Complete/Hold buttons dynamically
+                btnContainer.innerHTML = "";
+                const completeBtn = document.createElement("button");
+                completeBtn.className = "btn btn-sm btn-success";
+                completeBtn.textContent = "Complete";
+
+                const holdBtn = document.createElement("button");
+                holdBtn.className = "btn btn-sm btn-secondary";
+                holdBtn.textContent = "Hold";
+
+                btnContainer.appendChild(completeBtn);
+                btnContainer.appendChild(holdBtn);
+            });
+        }
+
+        // If buttons were pre-rendered from template
+        if (completeBtn) {
+            completeBtn.addEventListener("click", () => {
+                updateStatusOnServer("complete");
+                btnContainer.innerHTML = "";
+                if (generateBtn) generateBtn.style.display = "inline-block";
+            });
+        }
+
+        if (holdBtn) {
+            holdBtn.addEventListener("click", () => {
+                updateStatusOnServer("hold");
+                btnContainer.innerHTML = "";
+                if (generateBtn) generateBtn.style.display = "inline-block";
+            });
+        }
+    });
+</script>
+
 {% endblock %}
