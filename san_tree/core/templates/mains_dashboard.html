@@ -179,7 +179,6 @@
 
   <script>
     const publicKey = "{{ vapid_key |escapejs }}".trim();
-    console.log("VAPID Public Key:", publicKey); 
     subscribeToPush(publicKey);
   </script>
 

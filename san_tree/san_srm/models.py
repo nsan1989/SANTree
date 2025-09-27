@@ -83,7 +83,7 @@ class ShiftSchedule(models.Model):
 
 # Request Service Model.
 class Service(models.Model):
-    service_number = models.CharField(max_length=20, unique=True, blank=True)
+    service_number = models.CharField(max_length=20, unique=True, null=True, blank=True)
     service_type = models.ForeignKey(ServiceTypes, on_delete=models.SET_NULL, null=True, blank=True)
     service_block = models.ForeignKey(Blocks, related_name='service_blocks', on_delete=models.SET_NULL, null=True, blank=True)
     from_location = models.ForeignKey(Location, related_name='service_from', on_delete=models.SET_NULL, null=True, blank=True)
@@ -106,9 +106,13 @@ class Service(models.Model):
     
     def save(self, *args, **kwargs):
         is_new = self.pk is None
-        super().save(*args, **kwargs) 
         # Assign service number only once when new
         if is_new and not self.service_number:
+            temp_id = Service.objects.count() + 1
+            self.service_number = f"SRM{temp_id}"
+        super().save(*args, **kwargs)
+
+        if is_new and self.service_number.startswith("SRM") and self.service_number == f"SRM{Service.objects.count()}":
             self.service_number = f"SRM{self.id}"
             Service.objects.filter(pk=self.pk).update(service_number=self.service_number)
 

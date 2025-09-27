@@ -25,6 +25,7 @@ Service
         font-family: 'Poppins', sans-serif;
         font-size: 0.85rem;
     }
+    .status-progress > td   { background-color: #e7c60b; color: black; }
     .status-pending > td   { background-color: #990000; color: white; }
     .status-waiting > td  { background-color: #ff9900; color: #000; }
     .status-completed > td { background-color: #003300; color: #fff; }
@@ -87,7 +88,9 @@ Service
                     {% if page_obj %}
                         {% for service in page_obj %}
                             <tr
-                            {% if service.status|lower == "pending" %}
+                            {% if service.status|lower == "in_progress" %}
+                              class="status-progress"
+                            {% elif service.status|lower == "pending" %}
                               class="status-pending"
                             {% elif service.status|lower == "waiting" %}
                               class="status-waiting"

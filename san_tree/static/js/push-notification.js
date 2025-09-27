@@ -31,8 +31,6 @@ function getCookie(name) {
 
 
 function subscribeToPush(publicKey) {
-    console.log(publicKey)
-    console.log(Notification.permission); 
     Notification.requestPermission().then(function(permission) {
         if (permission !== "granted") {
             console.error("Notification permission denied");
@@ -47,7 +45,6 @@ function subscribeToPush(publicKey) {
                 });
             })
             .then(function(subscription) {
-                console.log("Subscription created:", subscription);
                 return fetch('/webpush/save_information/', {
                     method: 'POST',
                     headers: {

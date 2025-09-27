@@ -282,8 +282,7 @@ def assign_service_from_queue(vacant_staff):
         next_service_request = ServiceRequestQueue.objects.first()
         if next_service_request:
             service = next_service_request.service_request
-            service.assigned_to = ShiftSchedule.objects.filter(shift_staffs=vacant_staff).first()
-            print(service.assigned_to)
+            service.assigned_to = ShiftSchedule.objects.filter(shift_block = service.service_block, shift_staffs=vacant_staff).first()
             service.status = 'In Progress'
             service.save()
             vacant_staff.status = 'engaged'

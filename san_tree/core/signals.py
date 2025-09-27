@@ -37,7 +37,7 @@ def TaskGmailHandler(sender, instance, created, **kwargs):
 # Service gmail handler
 @receiver(post_save, sender=Service)
 def ServiceGmailHandler(sender, instance, created, **kwargs):
-    if created and instance.assigned_to.shift_staffs:
+    if created and instance.assigned_to and instance.assigned_to.shift_staffs:
         subject = "New complaint assigned"
         message = f"Hello! {instance.assigned_to.shift_staffs}, \n\nA new complaint has been assigned to you."
         send_mail(
