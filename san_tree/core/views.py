@@ -2,6 +2,7 @@ from django.shortcuts import render, get_object_or_404
 from accounts.models import Departments, CustomUsers
 from san_cms.models import Complaint, ComplaintRemarks, ComplaintType
 from san_tms.models import Tasks, TasksRemarks, TasksTypes
+from san_srm.models import Service, ServiceRemarks, ServiceTypes
 from django.http import JsonResponse
 from django.core.exceptions import PermissionDenied
 from django.http import JsonResponse
@@ -67,8 +68,8 @@ def SuperAdminDashboard(request):
         raise PermissionDenied("User profile not found")
     all_dept = Departments.objects.all()
     dept_count = all_dept.count()
-    all_users = CustomUsers.objects.all()
-    user_count = all_users.count()
+    all_service = Service.objects.all()
+    serv_count = all_service.count()
     all_comp = Complaint.objects.all()
     comp_count = all_comp.count()
     all_task = Tasks.objects.all()
@@ -76,7 +77,7 @@ def SuperAdminDashboard(request):
     context = {
         'user': user,
         'dept': dept_count,
-        'user': user_count,
+        'serv': serv_count,
         'comp': comp_count,
         'task': task_count,
     }
@@ -315,42 +316,96 @@ def AllTasksPieChart(request):
     buffer.seek(0)
     return HttpResponse(buffer.read(), content_type='image/png')
 
-# Users View.
-def UserView(request):
+# All Service Pie Chart.
+def AllServicePieChart(request):
+    user = request.user
+    open_comp = Service.objects.filter(status='Open').count()
+    pro_comp = Service.objects.filter(status='In Progress').count()
+    close_comp = Service.objects.filter(status='Completed').count()
+    pen_comp = Service.objects.filter(status='Pending').count()
+    if open_comp + pro_comp + close_comp + pen_comp == 0:
+        labels = ['No Data']
+        sizes = [1]
+        colors = ['#d3d3d3']
+    else:
+        raw_data = [
+            ('Open', open_comp, '#eb0707'),
+            ('Progress', pro_comp, '#ebd807'),
+            ('Resolved', close_comp, '#4feb07'),
+            ('Halt', pen_comp, "#2207eb")
+            ]
+    
+        filtered_data = [(label, size, color) for label, size, color in raw_data if size > 0]
+        labels, sizes, colors = zip(*filtered_data)
+
+    buffer = io.BytesIO()
+
+    with plot_lock:
+        bg_color = (0, 0, 0, 0.4)
+        fig, ax = plt.subplots(figsize=(6, 3), facecolor=bg_color) 
+        ax.pie(sizes, labels=labels, autopct='%1.1f%%', colors=colors, startangle=90, textprops={'color': 'white'})
+        ax.axis('equal')
+        # Add the chart title
+        ax.set_title("Service Pie Chart", color='white', fontsize=10)
+        plt.savefig(buffer, format='png', facecolor=fig.get_facecolor())
+        plt.close(fig)
+    
+    buffer.seek(0)
+    return HttpResponse(buffer.read(), content_type='image/png')
+
+# Services View.
+def ServiceView(request):
     user = request.user
     try:
         user_role = user.role
     except:
         raise PermissionDenied("User profile not found")
-    
+
     reg_dept = Departments.objects.all()
-    department_id = request.GET.get("department")
-    all_status = CustomUsers._meta.get_field("status").choices
+    dept_id = request.GET.get("department")
+    all_status = Service._meta.get_field("status").choices
     status_value = request.GET.get("status")
 
-    all_users = CustomUsers.objects.all()
+    all_service = Service.objects.all()
 
-    if department_id:
-        all_users = all_users.filter(department_id=department_id)
+    if dept_id:
+        all_service = all_service.filter(department_id = dept_id)
 
     if status_value:
-        all_users = all_users.filter(status=status_value)
+        all_service = all_service.filter(status = status_value)
 
-
-    paginator = Paginator(all_users, 10)
+    paginator = Paginator(all_service, 10)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
-
 
     context = {
         'page_obj': page_obj,
         'dept': reg_dept,
         'status': all_status,
-        'selected_department': department_id,
+        'selected_dept': dept_id,
+    }
+
+    view_name = request.resolver_match.view_name
+    if view_name == "all_services" and user_role == 'Super Admin':
+        return render(request, 'super_admin_services.html', context)
+    raise PermissionDenied("You are not authorized to view this page.")
+
+# Services Details View.
+def ServiceDetailView(request, id):
+    user = request.user
+    try:
+        user_role = user.role
+    except:
+        raise PermissionDenied("User profile not found")
+    selected_serv = get_object_or_404(Service, id=id)
+    remark = ServiceRemarks.objects.filter(service_id=id)
+    context = {
+        'service': selected_serv,
+        'remarks': remark,
     }
     view_name = request.resolver_match.view_name
-    if view_name == "all_users" and user_role == 'Super Admin':
-        return render(request, 'users.html', context)
+    if view_name == "service_detail" and user_role == 'Super Admin':
+        return render(request, 'services_details.html', context)
     raise PermissionDenied("You are not authorized to view this page.")
 
 # Complaints View.

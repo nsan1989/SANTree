@@ -83,17 +83,27 @@ Dashboard
             <div class="service-generate-btn d-flex align-items-center">
                 <small class="text-light">Generate a service</small>
                 &nbsp;
-                {% if show_action_buttons %}
                 <div id="actionButtons">
-                    <button id="completeBtn" class="btn btn-sm btn-success me-2">Complete</button>
-                    <button id="holdBtn" class="btn btn-sm btn-secondary">Hold</button>
+                    <button id="completeBtn"
+                            class="btn btn-sm btn-success me-2"
+                            data-url="{% url 'srm:generate_service' %}"
+                            {% if not show_action_buttons %} style="display:none;" {% endif %}>
+                        Complete
+                    </button>
+
+                    <button id="holdBtn"
+                            class="btn btn-sm btn-secondary"
+                            {% if not show_action_buttons %} style="display:none;" {% endif %}>
+                        Hold
+                    </button>
+
+                    <button id="generateBtn"
+                            type="button"
+                            class="btn btn-sm btn-warning"
+                            {% if show_action_buttons %} style="display:none;" {% endif %}>
+                        Generate
+                    </button>
                 </div>
-                <button id="generateBtn" type="button" class="btn btn-sm btn-warning"
-                    style="display:none;">Generate</button>
-                {% else %}
-                <button id="generateBtn" type="button" class="btn btn-sm btn-warning">Generate</button>
-                <div id="actionButtons" style="margin-top:10px;"></div>
-                {% endif %}
             </div>
         </div>
         {% endif %}
@@ -222,14 +232,22 @@ Dashboard
     </div>
 </div>
 
-<script>
+<!--Modal-->
+<div id="serviceModal" class="modal fade" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-body" id="serviceModalContent">
+        <p>Loading...</p>
+      </div>
+    </div>
+  </div>
+</div>
 
+<script>
     document.addEventListener("DOMContentLoaded", () => {
         const generateBtn = document.getElementById("generateBtn");
         const completeBtn = document.getElementById("completeBtn");
         const holdBtn = document.getElementById("holdBtn");
-        const btnContainer = document.getElementById("actionButtons");
-        const generateServiceForm = document.getElementById("generateServiceForm");
         let timeOutId = null;
 
         const updateStatusOnServer = (newStatus) => {
@@ -254,37 +272,46 @@ Dashboard
 
                 // Hide Generate button
                 generateBtn.style.display = "none";
-
-                // Show Complete/Hold buttons dynamically
-                btnContainer.innerHTML = "";
-                const completeBtn = document.createElement("button");
-                completeBtn.className = "btn btn-sm btn-success";
-                completeBtn.textContent = "Complete";
-
-                const holdBtn = document.createElement("button");
-                holdBtn.className = "btn btn-sm btn-secondary";
-                holdBtn.textContent = "Hold";
-
-                btnContainer.appendChild(completeBtn);
-                btnContainer.appendChild(holdBtn);
+                completeBtn.style.display = "inline-block";
+                holdBtn.style.display = "inline-block";
             });
         }
 
-        // If buttons were pre-rendered from template
         if (completeBtn) {
             completeBtn.addEventListener("click", () => {
-                updateStatusOnServer("complete");
-                btnContainer.innerHTML = "";
-                if (generateBtn) generateBtn.style.display = "inline-block";
+                updateStatusOnServer("vacant");
+
+                completeBtn.style.display = "none";
+                holdBtn.style.display = "none";
+
+                generateBtn.style.display = "inline-block";
+
+                const modalE1 = document.getElementById("serviceModal");
+                const modal = new bootstrap.Modal(modalE1);
+                modal.show();
+
+                const content = document.getElementById("serviceModalContent");
+                content.innerHTML = "<p>Loading...</p>";
+
+                fetch("{% url 'srm:generate_service' %}")
+                    .then(res => res.text())
+                    .then(html => {
+                        content.innerHTML = html;
+                    })
+                    .catch(() => {
+                        content.innerHTML = "<p class='text-danger'>Error loading content.</p>";
+                    });
             });
         }
 
         if (holdBtn) {
             holdBtn.addEventListener("click", () => {
-                updateStatusOnServer("hold");
+                timeOutId = setTimeout(() => {
+                    resetToVacant();
+                }, 20 * 60 * 1000);
+
                 btnContainer.innerHTML = "";
-                if (generateBtn) generateBtn.style.display = "inline-block";
-            });
+            })
         }
     });
 </script>

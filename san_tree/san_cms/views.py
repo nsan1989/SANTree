@@ -166,7 +166,7 @@ def raise_complaint_pie_chart(request):
     buffer = io.BytesIO()
 
     with plot_lock:
-        bg_color = (1.0, 1.0, 1.0, 0.2)
+        bg_color = (0, 0, 0, 0.4)
         fig, ax = plt.subplots(figsize=(4, 2), facecolor=bg_color) 
         ax.pie(sizes, labels=labels, autopct='%1.1f%%', colors=colors, startangle=90, textprops={'color': 'black'})
         ax.axis('equal')
@@ -201,7 +201,7 @@ def assign_complaint_pie_chart(request):
     buffer = io.BytesIO()
 
     with plot_lock:
-        bg_color = (1.0, 1.0, 1.0, 0.2)
+        bg_color = (0, 0, 0, 0.4)
         fig, ax = plt.subplots(figsize=(4, 2), facecolor=bg_color) 
         ax.pie(sizes, labels=labels, autopct='%1.1f%%', colors=colors, startangle=90, textprops={'color': 'black'})
         ax.axis('equal')

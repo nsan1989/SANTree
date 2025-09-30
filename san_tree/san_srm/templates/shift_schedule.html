@@ -81,6 +81,7 @@ tr {
               <th scope="col">Shift</th>
               <th scope="col">Block</th>
               <th scope="col">Timing</th>
+              <th scope="col">Edit</th>
             </tr>
           </thead>
           <tbody>
@@ -91,6 +92,11 @@ tr {
               <td>{{schedule.shift_type}}</td>
               <td>{{schedule.shift_block}}</td>
               <td>{{schedule.start_time}}&nbsp;&ndash;&nbsp;{{schedule.end_time}}</td>
+              <td>
+                <a class="edit-link" href="">
+                <i class="fa-solid fa-pencil"></i>
+                </a>
+              </td>
             </tr>
             {% endfor %}
             {% else %}

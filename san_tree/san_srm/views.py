@@ -452,12 +452,11 @@ def ServiceRemark(request, id):
     }
     return render(request, 'srm_remarks.html', context)
 
-@login_required
-def UpdateUserStatus(request):
+def UpdateUserStatus(request, id):
+    user = get_object_or_404(CustomUsers, id=id)
     if request.method == "POST":
         status = request.POST.get("status")
-        user = request.user
-        user.status = status  # assuming you have a 'status' field on your user model
+        user.status = status 
         user.save()
         return JsonResponse({"success": True, "status": user.status})
     return JsonResponse({"success": False})

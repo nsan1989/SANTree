@@ -1,0 +1,116 @@
+{% extends 'index.html' %}
+{% load static %}
+
+{% block title %}
+Service Detail
+{% endblock %}
+
+{% block start %}
+
+<style>
+	.service-title h3,
+	.remarks-title h3 {
+		font-family: 'Poppins', sans-serif;
+		font-weight: bold;
+		color: wheat;
+	}
+	ul {
+		list-style-type: none;
+	}
+	li {
+		display: flex;
+	}
+	li span {
+		font-family: 'Poppins', sans-serif;
+		font-weight: bold;
+		font-size: 1rem;
+		width: 8rem;
+	}
+	li p {
+		font-family: 'Poppins', sans-serif;
+		font-size: 0.9rem;
+	}
+	th, td {
+		font-family: 'Poppins', sans-serif;
+		font-size: 0.9rem;
+	}
+</style>
+
+<div class="container">
+	<div class="row pt-3">
+        <span style="width: auto;">
+            <div class="mb-3">
+                <a href="{% url 'all_services' %}" class="d-flex align-items-center text-warning"
+                    style="text-decoration: none">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    &nbsp;back
+                </a>
+            </div>
+        </span>
+        <div class="col-12">
+            <div class="service-title mb-3">
+                <h3 class="mb-0">{{service.service_type}}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+    	<div class="col-12">
+    		<ul class="ps-0">
+    			<li>
+    				<span class="detail-title">Service No.</span>
+    				<p>{{service.service_number}}</p>
+    			</li>
+    			<li>
+    				<span class="detail-title">Status</span>
+    				<p>{{service.status}}</p>
+    			</li>
+    			<li>
+    				<span class="detail-title">Location</span>
+    				<p>{{service.location}}</p>
+    			</li>
+    			<li>
+    				<span class="detail-title">Priority</span>
+    				<p>{{service.priority}}</p>
+    			</li>
+    			<li>
+    				<span class="detail-title">Concern Dept.</span>
+    				<p>{{service.department}}</p>
+    			</li>
+				<li>
+    				<span class="detail-title">Raised By</span>
+    				<p>{{service.created_by}}</p>
+    			</li>
+    		</ul>
+    	</div>
+    </div>
+    <div class="row">
+    	<div class="col-12">
+    		<div class="remarks-title">
+    			<h3>Remarks</h3>
+    		</div>
+    		<div class="remarks-content">
+    			<table class="table">
+				  <thead class="table-dark">
+				    <tr>
+				      <th scope="col">remark</th>
+				    </tr>
+				  </thead>
+				  <tbody class="table-info">
+				    {% if remarks %}
+				        {% for remark in remarks %}
+				        <tr>
+				            <td>{{ remark.remarks }}</td>
+				        </tr>
+				        {% endfor %}
+				    {% else %}
+				        <tr>
+				            <td colspan="100%">No Remarks!</td>
+				        </tr>
+				    {% endif %}
+				</tbody>
+				</table>    		
+			</div>
+    	</div>
+    </div>
+</div>
+{% endblock %}

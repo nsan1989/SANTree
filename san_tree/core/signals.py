@@ -11,7 +11,7 @@ from san_srm.models import Service
 def ComplaintGmailHandler(sender, instance, created, **kwargs):
     if created and instance.assigned_to:
         subject = "New complaint assigned"
-        message = f"Helle {instance.assigned_to}, \n\nA new complaint has been assigned to you"
+        message = f"Hello! {instance.assigned_to}, \n\nA new complaint has been assigned to you"
         send_mail(
             subject,
             message,
@@ -25,7 +25,7 @@ def ComplaintGmailHandler(sender, instance, created, **kwargs):
 def TaskGmailHandler(sender, instance, created, **kwargs):
     if created and instance.assigned_to:
         subject = "New task assigned"
-        message = f"Helle {instance.assigned_to}, \n\nA new task has been assigned to you"
+        message = f"Hello! {instance.assigned_to}, \n\nA new task has been assigned to you"
         send_mail(
             subject,
             message,
