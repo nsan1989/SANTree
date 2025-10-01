@@ -139,7 +139,7 @@ class GenerateService(models.Model):
     from_location = models.ForeignKey(Location, related_name='generate_from', on_delete=models.SET_NULL, null=True, blank=True)
     to_location = models.ForeignKey(Location, related_name='generate_to', on_delete=models.SET_NULL, null=True, blank=True)
     generate_by = models.ForeignKey(ShiftSchedule, related_name='srm_generate_service', on_delete=models.CASCADE)
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='In Progress')
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Completed')
     generate_at = models.DateTimeField(auto_now_add=True)
     completed_at = models.DateTimeField(null=True, blank=True)
     attachment = models.ImageField(upload_to=generate_service_image_path, null=True, blank=True)
@@ -147,23 +147,26 @@ class GenerateService(models.Model):
     def __str__(self):
         return str(self.service_type)
     
+    @property
+    def time_taken(self):
+        if self.completed_at and self.generate_at:
+            return self.completed_at - self.generate_at
+        return None
+    
     # Compress image before saving
     def save(self, *args, **kwargs):
         is_new = self.pk is None
         image_changed = False
+        super().save(*args, **kwargs)
 
         # Assign service number only once when new
         if is_new and not self.generate_number:
-            self.generate_number = f"GSN{self.id}"
-            Service.objects.filter(pk=self.pk).update(service_number=self.generate_number)
+            temp_id = GenerateService.objects.count() + 1
+            self.generate_number = f"GSN{temp_id}"
 
-        # Check if attachment has changed (only for existing object)
-        if self.pk:
-            old_attachment = Service.objects.get(pk=self.pk).attachment
-            if self.attachment and self.attachment != old_attachment:
-                image_changed = True
-        else:
-            image_changed = bool(self.attachment)
+        if is_new and self.generate_number.startswith("GSN") and self.generate_number == f"GSN{GenerateService.objects.count()}":
+            self.generate_number = f"GSN{self.id}"
+            GenerateService.objects.filter(pk=self.pk).update(generate_number=self.generate_number)
 
         # Compress image before saving
         if self.attachment and image_changed:

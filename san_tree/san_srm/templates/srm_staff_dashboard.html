@@ -250,6 +250,7 @@ Dashboard
         const holdBtn = document.getElementById("holdBtn");
         let timeOutId = null;
 
+        //update user status
         const updateStatusOnServer = (newStatus) => {
             fetch("{% url 'srm:update_status' %}", {
                 method: "POST",
@@ -306,6 +307,8 @@ Dashboard
 
         if (holdBtn) {
             holdBtn.addEventListener("click", () => {
+                updateServiceStatusOnServer("On Hold")
+
                 timeOutId = setTimeout(() => {
                     resetToVacant();
                 }, 20 * 60 * 1000);

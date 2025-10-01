@@ -427,7 +427,7 @@ def free_up_onhold_staff():
     except Exception as e:
         log.error("Error freeing up staff", error=str(e))
 
-# Service Remark View
+# Service Remark View.
 def ServiceRemark(request, id):
     service = get_object_or_404(Service, id=id)
     if request.method == 'POST':
@@ -452,8 +452,9 @@ def ServiceRemark(request, id):
     }
     return render(request, 'srm_remarks.html', context)
 
-def UpdateUserStatus(request, id):
-    user = get_object_or_404(CustomUsers, id=id)
+# Updating user status.
+def UpdateUserStatus(request):
+    user = request.user
     if request.method == "POST":
         status = request.POST.get("status")
         user.status = status 
