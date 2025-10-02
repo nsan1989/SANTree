@@ -3,6 +3,7 @@ from accounts.models import Departments, Location
 from san_cms.models import ComplaintType
 from san_tms.models import TasksTypes
 from san_srm.models import ServiceTypes, Blocks
+from .models import *
 
 # Add Department Form.
 class AddDepartmentForm(forms.ModelForm):
@@ -39,4 +40,3 @@ class AddBlockForm(forms.ModelForm):
     class Meta:
         model = Blocks
         fields = ['name']
-        

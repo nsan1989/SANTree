@@ -124,10 +124,24 @@ Service
     <div class="row mb-3">
         <div class="col-12 d-flex flex-column">
             <div class="all-tasks-title">
-                <h1 class="fw-bold mb-0">Requested Service</h1>
+                <h1 class="fw-bold mb-0">All Service</h1>
                 <p>All the service requested to you!</p>
             </div>
         </div>
+    </div>
+    <div class="row mb-3 d-flex">
+      <div class="col-auto">
+        <div class="form-check form-check-inline">
+          <input type="radio" name="serviceType" value="request" {% if selected_option == 'request' %}checked{% endif %}>
+          <label class="form-check-label" for="request">Request Service</label>
+        </div>
+      </div>
+      <div class="col-auto">
+        <div class="form-check form-check-inline">
+          <input type="radio" name="serviceType" value="generate" {% if selected_option == 'generate' %}checked{% endif %}>
+          <label class="form-check-label" for="generate">Generate Service</label>
+        </div>
+      </div>
     </div>
     <div class="row mb-3">
         <div class="col-12">
@@ -270,6 +284,17 @@ window.addEventListener('click', (e) => {
     modal.style.display = 'none';
     modalContent.innerHTML = '';
   }
+});
+
+// When a radio button changes, reload the page with the selected option as a GET parameter
+document.querySelectorAll('input[name="serviceType"]').forEach(radio => {
+  radio.addEventListener('change', function() {
+    const selected = this.value;
+    const url = new URL(window.location.href);
+    url.searchParams.set('serviceType', selected);
+    url.searchParams.delete('page');  // Reset pagination when switching
+    window.location.href = url.toString();
+  });
 });
 
 </script>

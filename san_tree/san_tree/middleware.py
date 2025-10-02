@@ -22,6 +22,9 @@ class RequireLoginMiddleware:
             'password_reset_done',
             'password_reset_confirm',
             'password_reset_complete',
+            'anonymous_service_generate',
+            'success_page',
+            'generate_qr',
         ]
 
         try:

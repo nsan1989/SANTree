@@ -9,7 +9,6 @@ from django.core.paginator import Paginator
 from django.contrib import messages
 from django.utils import timezone
 from datetime import timedelta
-import datetime
 import structlog
 import matplotlib
 matplotlib.use('Agg')
@@ -20,7 +19,6 @@ plot_lock = Lock()
 from django.http import HttpResponse
 from .forms import ServiceRemarkForm
 from django.db.models import OuterRef, Subquery
-from django.contrib.auth.decorators import login_required
 
 log = structlog.get_logger()
 now = timezone.now()
@@ -298,14 +296,14 @@ def GenerateServiceView(request):
         form = ServiceGenerateForm(request.POST, request.FILES, user=request.user)
         if form.is_valid():
             new_service = form.save(commit=False)
-            shift_schedule = ShiftSchedule.objects.filter(shift_staffs=request.user).first()
+            user = CustomUsers.objects.filter(username = request.user)
 
-            if shift_schedule:
-                new_service.generate_by = shift_schedule
+            if user:
+                new_service.generate_by = user
                 new_service.save()
 
-                new_service.generate_by.shift_staffs.status = 'engaged'
-                new_service.generate_by.shift_staffs.save()
+                user.status = 'engaged'
+                user.save()
 
                 messages.success(request, "Service generated successfully!")
                 return redirect('srm:staff_dashboard')
@@ -351,15 +349,22 @@ def RequestServiceView(request):
     assign_service = assign_service.annotate(
         latest_remark_text=Subquery(latest_remark_subquery.values('remarks')[:1])
     )
-    page_number = request.GET.get('page')
-    if user.department.name in ['GDA', 'General Duty Assistant']:
-        paginator = Paginator(assign_service, 10) 
-        page_obj = paginator.get_page(page_number)
+    selected_option = request.GET.get('serviceType', 'default')
+    if selected_option == 'request':
+        services = request_service
+    elif selected_option == 'generate':
+        services = assign_service
     else:
-        paginator = Paginator(request_service, 10) 
-        page_obj = paginator.get_page(page_number)
+        if user.department.name in ['GDA', 'General Duty Assistant']:
+            services = assign_service
+        else:
+            services = request_service
+    page_number = request.GET.get('page')
+    paginator = Paginator(services, 10)
+    page_obj = paginator.get_page(page_number)
     context = {
-        'page_obj': page_obj
+        'page_obj': page_obj,
+        'selected_option': selected_option,
     }
     view_name = request.resolver_match.view_name
     if view_name == "srm:admin_service" and user_role == 'Admin':

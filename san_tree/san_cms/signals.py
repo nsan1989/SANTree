@@ -1,8 +1,7 @@
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from django.contrib.auth.models import User
 from webpush import send_user_notification
-from webpush.models import SubscriptionInfo, PushInformation
+from webpush.models import PushInformation
 from accounts.models import CustomUsers
 
 from .models import Complaint

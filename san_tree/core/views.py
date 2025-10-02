@@ -1,4 +1,4 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from accounts.models import Departments, CustomUsers
 from san_cms.models import Complaint, ComplaintRemarks, ComplaintType
 from san_tms.models import Tasks, TasksRemarks, TasksTypes
@@ -21,6 +21,11 @@ from django.contrib import messages
 from django.core.exceptions import ValidationError
 from webpush.models import SubscriptionInfo, PushInformation
 import json
+from django.utils import timezone
+import structlog
+
+log = structlog.get_logger()
+now = timezone.now()
 
 # Home View.
 def Home(request):
