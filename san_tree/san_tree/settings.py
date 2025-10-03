@@ -23,9 +23,9 @@ load_dotenv()
 SECRET_KEY = 'django-insecure-+d7+e549uuue8$h(sl9o_tn*7cpwdye7-dbpt1lji5i*3*6hfz'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
-ALLOWED_HOSTS = ['ssms.shijahospitals.com', '31.97.233.248', 'localhost']
+ALLOWED_HOSTS = ['localhost']
 
 
 # Application definition
