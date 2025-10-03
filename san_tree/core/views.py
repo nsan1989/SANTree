@@ -23,6 +23,10 @@ from webpush.models import SubscriptionInfo, PushInformation
 import json
 from django.utils import timezone
 import structlog
+from django.db.models import Q
+import qrcode
+import base64
+from datetime import timedelta
 
 log = structlog.get_logger()
 now = timezone.now()
@@ -677,3 +681,69 @@ def save_information(request):
     )
 
     return JsonResponse({"status": "success"})
+
+# Anonymous Service Generate View.
+def AnonymousServiceView(request):
+    provider_staff = CustomUsers.objects.filter(role='User').filter(
+        Q(department__name='GDA') |
+        Q(department__name='General Duty Assistant')
+    )
+    if request.method == "POST":
+        form = AnonymousServiceGenerateForm(request.POST)
+        if form.is_valid():
+            request_service = form.save(commit=False)
+            request_service.status = 'Open'
+            request_service.save()
+            
+            for staff in provider_staff:
+                if staff.status == 'vacant' or staff.status == 'Vacant':
+                    schedule = ShiftSchedule.objects.filter(
+                        shift_staffs=staff,
+                        start_time__lte=now,
+                        end_time__gte=now
+                        ).first()
+                    if schedule:
+                        request_service.assigned_to = schedule
+                        request_service.status = 'In Progress'
+                        request_service.save()
+                        staff.status = 'engaged'
+                        staff.save()
+                        break
+                    else:
+                        messages.error(request, f"No shift schedule found for staff {staff}")
+            
+            return redirect('success_page')
+    else:
+        form = AnonymousServiceGenerateForm()
+    context = {
+        'form': form,
+    }
+    return render(request, "anonymous_service_page.html", context)
+
+# Service Request Success Page
+def ServiceSuccessView(request):
+    context = {}
+    return render(request, "service_request_success_page.html", context)
+
+# QR Generate View.
+def GenerateQRCode(request):
+    url = "http://10.10.13.246:8000/anonymous_service_generate/"
+
+    qr = qrcode.QRCode(
+        version=1,
+        error_correction=qrcode.constants.ERROR_CORRECT_L,
+        box_size=10,
+        border=4,
+    )
+    qr.add_data(url)
+    qr.make(fit=True)
+
+    img = qr.make_image(fill_color="black", back_color="white")
+
+    buffer = BytesIO()
+    img.save(buffer, format="PNG")
+    buffer.seek(0)
+
+    img_base64 = base64.b64encode(buffer.getvalue()).decode()
+
+    return render(request, 'qr_code.html', {'qr_code': img_base64})

@@ -19,6 +19,7 @@ plot_lock = Lock()
 from django.http import HttpResponse
 from .forms import ServiceRemarkForm
 from django.db.models import OuterRef, Subquery
+from core.models import AnonymousServiceGenerate
 
 log = structlog.get_logger()
 now = timezone.now()
@@ -227,9 +228,10 @@ def ServiceView(request):
 def free_up_staff():
     try:
         prog_service = Service.objects.filter(status='In Progress').all()
+        ano_service = AnonymousServiceGenerate.objects.filter(status='In Progress').all()
         if prog_service.exists():
             for service in prog_service:
-                if service.created_at <= timezone.now() - timedelta(minutes=3):
+                if service.created_at <= timezone.now() - timedelta(minutes=30):
                     staff = service.assigned_to.shift_staffs
                     if staff and staff.status == 'engaged':
                         staff.status = 'vacant'
@@ -238,7 +240,17 @@ def free_up_staff():
                         service.status = 'Pending'
                         service.save()
                     assign_service_from_queue(staff)
-        pass
+        elif ano_service.exists():
+            for service in ano_service:
+                if service.generate_at <= timezone.now() - timedelta(minutes=30):
+                    staff = service.assigned_to.shift_staffs
+                    if staff and staff.status == 'engaged':
+                        staff.status = 'vacant'
+                        staff.save()
+
+                        service.status = 'Pending'
+                        service.save()
+                        
     except Exception as e:
         log.error("Error freeing up staff", error=str(e))
 
@@ -249,23 +261,36 @@ def free_up_completed_staff(request, id):
         user_role = user.role
     except:
         raise PermissionDenied("User Profile not found.")
-    service = get_object_or_404(Service, id=id)
+    service = None
+    ano_service = None
+    try:
+        service = Service.objects.get(id=id)
+    except Service.DoesNotExist:
+        try:
+            ano_service = AnonymousServiceGenerate.objects.get(id=id)
+        except AnonymousServiceGenerate.DoesNotExist:
+            raise PermissionDenied("Service not found.")
+
     if request.method == 'POST':
-        if user_role == 'User' and service.assigned_to.shift_staffs == user:
+        obj = service or ano_service
+        assigned_staff = getattr(getattr(obj, "assigned_to", None), "shift_staffs", None)
+        if user_role == 'User' and assigned_staff == user:
             new_status = request.POST.get('status')
+            if not assigned_staff:
+                raise PermissionDenied("No staff assigned to this service.")
             if new_status == 'Completed':
-                service.status = new_status
-                service.assigned_to.shift_staffs.status = 'vacant'
-                service.assigned_to.shift_staffs.save()
-                service.save()
+                obj.status = new_status
+                assigned_staff.status = 'vacant'
+                assigned_staff.save()
+                obj.save()
                 messages.success(request, "Service status updated successfully.")
-                assign_service_from_queue(service.assigned_to.shift_staffs)
+                assign_service_from_queue(assigned_staff)
                 return redirect('srm:staff_service')
             elif new_status == 'On Hold':
-                service.status = new_status
-                service.assigned_to.shift_staffs.status = 'engaged'
-                service.assigned_to.shift_staffs.save()
-                service.save()
+                obj.status = new_status
+                assigned_staff.status = 'engaged'
+                assigned_staff.save()
+                obj.save()
                 messages.success(request, "Service status updated successfully.")
                 return redirect('srm:staff_service')
             
@@ -342,6 +367,7 @@ def RequestServiceView(request):
         raise PermissionDenied("User profile not found")
     request_service = Service.objects.filter(created_by = user).order_by('-created_at')
     assign_service = Service.objects.filter(assigned_to__shift_staffs = user).order_by('-created_at')
+    anonymous_service = AnonymousServiceGenerate.objects.filter(assigned_to__shift_staffs = user)
     latest_remark_subquery = ServiceRemarks.objects.filter(service=OuterRef('pk')).order_by('-created_at')
     request_service = request_service.annotate(
         latest_remark_text=Subquery(latest_remark_subquery.values('remarks')[:1])
@@ -354,6 +380,8 @@ def RequestServiceView(request):
         services = request_service
     elif selected_option == 'generate':
         services = assign_service
+    elif selected_option == 'anonymous':
+        services = anonymous_service
     else:
         if user.department.name in ['GDA', 'General Duty Assistant']:
             services = assign_service
@@ -417,9 +445,10 @@ def ShiftScheduleView(request):
 def free_up_onhold_staff():
     try:
         onhold_service = Service.objects.filter(status='On Hold').all()
+        onhold_ano_service = AnonymousServiceGenerate.objects.filter(status='On Hold').all()
         if onhold_service.exists():
             for service in onhold_service:
-                if service.created_at <= timezone.now() - timedelta(minutes=3):
+                if service.created_at <= timezone.now() - timedelta(minutes=25):
                     staff = service.assigned_to.shift_staffs
                     if staff and staff.status == 'engaged':
                         staff.status = 'vacant'
@@ -428,7 +457,15 @@ def free_up_onhold_staff():
                         service.status = 'Pending'
                         service.save()
                     assign_service_from_queue(staff)
-        pass
+        elif onhold_ano_service.exists():
+            for service in onhold_ano_service:
+                if service.generate_at <= timezone.now() - timedelta(minutes=25):
+                    staff = service.assigned_to.shift_staffs
+                    if staff and staff.status == 'engaged':
+                        staff.status = 'vacant'
+                        staff.save()
+                    assign_service_from_queue(staff)
+
     except Exception as e:
         log.error("Error freeing up staff", error=str(e))
 

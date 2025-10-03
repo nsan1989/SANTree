@@ -27,5 +27,8 @@ urlpatterns = [
     path('add_service_type/', AddServiceTypeView, name='add_service_type'),
     path('add_block/', AddBlockView, name='add_block'),
     path('profile/', ProfileView, name='profile'),
-    path('webpush/save_information/', save_information, name='save_subscription')
+    path('webpush/save_information/', save_information, name='save_subscription'),
+    path('anonymous_service_generate/', AnonymousServiceView, name='anonymous_service_generate'),
+    path('anonymous_service_generate/success_page/', ServiceSuccessView, name='success_page'),
+    path('generate_qr/', GenerateQRCode, name='generate_qr')
 ]

@@ -40,3 +40,29 @@ class AddBlockForm(forms.ModelForm):
     class Meta:
         model = Blocks
         fields = ['name']
+        
+# Anonymous Service Request Form.
+class AnonymousServiceGenerateForm(forms.ModelForm):
+    class Meta:
+        model = AnonymousServiceGenerate
+        fields = [
+            'service_type',
+            'block',
+            'from_location',
+            'to_location'
+        ]
+        labels = {
+            'service_type': 'Service'
+        }
+
+    def __init__(self, *args, **kwargs):
+        super(AnonymousServiceGenerateForm, self).__init__(*args, **kwargs)
+
+        self.fields['service_type'].required = True
+
+        self.fields['block'].required = True
+
+        self.fields['from_location'].required = True
+
+        self.fields['to_location'].required = True
+

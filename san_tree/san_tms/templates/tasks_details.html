@@ -67,7 +67,7 @@
                             <td>
                                 <form method="POST" action="{% url 'tms:staff_update_task_status' tasks.id %}">
                                 {% csrf_token %}
-                                <select name="status" required>
+                                <select class="mb-2" name="status" required>
                                     <option value="">select</option>
                                     <option value="In Progress" {% if tasks.status == 'In Progress' %} selected {% endif %}>In Progress</option>
                                     <option value="Waiting" {% if tasks.status == 'Waiting' %} selected {% endif %}>Waiting</option>

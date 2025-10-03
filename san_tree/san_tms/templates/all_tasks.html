@@ -121,12 +121,12 @@
                                 {% endif %}
 
                                 <td class="text-center"><a class="open-modal" data-url="{% url 'tms:tasks_remarks' task.id %}">
-                                  <i class="fa-solid fa-pen text-light"></i>
+                                  <i class="fa-solid fa-pen text-primary"></i>
                                   </a>
                                 </td>
                                 <td style="width: 15%;">
                                     {% if task.id %}
-                                        <a href="{% url 'tms:admin_tasks_details' task.id %}"><i class="fa-solid fa-eye text-light"></i></a>
+                                        <a href="{% url 'tms:admin_tasks_details' task.id %}"><i class="fa-solid fa-eye text-primary"></i></a>
                                     {% else %}
                                         <span>N/A</span>
                                     {% endif %}

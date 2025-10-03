@@ -142,6 +142,12 @@ Service
           <label class="form-check-label" for="generate">Generate Service</label>
         </div>
       </div>
+      <div class="col-auto">
+        <div class="form-check form-check-inline">
+          <input type="radio" name="serviceType" value="anonymous" {% if selected_option == 'anonymous' %}checked{% endif %}>
+          <label class="form-check-label" for="anonymous">Anonymous Service</label>
+        </div>
+      </div>
     </div>
     <div class="row mb-3">
         <div class="col-12">
@@ -203,7 +209,7 @@ Service
                             >
                                 <td>{{service.service_number}}</td>
                                 <td>{{service.service_type}}</td>
-                                <td>{{service.created_by}}</td>
+                                <td>{{service.created_by|default:"-"}}</td>
                                 <td>{{service.from_location}}</td>
                                 <td>{{service.to_location}}</td>
                                 <td>{{service.priority}}</td>
