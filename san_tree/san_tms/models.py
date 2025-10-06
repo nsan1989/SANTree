@@ -12,6 +12,9 @@ class TasksTypes(models.Model):
 
     def __str__(self):
         return f'{self.name} {self.department}'
+    
+    class Meta:
+        verbose_name_plural = 'Tasks Types'
 
 # Status Choices.
 STATUS_CHOICES = (
@@ -96,6 +99,9 @@ class Tasks(models.Model):
         if is_new and not self.tasks_number:
             self.tasks_number = f"TMS{self.id}"
             Tasks.objects.filter(pk=self.pk).update(tasks_number=self.tasks_number)
+
+    class Meta:
+        verbose_name_plural = 'Tasks'
     
 def task_remark_image_path(instance, filename):
     filename = os.path.basename(filename)  
@@ -144,3 +150,6 @@ class TasksRemarks(models.Model):
 
         # Save instance
         super().save(*args, **kwargs)
+
+    class Meta:
+        verbose_name_plural = 'Tasks Remarks'

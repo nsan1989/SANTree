@@ -39,7 +39,7 @@ tr {
     <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6">
       <div class="schedule-link">
         Set Schedules 
-        <a class="text-warning open-modal" href="{% url 'srm:shift_schedule' %}" data-bs-toggle="modal" data-bs-target="#scheduleModal">click here</a>
+        <a class="text-warning shift-add-modal" href="{% url 'srm:shift_schedule' %}" data-bs-toggle="modal" data-bs-target="#scheduleModal">click here</a>
       </div>
     </div>
     {% endif %}
@@ -81,7 +81,9 @@ tr {
               <th scope="col">Shift</th>
               <th scope="col">Block</th>
               <th scope="col">Timing</th>
+              {% if request.user.department.name == 'GDA' and request.user.role == 'Admin' or request.user.department.name == 'General Duty Assistant' and request.user.role == 'Admin' %}
               <th scope="col">Edit</th>
+              {% endif %}
             </tr>
           </thead>
           <tbody>
@@ -92,11 +94,13 @@ tr {
               <td>{{schedule.shift_type}}</td>
               <td>{{schedule.shift_block}}</td>
               <td>{{schedule.start_time}}&nbsp;&ndash;&nbsp;{{schedule.end_time}}</td>
+              {% if request.user.department.name == 'GDA' and request.user.role == 'Admin' or request.user.department.name == 'General Duty Assistant' and request.user.role == 'Admin' %}
               <td>
-                <a class="edit-link" href="">
+                <a class="edit-link shift-edit-modal" href="{% url 'srm:edit_schedule' schedule.id %}" data-bs-toggle="modal" data-bs-target="#editSchedule">
                 <i class="fa-solid fa-pencil"></i>
                 </a>
               </td>
+              {% endif %}
             </tr>
             {% endfor %}
             {% else %}
@@ -129,7 +133,7 @@ tr {
 <!--Open Modal Script-->
 <script>
   document.addEventListener('DOMContentLoaded', function () {
-  document.querySelectorAll('.open-modal').forEach(link => {
+  document.querySelectorAll('.shift-add-modal').forEach(link => {
     link.addEventListener('click', function (e) {
       e.preventDefault();
       const url = this.getAttribute('href');
@@ -137,6 +141,36 @@ tr {
         .then(res => res.text())
         .then(html => {
           document.querySelector('#scheduleModal .modal-body').innerHTML = html;
+        });
+    });
+  });
+});
+</script>
+
+<div class="modal fade" id="editSchedule" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Edit Schedule</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <!-- Content will be loaded here -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+  document.querySelectorAll('.shift-edit-modal').forEach(link => {
+    link.addEventListener('click', function (e) {
+      e.preventDefault();
+      const url = this.getAttribute('href');
+      fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          document.querySelector('#editSchedule .modal-body').innerHTML = html;
         });
     });
   });

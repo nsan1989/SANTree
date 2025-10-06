@@ -35,13 +35,25 @@ def AdminComplaintDashboard(request):
     complaints = Complaint.objects.filter(
         Q(department = user.department) |
         (Q(assigned_to=user)|Q(created_by=user))
-        ).all().count()
+        )
+    total_comp = complaints.count()
+    start_date = request.GET.get('start_date')
+    end_date = request.GET.get('end_date')
+
+    if start_date and end_date:
+        try:
+            start = datetime.strptime(start_date, "%Y-%m-%d")
+            end = datetime.strptime(end_date, "%Y-%m-%d") + timedelta(days=1)
+            complaints = complaints.filter(created_at__range=(start, end))
+        except ValueError:
+            pass
     context = {
+        'complaints': complaints.order_by('-created_at'),
         'current_user': user,
         'all_users': all_user,
         'engage_user': engaged_users,
         'vacant_user': vacant_users,
-        'total_complaint': complaints,
+        'total_complaint': total_comp,
     }
     view_name = request.resolver_match.view_name
     if view_name == "cms:admin_dashboard" and user_role == 'Admin':

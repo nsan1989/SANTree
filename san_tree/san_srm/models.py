@@ -16,6 +16,9 @@ class ServiceTypes(models.Model):
     def __str__(self):
         return f'{self.name} {self.department}'
     
+    class Meta:
+        verbose_name_plural = 'Service Types'
+    
 # Block Model.
 class Blocks(models.Model):
     name = models.CharField(max_length=100)
@@ -32,6 +35,7 @@ class Blocks(models.Model):
 
     class Meta:
         ordering = ['name']
+        verbose_name_plural = 'Blocks'
     
 # Status Choices.
 STATUS_CHOICES = (
@@ -236,3 +240,6 @@ class ServiceRemarks(models.Model):
 
         # Save instance
         super().save(*args, **kwargs)
+
+    class Meta:
+        verbose_name_plural = 'Service Remarks'

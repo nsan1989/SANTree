@@ -2,7 +2,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.core.mail import send_mail
 from django.conf import settings
-from san_cms.models import Complaint
+from san_cms.models import Complaint, ReassignedComplaint
 from san_tms.models import Tasks
 from san_srm.models import Service
 
@@ -17,6 +17,20 @@ def ComplaintGmailHandler(sender, instance, created, **kwargs):
             message,
             settings.DEFAULT_FROM_EMAIL,
             [instance.assigned_to.email],
+            fail_silently=False,
+        )
+
+# Reassigned gmail handler
+@receiver(post_save, sender=ReassignedComplaint)
+def ReassignedGmailHandler(sender, instance, created, **kwargs):
+    if created and instance.reassigned_to:
+        subject = "New complaint assigned"
+        message = f"Hello! {instance.reassigned_to}, \n\nA new complaint has been assigned to you"
+        send_mail(
+            subject,
+            message,
+            settings.DEFAULT_FROM_EMAIL,
+            [instance.reassigned_to.email],
             fail_silently=False,
         )
 

@@ -14,7 +14,7 @@
       <div class="col-md-6 col-lg-4 w-100">
         <div class="card shadow-lg border-0 rounded-4">
           <div class="card-body p-4">
-            <form id="remarksForm" method="post" enctype="multipart/form-data" action="{% url 'srm:shift_schedule' %}">
+            <form id="remarksForm" method="post" enctype="multipart/form-data" action="{% url 'srm:edit_schedule' edit_schedule.id %}">
               {% csrf_token %} {{ form|crispy }}
 
               <div class="d-grid mt-4">

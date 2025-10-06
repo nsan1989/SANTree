@@ -47,6 +47,7 @@ class Departments(models.Model):
 
     class Meta:
         ordering = ['name']
+        verbose_name_plural = 'Departments'
     
 # Location Model.
 class Location(models.Model):
@@ -72,3 +73,4 @@ class CustomUsers(AbstractUser):
     
     class Meta:
         ordering = ['username']
+        verbose_name_plural = 'Custom Users'

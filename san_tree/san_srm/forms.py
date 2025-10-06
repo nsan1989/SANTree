@@ -128,3 +128,51 @@ class ShiftScheduleForm(forms.ModelForm):
         
         if start and end and start >= end:
             self.add_error('end_time', 'End time must be after start time.')
+
+# Shift Edit Form.
+class ShiftEditForm(forms.ModelForm):
+    class Meta:
+        model = ShiftSchedule
+        fields = [
+            'shift_type',
+            'shift_block',
+            'shift_staffs',
+            'start_time',
+            'end_time',
+        ]
+        widgets = {
+            'start_time': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
+            'end_time': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)
+        super(ShiftEditForm, self).__init__(*args, **kwargs)
+
+        self.fields['shift_type'].required = True
+
+        self.fields['shift_block'].required = True
+
+        self.fields['shift_staffs'].required = True
+
+        self.fields['start_time'].required = True
+
+        self.fields['end_time'].required = True
+
+        # Filter based on current user's department
+        if user and hasattr(user, 'department') and user.department:
+            department = user.department
+
+            self.fields['shift_staffs'].queryset = CustomUsers.objects.filter(
+                department=department,
+                role='User'
+            )
+
+    def clean(self):
+        cleaned_data = super().clean()
+        start = cleaned_data.get('start_time')
+        end = cleaned_data.get('end_time')
+        
+        if start and end and start >= end:
+            self.add_error('end_time', 'End time must be after start time.')
+            

@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'pwa',
     'webpush',
     'structlog',
+    'import_export',
     'core',
     'accounts',
     'san_tms.apps.SanTmsConfig',

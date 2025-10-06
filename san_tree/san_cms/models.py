@@ -196,4 +196,7 @@ class ComplaintRemarks(models.Model):
 
         # Save instance
         super().save(*args, **kwargs)
+
+    class Meta:
+        verbose_name_plural = 'Complaint Remarks'
         

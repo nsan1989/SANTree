@@ -17,9 +17,9 @@ import io
 from threading import Lock
 plot_lock = Lock()
 from django.http import HttpResponse
-from .forms import ServiceRemarkForm
 from django.db.models import OuterRef, Subquery
 from core.models import AnonymousServiceGenerate
+from datetime import datetime
 
 log = structlog.get_logger()
 now = timezone.now()
@@ -77,15 +77,27 @@ def AdminDashboard(request):
     vacant = vacant_users.count()
     engaged_users = dept_users.filter(status = 'engaged')
     engage = engaged_users.count()
-    services = Service.objects.filter(assigned_to__shift_staffs__department__name= user.department).all().count()
+    services = Service.objects.filter(assigned_to__shift_staffs__department__name= user.department)
+    total_serv = services.count()
+    start_date = request.GET.get('start_date')
+    end_date = request.GET.get('end_date')
+
+    if start_date and end_date:
+        try:
+            start = datetime.strptime(start_date, "%Y-%m-%d")
+            end = datetime.strptime(end_date, "%Y-%m-%d") + timedelta(days=1)
+            services = services.filter(created_at__range=(start, end))
+        except ValueError:
+            pass
     context = {
+        'sevices': services.order_by('-created_at'),
         'current_user': user,
         'all_users': user_count,
         'engage_user': engaged_users,
         'engaged': engage,
         'vacant_user': vacant_users,
         'vacants': vacant,
-        'total_service': services,
+        'total_service': total_serv,
     }
     view_name = request.resolver_match.view_name
     if view_name == "srm:admin_dashboard" and user_role == 'Admin':
@@ -503,3 +515,22 @@ def UpdateUserStatus(request):
         user.save()
         return JsonResponse({"success": True, "status": user.status})
     return JsonResponse({"success": False})
+
+# Shift Edit Form View.
+def ShiftEditView(request, id):
+    edit_schedule = get_object_or_404(ShiftSchedule, id=id)
+    if request.method == 'POST':
+        form = ShiftEditForm(request.POST, instance=edit_schedule, user=request.user)
+        if form.is_valid():
+            edit_schedule = form.save(commit=False)
+            edit_schedule.created_by = request.user
+            edit_schedule.save()
+            messages.success(request, "Shift schedule edited successfully.")
+            return redirect('srm:schedule')
+    else:
+        form = ShiftEditForm(instance=edit_schedule ,user=request.user)
+    context = {
+        'form': form,
+        'edit_schedule': edit_schedule
+    }
+    return render(request, 'shift_edit.html', context)

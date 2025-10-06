@@ -58,12 +58,33 @@
         </div>
       </div>
     </div>
+    <!--Complaint Chart-->
     <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xs-4">
-      <div class="chart-title">Complaint Chart</div>
+      <!-- Filter form -->
+        <form method="get" class="row g-2 align-items-end mb-3">
+          <div class="col-auto">
+            <label for="start_date" class="form-label small mb-1">Start</label>
+            <input type="date" id="start_date" name="start_date" class="form-control form-control-sm"
+              value="{{ request.GET.start_date }}">
+          </div>
+
+          <div class="col-auto">
+            <label for="end_date" class="form-label small mb-1">End</label>
+            <input type="date" id="end_date" name="end_date" class="form-control form-control-sm"
+              value="{{ request.GET.end_date }}">
+          </div>
+
+          <div class="col-auto">
+            <button type="submit" class="btn btn-primary btn-sm">
+              Filter
+            </button>
+          </div>
+        </form>
+      <div class="chart-title mb-2">Complaint Chart</div>
       <div class="complaint-chart d-flex justify-content-center">
         <img
           class="img-fluid"
-          src="{% url 'cms:complaint_status_pie_chart' %}?v={{ now }}"
+          src="{% url 'cms:complaint_status_pie_chart' %}?start_date={{ request.GET.start_date }}&end_date={{ request.GET.end_date }}&v={{ now }}"
           alt="Complaint Pie Chart"
         />
       </div>
@@ -130,6 +151,7 @@
         </div>
       </div>
     </div>
+    <!--Users Chart-->
     <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xs-4 flex-column mb-3">
       <div class="chart-title">Users Chart</div>
       <div class="user-chart d-flex justify-content-center">

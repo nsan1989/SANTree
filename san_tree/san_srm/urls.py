@@ -8,6 +8,7 @@ urlpatterns = [
     path('incharge/dashboard/request_service/', ServiceView, name='admin_request_service'),
     path('incharge/dashboard/schedules/', ShiftSchedules, name='schedule'),
     path('incharge/dashboard/schedules/set_schedule/', ShiftScheduleView, name='shift_schedule'),
+    path('incharge/dashboard/schedules/edit_schedule/<int:id>/', ShiftEditView, name='edit_schedule'),
     path('staff/dashboard/', StaffDashboard, name='staff_dashboard'),
     path('staff/dashboard/request_service/', ServiceView, name='request_service'),
     path('staff/dashboard/generate_service/', GenerateServiceView, name='generate_service'),
