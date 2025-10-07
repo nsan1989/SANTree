@@ -27,6 +27,11 @@ Dashboard
         min-height: 8rem;
     }
 
+    .card:hover {
+        background-color: #990000;
+        color: #fff;
+    }
+
     .card-body {
         display: flex;
         flex-direction: column;
@@ -187,13 +192,16 @@ Dashboard
     <div class="row mb-3">
         {% if request.user.department.name == 'GDA' or request.user.department.name == 'General Duty Assistant' %}
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6">
-            <div class="row">
-                <div class="col-12 shift-title mb-2">
+            <div class="row h-100">
+                <div 
+                class="col-12 shift-title" 
+                style="height: 3rem;min-height: 3rem;"
+                >
                     <h3>Shift Schedule</h3>
                 </div>
                 <div 
                 class="col-12 table-responsive"
-                style="min-height: 12rem; overflow-y: auto;"
+                style="height: calc(100% - 3rem);min-height: calc(100% - 3rem); overflow-y: auto;"
                 >
                     <table 
                     class="table h-100"
@@ -232,7 +240,27 @@ Dashboard
             <div class="chart-title mb-2">
                 <h3>Service Pie Chart</h3>
             </div>
-            <img class="img-fluid rounded-2 w-100" src="{% url 'srm:service_pie_chart' %}?v={{ now }}"
+            <!-- Filter form -->
+        <form method="get" class="row g-2 align-items-end mb-3">
+          <div class="col-auto">
+            <label for="start_date" class="form-label small mb-1">Start</label>
+            <input type="date" id="start_date" name="start_date" class="form-control form-control-sm"
+              value="{{ request.GET.start_date }}">
+          </div>
+
+          <div class="col-auto">
+            <label for="end_date" class="form-label small mb-1">End</label>
+            <input type="date" id="end_date" name="end_date" class="form-control form-control-sm"
+              value="{{ request.GET.end_date }}">
+          </div>
+
+          <div class="col-auto">
+            <button type="submit" class="btn btn-primary btn-sm">
+              Filter
+            </button>
+          </div>
+        </form>
+            <img class="img-fluid rounded-2 w-100" src="{% url 'srm:service_pie_chart' %}?start_date={{ request.GET.start_date }}&end_date={{ request.GET.end_date }}&v={{ now }}"
                 alt="Complaint Pie Chart" />
         </div>
     </div>

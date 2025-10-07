@@ -73,7 +73,7 @@ def TasksPieChart(request):
 
     return HttpResponse(buffer.read(), content_type='image/png')
 
-# Task Dashboard view.
+# Admin Dashboard view.
 def TaskDashboard(request):
     user = request.user
     try:

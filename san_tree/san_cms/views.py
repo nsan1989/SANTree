@@ -135,11 +135,24 @@ def UserComplaintDashboard(request):
     except:
         raise PermissionDenied("User profile not found")
     total_comp = Complaint.objects.filter(created_by = user, assigned_to = user).all().count()
-    create_comp = Complaint.objects.filter(created_by = user).all()
-    assign_comp = Complaint.objects.filter(assigned_to = user).all()
-    create_count = create_comp.count()
-    assign_count = assign_comp.count()
+    complaints_created = Complaint.objects.filter(created_by = user).all()
+    complaints_assigned = Complaint.objects.filter(assigned_to = user).all()
+    create_count = complaints_created.count()
+    assign_count = complaints_assigned.count()
+    start_date = request.GET.get('start_date')
+    end_date = request.GET.get('end_date')
+
+    if start_date and end_date:
+        try:
+            start = datetime.strptime(start_date, "%Y-%m-%d")
+            end = datetime.strptime(end_date, "%Y-%m-%d") + timedelta(days=1)
+            complaints_created = complaints_created.filter(created_at__range=(start, end))
+            complaints_assigned = complaints_assigned.filter(created_at__range=(start, end))
+        except ValueError:
+            pass
     context = {
+        'create_comp': complaints_created.order_by('-created_at'),
+        'assign_comp': complaints_assigned.order_by('-created_at'),
         'total': total_comp,
         'current_user': user,
         'raised': create_count,

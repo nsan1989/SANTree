@@ -113,7 +113,8 @@ def StaffDashboard(request):
         user_role = user.role
     except:
         raise PermissionDenied("User profile not found")
-    created_services = Service.objects.filter(created_by = user).all().count()
+    service_created = Service.objects.filter(created_by = user)
+    created_services = service_created.count()
     open_created_service = Service.objects.filter(created_by = user, status = 'Open').count()
     progress_created_service = Service.objects.filter(created_by = user, status = 'In Progress').count()
     completed_created_service = Service.objects.filter(created_by = user, status = 'Completed').count()
@@ -126,6 +127,15 @@ def StaffDashboard(request):
         start_time__gte=today, 
         end_time__lt=tomorrow
         ).all()
+    start_date = request.GET.get('start_date')
+    end_date = request.GET.get('end_date')
+    if start_date and end_date:
+        try:
+            start = datetime.strptime(start_date, "%Y-%m-%d")
+            end = datetime.strptime(end_date, "%Y-%m-%d") + timedelta(days=1)
+            service_created = service_created.filter(created_at__range=(start, end))
+        except ValueError:
+            pass
     if request.method == 'POST':
         form = ServiceGenerateForm(request.POST, request.FILES, user=request.user)
         if form.is_valid():
@@ -162,6 +172,7 @@ def StaffDashboard(request):
     else:
         form = ServiceGenerateForm(user=request.user)
     context = {
+        'services': service_created.order_by('-created_at'),
         'current_user': user,
         'total_created_service': created_services,
         'open_created_serv': open_created_service,

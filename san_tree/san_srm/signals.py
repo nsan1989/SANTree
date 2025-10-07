@@ -35,7 +35,7 @@ def send_push_notification(username, title, message):
 # ----- Services -----
 @receiver(post_save, sender=Service)
 def service_notification(sender, instance, created, **kwargs):
-    if created and instance.assigned_to and instance.assigned_to.shift_staffs:
+    if created and instance.assigned_to.shift_staffs:
         send_push_notification(
             username=instance.assigned_to.shift_staffs.username,
             title="New Service Assigned",

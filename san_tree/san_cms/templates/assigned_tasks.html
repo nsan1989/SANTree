@@ -43,6 +43,11 @@ Complaint
         <h3>Assigned Complaints</h3>
       </div>
     </div>
+  {% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+  {% endif %}
     <div class="col-12">
       <div class="row mb-3">
         <!-- Pagination Section -->
@@ -90,7 +95,7 @@ Complaint
                 <input type="date" id="end_date" name="end_date" class="form-control form-control-sm"
                   style="max-width: 140px;" required>
               </div>
-              <a class="btn btn-primary d-flex align-items-center" href="{% url 'cms:export_tasks_excel' %}"
+              <a class="btn btn-sm btn-primary d-flex align-items-center" href="{% url 'cms:export_tasks_excel' %}"
                 style="text-decoration: none;">
                 <i class="fa-solid fa-up-right-from-square"></i>
                 &nbsp;export
@@ -139,7 +144,7 @@ Complaint
             <td>{{task.complaint.status}}</td>
             <td>{{task.complaint.created_at}}</td>
             {% if task.complaint.status != 'Cancelled' and task.complaint.status != 'Resolved' and task.complaint.status != 'Halt' %}
-            <td>
+            <td class="d-flex align-items-center">
                 <form method="POST" action="{% url 'cms:staff_update_complaint_status' task.complaint.id %}">
                   {% csrf_token %}
                   <select name="status" required>
