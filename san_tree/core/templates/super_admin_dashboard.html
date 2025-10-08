@@ -212,17 +212,44 @@
         <h3>CHARTS</h3>
       </div>
     </div>
+    <form method="get" class="row g-2 align-items-end">
+      <div class="col-auto">
+        <label for="start_date" class="form-label small mb-1">Start</label>
+        <input
+          type="date"
+          id="start_date"
+          name="start_date"
+          class="form-control form-control-sm"
+          value="{{ request.GET.start_date }}"
+        >
+      </div>
+
+      <div class="col-auto">
+        <label for="end_date" class="form-label small mb-1">End</label>
+        <input
+          type="date"
+          id="end_date"
+          name="end_date"
+          class="form-control form-control-sm"
+          value="{{ request.GET.end_date }}"
+        >
+      </div>
+
+      <div class="col-auto">
+        <button type="submit" class="btn btn-primary btn-sm">Filter</button>
+      </div>
+    </form>
     <div class="d-flex gap-1">
     <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4">
-      <img class="img-fluid w-100 rounded-2" src="{% url 'all_complaints_pie_chart' %}?v={{ now }}"
+      <img class="img-fluid w-100 rounded-2" src="{% url 'all_complaints_pie_chart' %}?start_date={{ request.GET.start_date|default:'' }}&end_date={{ request.GET.end_date|default:'' }}&v={{ now }}"
         alt="All Complaint Pie Chart" />
     </div>
     <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4">
-      <img class="img-fluid w-100 rounded-2" src="{% url 'all_tasks_pie_chart' %}?v={{ now }}"
+      <img class="img-fluid w-100 rounded-2" src="{% url 'all_tasks_pie_chart' %}?start_date={{ request.GET.start_date|default:'' }}&end_date={{ request.GET.end_date|default:'' }}&v={{ now }}"
         alt="All Task Pie Chart" />
     </div>
     <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4">
-      <img class="img-fluid w-100 rounded-2" src="{% url 'all_service_pie_chart' %}?v={{ now }}"
+      <img class="img-fluid w-100 rounded-2" src="{% url 'all_service_pie_chart' %}?start_date={{ request.GET.start_date|default:'' }}&end_date={{ request.GET.end_date|default:'' }}&v={{ now }}"
         alt="All Service Pie Chart" />
     </div>
     </div>

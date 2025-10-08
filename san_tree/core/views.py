@@ -27,6 +27,8 @@ from django.db.models import Q
 import qrcode
 import base64
 from datetime import timedelta
+from datetime import datetime
+from django.utils.dateparse import parse_date
 
 log = structlog.get_logger()
 now = timezone.now()
@@ -83,7 +85,23 @@ def SuperAdminDashboard(request):
     comp_count = all_comp.count()
     all_task = Tasks.objects.all()
     task_count = all_task.count()
+    start_date = request.GET.get('start_date')
+    end_date = request.GET.get('end_date')
+
+    if start_date and end_date:
+        try:
+            start = datetime.strptime(start_date, "%Y-%m-%d")
+            end = datetime.strptime(end_date, "%Y-%m-%d") + timedelta(days=1)
+            all_comp = all_comp.filter(created_at__range=(start, end))
+            all_task = all_task.filter(created_at__range=(start, end))
+            all_service = all_service.filter(created_at__range=(start, end))
+        except ValueError:
+            pass
+
     context = {
+        'all_comp': all_comp.order_by('-created_at'),
+        'all_task': all_task.order_by('-created_at'),
+        'all_service': all_service.order_by('-created_at'),
         'user': user,
         'dept': dept_count,
         'serv': serv_count,
@@ -203,10 +221,26 @@ def DepartmentDetails(request, id):
     except:
         raise PermissionDenied("User profile not found")
     selected_dept = get_object_or_404(Departments, id=id)
-    dept_comp = Complaint.objects.filter(department=selected_dept).count()
-    dept_task = Tasks.objects.filter(department=selected_dept).count()
+    all_comp = Complaint.objects.filter(department=selected_dept).all()
+    all_task = Tasks.objects.filter(department=selected_dept).all()
+    dept_comp = all_comp.filter(department=selected_dept).count()
+    dept_task = all_task.filter(department=selected_dept).count()
     dept_users = CustomUsers.objects.filter(department=selected_dept).count()
+    start_date = request.GET.get('start_date')
+    end_date = request.GET.get('end_date')
+
+    if start_date and end_date:
+        try:
+            start = datetime.strptime(start_date, "%Y-%m-%d")
+            end = datetime.strptime(end_date, "%Y-%m-%d") + timedelta(days=1)
+            all_comp = all_comp.filter(created_at__range=(start, end))
+            all_task = all_task.filter(created_at__range=(start, end))
+        except ValueError:
+            pass
+
     context = {
+        'all_comp': all_comp.order_by('-created_at'),
+        'all_task': all_task.order_by('-created_at'),
         'select_dept': selected_dept,
         'comp': dept_comp,
         'task': dept_task,
@@ -254,10 +288,18 @@ def DepartmentTasks(request, id):
 # All Complaint Pie Chart.
 def AllComplaintPieChart(request):
     user = request.user
-    open_comp = Complaint.objects.filter(status='Open').count()
-    pro_comp = Complaint.objects.filter(status='In Progress').count()
-    close_comp = Complaint.objects.filter(status='Resolved').count()
-    halt_comp = Complaint.objects.filter(status='Halt').count()
+    start_date = request.GET.get("start_date")
+    end_date = request.GET.get("end_date")
+    qs = Complaint.objects.all()
+    if start_date and end_date:
+        start_date_parsed = parse_date(start_date)
+        end_date_parsed = parse_date(end_date)
+        if start_date_parsed and end_date_parsed:
+            qs = qs.filter(created_at__date__range=[start_date_parsed, end_date_parsed])
+    open_comp = qs.filter(status='Open').count()
+    pro_comp = qs.filter(status='In Progress').count()
+    close_comp = qs.filter(status='Resolved').count()
+    halt_comp = qs.filter(status='Halt').count()
     if open_comp + pro_comp + close_comp + halt_comp == 0:
         labels = ['No Data']
         sizes = [1]
@@ -291,10 +333,18 @@ def AllComplaintPieChart(request):
 # All Task Pie Chart.
 def AllTasksPieChart(request):
     user = request.user
-    open_comp = Tasks.objects.filter(status='Open').count()
-    pro_comp = Tasks.objects.filter(status='In Progress').count()
-    close_comp = Tasks.objects.filter(status='Completed').count()
-    halt_comp = Tasks.objects.filter(status='Halt').count()
+    start_date = request.GET.get("start_date")
+    end_date = request.GET.get("end_date")
+    qs = Tasks.objects.all()
+    if start_date and end_date:
+        start_date_parsed = parse_date(start_date)
+        end_date_parsed = parse_date(end_date)
+        if start_date_parsed and end_date_parsed:
+            qs = qs.filter(created_at__date__range=[start_date_parsed, end_date_parsed])
+    open_comp = qs.filter(status='Open').count()
+    pro_comp = qs.filter(status='In Progress').count()
+    close_comp = qs.filter(status='Completed').count()
+    halt_comp = qs.filter(status='Halt').count()
     if open_comp + pro_comp + close_comp + halt_comp == 0:
         labels = ['No Data']
         sizes = [1]
@@ -328,10 +378,18 @@ def AllTasksPieChart(request):
 # All Service Pie Chart.
 def AllServicePieChart(request):
     user = request.user
-    open_comp = Service.objects.filter(status='Open').count()
-    pro_comp = Service.objects.filter(status='In Progress').count()
-    close_comp = Service.objects.filter(status='Completed').count()
-    pen_comp = Service.objects.filter(status='Pending').count()
+    start_date = request.GET.get("start_date")
+    end_date = request.GET.get("end_date")
+    qs = Service.objects.all()
+    if start_date and end_date:
+        start_date_parsed = parse_date(start_date)
+        end_date_parsed = parse_date(end_date)
+        if start_date_parsed and end_date_parsed:
+            qs = qs.filter(created_at__date__range=[start_date_parsed, end_date_parsed])
+    open_comp = qs.filter(status='Open').count()
+    pro_comp = qs.filter(status='In Progress').count()
+    close_comp = qs.filter(status='Completed').count()
+    pen_comp = qs.filter(status='Pending').count()
     if open_comp + pro_comp + close_comp + pen_comp == 0:
         labels = ['No Data']
         sizes = [1]

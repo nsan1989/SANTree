@@ -5,6 +5,8 @@ from django.conf import settings
 from san_cms.models import Complaint, ReassignedComplaint, ReassignDepartment
 from san_tms.models import Tasks
 from san_srm.models import Service
+from django.db.models.signals import pre_save, post_save
+from django.dispatch import receiver
 
 # Complaint gmail handler
 @receiver(post_save, sender=Complaint)
@@ -29,6 +31,8 @@ def ComplaintGmailHandler(sender, instance, created, **kwargs):
         f"A new complaint has been assigned to you. \n\n"
         f"Complaint Number: {instance.id} \n"
         "Please check your complaint page for more details."
+        "Regards,\n"
+        "Team MIS"
     )
     send_mail(
         subject,
@@ -61,6 +65,8 @@ def ReassignedGmailHandler(sender, instance, created, **kwargs):
         f"A new complaint has been assigned to you. \n\n"
         f"Complaint Number: {instance.id} \n"
         "Please check your complaint page for more details."
+        "Regards,\n"
+        "Team MIS"
     )
     send_mail(
         subject,
@@ -93,6 +99,8 @@ def ReassignDepartmentGmailHandler(sender, instance, created, **kwargs):
         f"A new complaint has been assigned to you. \n\n"
         f"Complaint Number: {instance.id} \n"
         "Please check your complaint page for more details."
+        "Regards,\n"
+        "Team MIS"
     )
     send_mail(
         subject,
@@ -124,6 +132,8 @@ def TaskGmailHandler(sender, instance, created, **kwargs):
         f"A new task has been assigned to you. \n\n"
         f"Task Number: {instance.id} \n"
         "Please check your task request page for more details."
+        "Regards,\n"
+        "Team MIS"
     )
     
     send_mail(
@@ -134,18 +144,34 @@ def TaskGmailHandler(sender, instance, created, **kwargs):
         fail_silently=False,
     )
 
+@receiver(pre_save, sender=Service)
+def store_previous_assigned_to(sender, instance, **kwargs):
+    if not instance.pk:
+        instance._old_assigned_to = None
+    else:
+        try:
+            old_instance = Service.objects.get(pk=instance.pk)
+            instance._old_assigned_to = old_instance.assigned_to
+        except Service.DoesNotExist:
+            instance._old_assigned_to = None
+
 # Service gmail handler
 @receiver(post_save, sender=Service)
 def ServiceGmailHandler(sender, instance, created, **kwargs):
 
-    if not created:
-        return
-    
     assigned_to = getattr(instance, 'assigned_to', None)
-    if not assigned_to or not getattr(assigned_to, "shift_staffs", None):
+    old_assigned_to = getattr(instance, '_old_assigned_to', None)
+
+    if created and not assigned_to:
         return
-    
-    staff = assigned_to.shift_staffs
+
+    if not assigned_to or assigned_to == old_assigned_to:
+        return
+
+    staff = getattr(assigned_to, "shift_staffs", None)
+    if not staff:
+        return
+
     staff_name = getattr(staff, "username", "Staff Member")
     staff_email = getattr(staff, "email", None)
 
@@ -154,10 +180,12 @@ def ServiceGmailHandler(sender, instance, created, **kwargs):
 
     subject = "New service assigned"
     message = (
-        f"Hello! {staff_name}, \n\n"
-        f"A new service has been assigned to you. \n\n"
-        f"Service Number: {instance.id} \n"
-        "Please check your service request page for more details."
+        f"Hello {staff_name},\n\n"
+        f"A new service has been assigned to you.\n\n"
+        f"Service Number: {instance.service_number or instance.id}\n"
+        "Please check your service request page for more details.\n\n"
+        "Regards,\n"
+        "Team MIS"
     )
 
     send_mail(

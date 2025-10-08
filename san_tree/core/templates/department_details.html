@@ -85,52 +85,40 @@ Department Detail
         </div>
     </div>
     <div class="row mb-4 g-2 d-flex">
+        <!-- Filter form -->
+            <form method="get" class="row g-2 align-items-end">
+      <div class="col-auto">
+        <label for="start_date" class="form-label small mb-1">Start</label>
+        <input
+          type="date"
+          id="start_date"
+          name="start_date"
+          class="form-control form-control-sm"
+          value="{{ request.GET.start_date }}"
+        >
+      </div>
+
+      <div class="col-auto">
+        <label for="end_date" class="form-label small mb-1">End</label>
+        <input
+          type="date"
+          id="end_date"
+          name="end_date"
+          class="form-control form-control-sm"
+          value="{{ request.GET.end_date }}"
+        >
+      </div>
+
+      <div class="col-auto">
+        <button type="submit" class="btn btn-primary btn-sm">Filter</button>
+      </div>
+    </form>
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6">
-            <!-- Filter form -->
-            <form method="get" class="row g-2 align-items-end mb-3">
-                <div class="col-auto">
-                    <label for="start_date" class="form-label small mb-1">Start</label>
-                    <input type="date" id="start_date" name="start_date" class="form-control form-control-sm"
-                        value="{{ request.GET.start_date }}">
-                </div>
-
-                <div class="col-auto">
-                    <label for="end_date" class="form-label small mb-1">End</label>
-                    <input type="date" id="end_date" name="end_date" class="form-control form-control-sm"
-                        value="{{ request.GET.end_date }}">
-                </div>
-
-                <div class="col-auto">
-                    <button type="submit" class="btn btn-primary btn-sm">
-                        Filter
-                    </button>
-                </div>
-            </form>
-            <img class="img-fluid w-100 rounded-2" src="{% url 'dept_complaint_pie_chart' select_dept.id %}?v={{ now }}"
+            <img class="img-fluid w-100 rounded-2" src="{% url 'dept_complaint_pie_chart' select_dept.id %}?start_date={{ request.GET.start_date|default:'' }}&end_date={{ request.GET.end_date|default:'' }}&v={{ now }}"
                 alt="Dept. Complaint Pie Chart" />
         </div>
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6">
-            <!-- Filter form -->
-            <form method="get" class="row g-2 align-items-end mb-3">
-                <div class="col-auto">
-                    <label for="start_date" class="form-label small mb-1">Start</label>
-                    <input type="date" id="start_date" name="start_date" class="form-control form-control-sm"
-                        value="{{ request.GET.start_date }}">
-                </div>
-
-                <div class="col-auto">
-                    <label for="end_date" class="form-label small mb-1">End</label>
-                    <input type="date" id="end_date" name="end_date" class="form-control form-control-sm"
-                        value="{{ request.GET.end_date }}">
-                </div>
-
-                <div class="col-auto">
-                    <button type="submit" class="btn btn-primary btn-sm">
-                        Filter
-                    </button>
-                </div>
-            </form>
-            <img class="img-fluid w-100 rounded-2" src="{% url 'dept_task_pie_chart' select_dept.id %}?v={{ now }}"
+            <img class="img-fluid w-100 rounded-2" src="{% url 'dept_task_pie_chart' select_dept.id %}?start_date={{ request.GET.start_date|default:'' }}&end_date={{ request.GET.end_date|default:'' }}&v={{ now }}"
                 alt="Dept. Complaint Pie Chart" />
         </div>
     </div>
