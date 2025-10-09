@@ -86,7 +86,7 @@ Department Detail
     </div>
     <div class="row mb-4 g-2 d-flex">
         <!-- Filter form -->
-            <form method="get" class="row g-2 align-items-end">
+            <form id="chart-filters" method="get" class="row g-2 align-items-end">
       <div class="col-auto">
         <label for="start_date" class="form-label small mb-1">Start</label>
         <input
@@ -114,13 +114,37 @@ Department Detail
       </div>
     </form>
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6">
-            <img class="img-fluid w-100 rounded-2" src="{% url 'dept_complaint_pie_chart' select_dept.id %}?start_date={{ request.GET.start_date|default:'' }}&end_date={{ request.GET.end_date|default:'' }}&v={{ now }}"
+            <img id="complaints-chart" class="img-fluid w-100 rounded-2" src="{% url 'dept_complaint_pie_chart' select_dept.id %}?start_date={{ request.GET.start_date|default:'' }}&end_date={{ request.GET.end_date|default:'' }}&v={{ now }}"
                 alt="Dept. Complaint Pie Chart" />
         </div>
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6">
-            <img class="img-fluid w-100 rounded-2" src="{% url 'dept_task_pie_chart' select_dept.id %}?start_date={{ request.GET.start_date|default:'' }}&end_date={{ request.GET.end_date|default:'' }}&v={{ now }}"
+            <img id="tasks-chart" class="img-fluid w-100 rounded-2" src="{% url 'dept_task_pie_chart' select_dept.id %}?start_date={{ request.GET.start_date|default:'' }}&end_date={{ request.GET.end_date|default:'' }}&v={{ now }}"
                 alt="Dept. Complaint Pie Chart" />
         </div>
     </div>
 </div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const form = document.getElementById('chart-filters');
+    const urls = {
+      complaints: `{% url 'dept_complaint_pie_chart' select_dept.id %}`,
+      tasks: `{% url 'dept_task_pie_chart' select_dept.id %}`,
+    };
+    const chart_id = {
+      complaints: 'complaints-chart',
+      tasks: 'tasks-chart'
+    };
+    form.reset();
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      const startDate = document.getElementById('start_date').value;
+      const endDate = document.getElementById('end_date').value;
+      const query = `start_date=${encodeURIComponent(startDate)}&end_date=${encodeURIComponent(endDate)}&v=${Date.now()}`;
+      for (const key of Object.keys(urls)) {
+        document.getElementById(chart_id[key]).src = `${urls[key]}?${query}`;
+      }
+    });
+  });
+</script>
 {% endblock %}

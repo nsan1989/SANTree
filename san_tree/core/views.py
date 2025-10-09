@@ -139,12 +139,20 @@ def DepartmentView(request):
 
 # Department Complaint Pie Chart.
 def DeptComplaintPieChart(request,id):
-    user = request.user
     selected_dept = get_object_or_404(Departments, id=id)
-    open_comp = Complaint.objects.filter(department=selected_dept, status='Open').count()
-    pro_comp = Complaint.objects.filter(department=selected_dept, status='In Progress').count()
-    close_comp = Complaint.objects.filter(department=selected_dept, status='Resolved').count()
-    halt_comp = Complaint.objects.filter(department=selected_dept, status='Halt').count()
+    start_date = request.GET.get('start_date')
+    end_date = request.GET.get('end_date')
+    qs = Complaint.objects.filter(department=selected_dept)
+    if start_date:
+        start_date_obj = datetime.strptime(start_date, "%Y-%m-%d")
+        qs = qs.filter(created_at__gte=start_date_obj)
+    if end_date:
+        end_date_obj = datetime.strptime(end_date, "%Y-%m-%d")
+        qs = qs.filter(created_at__lte=end_date_obj)
+    open_comp = qs.filter(department=selected_dept, status='Open').count()
+    pro_comp = qs.filter(department=selected_dept, status='In Progress').count()
+    close_comp = qs.filter(department=selected_dept, status='Resolved').count()
+    halt_comp = qs.filter(department=selected_dept, status='Halt').count()
     if open_comp + pro_comp + close_comp + halt_comp == 0:
         labels = ['No Data']
         sizes = [1]
@@ -177,12 +185,20 @@ def DeptComplaintPieChart(request,id):
 
 # Department Task Pie Chart.
 def DeptTaskPieChart(request,id):
-    user = request.user
     selected_dept = get_object_or_404(Departments, id=id)
-    open_comp = Tasks.objects.filter(department=selected_dept, status='Open').count()
-    pro_comp = Tasks.objects.filter(department=selected_dept, status='In Progress').count()
-    close_comp = Tasks.objects.filter(department=selected_dept, status='Completed').count()
-    halt_comp = Tasks.objects.filter(department=selected_dept, status='Halt').count()
+    start_date = request.GET.get('start_date')
+    end_date = request.GET.get('end_date')
+    qs = Tasks.objects.filter(department=selected_dept)
+    if start_date:
+        start_date_obj = datetime.strptime(start_date, "%Y-%m-%d")
+        qs = qs.filter(created_at__gte=start_date_obj)
+    if end_date:
+        end_date_obj = datetime.strptime(end_date, "%Y-%m-%d")
+        qs = qs.filter(created_at__lte=end_date_obj)
+    open_comp = qs.filter(department=selected_dept, status='Open').count()
+    pro_comp = qs.filter(department=selected_dept, status='In Progress').count()
+    close_comp = qs.filter(department=selected_dept, status='Completed').count()
+    halt_comp = qs.filter(department=selected_dept, status='Halt').count()
     if open_comp + pro_comp + close_comp + halt_comp == 0:
         labels = ['No Data']
         sizes = [1]
@@ -287,15 +303,15 @@ def DepartmentTasks(request, id):
 
 # All Complaint Pie Chart.
 def AllComplaintPieChart(request):
-    user = request.user
+    qs = Complaint.objects.all()
     start_date = request.GET.get("start_date")
     end_date = request.GET.get("end_date")
-    qs = Complaint.objects.all()
-    if start_date and end_date:
-        start_date_parsed = parse_date(start_date)
-        end_date_parsed = parse_date(end_date)
-        if start_date_parsed and end_date_parsed:
-            qs = qs.filter(created_at__date__range=[start_date_parsed, end_date_parsed])
+    if start_date:
+        start_date_obj = datetime.strptime(start_date, "%Y-%m-%d")
+        qs = qs.filter(created_at__gte=start_date_obj)
+    if end_date:
+        end_date_obj = datetime.strptime(end_date, "%Y-%m-%d")
+        qs = qs.filter(created_at__lte=end_date_obj)
     open_comp = qs.filter(status='Open').count()
     pro_comp = qs.filter(status='In Progress').count()
     close_comp = qs.filter(status='Resolved').count()
@@ -307,7 +323,7 @@ def AllComplaintPieChart(request):
     else:
         raw_data = [
             ('Open', open_comp, '#eb0707'),
-            ('Progress', pro_comp, '#ebd807'),
+            ('In Progress', pro_comp, '#ebd807'),
             ('Resolved', close_comp, '#4feb07'),
             ('Halt', halt_comp, "#2207eb")
             ]
@@ -316,13 +332,11 @@ def AllComplaintPieChart(request):
         labels, sizes, colors = zip(*filtered_data)
 
     buffer = io.BytesIO()
-
     with plot_lock:
         bg_color = (0, 0, 0, 0.4)
         fig, ax = plt.subplots(figsize=(6, 3), facecolor=bg_color) 
         ax.pie(sizes, labels=labels, autopct='%1.1f%%', colors=colors, startangle=90, textprops={'color': 'white'})
         ax.axis('equal')
-        # Add the chart title
         ax.set_title("Complaint Pie Chart", color='white', fontsize=10)
         plt.savefig(buffer, format='png', facecolor=fig.get_facecolor())
         plt.close(fig)
@@ -332,43 +346,41 @@ def AllComplaintPieChart(request):
 
 # All Task Pie Chart.
 def AllTasksPieChart(request):
-    user = request.user
+    qs = Tasks.objects.all()
     start_date = request.GET.get("start_date")
     end_date = request.GET.get("end_date")
-    qs = Tasks.objects.all()
-    if start_date and end_date:
-        start_date_parsed = parse_date(start_date)
-        end_date_parsed = parse_date(end_date)
-        if start_date_parsed and end_date_parsed:
-            qs = qs.filter(created_at__date__range=[start_date_parsed, end_date_parsed])
-    open_comp = qs.filter(status='Open').count()
-    pro_comp = qs.filter(status='In Progress').count()
-    close_comp = qs.filter(status='Completed').count()
-    halt_comp = qs.filter(status='Halt').count()
-    if open_comp + pro_comp + close_comp + halt_comp == 0:
+    if start_date:
+        start_date_obj = datetime.strptime(start_date, "%Y-%m-%d")
+        qs = qs.filter(created_at__gte=start_date_obj)
+    if end_date:
+        end_date_obj = datetime.strptime(end_date, "%Y-%m-%d")
+        qs = qs.filter(created_at__lte=end_date_obj)
+    open_task = qs.filter(status='Open').count()
+    pro_task = qs.filter(status='In Progress').count()
+    close_task = qs.filter(status='Completed').count()
+    halt_task = qs.filter(status='Halt').count()
+    if open_task + pro_task + close_task + halt_task == 0:
         labels = ['No Data']
         sizes = [1]
         colors = ['#d3d3d3']
     else:
         raw_data = [
-            ('Open', open_comp, '#eb0707'),
-            ('Progress', pro_comp, '#ebd807'),
-            ('Resolved', close_comp, '#4feb07'),
-            ('Halt', halt_comp, "#2207eb")
+            ('Open', open_task, '#eb0707'),
+            ('In Progress', pro_task, '#ebd807'),
+            ('Resolved', close_task, '#4feb07'),
+            ('Halt', halt_task, "#2207eb")
             ]
     
         filtered_data = [(label, size, color) for label, size, color in raw_data if size > 0]
         labels, sizes, colors = zip(*filtered_data)
 
     buffer = io.BytesIO()
-
     with plot_lock:
         bg_color = (0, 0, 0, 0.4)
         fig, ax = plt.subplots(figsize=(6, 3), facecolor=bg_color) 
         ax.pie(sizes, labels=labels, autopct='%1.1f%%', colors=colors, startangle=90, textprops={'color': 'white'})
         ax.axis('equal')
-        # Add the chart title
-        ax.set_title("Task Pie Chart", color='white', fontsize=10)
+        ax.set_title("Complaint Pie Chart", color='white', fontsize=10)
         plt.savefig(buffer, format='png', facecolor=fig.get_facecolor())
         plt.close(fig)
     
@@ -377,43 +389,41 @@ def AllTasksPieChart(request):
 
 # All Service Pie Chart.
 def AllServicePieChart(request):
-    user = request.user
+    qs = Service.objects.all()
     start_date = request.GET.get("start_date")
     end_date = request.GET.get("end_date")
-    qs = Service.objects.all()
-    if start_date and end_date:
-        start_date_parsed = parse_date(start_date)
-        end_date_parsed = parse_date(end_date)
-        if start_date_parsed and end_date_parsed:
-            qs = qs.filter(created_at__date__range=[start_date_parsed, end_date_parsed])
-    open_comp = qs.filter(status='Open').count()
-    pro_comp = qs.filter(status='In Progress').count()
-    close_comp = qs.filter(status='Completed').count()
-    pen_comp = qs.filter(status='Pending').count()
-    if open_comp + pro_comp + close_comp + pen_comp == 0:
+    if start_date:
+        start_date_obj = datetime.strptime(start_date, "%Y-%m-%d")
+        qs = qs.filter(created_at__gte=start_date_obj)
+    if end_date:
+        end_date_obj = datetime.strptime(end_date, "%Y-%m-%d")
+        qs = qs.filter(created_at__lte=end_date_obj)
+    open_serv = qs.filter(status='Open').count()
+    pro_serv = qs.filter(status='In Progress').count()
+    close_serv = qs.filter(status='Completed').count()
+    pen_serv = qs.filter(status='On Hold').count()
+    if open_serv + pro_serv + close_serv + pen_serv == 0:
         labels = ['No Data']
         sizes = [1]
         colors = ['#d3d3d3']
     else:
         raw_data = [
-            ('Open', open_comp, '#eb0707'),
-            ('Progress', pro_comp, '#ebd807'),
-            ('Resolved', close_comp, '#4feb07'),
-            ('Halt', pen_comp, "#2207eb")
+            ('Open', open_serv, '#eb0707'),
+            ('In Progress', pro_serv, '#ebd807'),
+            ('Completed', close_serv, '#4feb07'),
+            ('On Hold', pen_serv, "#2207eb")
             ]
     
         filtered_data = [(label, size, color) for label, size, color in raw_data if size > 0]
         labels, sizes, colors = zip(*filtered_data)
 
     buffer = io.BytesIO()
-
     with plot_lock:
         bg_color = (0, 0, 0, 0.4)
         fig, ax = plt.subplots(figsize=(6, 3), facecolor=bg_color) 
         ax.pie(sizes, labels=labels, autopct='%1.1f%%', colors=colors, startangle=90, textprops={'color': 'white'})
         ax.axis('equal')
-        # Add the chart title
-        ax.set_title("Service Pie Chart", color='white', fontsize=10)
+        ax.set_title("Complaint Pie Chart", color='white', fontsize=10)
         plt.savefig(buffer, format='png', facecolor=fig.get_facecolor())
         plt.close(fig)
     

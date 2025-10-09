@@ -212,7 +212,8 @@
         <h3>CHARTS</h3>
       </div>
     </div>
-    <form method="get" class="row g-2 align-items-end">
+    <!-- Filter form -->
+            <form id="chart-filters" method="get" class="row g-2 align-items-end">
       <div class="col-auto">
         <label for="start_date" class="form-label small mb-1">Start</label>
         <input
@@ -241,20 +242,43 @@
     </form>
     <div class="d-flex gap-1">
     <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4">
-      <img class="img-fluid w-100 rounded-2" src="{% url 'all_complaints_pie_chart' %}?start_date={{ request.GET.start_date|default:'' }}&end_date={{ request.GET.end_date|default:'' }}&v={{ now }}"
-        alt="All Complaint Pie Chart" />
+      <img id="complaints-chart" class="img-fluid w-100 rounded-2" src="{% url 'all_complaints_pie_chart' %}?start_date={{ request.GET.start_date|default:'' }}&end_date={{ request.GET.end_date|default:'' }}&v={{ now }}" alt="All Complaint Pie Chart" />
     </div>
     <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4">
-      <img class="img-fluid w-100 rounded-2" src="{% url 'all_tasks_pie_chart' %}?start_date={{ request.GET.start_date|default:'' }}&end_date={{ request.GET.end_date|default:'' }}&v={{ now }}"
-        alt="All Task Pie Chart" />
+      <img id="tasks-chart" class="img-fluid w-100 rounded-2" src="{% url 'all_tasks_pie_chart' %}?start_date={{ request.GET.start_date|default:'' }}&end_date={{ request.GET.end_date|default:'' }}&v={{ now }}" alt="All Task Pie Chart" />
     </div>
     <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4">
-      <img class="img-fluid w-100 rounded-2" src="{% url 'all_service_pie_chart' %}?start_date={{ request.GET.start_date|default:'' }}&end_date={{ request.GET.end_date|default:'' }}&v={{ now }}"
-        alt="All Service Pie Chart" />
+      <img id="service-chart" class="img-fluid w-100 rounded-2" src="{% url 'all_service_pie_chart' %}?start_date={{ request.GET.start_date|default:'' }}&end_date={{ request.GET.end_date|default:'' }}&v={{ now }}" alt="All Service Pie Chart" />
     </div>
     </div>
   </div>
 </div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const form = document.getElementById('chart-filters');
+    const urls = {
+      complaints: `{% url 'all_complaints_pie_chart' %}`,
+      tasks: `{% url 'all_tasks_pie_chart' %}`,
+      service: `{% url 'all_service_pie_chart' %}`
+    };
+    const chart_id = {
+      complaints: 'complaints-chart',
+      tasks: 'tasks-chart',
+      service: 'service-chart'
+    };
+    form.reset();
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      const startDate = document.getElementById('start_date').value;
+      const endDate = document.getElementById('end_date').value;
+      const query = `start_date=${encodeURIComponent(startDate)}&end_date=${encodeURIComponent(endDate)}&v=${Date.now()}`;
+      for (const key of Object.keys(urls)) {
+        document.getElementById(chart_id[key]).src = `${urls[key]}?${query}`;
+      }
+    });
+  });
+</script>
 
 <!--Modal Block-->
 <div class="modal fade" id="dynamicModal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
@@ -328,4 +352,5 @@
     });
   });
 </script>
+
 {% endblock %}
