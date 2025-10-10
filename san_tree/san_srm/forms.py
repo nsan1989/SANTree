@@ -125,9 +125,21 @@ class ShiftScheduleForm(forms.ModelForm):
         cleaned_data = super().clean()
         start = cleaned_data.get('start_time')
         end = cleaned_data.get('end_time')
+
+        if start and end:
+            tz = timezone.get_current_timezone()
+            print(tz)
+            if timezone.is_naive(start):
+                start = timezone.make_aware(start, timezone=tz)
+                print("Start (aware):", start)
+            if timezone.is_naive(end):
+                end = timezone.make_aware(end, timezone=tz)
+                print("End (aware):", end)
+            cleaned_data['start_time'] = start
+            cleaned_data['end_time'] = end
         
-        if start and end and start >= end:
-            self.add_error('end_time', 'End time must be after start time.')
+            if start and end and start >= end:
+                self.add_error('end_time', 'End time must be after start time.')
 
 # Shift Edit Form.
 class ShiftEditForm(forms.ModelForm):

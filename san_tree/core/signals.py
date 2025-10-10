@@ -7,40 +7,66 @@ from san_tms.models import Tasks
 from san_srm.models import Service
 from django.db.models.signals import pre_save, post_save
 from django.dispatch import receiver
+from accounts.models import CustomUsers
 
 # Complaint gmail handler
 @receiver(post_save, sender=Complaint)
 def ComplaintGmailHandler(sender, instance, created, **kwargs):
 
-    if not created:
-        return
-    
-    assigned_to = getattr(instance, 'assigned_to', None)
-    if not assigned_to or not getattr(assigned_to, "cms_assigned_complaints", None):
-        return
-    
-    staff_name = getattr(assigned_to, "username", "Staff Member")
-    staff_email = getattr(assigned_to, "email", None)
+    if created and instance.status == 'Waiting':
+        department = getattr(instance, 'department', None)
+        dept_admins = CustomUsers.objects.filter(department=department, role='Admin', is_active=True)
 
-    if not staff_email:
-        return
-   
-    subject = "New complaint assigned"
-    message = (
-        f"Hello! {staff_name}, \n\n"
-        f"A new complaint has been assigned to you. \n\n"
-        f"Complaint Number: {instance.id} \n"
-        "Please check your complaint page for more details."
-        "Regards,\n"
-        "Team MIS"
-    )
-    send_mail(
-        subject,
-        message,
-        settings.DEFAULT_FROM_EMAIL,
-        [staff_email],
-        fail_silently=False,
-    )
+        for admin in dept_admins:
+            admin_name = getattr(admin, "username", "Admin")
+            admin_email = getattr(admin, "email", None)
+
+            if not admin_email:
+                continue
+
+            subject = "New complaint received"
+            message = (
+                f"Hello! {admin_name}, \n\n"
+                f"A new complaint has been received in your department. \n\n"
+                f"Complaint Number: {instance.id} \n"
+                "Please check your complaint page for more details."
+                "Regards,\n"
+                "Team MIS"
+            )
+            send_mail(
+                subject,
+                message,
+                settings.DEFAULT_FROM_EMAIL,
+                [admin_email],
+                fail_silently=False,
+            )
+    elif created and instance.status == 'Open':
+        assigned_to = getattr(instance, 'assigned_to', None)
+        print(assigned_to)
+        staff_name = getattr(assigned_to, "username", "Staff Member")
+        print(staff_name)
+        staff_email = getattr(assigned_to, "email", None)
+        print(staff_email)
+
+        if not staff_email:
+            return
+
+        subject = "New complaint assigned"
+        message = (
+            f"Hello! {staff_name}, \n\n"
+            f"A new complaint has been assigned to you. \n\n"
+            f"Complaint Number: {instance.id} \n"
+            "Please check your complaint page for more details."
+            "Regards,\n"
+            "Team MIS"
+        )
+        send_mail(
+            subject,
+            message,
+            settings.DEFAULT_FROM_EMAIL,
+            [staff_email],
+            fail_silently=False,
+        )
 
 # Reassigned to user gmail handler
 @receiver(post_save, sender=ReassignedComplaint)
