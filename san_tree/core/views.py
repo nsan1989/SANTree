@@ -620,7 +620,6 @@ def AddComplaintTypeView(request):
         if form.is_valid():
             comp_type = form.save(commit=False)
             
-            # use "exists" instead of reusing comp_type
             exists = ComplaintType.objects.filter(
                 name__iexact=comp_type.name,
                 department=comp_type.department

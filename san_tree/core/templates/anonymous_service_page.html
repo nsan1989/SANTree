@@ -10,6 +10,14 @@
   }
 </style>
 
+{% if messages %}
+    {% for message in messages %}
+      <div class="anonymous-alert alert-{{ message.tags }}">
+        {{ message }}
+      </div>
+    {% endfor %}
+  {% endif %}
+
 <div class="container-fluid d-flex flex-column justify-content-center align-items-center h-100">
   <div class="row w-100 d-flex justify-content-center p-5">
     <div class="col-sm-12 col-8 px-4 py-5 bg-secondary text-light rounded">

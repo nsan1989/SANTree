@@ -24,6 +24,7 @@ class TasksResources(resources.ModelResource):
 class TasksAdmin(ImportExportModelAdmin):
     resource_class = TasksResources
     list_display = ('tasks_number', 'tasks_types', 'location', 'status', 'priority', 'department', 'created_by', 'assigned_to', 'created_at', 'completed_at', 'waiting_time', 'attachment')
+    list_filter = ('location', 'status', 'priority', 'created_at', 'completed_at')
 
 # tasks remarks resources.
 class TasksRemarksResources(resources.ModelResource):

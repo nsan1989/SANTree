@@ -81,6 +81,7 @@ tr {
               <th scope="col">Shift</th>
               <th scope="col">Block</th>
               <th scope="col">Timing</th>
+              <th scope="col">Status</th>
               {% if request.user.department.name == 'GDA' and request.user.role == 'Admin' or request.user.department.name == 'General Duty Assistant' and request.user.role == 'Admin' %}
               <th scope="col">Edit</th>
               {% endif %}
@@ -94,6 +95,7 @@ tr {
               <td>{{schedule.shift_type}}</td>
               <td>{{schedule.shift_block}}</td>
               <td>{{schedule.start_time}}&nbsp;&ndash;&nbsp;{{schedule.end_time}}</td>
+              <td>{{schedule.shift_staffs.status}}</td>
               {% if request.user.department.name == 'GDA' and request.user.role == 'Admin' or request.user.department.name == 'General Duty Assistant' and request.user.role == 'Admin' %}
               <td>
                 <a class="edit-link shift-edit-modal" href="{% url 'srm:edit_schedule' schedule.id %}" data-bs-toggle="modal" data-bs-target="#editSchedule">

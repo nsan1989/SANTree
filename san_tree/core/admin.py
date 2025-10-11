@@ -13,3 +13,4 @@ class ServiceGenerateResource(resources.ModelResource):
 class ServiceGenerateAdmin(ImportExportModelAdmin):
     resource_class = ServiceGenerateResource
     list_display = ('service_number', 'service_type', 'assigned_to', 'status', 'block', 'from_location', 'to_location', 'generate_at', 'completed_at')
+    list_filter = ('status', 'block')

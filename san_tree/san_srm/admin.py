@@ -46,6 +46,7 @@ class ServiceResources(resources.ModelResource):
 class ServiceAdmin(ImportExportModelAdmin):
     resource_class = ServiceResources
     list_display = ('service_number', 'service_type', 'service_block', 'from_location', 'to_location', 'priority', 'status', 'assigned_to', 'created_by', 'created_at', 'completed_at')
+    list_filter = ('service_block', 'priority', 'status')
 
 # service queue resources
 class ServiceQueueResources(resources.ModelResource):

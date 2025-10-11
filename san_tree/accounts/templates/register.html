@@ -43,7 +43,7 @@ Register
       <div class="register-form w-100 my-4 py-2">
         {% if messages %} 
           {% for message in messages %}
-            <div class="alert alert-{{ message.tags }} text-center">
+            <div class="register-alert alert-{{ message.tags }} text-center">
               {{ message }}
             </div>
           {% endfor %} 

@@ -11,6 +11,16 @@
 </style>
 
 <div class="container-fluid d-flex flex-column justify-content-center align-items-center h-100">
+  {% if messages %}
+        {% for message in messages %}
+        <div class="service-generate-alert alert-{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+    {% if errors %}
+        <div class="service-generate-error-alert alert-danger">
+        {{ errors }}
+        </div>
+    {% endif %}
   <span style="width: auto;">
     <div class="mb-3">
       <a href="{% url 'srm:staff_dashboard' %}" class="d-flex align-items-center text-warning"

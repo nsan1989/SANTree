@@ -59,7 +59,7 @@ Assigned Complaint
   </div>
   {% if messages %}
     {% for message in messages %}
-    <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+    <div class="complaint-approve-alert alert-{{ message.tags }}">{{ message }}</div>
     {% endfor %}
   {% endif %}
   <div class="row mb-2">

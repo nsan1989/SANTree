@@ -494,10 +494,9 @@ def StaffUpdateComplaintStatus(request, id):
         return redirect('cms:staff_assigned_tasks')
     
     if complaint.complaint.status in ['Closed', 'Cancelled']:
-        messages.warning(request, f"Cannot update status. Complaint is already {complaint.complaint.status}.")
         return redirect('cms:staff_assigned_tasks')
     
-    dept_admin = CustomUsers.objects.filter(department=user.department, role='Admin').first()
+#    dept_admin = CustomUsers.objects.filter(department=user.department, role='Admin').first()
     
     if request.method == 'POST':
         new_status = request.POST.get('status')
@@ -508,7 +507,6 @@ def StaffUpdateComplaintStatus(request, id):
             complaint.complaint.save()
             complaint.save()
 
-            messages.success(request, "Status updated successfully.")
     view_name = request.resolver_match.view_name
     if view_name == 'cms:staff_update_complaint_status' and user_role == 'User':
         return redirect('cms:staff_assigned_tasks')
@@ -528,12 +526,10 @@ def AdminUpdateComplaintStatus(request, id):
         return redirect('cms:assigned_complaint')
     
     if complaint.complaint.status in ['Closed', 'Cancelled']:
-        messages.warning(request, f"Cannot update status. Complaint is already {complaint.complaint.status}.")
         return redirect('cms:assigned_complaint')
     
     if request.method == 'POST':
         new_status = request.POST.get('status')
-        print(new_status)
         if new_status == 'Closed' and complaint.status_changed_to == 'Cancelled':
             messages.warning(request, "Cancelled complaint cannot be Closed.")
         else:
@@ -544,18 +540,14 @@ def AdminUpdateComplaintStatus(request, id):
             if new_status == 'In Progress':
                 if complaint.complaint.assigned_to.status.strip().lower() != 'engaged':
                     complaint.complaint.assigned_to.status ='engaged'
-                    print(complaint.complaint.assigned_to.status)
                     complaint.complaint.assigned_to.save()
             elif new_status == 'Resolved':
                 if complaint.complaint.assigned_to.status.strip().lower() != 'vacant':
                     complaint.complaint.assigned_to.status = 'vacant'
-                    print(complaint.complaint.assigned_to.status)
                     complaint.complaint.assigned_to.save()
 
             complaint.complaint.save()
             complaint.save()
-
-            print("Final status in DB:", complaint.complaint.assigned_to.status)
 
             messages.success(request, "Status updated successfully.")
     view_name = request.resolver_match.view_name

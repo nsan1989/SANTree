@@ -23,6 +23,7 @@ from datetime import datetime
 
 log = structlog.get_logger()
 now = timezone.now()
+today = timezone.localdate()
 
 # Tasks Pie Chart
 def ServicePieChart(request):
@@ -218,7 +219,8 @@ def ServiceView(request):
             for staff in provider_staff:
                 if staff.status == 'vacant' or staff.status == 'Vacant':
                     schedule = ShiftSchedule.objects.filter(
-                        shift_staffs=staff,
+                        shift_block=new_service.service_block,
+                        shift_staffs__id=staff.id,
                         start_time__lte=now,
                         end_time__gte=now
                         ).first()
@@ -231,7 +233,9 @@ def ServiceView(request):
                         assigned = True
                         break
                     else:
-                        messages.error(request, f"No shift schedule found for staff {staff}")
+                        new_service.status = 'Open'
+                        new_service.save()
+                        break
 
             if not assigned:
                 new_service.status = 'Waiting'
@@ -431,8 +435,12 @@ def ShiftSchedules(request):
         user_role = user.role
     except:
         raise PermissionDenied("User profile not found")
+    start_of_day = timezone.make_aware(timezone.datetime.combine(today, timezone.datetime.min.time()))
+    end_of_day = timezone.make_aware(timezone.datetime.combine(today, timezone.datetime.max.time()))
     schedules = ShiftSchedule.objects.filter(
-    Q(shift_staffs__department__name__in=['GDA', 'General Duty Assistant'])
+    Q(shift_staffs__department__name__in=['GDA', 'General Duty Assistant']),
+    start_time__gte=start_of_day,
+    end_time__lte=end_of_day
     ).order_by("-id")
     page_number = request.GET.get('page')
     paginator = Paginator(schedules, 10) 
@@ -489,6 +497,28 @@ def free_up_onhold_staff():
                         staff.save()
                     assign_service_from_queue(staff)
 
+    except Exception as e:
+        log.error("Error freeing up staff", error=str(e))
+
+# free up the staff when the service status is 'pending'.
+def free_up_pending_staff(request):
+    try:
+        pen_service = Service.objects.filter(status='Pending').all()
+        pen_ano_service = AnonymousServiceGenerate.objects.filter(status='Pending').all()
+        if pen_service.exists():
+            for service in pen_service:
+                staff = pen_service.assigned_to.shift_staffs
+                if staff and staff.status == 'engaged':
+                    staff.status = 'vacant'
+                    staff.save()
+                    assign_service_from_queue(staff)
+        elif pen_ano_service.exists():
+            for service in pen_ano_service:
+                staff = pen_ano_service.assigned_to.shift_staffs
+                if staff and staff.status == 'engaged':
+                    staff.status = 'vacant'
+                    staff.save()
+                    assign_service_from_queue(staff)
     except Exception as e:
         log.error("Error freeing up staff", error=str(e))
 
