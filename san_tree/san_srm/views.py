@@ -503,22 +503,22 @@ def free_up_onhold_staff():
 # free up the staff when the service status is 'pending'.
 def free_up_pending_staff(request):
     try:
-        pen_service = Service.objects.filter(status='Pending').all()
-        pen_ano_service = AnonymousServiceGenerate.objects.filter(status='Pending').all()
-        if pen_service.exists():
-            for service in pen_service:
-                staff = pen_service.assigned_to.shift_staffs
-                if staff and staff.status == 'engaged':
-                    staff.status = 'vacant'
-                    staff.save()
-                    assign_service_from_queue(staff)
-        elif pen_ano_service.exists():
-            for service in pen_ano_service:
-                staff = pen_ano_service.assigned_to.shift_staffs
-                if staff and staff.status == 'engaged':
-                    staff.status = 'vacant'
-                    staff.save()
-                    assign_service_from_queue(staff)
+        pen_service = Service.objects.filter(status='Pending')
+        pen_ano_service = AnonymousServiceGenerate.objects.filter(status='Pending')
+        all_services = list(pen_service) + list(pen_ano_service)
+        for service in all_services:
+            shift_schedule = service.assigned_to
+
+            if not shift_schedule:
+                continue
+
+            staff = shift_schedule.shift_staffs
+
+            if hasattr(staff, 'status') and staff.status == 'engaged':
+                staff.status = 'vacant'
+                staff.save()
+                assign_service_from_queue(staff)
+
     except Exception as e:
         log.error("Error freeing up staff", error=str(e))
 
