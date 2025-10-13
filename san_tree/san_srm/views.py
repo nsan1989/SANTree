@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.db.models import Q
+from django.db.models import Q, F
 from django.core.exceptions import PermissionDenied
 from .models import *
 from .forms import *
@@ -22,7 +22,7 @@ from core.models import AnonymousServiceGenerate
 from datetime import datetime, time
 
 log = structlog.get_logger()
-now = timezone.now()
+now = timezone.localtime()
 today = timezone.localdate()
 
 # Tasks Pie Chart
@@ -230,14 +230,25 @@ def ServiceView(request):
                 raise ValueError("Service not saved properly; missing required fields!")
 
             assigned = False
+            now_utc = timezone.now()
+            now_local = timezone.localtime(now_utc)
             for staff in provider_staff:
-                if staff.status == 'vacant' or staff.status == 'Vacant':
-                    schedule = ShiftSchedule.objects.filter(
+                staff_status = (staff.status or '').strip().lower()
+                if staff_status == 'vacant':
+                    schedule_qs = ShiftSchedule.objects.filter(
                         shift_block=new_service.service_block,
-                        shift_staffs__id=staff.id,
-                        start_time__lte=now,
-                        end_time__gte=now
-                        ).first()
+                        shift_staffs_id=staff.id
+                    ).exclude(end_time__lte=F('start_time'))
+                    schedule = schedule_qs.filter(start_time__lte=now_utc, end_time__gte=now_utc).first()
+                    if not schedule:
+                        for s in schedule_qs[:10]:  # limit for performance
+                            s_local_start = timezone.localtime(s.start_time)
+                            s_local_end = timezone.localtime(s.end_time)
+                            if s_local_end < s_local_start:
+                                # spans midnight
+                                if now_local >= s_local_start or now_local <= s_local_end:
+                                    schedule = s
+                                    break
                     if schedule:
                         new_service.assigned_to = schedule
                         new_service.status = 'In Progress'
@@ -245,7 +256,8 @@ def ServiceView(request):
                         staff.status = 'engaged'
                         staff.save()
                         assigned = True
-                        break
+                    else:
+                        print(f"No active shift found for staff {staff.username} in block {new_service.service_block}")
 
             if not assigned:
                 new_service.status = 'Waiting'
