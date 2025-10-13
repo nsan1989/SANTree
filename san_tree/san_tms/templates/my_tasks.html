@@ -24,7 +24,7 @@ My Tasks
   .status-completed > td { background-color: #003300; color: #fff; }
   .status-progress > td { background-color: #ff6600; color: #000; }
   .status-waiting > td { background-color: #808080; color: #fff; }
-  .status-cancelled > td { background-color: #cc0000; color: #fff; }
+  .status-rejected > td { background-color: #cc0000; color: #fff; }
 </style>
 
 <div class="container-fluid">
@@ -90,8 +90,8 @@ My Tasks
               class="status-progress"
               {% elif task.status == 'Waiting' %}
               class="status-waiting"
-              {% elif task.status == 'Cancelled' %}
-              class="status-cancelled"
+              {% elif task.status == 'Rejected' %}
+              class="status-rejected"
               {% endif %}
             >
               <td>{{ task.tasks_number}}</td>

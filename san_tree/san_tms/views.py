@@ -225,8 +225,13 @@ def MyTasks(request):
     except:
         raise PermissionDenied("User profile not found")
     my_tasks = Tasks.objects.filter(
-        Q(department = user.department) & 
-        Q(assigned_to = user)
+        Q(assigned_to = user) & 
+        Q(
+            Q(status='In Progress') | 
+            Q(status='Waiting') | 
+            Q(status='Rejected') |
+            Q(status='Completed')
+        )
     )
 
     page_number = request.GET.get('page')
