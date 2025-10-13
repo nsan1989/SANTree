@@ -271,10 +271,20 @@ Dashboard
           </div>
         </form>
             <img class="img-fluid rounded-2 w-100" src="{% url 'srm:service_pie_chart' %}?start_date={{ request.GET.start_date }}&end_date={{ request.GET.end_date }}&v={{ now }}"
-                alt="Complaint Pie Chart" />
+                alt="service Pie Chart" />
         </div>
     </div>
 </div>
+
+<script>
+  document.getElementById('serv-chart-filters').addEventListener('submit', function (e) {
+    e.preventDefault();
+    const params = new URLSearchParams(new FormData(this));
+    params.append('v', Date.now());
+    const chart = document.getElementById('serv-chart-img');
+    chart.src = `{% url 'srm:service_pie_chart' %}?${params.toString()}`;
+  });
+</script>
 
 <!--Modal-->
 <div id="serviceModal" class="modal fade" tabindex="-1">

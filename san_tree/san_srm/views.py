@@ -19,7 +19,7 @@ plot_lock = Lock()
 from django.http import HttpResponse
 from django.db.models import OuterRef, Subquery
 from core.models import AnonymousServiceGenerate
-from datetime import datetime
+from datetime import datetime, time
 
 log = structlog.get_logger()
 now = timezone.now()
@@ -27,12 +27,26 @@ today = timezone.localdate()
 
 # Tasks Pie Chart
 def ServicePieChart(request):
-    open_serv = Service.objects.filter(status = 'Open', created_by = request.user).count()
-    prog_serv = Service.objects.filter(status = 'In Progress', created_by = request.user).count()
-    wait_serv = Service.objects.filter(status = 'Waiting', created_by = request.user).count()
-    pen_serv = Service.objects.filter(status = 'Pending', created_by = request.user).count()
-    hold_serv = Service.objects.filter(status = 'On Hold', created_by = request.user).count()
-    comp_serv = Service.objects.filter(status = 'Completed', created_by = request.user).count()
+
+    start_date = request.GET.get('start_date')
+    end_date = request.GET.get('end_date')
+
+    services = Service.objects.filter(created_by = request.user)
+
+    if start_date and end_date:
+        try:
+            start = datetime.strptime(start_date, "%Y-%m-%d")
+            end = datetime.strptime(end_date, "%Y-%m-%d") + timedelta(days=1)
+            services = services.filter(created_at__range=(start, end))
+        except ValueError:
+            pass
+
+    open_serv = services.filter(status = 'Open').count()
+    prog_serv = services.filter(status = 'In Progress').count()
+    wait_serv = services.filter(status = 'Waiting').count()
+    pen_serv = services.filter(status = 'Pending').count()
+    hold_serv = services.filter(status = 'On Hold').count()
+    comp_serv = services.filter(status = 'Completed').count()
     if open_serv + prog_serv + wait_serv + pen_serv + hold_serv + comp_serv == 0:
         labels = ['No Data']
         sizes = [1]
@@ -231,10 +245,6 @@ def ServiceView(request):
                         staff.status = 'engaged'
                         staff.save()
                         assigned = True
-                        break
-                    else:
-                        new_service.status = 'Open'
-                        new_service.save()
                         break
 
             if not assigned:
@@ -435,8 +445,8 @@ def ShiftSchedules(request):
         user_role = user.role
     except:
         raise PermissionDenied("User profile not found")
-    start_of_day = timezone.make_aware(timezone.datetime.combine(today, timezone.datetime.min.time()))
-    end_of_day = timezone.make_aware(timezone.datetime.combine(today, timezone.datetime.max.time()))
+    start_of_day = timezone.make_aware(timezone.datetime.combine(today, time(0, 0, 0)))
+    end_of_day = timezone.make_aware(timezone.datetime.combine(today, time(23, 59, 59)))
     schedules = ShiftSchedule.objects.filter(
     Q(shift_staffs__department__name__in=['GDA', 'General Duty Assistant']),
     start_time__gte=start_of_day,
@@ -496,28 +506,6 @@ def free_up_onhold_staff():
                         staff.status = 'vacant'
                         staff.save()
                     assign_service_from_queue(staff)
-
-    except Exception as e:
-        log.error("Error freeing up staff", error=str(e))
-
-# free up the staff when the service status is 'pending'.
-def free_up_pending_staff(request):
-    try:
-        pen_service = Service.objects.filter(status='Pending')
-        pen_ano_service = AnonymousServiceGenerate.objects.filter(status='Pending')
-        all_services = list(pen_service) + list(pen_ano_service)
-        for service in all_services:
-            shift_schedule = service.assigned_to
-
-            if not shift_schedule:
-                continue
-
-            staff = shift_schedule.shift_staffs
-
-            if hasattr(staff, 'status') and staff.status == 'engaged':
-                staff.status = 'vacant'
-                staff.save()
-                assign_service_from_queue(staff)
 
     except Exception as e:
         log.error("Error freeing up staff", error=str(e))
