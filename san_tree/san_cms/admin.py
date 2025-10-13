@@ -13,7 +13,7 @@ class ComplaintResource(resources.ModelResource):
 class ComplaintAdmin(ImportExportModelAdmin):
     resource_class = ComplaintResource
     list_display = ('complaint_number', 'complaint_type', 'description', 'assigned_to', 'location', 'status', 'priority', 'department', 'created_by', 'created_at', 'completed_at', 'attachment')
-    list_filter = ('status', 'department', 'location', 'created_by')
+    list_filter = ('status',)
 
 # complaint type resources.
 class ComplaintTypeResource(resources.ModelResource):
