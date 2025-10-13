@@ -698,7 +698,7 @@ def AssignedTasks(request):
     except:
         raise PermissionDenied("User profile not found.")
     assign_complaints = ComplaintHistory.objects.filter(
-        Q(complaint__assigned_to = user) | 
+        Q(complaint__assigned_to = user) &
         Q(Q(complaint__status = 'Review') | Q(complaint__status = 'Resolved'))
         ).order_by('complaint__created_at')
 

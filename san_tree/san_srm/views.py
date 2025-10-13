@@ -22,8 +22,6 @@ from core.models import AnonymousServiceGenerate
 from datetime import datetime, time
 
 log = structlog.get_logger()
-now = timezone.localtime()
-today = timezone.localdate()
 
 # Tasks Pie Chart
 def ServicePieChart(request):
@@ -230,35 +228,32 @@ def ServiceView(request):
                 raise ValueError("Service not saved properly; missing required fields!")
 
             assigned = False
-            now_utc = timezone.now()
-            now_local = timezone.localtime(now_utc)
+            now_local = timezone.localtime(timezone.now())
             for staff in provider_staff:
                 staff_status = (staff.status or '').strip().lower()
-                if staff_status == 'vacant':
-                    schedule_qs = ShiftSchedule.objects.filter(
-                        shift_block=new_service.service_block,
-                        shift_staffs_id=staff.id
-                    ).exclude(end_time__lte=F('start_time'))
-                    schedule = schedule_qs.filter(start_time__lte=now_utc, end_time__gte=now_utc).first()
-                    if not schedule:
-                        for s in schedule_qs[:10]:  # limit for performance
-                            s_local_start = timezone.localtime(s.start_time)
-                            s_local_end = timezone.localtime(s.end_time)
-                            if s_local_end < s_local_start:
-                                # spans midnight
-                                if now_local >= s_local_start or now_local <= s_local_end:
-                                    schedule = s
-                                    break
-                    if schedule:
-                        new_service.assigned_to = schedule
+                if staff_status != 'vacant':
+                    continue
+                schedule_qs = ShiftSchedule.objects.filter(
+                    shift_block=new_service.service_block,
+                    shift_staffs_id=staff.id
+                )
+                for s in schedule_qs:
+                    s_start = timezone.localtime(s.start_time)
+                    s_end = timezone.localtime(s.end_time)
+                    if s_start <= s_end:
+                        active = s_start <= now_local <= s_end
+                    else:
+                        active = now_local >= s_start or now_local <= s_end
+                    if active:
+                        new_service.assigned_to = s
                         new_service.status = 'In Progress'
                         new_service.save()
                         staff.status = 'engaged'
                         staff.save()
                         assigned = True
-                    else:
-                        print(f"No active shift found for staff {staff.username} in block {new_service.service_block}")
-
+                        break
+                if assigned:
+                    break
             if not assigned:
                 new_service.status = 'Waiting'
                 new_service.save()
@@ -457,6 +452,7 @@ def ShiftSchedules(request):
         user_role = user.role
     except:
         raise PermissionDenied("User profile not found")
+    today = timezone.localdate()
     start_of_day = timezone.make_aware(timezone.datetime.combine(today, time(0, 0, 0)))
     end_of_day = timezone.make_aware(timezone.datetime.combine(today, time(23, 59, 59)))
     schedules = ShiftSchedule.objects.filter(
