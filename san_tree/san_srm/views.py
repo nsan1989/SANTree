@@ -275,7 +275,7 @@ def free_up_staff():
         ano_service = AnonymousServiceGenerate.objects.filter(status='In Progress').all()
         if prog_service.exists():
             for service in prog_service:
-                if service.created_at <= timezone.now() - timedelta(minutes=30):
+                if service.created_at <= timezone.now() - timedelta(minutes=3):
                     staff = service.assigned_to.shift_staffs
                     if staff and staff.status == 'engaged':
                         staff.status = 'vacant'
@@ -286,7 +286,7 @@ def free_up_staff():
                     assign_service_from_queue(staff)
         elif ano_service.exists():
             for service in ano_service:
-                if service.generate_at <= timezone.now() - timedelta(minutes=30):
+                if service.generate_at <= timezone.now() - timedelta(minutes=3):
                     staff = service.assigned_to.shift_staffs
                     if staff and staff.status == 'engaged':
                         staff.status = 'vacant'
