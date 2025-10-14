@@ -271,8 +271,8 @@ def ServiceView(request):
 # Free up the staff when exceeds timestamp.
 def free_up_staff():
     try:
-        prog_service = Service.objects.filter(status='In Progress').all()
-        ano_service = AnonymousServiceGenerate.objects.filter(status='In Progress').all()
+        prog_service = Service.objects.filter(status='In Progress')
+        ano_service = AnonymousServiceGenerate.objects.filter(status='In Progress')
         if prog_service.exists():
             for service in prog_service:
                 if service.created_at <= timezone.now() - timedelta(minutes=3):
@@ -280,7 +280,6 @@ def free_up_staff():
                     if staff and staff.status == 'engaged':
                         staff.status = 'vacant'
                         staff.save()
-                        
                         service.status = 'Pending'
                         service.save()
                     assign_service_from_queue(staff)
@@ -291,7 +290,6 @@ def free_up_staff():
                     if staff and staff.status == 'engaged':
                         staff.status = 'vacant'
                         staff.save()
-
                         service.status = 'Pending'
                         service.save()
                         
