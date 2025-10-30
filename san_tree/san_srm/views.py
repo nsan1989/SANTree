@@ -345,15 +345,47 @@ def free_up_completed_staff(request, id):
 def assign_service_from_queue(vacant_staff):
     try:
         next_service_request = ServiceRequestQueue.objects.first()
-        if next_service_request:
-            service = next_service_request.service_request
-            service.assigned_to = ShiftSchedule.objects.filter(shift_block = service.service_block, shift_staffs=vacant_staff).first()
-            service.status = 'In Progress'
-            service.save()
-            vacant_staff.status = 'engaged'
-            vacant_staff.save()
+        if not next_service_request:
+            return
+        
+        service = next_service_request.service_request
+
+        if service.status != 'Waiting':
             next_service_request.delete()
-        pass
+            return
+        
+        now_local = timezone.localtime(timezone.now())
+        assigned = False
+
+        schedule_qs = ShiftSchedule.objects.filter(
+            shift_block=service.service_block,
+            shift_staffs=vacant_staff
+        )
+
+        for s in schedule_qs:
+            s_start = timezone.localtime(s.start_time)
+            s_end = timezone.localtime(s.end_time)
+
+            if s_start <= s_end:
+                active = s_start <= now_local <= s_end
+            else:
+                active = now_local >= s_start or now_local <= s_end
+
+            if active:
+                service.assigned_to = s
+                service.status = 'In Progress'
+                service.save()
+
+                vacant_staff.status = 'engaged'
+                vacant_staff.save()
+
+                next_service_request.delete()
+                assigned = True
+                break
+
+        if not assigned:
+            log.info(f"No active shift found for {vacant_staff}. Service remains in queue.")
+            
     except Exception as e:
         log.error("Error freeing up staff", error=str(e))
 
