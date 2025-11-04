@@ -23,7 +23,7 @@ class UsersResource(resources.ModelResource):
 @admin.register(CustomUsers)
 class UsersAdmin(ImportExportModelAdmin):
     resource_class = UsersResource
-    list_display = ('username', 'role', 'department', 'designation', 'employee_id')
+    list_display = ('username', 'role', 'department', 'designation', 'employee_id', 'status')
 
 # Users location class
 class UsersResource(resources.ModelResource):

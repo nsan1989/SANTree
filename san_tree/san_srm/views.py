@@ -212,10 +212,18 @@ def load_service_types(request):
 
 # Service Request View.
 def ServiceView(request):
+    priorities = [
+        ('high', 'High'),
+        ('mid', 'Mid'),
+        ('low', 'Low'),
+    ]
     provider_staff = CustomUsers.objects.filter(role='User').filter(
         Q(department__name='GDA') |
         Q(department__name='General Duty Assistant')
     )
+    service_types = ServiceTypes.objects.all()
+    blocks = Blocks.objects.all()
+    locations = Location.objects.all()
     if request.method == 'POST':
         form = ServiceForm(request.POST, user=request.user)
         if form.is_valid():
@@ -265,7 +273,13 @@ def ServiceView(request):
                 return redirect('srm:staff_dashboard')
     else:
         form = ServiceForm(user=request.user)
-    context = {'form': form}
+    context = {
+        'form': form, 
+        'service_types': service_types, 
+        'priorities': priorities,
+        'blocks': blocks,
+        'locations': locations
+    }
     return render(request, 'service_request.html', context)
 
 # Free up the staff when exceeds timestamp.
