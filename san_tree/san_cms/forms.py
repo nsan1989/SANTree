@@ -33,12 +33,14 @@ class ComplaintForm(forms.ModelForm):
 
         user_department = getattr(user, 'department', None) if user else None
 
-        department_qs = Departments.objects.annotate(
-            valid_complaint_type_count=Count(
-                'complaint_types',
-                filter=~Q(complaint_types__name__iexact='Others')
-            )
-        ).filter(valid_complaint_type_count__gt=0)
+        department_qs = Departments.objects.all()
+
+#        department_qs = Departments.objects.annotate(
+#            valid_complaint_type_count=Count(
+#                'complaint_types',
+#                filter=~Q(complaint_types__name__iexact='Others')
+#            )
+#        ).filter(valid_complaint_type_count__gt=0)
 
         if user_department:
             department_qs = department_qs.exclude(id=user_department.id)

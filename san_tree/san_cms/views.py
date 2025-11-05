@@ -245,7 +245,6 @@ def load_complaint_types(request):
 # Complaints View.
 def ComplaintView(request):
     user = request.user
-    
     if request.method == 'POST':
         form = ComplaintForm(request.POST or None, request.FILES, user=request.user)
 
@@ -256,10 +255,14 @@ def ComplaintView(request):
             complaint_type = form.cleaned_data.get('complaint_type')
             if not complaint_type:
                 types = ComplaintType.objects.filter(department=department)
-                non_other_types = types.exclude(name__iexact='Others')
-                if non_other_types.count() == 1:
+#                non_other_types = types.exclude(name__iexact='Others')
+                if not types.exists():
+                    types = ComplaintType.objects.filter(name__iexact='Others', department__isnull=True)
+
+                if types.count() == 1:
                     form.instance.complaint_type = types.first()
-                elif non_other_types.count() > 1:
+                    complaint_type = form.instance.complaint_type
+                elif types.count() > 1:
                     form.add_error('complaint_type', 'Please select a complaint type.')
                     return render(request, 'complaints.html', {'form': form})
                 else:

@@ -22,11 +22,12 @@ from django.core.paginator import Paginator
 
 # Tasks Pie Chart
 def TasksPieChart(request):
+    user = request.user
     # --- date filter ---
     start_date = request.GET.get('start_date')
     end_date = request.GET.get('end_date')
 
-    tasks = Tasks.objects.all()
+    tasks = Tasks.objects.filter(assigned_to = user)
 
     if start_date and end_date:
         try:
