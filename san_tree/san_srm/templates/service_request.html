@@ -113,12 +113,9 @@
   document.addEventListener("DOMContentLoaded", function() {
     const form = document.getElementById("servForm");
     const submitBtn = document.getElementById("submitBtn");
-    form.addEventListener("submit", function() {
+    form.addEventListener("submit", function(event) {
       submitBtn.disabled = true;
       submitBtn.innerText = "Submitting...";
-      setTimeout(() => {
-        form.submit();
-      }, 500);
     });
   });
 </script>

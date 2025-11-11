@@ -508,7 +508,7 @@ def ShiftSchedules(request):
     paginator = Paginator(schedules, 10) 
     page_obj = paginator.get_page(page_number)
     context = {
-        'page_obj': page_obj
+        'page_obj': page_obj,
     }
     view_name = request.resolver_match.view_name
     if view_name == "srm:schedule" and user_role == 'Admin':
@@ -519,6 +519,16 @@ def ShiftSchedules(request):
 
 # Shift Schedule Form View.
 def ShiftScheduleView(request):
+    shift_choices = [
+        ('morning', 'Morning'),
+        ('evening', 'Evening'),
+        ('day', 'Day'),
+        ('night', 'Night'),
+    ]
+    shift_blocks = Blocks.objects.all()
+    shift_staffs = CustomUsers.objects.filter(
+        (Q(department__name='GDA') | Q(department__name='General Duty Assistant')) & Q(role='User')
+    )
     if request.method == 'POST':
         form = ShiftScheduleForm(request.POST, user=request.user)
         if form.is_valid():
@@ -531,6 +541,9 @@ def ShiftScheduleView(request):
         form = ShiftScheduleForm(user=request.user)
     context = {
         'form': form,
+        'choices': shift_choices,
+        'blocks': shift_blocks,
+        'staffs': shift_staffs,
     }
     return render(request, 'schedule.html', context)
 

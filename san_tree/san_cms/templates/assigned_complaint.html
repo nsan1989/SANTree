@@ -56,17 +56,14 @@ Assigned Complaint
             <li class="page-item active"><span class="page-link">{{ num }}</span></li>
             {% else %}
             <li class="page-item">
-              <a class="page-link"
-                href="?page={{ num }}">{{ num
-                }}</a>
+              <a class="page-link" href="?page={{ num }}">{{ num }}</a>
             </li>
             {% endif %}
             {% endfor %}
 
             {% if page_obj.has_next %}
             <li class="page-item">
-              <a class="page-link"
-                href="?page={{ page_obj.next_page_number }}">Next</a>
+              <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
             </li>
             {% endif %}
           </ul>

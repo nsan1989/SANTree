@@ -94,6 +94,7 @@ Dashboard
             </div>
         </div>
         {% else %}
+        <!--
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 d-flex align-items-center">
             <div class="service-generate-btn d-flex align-items-center">
                 <small class="text-light">Generate a service</small>
@@ -121,11 +122,12 @@ Dashboard
                 </div>
             </div>
         </div>
+        -->
         {% endif %}
     </div>
     {% if request.user.department.name == 'GDA' or request.user.department.name == 'General Duty Assistant' %}
     <div class="row mb-3">
-        <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-3 p-2">
+        <div class="col-12 col-md-3 p-2">
             <div class="card text-center">
                 <div class="card-body">
                     <h5>Request</h5>
@@ -133,7 +135,7 @@ Dashboard
                 </div>
             </div>
         </div>
-        <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-3 p-2">
+        <div class="col-12 col-md-3 p-2">
             <div class="card text-center">
                 <div class="card-body">
                     <h5>Progress</h5>
@@ -141,7 +143,7 @@ Dashboard
                 </div>
             </div>
         </div>
-        <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-3 p-2">
+        <div class="col-12 col-md-3 p-2">
             <div class="card text-center">
                 <div class="card-body">
                     <h5>Completed</h5>
@@ -149,7 +151,7 @@ Dashboard
                 </div>
             </div>
         </div>
-        <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-3 p-2">
+        <div class="col-12 col-md-3 p-2">
             <div class="card text-center">
                 <div class="card-body">
                     <h5>Generate</h5>
@@ -166,7 +168,7 @@ Dashboard
     </div>
     {% else %}
     <div class="row mb-3">
-        <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-3 p-2">
+        <div class="col-12 col-md-3 p-2">
             <div class="card text-center">
                 <div class="card-body">
                     <h5>Created</h5>
@@ -174,7 +176,7 @@ Dashboard
                 </div>
             </div>
         </div>
-        <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-3 p-2">
+        <div class="col-12 col-md-3 p-2">
             <div class="card text-center">
                 <div class="card-body">
                     <h5>Open</h5>
@@ -182,7 +184,7 @@ Dashboard
                 </div>
             </div>
         </div>
-        <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-3 p-2">
+        <div class="col-12 col-md-3 p-2">
             <div class="card text-center">
                 <div class="card-body">
                     <h5>Progress</h5>
@@ -190,7 +192,7 @@ Dashboard
                 </div>
             </div>
         </div>
-        <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-3 p-2">
+        <div class="col-12 col-md-3 p-2">
             <div class="card text-center">
                 <div class="card-body">
                     <h5>Completed</h5>
@@ -203,7 +205,7 @@ Dashboard
 
     <div class="row mb-3">
         {% if request.user.department.name == 'GDA' or request.user.department.name == 'General Duty Assistant' %}
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6">
+        <div class="col-12 col-md-4">
             <div class="row h-100">
                 <div 
                 class="col-12 shift-title" 
@@ -219,7 +221,7 @@ Dashboard
                     class="table h-100"
                     style="overflow-y: auto;"
                     >
-                        <thead class="table-dark">
+                        <thead class="table-dark position-sticky top-0">
                             <tr>
                                 <th scope="col">Shift</th>
                                 <th scope="col">Location</th>
@@ -248,7 +250,7 @@ Dashboard
             </div>
         </div>
         {% endif %}
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6">
+        <div class="col-12 col-md-4">
             <div class="chart-title mb-2">
                 <h3>Service Pie Chart</h3>
             </div>
@@ -272,7 +274,7 @@ Dashboard
             </button>
           </div>
         </form>
-            <img class="img-fluid rounded-2 w-100" src="{% url 'srm:service_pie_chart' %}?start_date={{ request.GET.start_date }}&end_date={{ request.GET.end_date }}&v={{ now }}"
+            <img class="img-fluid rounded-2" src="{% url 'srm:service_pie_chart' %}?start_date={{ request.GET.start_date }}&end_date={{ request.GET.end_date }}&v={{ now }}"
                 alt="service Pie Chart" />
         </div>
     </div>
