@@ -32,7 +32,7 @@
                 <div class="d-flex flex-wrap gap-3">
                   {% for c in choices %}
                   <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="shift" id="shift_{{ c.0 }}" value="{{ c.0 }}">
+                    <input class="form-check-input" type="checkbox" name="shift_type" id="shift_{{ c.0 }}" value="{{ c.0 }}">
                     <label class="form-check-label" for="shift_{{ c.0 }}">
                       {{ c.1 }}
                     </label>
@@ -42,12 +42,12 @@
                 </div>
               </div>
 
-              <!-- Service Block -->
+              <!-- Shift Block -->
               <div class="col-12 col-md-6 mb-3">
-                <label for="id_service_block" class="form-label requiredField">
-                  Service Block <span class="asteriskField">*</span>
+                <label for="id_shift_block" class="form-label requiredField">
+                  Shift Block <span class="asteriskField">*</span>
                 </label>
-                <select name="service_block" class="form-select" required id="id_service_block">
+                <select name="shift_block" class="form-select" required id="id_shift_block">
                   <option value="" selected>select</option>
                   {% for block in blocks %}
                   <option value="{{ block.id }}">{{ block.name }}</option>
