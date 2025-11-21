@@ -1,6 +1,6 @@
 from django.contrib import admin
 from .models import *
-from import_export import resources
+from import_export import resources, fields, widgets
 from import_export.admin import ImportExportModelAdmin
 
 # service types resources
@@ -38,6 +38,11 @@ class ShiftScheduleAdmin(ImportExportModelAdmin):
 
 # service resources
 class ServiceResources(resources.ModelResource):
+    assigned_to = fields.Field(
+        column_name='assigned_to',
+        attribute='assigned_to',
+        widget=widgets.ManyToManyWidget(ShiftSchedule, field='id')
+    )
     class Meta:
         models = Service
         fields = ('id', 'service_number', 'service_type', 'service_block', 'from_location', 'to_location', 'priority', 'status', 'assigned_to', 'created_by', 'created_at', 'completed_at')
@@ -45,8 +50,15 @@ class ServiceResources(resources.ModelResource):
 @admin.register(Service)
 class ServiceAdmin(ImportExportModelAdmin):
     resource_class = ServiceResources
-    list_display = ('service_number', 'service_type', 'service_block', 'from_location', 'to_location', 'priority', 'status', 'assigned_to', 'created_by', 'created_at', 'completed_at')
+    list_display = ('service_number', 'service_type', 'service_block', 'from_location', 'to_location', 'priority', 'status', 'get_assigned_staff', 'created_by', 'created_at', 'completed_at')
     list_filter = ('service_block', 'priority', 'status')
+    
+    def get_assigned_staff(self, obj):
+        if obj.assigned_to is None:
+            return "-"
+        return str(obj.assigned_to)
+
+    get_assigned_staff.short_description = "Assigned Staff"
 
 # service queue resources
 class ServiceQueueResources(resources.ModelResource):

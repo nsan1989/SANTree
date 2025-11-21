@@ -13,6 +13,7 @@ ENGAGED = 'engaged'
 VACANT = 'vacant'
 
 # Role Choices.
+# SUPER_ADMIN is store in DB and also use for compare. While, super admin is use for display like in options
 ROLE_CHOICES = (
     (SUPER_ADMIN, 'super admin'),
     (ADMIN, 'admin'),

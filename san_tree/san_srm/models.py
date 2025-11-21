@@ -39,12 +39,12 @@ class Blocks(models.Model):
     
 # Status Choices.
 STATUS_CHOICES = (
-    ('open', 'Open'),
-    ('in_progress', 'In Progress'),
-    ('waiting', 'Waiting'),
-    ('pending', 'Pending'),
-    ('on hold', 'On Hold'),
-    ('completed', 'Completed'),
+    ('Open', 'Open'),
+    ('In Progress', 'In Progress'),
+    ('Waiting', 'Waiting'),
+    ('Pending', 'Pending'),
+    ('On Hole', 'On Hold'),
+    ('Completed', 'Completed'),
 )
 
 # Prority Choices.
@@ -94,6 +94,7 @@ class Service(models.Model):
     to_location = models.ForeignKey(Location, related_name='service_to', on_delete=models.SET_NULL, null=True, blank=True)
     priority = models.CharField(max_length=20, choices=PRIORITY_CHOICES, default='Low')
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Open')
+    started_at = models.DateTimeField(null=True, blank=True)
     assigned_to = models.ForeignKey(ShiftSchedule, related_name='srm_service_staff', on_delete=models.SET_NULL, null=True, blank=True)
     created_by = models.ForeignKey(CustomUsers, related_name='srm_created_service', on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -108,12 +109,28 @@ class Service(models.Model):
             return self.completed_at - self.created_at
         return None
     
+    @property
+    def start_time(self):
+        if self.started_at and self.created_at:
+            return self.started_at - self.created_at
+        return None
+    
     def save(self, *args, **kwargs):
         is_new = self.pk is None
         # Assign service number only once when new
         if is_new and not self.service_number:
             temp_id = Service.objects.count() + 1
             self.service_number = f"SRM{temp_id}"
+
+        if not is_new:
+            before = Service.objects.get(pk=self.pk)
+            old_status = before.status
+            new_status = self.status
+
+            if old_status == 'Open' and new_status == 'In Progress':
+                if not self.started_at:
+                    self.started_at = timezone.now()
+
         super().save(*args, **kwargs)
 
         if is_new and self.service_number.startswith("SRM") and self.service_number == f"SRM{Service.objects.count()}":

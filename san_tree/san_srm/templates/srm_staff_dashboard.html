@@ -102,7 +102,7 @@ Dashboard
                 <div id="actionButtons">
                     <button id="completeBtn"
                             class="btn btn-sm btn-success me-2"
-                            data-url="{% url 'srm:generate_service' %}"
+                            data-url=""
                             {% if not show_action_buttons %} style="display:none;" {% endif %}>
                         Complete
                     </button>
@@ -352,7 +352,7 @@ Dashboard
                 const content = document.getElementById("serviceModalContent");
                 content.innerHTML = "<p>Loading...</p>";
 
-                fetch("{% url 'srm:generate_service' %}")
+                fetch("")
                     .then(res => res.text())
                     .then(html => {
                         content.innerHTML = html;
