@@ -11,9 +11,9 @@
 </style>
 
 {% if messages %}
-    {% for message in messages %}
+    {% for anonymous_message in messages %}
       <div class="anonymous-alert alert-{{ message.tags }}">
-        {{ message }}
+        {{ anonymous_message }}
       </div>
     {% endfor %}
   {% endif %}

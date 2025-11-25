@@ -116,7 +116,7 @@ Dashboard
                 <i class="fa-solid fa-circle fa-sm text-danger"></i>
                 <h4 class="ms-2 mb-0">Engage User</h4>
             </div>
-            <div class="col-table table-responsive" style="height: 100%;overflow-y: auto">
+            <div class="col-table table-responsive" style="min-height: 16rem;overflow-y: auto">
                 <table class="table h-100">
                     <thead class="table-danger position-sticky top-0">
                         <tr>
@@ -146,7 +146,7 @@ Dashboard
                 <i class="fa-solid fa-circle fa-sm text-success"></i>
                 <h4 class="ms-2 mb-0">Vacant User</h4>
             </div>
-            <div class="col-table table-responsive" style="height: 100%;overflow-y: auto">
+            <div class="col-table table-responsive" style="min-height: 16rem;overflow-y: auto">
                 <table class="table h-100">
                     <thead class="table-danger position-sticky top-0">
                         <tr>
@@ -197,7 +197,7 @@ Dashboard
                         </button>
                     </div>
                 </form>
-                <img class="img-fluid rounded-2 w-100" src="{% url 'srm:service_pie_chart' %}?start_date={{ request.GET.start_date }}&end_date={{ request.GET.end_date }}&v={{ now }}"
+                <img class="img-fluid rounded-2" src="{% url 'srm:service_pie_chart' %}?start_date={{ request.GET.start_date }}&end_date={{ request.GET.end_date }}&v={{ now }}"
                     alt="Complaint Pie Chart" />
             </div>
         </div>

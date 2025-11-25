@@ -132,6 +132,7 @@ def StaffDashboard(request):
     progress_created_service = Service.objects.filter(created_by = user, status = 'In Progress').count()
     completed_created_service = Service.objects.filter(created_by = user, status = 'Completed').count()
     assign_service = Service.objects.filter(assigned_to__shift_staffs = user).all().count()
+    open_assign_service = Service.objects.filter(assigned_to__shift_staffs = user, status = 'Open').count()
     progress_assign_service = Service.objects.filter(assigned_to__shift_staffs = user, status = 'In Progress').count()
     completed_assign_service = Service.objects.filter(assigned_to__shift_staffs = user, status = 'Completed').count()
     service_generated_by = GenerateService.objects.filter(generate_by__shift_staffs = user).count()
@@ -192,6 +193,7 @@ def StaffDashboard(request):
         'prog_created_serv': progress_created_service,
         'comp_created_serv': completed_created_service,
         'total_assign_service': assign_service,
+        'open_assign_service': open_assign_service,
         'prog_assign_serv': progress_assign_service,
         'comp_assign_serv': completed_assign_service,
         'shifts': my_shift,
@@ -256,9 +258,13 @@ def ServiceView(request):
                     status = "Open"
                 ).exists()
 
+#                today = timezone.localdate()
+#                print('today', today)
+
                 schedule_qs = ShiftSchedule.objects.filter(
                     shift_block=new_service.service_block,
-                    shift_staffs_id=staff.id
+                    shift_staffs_id=staff.id,
+                    #start_time__date = today
                 )
 
                 if is_engaged:
@@ -267,10 +273,7 @@ def ServiceView(request):
                 for s in schedule_qs:
                     s_start = timezone.localtime(s.start_time)
                     s_end = timezone.localtime(s.end_time)
-                    if s_start <= s_end:
-                        active = s_start <= now_local <= s_end
-                    else:
-                        active = now_local >= s_start or now_local <= s_end
+                    active = s_start <= now_local <= s_end
                     if active:
                         eligible_shift_schedules.append(s)
 
@@ -311,7 +314,7 @@ def free_up_staff():
 #        ano_service = AnonymousServiceGenerate.objects.filter(status='In Progress')
         if prog_service.exists():
             for service in prog_service:
-                if service.created_at <= timezone.now() - timedelta(minutes=3):
+                if service.started_at <= timezone.now() - timedelta(minutes=30):
                     staff = service.assigned_to.shift_staffs
                     if staff and staff.status == 'engaged':
                         staff.status = 'vacant'
@@ -483,7 +486,7 @@ def RequestServiceView(request):
     except:
         raise PermissionDenied("User profile not found")
     request_service = Service.objects.filter(created_by = user).order_by('-created_at')
-    assign_service = Service.objects.filter(assigned_to__shift_staffs = user).order_by('-created_at')
+    assign_service = Service.objects.filter(Q(assigned_to__shift_staffs = user) | Q(assigned_to__shift_staffs__department__name = user.department)).order_by('-created_at')
     anonymous_service = AnonymousServiceGenerate.objects.filter(assigned_to__shift_staffs = user)
     latest_remark_subquery = ServiceRemarks.objects.filter(service=OuterRef('pk')).order_by('-created_at')
     request_service = request_service.annotate(

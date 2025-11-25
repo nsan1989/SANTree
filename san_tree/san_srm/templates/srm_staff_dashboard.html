@@ -67,16 +67,6 @@ Dashboard
 </style>
 
 <div class="container-fluid">
-    {% if messages %}
-        {% for message in messages %}
-        <div class="staff-alert alert-{{ message.tags }}">{{ message }}</div>
-        {% endfor %}
-    {% endif %}
-    {% if errors %}
-        <div class="staff-error-alert alert-danger">
-        {{ errors }}
-        </div>
-    {% endif %}
     <div class="row mb-3">
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6">
             <div class="dashboard-title">
@@ -138,6 +128,20 @@ Dashboard
         <div class="col-12 col-md-3 p-2">
             <div class="card text-center">
                 <div class="card-body">
+                    <h5>Open</h5>
+                    <p class="m-0 p-0">{{open_assign_service}}</p>
+                </div>
+                <!--
+                <div class="card-link">
+                    <a class="generated_service_link text-warning" href="{% url 'srm:all_generate_service' %}">view
+                        all</a>
+                </div>
+                -->
+            </div>
+        </div>
+        <div class="col-12 col-md-3 p-2">
+            <div class="card text-center">
+                <div class="card-body">
                     <h5>Progress</h5>
                     <p>{{prog_assign_serv}}</p>
                 </div>
@@ -149,20 +153,6 @@ Dashboard
                     <h5>Completed</h5>
                     <p>{{comp_assign_serv}}</p>
                 </div>
-            </div>
-        </div>
-        <div class="col-12 col-md-3 p-2">
-            <div class="card text-center">
-                <div class="card-body">
-                    <h5>Generate</h5>
-                    <p class="m-0 p-0">{{generate}}</p>
-                </div>
-                <!--
-                <div class="card-link">
-                    <a class="generated_service_link text-warning" href="{% url 'srm:all_generate_service' %}">view
-                        all</a>
-                </div>
-                -->
             </div>
         </div>
     </div>

@@ -43,15 +43,8 @@ STATUS_CHOICES = (
     ('In Progress', 'In Progress'),
     ('Waiting', 'Waiting'),
     ('Pending', 'Pending'),
-    ('On Hole', 'On Hold'),
+    ('On Hold', 'On Hold'),
     ('Completed', 'Completed'),
-)
-
-# Prority Choices.
-PRIORITY_CHOICES = (
-    ('high', 'High'),
-    ('mid', 'Mid'),
-    ('low', 'Low')
 )
 
 # Shift Types.
@@ -90,9 +83,10 @@ class Service(models.Model):
     service_number = models.CharField(max_length=20, unique=True, null=True, blank=True)
     service_type = models.ForeignKey(ServiceTypes, on_delete=models.SET_NULL, null=True, blank=True)
     service_block = models.ForeignKey(Blocks, related_name='service_blocks', on_delete=models.SET_NULL, null=True, blank=True)
+    UHID = models.CharField(max_length=20, unique=True, null=True, blank=True)
     from_location = models.ForeignKey(Location, related_name='service_from', on_delete=models.SET_NULL, null=True, blank=True)
     to_location = models.ForeignKey(Location, related_name='service_to', on_delete=models.SET_NULL, null=True, blank=True)
-    priority = models.CharField(max_length=20, choices=PRIORITY_CHOICES, default='Low')
+    description = models.TextField(default='enter description here', max_length=100)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Open')
     started_at = models.DateTimeField(null=True, blank=True)
     assigned_to = models.ForeignKey(ShiftSchedule, related_name='srm_service_staff', on_delete=models.SET_NULL, null=True, blank=True)
@@ -105,8 +99,8 @@ class Service(models.Model):
 
     @property
     def time_taken(self):
-        if self.completed_at and self.created_at:
-            return self.completed_at - self.created_at
+        if self.completed_at and self.started_at:
+            return self.completed_at - self.started_at
         return None
     
     @property
@@ -130,6 +124,10 @@ class Service(models.Model):
             if old_status == 'Open' and new_status == 'In Progress':
                 if not self.started_at:
                     self.started_at = timezone.now()
+            
+            if old_status == 'In Progress' and new_status == 'Completed':
+                if not self.completed_at:
+                    self.completed_at = timezone.now()
 
         super().save(*args, **kwargs)
 

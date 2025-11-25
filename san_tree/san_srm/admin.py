@@ -45,13 +45,13 @@ class ServiceResources(resources.ModelResource):
     )
     class Meta:
         models = Service
-        fields = ('id', 'service_number', 'service_type', 'service_block', 'from_location', 'to_location', 'priority', 'status', 'assigned_to', 'created_by', 'created_at', 'completed_at')
+        fields = ('id', 'service_number', 'service_type', 'service_block', 'from_location', 'to_location', 'UHID', 'status', 'assigned_to', 'description', 'created_by', 'created_at', 'completed_at')
 
 @admin.register(Service)
 class ServiceAdmin(ImportExportModelAdmin):
     resource_class = ServiceResources
-    list_display = ('service_number', 'service_type', 'service_block', 'from_location', 'to_location', 'priority', 'status', 'get_assigned_staff', 'created_by', 'created_at', 'completed_at')
-    list_filter = ('service_block', 'priority', 'status')
+    list_display = ('service_number', 'service_type', 'service_block', 'from_location', 'to_location', 'UHID', 'status', 'get_assigned_staff', 'description', 'created_by', 'created_at', 'completed_at')
+    list_filter = ('service_block', 'status')
     
     def get_assigned_staff(self, obj):
         if obj.assigned_to is None:

@@ -82,7 +82,8 @@ Service
                         <th scope="col">Assigned To</th>
                         <th scope="col">From</th>
                         <th scope="col">To</th>
-                        <th scope="col">Priority</th>
+                        <th scope="col">UHID</th>
+                        <th scope="col">Description</th>
                         <th scope="col">Status</th>
                         <th scope="col">Start Time</th>
                         <th scope="col">Complted AT</th>
@@ -92,17 +93,17 @@ Service
                     {% if page_obj %}
                         {% for service in page_obj %}
                             <tr
-                            {% if service.status|lower == "open" %}
+                            {% if service.status == "Open" %}
                               class="status-open"
-                            {% elif service.status|lower == "in progress" %}
+                            {% elif service.status == "In Progress" %}
                               class="status-progress"
-                            {% elif service.status|lower == "pending" %}
+                            {% elif service.status == "Pending" %}
                               class="status-pending"
-                            {% elif service.status|lower == "waiting" %}
+                            {% elif service.status == "Waiting" %}
                               class="status-waiting"
-                            {% elif service.status|lower == "completed" %}
+                            {% elif service.status == "Completed" %}
                               class="status-completed"
-                            {% elif service.status|lower == "on hold" %}
+                            {% elif service.status == "On Hold" %}
                               class="status-onhold"
                             {% endif %}
                             >
@@ -111,7 +112,8 @@ Service
                                 <td>{{service.assigned_to}}</td>
                                 <td>{{service.from_location}}</td>
                                 <td>{{service.to_location}}</td>
-                                <td>{{service.priority}}</td>
+                                <td>{{service.UHID}}</td>
+                                <td>{{service.description}}</td>
                                 <td>{{service.status}}</td>
                                 <td>{{service.start_time|duration_display}}</td>
                                 <td>{{service.time_taken|duration_display}}</td>
@@ -175,7 +177,8 @@ Service
                         <th scope="col">Requested By</th>
                         <th scope="col">From</th>
                         <th scope="col">To</th>
-                        <th scope="col">Priority</th>
+                        <th scope="col">UHID</th>
+                        <th scope="col">Description</th>
                         <th scope="col">Status</th>
                         <th scope="col">Start Time</th>
                         <th scope="col">Completed At</th>
@@ -187,13 +190,15 @@ Service
                     {% if page_obj %}
                         {% for service in page_obj %}
                             <tr
-                            {% if service.status|lower == "pending" %}
+                            {% if service.status == "Pending" %}
                               class="status-pending"
-                            {% elif service.status|lower == "waiting" %}
+                            {% elif service.status == "Waiting" %}
                               class="status-waiting"
-                            {% elif service.status|lower == "completed" %}
+                              {% elif service.status == "In Progress" %}
+                              class="status-progress"
+                            {% elif service.status == "Completed" %}
                               class="status-completed"
-                            {% elif service.status|lower == "on hold" %}
+                            {% elif service.status == "On Hold" %}
                               class="status-onhold"
                             {% endif %}
                             >
@@ -202,7 +207,8 @@ Service
                                 <td>{{service.created_by|default:"-"}}</td>
                                 <td>{{service.from_location}}</td>
                                 <td>{{service.to_location}}</td>
-                                <td>{{service.priority}}</td>
+                                <td>{{service.UHID}}</td>
+                                <td>{{service.description}}</td>
                                 <td>{{service.status}}</td>
                                 <td>{{service.start_time|duration_display}}</td>
                                 <td>{{service.time_taken|duration_display}}</td>

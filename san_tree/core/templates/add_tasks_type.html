@@ -12,9 +12,9 @@
 
 <div class="container">
   {% if messages %}
-    {% for message in messages %}
+    {% for add_tasks_message in messages %}
       <div class="task-type-alert alert-{{ message.tags }}">
-        {{ message }}
+        {{ add_tasks_message }}
       </div>
     {% endfor %}
   {% endif %}

@@ -42,9 +42,9 @@ Register
       </div>
       <div class="register-form w-100 my-4 py-2">
         {% if messages %} 
-          {% for message in messages %}
+          {% for register_message in messages %}
             <div class="register-alert alert-{{ message.tags }} text-center">
-              {{ message }}
+              {{ register_message }}
             </div>
           {% endfor %} 
         {% endif %}
@@ -105,7 +105,7 @@ Register
       >
     </div>
     <div class="col-12 d-flex justify-content-center pb-2">
-      <small class="text-light"
+      <small class="text-primary"
         >Design & Developed by MIS Department</small
       >
     </div>

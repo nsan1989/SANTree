@@ -26,6 +26,12 @@ Service Requested
     tr {
         font-size: 0.85rem;
     }
+    .status-open > td { background-color: #0ba50b; color: #fff;}
+    .status-progress > td   { background-color: #e7c60b; color: black; }
+    .status-pending > td   { background-color: #990000; color: white; }
+    .status-waiting > td  { background-color: #ff9900; color: #000; }
+    .status-completed > td { background-color: #003300; color: #fff; }
+    .status-onhold  > td  { background-color: #d2d2d2; color: #000; }
 </style>
 
 <div class="container-fluid">
@@ -70,30 +76,47 @@ Service Requested
                 <thead class="table-danger">
                     <tr>
                         <th scope="col">Service Type</th>
+                        <th scope="col">Created By</th>
                         <th scope="col">Assigned To</th>
+                        <th scope="col">UHID</th>
+                        <th scope="col">Description</th>
                         <th scope="col">Status</th>
+                        <th scope="col">Started At</th>
+                        <th scope="col">Completed At</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% if page_obj %}
-                    {% for service in page_obj %}
-                    <tr {% if service.status|lower == 'completed' %} 
-                            class="table-success" 
-                        {% elif service.status|lower == 'in-progress' %} 
-                            class="table-warning" 
-                        {% elif service.status|lower == 'pending' %} 
-                            class="table-info" 
-                        {% endif %}
-                    >
-                        <td>{{ service.service_type }}</td>
-                        <td>{{ service.assigned_to }}</td>
-                        <td>{{ service.status }}</td>
-                    <tr>
+                        {% for service in page_obj %}
+                            <tr 
+                            {% if service.status == "Open" %}
+                              class="status-open"
+                            {% elif service.status == "In Progress" %}
+                              class="status-progress"
+                            {% elif service.status == "Pending" %}
+                              class="status-pending"
+                            {% elif service.status == "Waiting" %}
+                              class="status-waiting"
+                            {% elif service.status == "Completed" %}
+                              class="status-completed"
+                            {% elif service.status == "On Hold" %}
+                              class="status-onhold"
+                            {% endif %}
+                            >
+                                <td>{{ service.service_type }}</td>
+                                <td>{{ service.created_by }}</td>
+                                <td>{{ service.assigned_to }}</td>
+                                <td>{{ service.UHID }}</td>
+                                <td>{{ service.description }}</td>
+                                <td>{{ service.status }}</td>
+                                <td>{{ service.started_at }}</td>
+                                <td>{{ service.completed_at }}</td>
+                            <tr>
                         {% endfor %}
-                        {% else %}
-                    <tr>
-                        <td colspan="3">No services found.</td>
-                    </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="3">No services found.</td>
+                        </tr>
                     {% endif %}
                 </tbody>
             </table>

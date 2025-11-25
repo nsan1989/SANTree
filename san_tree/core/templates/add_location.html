@@ -12,9 +12,9 @@
 
 <div class="container">
   {% if messages %}
-    {% for message in messages %}
+    {% for add_location_message in messages %}
       <div class="location-alert alert-{{ message.tags }}">
-        {{ message }}
+        {{ add_location_message }}
       </div>
     {% endfor %}
   {% endif %}

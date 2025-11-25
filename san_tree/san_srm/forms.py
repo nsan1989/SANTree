@@ -11,7 +11,8 @@ class ServiceForm(forms.ModelForm):
             'service_block',
             'from_location',
             'to_location',
-            'priority'
+            'UHID',
+            'description'
         ]
         labels = {
             'service_type': 'Service'
@@ -28,6 +29,8 @@ class ServiceForm(forms.ModelForm):
         self.fields['from_location'].required = True
 
         self.fields['to_location'].required = True
+
+        self.fields['UHID'].required = True
 
 # Generated Service Form.
 class ServiceGenerateForm(forms.ModelForm):

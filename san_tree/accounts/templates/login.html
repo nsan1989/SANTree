@@ -42,9 +42,9 @@
         <small>Please enter your credentials.</small>
       </div>
       <div class="login-form w-100">
-        {% if messages %} {% for message in messages %}
+        {% if messages %} {% for login_message in messages %}
         <div class="login-alert alert-{{ message.tags }} text-center">
-          {{ message }}
+          {{ login_message }}
         </div>
         {% endfor %} {% endif %}
         <form method="post">
@@ -78,7 +78,7 @@
       >
     </div>
     <div class="col-12 d-flex justify-content-center">
-      <small class="text-light text-center"
+      <small class="text-primary text-center"
         >Design & Developed by MIS Department</small
       >
     </div>
