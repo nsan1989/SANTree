@@ -486,7 +486,10 @@ def RequestServiceView(request):
     except:
         raise PermissionDenied("User profile not found")
     request_service = Service.objects.filter(created_by = user).order_by('-created_at')
-    assign_service = Service.objects.filter(Q(assigned_to__shift_staffs = user) | Q(assigned_to__shift_staffs__department__name = user.department)).order_by('-created_at')
+    if user.role == 'Admin':
+        assign_service = Service.objects.filter(assigned_to__shift_staffs__department__name = user.department).order_by('-created_at')
+    else:
+        assign_service = Service.objects.filter(assigned_to__shift_staffs = user).order_by('-created_at')
     anonymous_service = AnonymousServiceGenerate.objects.filter(assigned_to__shift_staffs = user)
     latest_remark_subquery = ServiceRemarks.objects.filter(service=OuterRef('pk')).order_by('-created_at')
     request_service = request_service.annotate(

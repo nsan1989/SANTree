@@ -11,8 +11,8 @@
 
 <div class="container">
   {% if messages %}
-        {% for message in messages %}
-        <div class="shift-edit-alert alert-{{ message.tags }}">{{ message }}</div>
+        {% for edit_message in messages %}
+        <div class="shift-edit-alert alert-{{ message.tags }}">{{ edit_message }}</div>
         {% endfor %}
     {% endif %}
   <div class="row d-flex justify-content-center py-3">

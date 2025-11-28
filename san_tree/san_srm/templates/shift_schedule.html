@@ -4,30 +4,68 @@
 {% block start %}
 
 <style>
-#page-title h1 {
-  color: wheat;
-  font-family: 'Poppins', sans-serif;
-  font-weight: bold;
-}
-.schedule-link {
-  font-size: 1.1em;
-  margin-top: 10px;
-  font-family: 'Poppins', sans-serif;
-  color: wheat;
-}
-.schedule-link a {
-  text-decoration: none;
-  color: orange;
-}
-th, tr {
-  font-family: 'Poppins', sans-serif;
-}
-th {
-  font-size: 0.9rem;
-}
-tr {
-  font-size: 0.85rem;
-}
+  #page-title h1 {
+    color: wheat;
+    font-family: 'Poppins', sans-serif;
+    font-weight: bold;
+  }
+
+  .schedule-link {
+    font-size: 1.1em;
+    margin-top: 10px;
+    font-family: 'Poppins', sans-serif;
+    color: wheat;
+  }
+
+  .schedule-link a {
+    text-decoration: none;
+    color: orange;
+  }
+
+  th,
+  tr {
+    font-family: 'Poppins', sans-serif;
+  }
+
+  th {
+    font-size: 0.9rem;
+  }
+
+  tr {
+    font-size: 0.85rem;
+  }
+
+  .status-open>td {
+    background-color: #0ba50b;
+    color: #fff;
+  }
+
+  .status-progress>td {
+    background-color: #e7c60b;
+    color: black;
+  }
+
+  .status-pending>td {
+    background-color: #990000;
+    color: white;
+  }
+
+  .status-waiting>td {
+    background-color: #ff9900;
+    color: #000;
+  }
+
+  .status-completed>td {
+    background-color: #003300;
+    color: #fff;
+  }
+
+  .status-onhold>td {
+    background-color: #d2d2d2;
+    color: #000;
+  }
+  .status-vacant > td { background-color: #0ba50b; color: #fff;}
+  .status-engage > td   { background-color: #990000; color: white; }
 </style>
 
 <div class="container-fluid">
@@ -38,80 +76,88 @@ tr {
     {% if request.user.department.name == 'GDA' and request.user.role == 'Admin' or request.user.department.name == 'General Duty Assistant' and request.user.role == 'Admin' %}
     <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6">
       <div class="schedule-link">
-        Set Schedules 
-        <a class="text-warning shift-add-modal" href="{% url 'srm:shift_schedule' %}" data-bs-toggle="modal" data-bs-target="#scheduleModal">click here</a>
+        Set Schedules
+        <a class="text-warning shift-add-modal" href="{% url 'srm:shift_schedule' %}" data-bs-toggle="modal"
+          data-bs-target="#scheduleModal">click here</a>
       </div>
     </div>
     {% endif %}
   </div>
   <div class="row mb-3">
-        <div class="col-12">
-            <nav>
-            <ul class="pagination">
-              {% if page_obj.has_previous %}
-                <li class="page-item">
-                  <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a>
-                </li>
-              {% endif %}
-              {% for num in page_obj.paginator.page_range %}
-                {% if page_obj.number == num %}
-                  <li class="page-item active"><span class="page-link">{{ num }}</span></li>
-                {% else %}
-                  <li class="page-item">
-                    <a class="page-link" href="?page={{ num }}">{{ num }}</a>
-                  </li>
-                {% endif %}
-              {% endfor %}
-        
-              {% if page_obj.has_next %}
-                <li class="page-item">
-                  <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
-                </li>
-              {% endif %}
-            </ul>
-          </nav>
-        </div>
+    <div class="col-12">
+      <nav>
+        <ul class="pagination">
+          {% if page_obj.has_previous %}
+          <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+          </li>
+          {% endif %}
+          {% for num in page_obj.paginator.page_range %}
+          {% if page_obj.number == num %}
+          <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+          {% else %}
+          <li class="page-item">
+            <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+          </li>
+          {% endif %}
+          {% endfor %}
+
+          {% if page_obj.has_next %}
+          <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
+          </li>
+          {% endif %}
+        </ul>
+      </nav>
+    </div>
   </div>
   <div class="row">
     <div class="col-12 table-responsive">
-        <table class="table">
-          <thead class="table-danger">
-            <tr>
-              <th scope="col">Emp. Name</th>
-              <th scope="col">Shift</th>
-              <th scope="col">Block</th>
-              <th scope="col">Timing</th>
-              <th scope="col">Status</th>
-              {% if request.user.department.name == 'GDA' and request.user.role == 'Admin' or request.user.department.name == 'General Duty Assistant' and request.user.role == 'Admin' %}
-              <th scope="col">Edit</th>
-              {% endif %}
-            </tr>
-          </thead>
-          <tbody>
-            {% if page_obj %}
-            {% for schedule in page_obj %}
-            <tr class="table-light">
-              <td>{{schedule.shift_staffs}}</td>
-              <td>{{schedule.shift_type}}</td>
-              <td>{{schedule.shift_block}}</td>
-              <td>{{schedule.start_time}}&nbsp;&ndash;&nbsp;{{schedule.end_time}}</td>
-              <td>{{schedule.shift_staffs.status}}</td>
-              {% if request.user.department.name == 'GDA' and request.user.role == 'Admin' or request.user.department.name == 'General Duty Assistant' and request.user.role == 'Admin' %}
-              <td>
-                <a class="edit-link shift-edit-modal" href="{% url 'srm:edit_schedule' schedule.id %}" data-bs-toggle="modal" data-bs-target="#editSchedule">
-                <i class="fa-solid fa-pencil"></i>
-                </a>
-              </td>
-              {% endif %}
-            </tr>
-            {% endfor %}
-            {% else %}
-            <tr>
-              <td colspan="100%">No Schedules available</td>
-            </tr>
+      <table class="table">
+        <thead class="table-danger">
+          <tr>
+            <th scope="col">Emp. Name</th>
+            <th scope="col">Shift</th>
+            <th scope="col">Block</th>
+            <th scope="col">Timing</th>
+            <th scope="col">Status</th>
+            {% if request.user.department.name == 'GDA' and request.user.role == 'Admin' or request.user.department.name == 'General Duty Assistant' and request.user.role == 'Admin' %}
+            <th scope="col">Edit</th>
             {% endif %}
-          </tbody>
-        </table>
+          </tr>
+        </thead>
+        <tbody>
+          {% if page_obj %}
+          {% for schedule in page_obj %}
+          <tr
+            {% if service.status == "vacant" %}
+              class="status-vacant"
+            {% elif service.status == "engage" %}
+              class="status-engage"
+            {% endif %}
+          >
+            <td>{{schedule.shift_staffs}}</td>
+            <td>{{schedule.shift_type}}</td>
+            <td>{{schedule.shift_block}}</td>
+            <td>{{schedule.start_time}}&nbsp;&ndash;&nbsp;{{schedule.end_time}}</td>
+            <td>{{schedule.shift_staffs.status}}</td>
+            {% if request.user.department.name == 'GDA' and request.user.role == 'Admin' or request.user.department.name == 'General Duty Assistant' and request.user.role == 'Admin' %}
+            <td>
+              <a class="edit-link shift-edit-modal" href="{% url 'srm:edit_schedule' schedule.id %}"
+                data-bs-toggle="modal" data-bs-target="#editSchedule">
+                <i class="fa-solid fa-pencil"></i>
+              </a>
+            </td>
+            {% endif %}
+          </tr>
+          {% endfor %}
+          {% else %}
+          <tr>
+            <td colspan="100%">No Schedules available</td>
+          </tr>
+          {% endif %}
+        </tbody>
+      </table>
     </div>
   </div>
 </div>
@@ -135,18 +181,18 @@ tr {
 <!--Open Modal Script-->
 <script>
   document.addEventListener('DOMContentLoaded', function () {
-  document.querySelectorAll('.shift-add-modal').forEach(link => {
-    link.addEventListener('click', function (e) {
-      e.preventDefault();
-      const url = this.getAttribute('href');
-      fetch(url)
-        .then(res => res.text())
-        .then(html => {
-          document.querySelector('#scheduleModal .modal-body').innerHTML = html;
-        });
+    document.querySelectorAll('.shift-add-modal').forEach(link => {
+      link.addEventListener('click', function (e) {
+        e.preventDefault();
+        const url = this.getAttribute('href');
+        fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            document.querySelector('#scheduleModal .modal-body').innerHTML = html;
+          });
+      });
     });
   });
-});
 </script>
 
 <div class="modal fade" id="editSchedule" tabindex="-1" aria-hidden="true">
@@ -165,17 +211,17 @@ tr {
 
 <script>
   document.addEventListener('DOMContentLoaded', function () {
-  document.querySelectorAll('.shift-edit-modal').forEach(link => {
-    link.addEventListener('click', function (e) {
-      e.preventDefault();
-      const url = this.getAttribute('href');
-      fetch(url)
-        .then(res => res.text())
-        .then(html => {
-          document.querySelector('#editSchedule .modal-body').innerHTML = html;
-        });
+    document.querySelectorAll('.shift-edit-modal').forEach(link => {
+      link.addEventListener('click', function (e) {
+        e.preventDefault();
+        const url = this.getAttribute('href');
+        fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            document.querySelector('#editSchedule .modal-body').innerHTML = html;
+          });
+      });
     });
   });
-});
 </script>
 {% endblock %}
