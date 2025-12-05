@@ -50,7 +50,7 @@ def AdminDashboardView(request):
     try:
         activity = AssetModel.objects.all()
         if activity.exists():
-            context["activities"] = activity[:10]
+            context["activities"] = activity
         else:
             context["activity_message"] = "No current activity!"
         total_asset_users = CustomUsers.objects.filter(
@@ -74,6 +74,21 @@ def AdminDashboardView(request):
     view_name = request.resolver_match.view_name
     if view_name == "ams:admin_dashboard" and current_user_role == 'Admin':
         return render(request, 'asset_admin_dashboard.html', context)
+    raise PermissionDenied("You are not authorized to view this page. Please contact administrator!")
+
+# Asset View.
+def AssetView(request):
+    current_user = request.user
+    try:
+        current_user_role = current_user.role
+    except:
+        raise PermissionDenied("User profile not found")
+    context = {}
+    view_name = request.resolver_match.view_name
+    if view_name == "ams:admin_assets" and current_user_role == 'Admin':
+        return render(request, 'admin_assets.html', context)
+    if view_name == "ams:staff_assets" and current_user_role == 'User':
+        return render(request, 'staff_assets.html', context)
     raise PermissionDenied("You are not authorized to view this page. Please contact administrator!")
 
 # License View.
@@ -166,7 +181,30 @@ def ComponentsView(request):
         return render(request, 'staff_components_page.html', context)
     raise PermissionDenied("You are not authorized to view this page. Please contact administrator!")
 
-# Asset View.
+# Asset Users View.
+def AssetUsersView(request):
+    current_user = request.user
+    try:
+        current_user_role = current_user.role
+    except:
+        raise PermissionDenied("User profile not found")
+    context = {}
+    try:
+        asset_users = CustomUsers.objects.filter(
+                id__in=AssetModel.objects.values('assigned_to')
+            )
+        if asset_users.exists():
+            context["asset_users"] = asset_users
+        else:
+            context["asset_users_message"] = "No active users!"
+    except Exception as e:
+        context["error"] = f"An unexpected error occurred: {e}"
+    view_name = request.resolver_match.view_name
+    if view_name == "ams:admin_asset_users" and current_user_role == 'Admin':
+        return render(request, 'admin_asset_users.html', context)
+    if view_name == "ams:staff_asset_users" and current_user_role == 'User':
+        return render(request, 'staff_asset_users.html', context)
+    raise PermissionDenied("You are not authorized to view this page. Please contact administrator!")
 
 # Add License View.
 def AddLicenseView(request):
@@ -185,7 +223,7 @@ def AddLicenseView(request):
     else:
         form = AddLicenseForm()
 
-    return render(request, 'license_form.html', {'form': form})
+    return render(request, 'asset_form_templates/license_form.html', {'form': form})
 
 # Add Accesspry Category View.
 def AddAccessoryCategoryView(request):
@@ -204,10 +242,10 @@ def AddAccessoryCategoryView(request):
     else:
         form = AddAccessoryCategoryForm()
 
-    return render(request, 'accessory_category_form.html', {'form': form})
+    return render(request, 'asset_form_templates/accessory_category_form.html', {'form': form})
 
 # Add Accessory View.
-def AddAccessoryCategoryView(request):
+def AddAccessoryView(request):
     if request.method == 'POST':
         form = AddAccessoryForm(request.POST)
         if form.is_valid():
@@ -223,7 +261,7 @@ def AddAccessoryCategoryView(request):
     else:
         form = AddAccessoryCategoryForm()
 
-    return render(request, 'accessory_form.html', {'form': form})
+    return render(request, 'asset_form_templates/accessory_form.html', {'form': form})
 
 # Add Consumable Category Form.
 def AddConsumableCategoryView(request):
@@ -242,7 +280,7 @@ def AddConsumableCategoryView(request):
     else:
         form = AddConsumableCategoryForm()
 
-    return render(request, 'consumable_category_form.html', {'form': form})
+    return render(request, 'asset_form_templates/consumable_category_form.html', {'form': form})
 
 # Add Consumable Form
 def AddConsumableView(request):
@@ -261,7 +299,7 @@ def AddConsumableView(request):
     else:
         form = AddConsumableForm()
 
-    return render(request, 'consumable_form.html', {'form': form})
+    return render(request, 'asset_form_templates/consumable_form.html', {'form': form})
 
 # Add Component Category Form
 def AddComponentCategoryView(request):
@@ -280,7 +318,7 @@ def AddComponentCategoryView(request):
     else:
         form = AddComponentCategoryForm()
 
-    return render(request, 'component_category_form.html', {'form': form})
+    return render(request, 'asset_form_templates/component_category_form.html', {'form': form})
 
 # Add Component Form
 def AddComponentView(request):
@@ -299,10 +337,10 @@ def AddComponentView(request):
     else:
         form = AddComponentForm()
 
-    return render(request, 'component_category_form.html', {'form': form})
+    return render(request, 'asset_form_templates/component_category_form.html', {'form': form})
 
 # Add Asset Category Form
-def AddAssetCategoryForm(request):
+def AddAssetCategoryView(request):
     if request.method == 'POST':
         form = AddAssetCategoryForm(request.POST)
         if form.is_valid():
@@ -318,6 +356,23 @@ def AddAssetCategoryForm(request):
     else:
         form = AddAssetCategoryForm()
 
-    return render(request, 'asset_category_form.html', {'form': form})
+    return render(request, 'asset_form_templates/asset_category_form.html', {'form': form})
 
+# Add Asset Form
+def AddAssetView(request):
+    if request.method == 'POST':
+        form = AddAssetForm(request.POST)
+        if form.is_valid():
+            asset = form.save(commit=False)
+            exists = AssetCategoryModel.objects.filter(name__iexact=asset.name).exists()
+            if exists:
+                messages.error(request, 'Asset category already exist!')
+            else:
+                asset.save()
+                messages.error(request, 'Asset category added successfully!')
+        else:
+            messages.error(request, 'Please correct the errors below.')
+    else:
+        form = AddAssetForm()
 
+    return render(request, 'asset_form_templates/asset_form.html', {'form': form})

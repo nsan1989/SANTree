@@ -37,20 +37,20 @@ MENU_STRUCTURE = {
     'ams': {
         'admin': [
             {"name": "Dashboard", "url_name": "ams:admin_dashboard", "view_name": "AdminDashboardView", "icon": "fa-solid fa-chart-line"},
-#            {"name": "Assets", "url_name": "", "view_name": "", "icon": "fa-solid fa-warehouse"},
+            {"name": "Assets", "url_name": "ams:admin_assets", "view_name": "AssetView", "icon": "fa-solid fa-warehouse"},
             {"name": "Licenses", "url_name": "ams:all_licenses", "view_name": "LicenseView", "icon": "fa-solid fa-file-contract"},
             {"name": "Accessories", "url_name": "ams:admin_accessories", "view_name": "AccessoriesView", "icon": "fa-solid fa-keyboard"},
             {"name": "Consumables", "url_name": "ams:admin_consumables", "view_name": "ConsumablesView", "icon": "fa-solid fa-paperclip"},
             {"name": "Components", "url_name": "ams:admin_components", "view_name": "ComponentsView", "icon": "fa-solid fa-microchip"},
-#            {"name": "Users", "url_name": "", "view_name": "", "icon": "fa-solid fa-users"},
-#            {"name": "Settings", "url_name": "", "view_name": "", "icon": "fa-solid fa-gear"},
-#            {"name": "Reports", "url_name": "", "view_name": "", "icon": "fa-solid fa-flag"},
+            {"name": "Asset Users", "url_name": "ams:admin_asset_users", "view_name": "AssetUsersView", "icon": "fa-solid fa-users"},
         ],
         'user': [
             {"name": "Dashboard", "url_name": "ams:staff_dashboard", "view_name": "StaffDashboardView", "icon": "fa-solid fa-chart-line"},
+            {"name": "Assets", "url_name": "ams:staff_assets", "view_name": "AssetView", "icon": "fa-solid fa-warehouse"},
             {"name": "Accessories", "url_name": "ams:staff_accessories", "view_name": "AccessoriesView", "icon": "fa-solid fa-keyboard"},
             {"name": "Consumables", "url_name": "ams:staff_consumables", "view_name": "ConsumablesView", "icon": "fa-solid fa-paperclip"},
             {"name": "Components", "url_name": "ams:staff_components", "view_name": "ComponentsView", "icon": "fa-solid fa-microchip"},
+            {"name": "Asset Users", "url_name": "ams:staff_asset_users", "view_name": "AssetUsersView", "icon": "fa-solid fa-users"},
         ]
     },
 }
