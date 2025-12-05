@@ -46,39 +46,22 @@
                     <thead class="table-danger">
                         <tr>
                             <th scope="col">Task</th>
+                            <th scope="col">Frequency</th>
                             <th scope="col">Location</th>
                             <th scope="col">Created At</th>
-                            <th scope="col">Completed At</th>
-                            {% if request.user.role == 'User' %}
-                            <th scope="col">Update Status</th>
-                            {% else %}
+                            <th scope="col">Next Date</th>
                             <th scope="col">Status</th>
-                            {% endif %}
                         </tr>
                     </thead>
-                    <tbody class="table-primary">
+                    <tbody>
                         {% if tasks %}
                         <tr>
                             <td>{{tasks.tasks_types.name}}</td>
+                            <td>{{tasks.task_frequency}}</td>
                             <td>{{tasks.location}}</td>
                             <td>{{tasks.created_at}}</td>
-                            <td>{{tasks.completed_at}}</td>
-                            {% if tasks.status != 'Completed' and tasks.status != 'Review' %}
-                            <td>
-                                <form method="POST" action="{% url 'tms:staff_update_task_status' tasks.id %}">
-                                {% csrf_token %}
-                                <select class="mb-2" name="status" required>
-                                    <option value="">select</option>
-                                    <option value="In Progress" {% if tasks.status == 'In Progress' %} selected {% endif %}>In Progress</option>
-                                    <option value="Waiting" {% if tasks.status == 'Waiting' %} selected {% endif %}>Waiting</option>
-                                    <option value="Review" {% if tasks.status == 'Review' %} selected {% endif %}>Review</option>
-                                </select>
-                                <button class="btn btn-sm btn-primary" type="submit">Update</button>
-                                </form>
-                            </td>
-                            {% else %}
+                            <td>{{tasks.next_date}}</td>
                             <td>{{tasks.status}}</td>
-                            {% endif %}
                         </tr>
                         {% endif %}
                     </tbody>
@@ -101,7 +84,7 @@
                         <th scope="col">Created At</th>
                         </tr>
                     </thead>
-                    <tbody class="table-primary">
+                    <tbody>
                         {% if remark %}
                             {% for remarks in remark %}
                             <tr>

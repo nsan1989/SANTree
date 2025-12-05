@@ -19,6 +19,12 @@ from django.http import HttpResponse
 from django.utils.dateparse import parse_date
 from datetime import datetime
 from django.core.paginator import Paginator
+import calendar
+from django.utils.safestring import mark_safe
+import json
+from django.core.serializers.json import DjangoJSONEncoder
+from django.urls import reverse
+from django.utils.timezone import now
 
 # Tasks Pie Chart
 def TasksPieChart(request):
@@ -81,27 +87,78 @@ def TaskDashboard(request):
         user_role = user.role
     except AttributeError:
         raise PermissionDenied("User profile not found.")
+    
+    events = []
+    if request.method == 'POST':
+        form = TasksForm(request.POST, request.FILES, user=request.user)
+
+        if form.is_valid():
+            new_task = form.save(commit=False)
+            new_task.created_by = request.user
+            department = form.cleaned_data.get('department')
+            task_type = form.cleaned_data.get('tasks_types')
+            assigned_user = form.cleaned_data.get('assigned_to')
+            if not task_type:
+                types = TasksTypes.objects.filter(department=department)
+                if types.count() == 1:
+                    form.instance.task_type = types.first()
+                elif types.count() > 1 and types == 'others':
+                    form.add_error('task_type', 'Please select a task type.')
+            if assigned_user:
+                if assigned_user.status.strip().lower() == 'vacant':
+                    new_task.assigned_to = assigned_user
+                    assigned_user.status = 'engaged'
+                    assigned_user.save()
+                else:
+                    form.add_error('assigned_to', f"{assigned_user.username} is not vacant.")
+            
+            if form.errors:
+                return render(request, 'tasks_dashboard.html', {
+                    'form': form,
+                    'current_user': user,
+                    "calendar_events": json.dumps(events, cls=DjangoJSONEncoder),
+                })
+        
+            new_task.save()
+            return redirect('tms:tasks')
+    else:
+        form = TasksForm(user=request.user)
+
+    
     total_users = CustomUsers.objects.filter(
         Q(department = user.department) &
         ~Q(id=user.id)
         ).all().count()
-    incharge_tasks = Tasks.objects.filter(created_by = user).all().count()
+    
+    incharge_tasks = Tasks.objects.filter(created_by = user).all()
+    for tasks in incharge_tasks:
+        events.append({
+            'title': f"{tasks.tasks_types} ({tasks.task_frequency})",
+            'start': tasks.created_at.strftime('%Y-%m-%d'),
+            'url': reverse("tms:admin_tasks_details", args=[tasks.id]),
+        })
+        if tasks.next_date:
+            events.append({
+                "title": f"{tasks.tasks_types} - Next ({tasks.task_frequency})",
+                "start": tasks.next_date.strftime("%Y-%m-%d"),
+                "url": reverse("tms:admin_tasks_details", args=[tasks.id])
+            })
+    total_tasks = incharge_tasks.count()
     complete_tasks = Tasks.objects.filter(
         Q(department = user.department) &
         Q(status = 'Completed')
         ).all().count()
     dept_users = CustomUsers.objects.filter(department = user.department).exclude(role='Admin')
-    vacant_users = dept_users.filter(status = 'vacant')
-    engaged_users = dept_users.filter(status = 'engaged')
 
     context = {
         'current_user': user,
         'date': date.today(),
-        'created_tasks': incharge_tasks,
+        'all_tasks': incharge_tasks,
+        "calendar_events": json.dumps(events, cls=DjangoJSONEncoder),
+        'created_tasks': total_tasks,
         'comp_tasks': complete_tasks,
         'tot_users': total_users,
-        'engage': engaged_users,
-        'vacant': vacant_users,
+        'form': form,
     }
 
     view_name = request.resolver_match.view_name
@@ -117,36 +174,38 @@ def StaffDashboard(request):
         user_role = user.role
     except AttributeError:
         raise PermissionDenied("User profile not found.")
-    tasks = Tasks.objects.filter(assigned_to = user)
-    
-    start_date = request.GET.get('start_date')
-    end_date = request.GET.get('end_date')
-
-    if start_date and end_date:
-        try:
-            start = datetime.strptime(start_date, "%Y-%m-%d")
-            end = datetime.strptime(end_date, "%Y-%m-%d") + timedelta(days=1)
-            tasks = tasks.filter(created_at__range=(start, end))
-        except ValueError:
-            pass
-
-    staff_tasks = tasks.count()
-    open = tasks.filter(status='Open')
-    open_count = open.count()
-    completed = tasks.filter(status='Completed')
-    complete_count = completed.count()
-    in_progress = tasks.filter(status='In Progress')
-    progress_count = in_progress.count()
+    staff_tasks = Tasks.objects.filter(assigned_to = user)
+    events = []
+    for tasks in staff_tasks:
+        # Determine event color based on status
+        if tasks.status == "Completed":
+            color = "#006600"
+        elif tasks.status == "Overdue":
+            color = "#800000"
+        elif tasks.status == "Pending":
+            color = "#ff6600"
+        else:
+            color = "gray"
+        events.append({
+            'title': str(tasks.tasks_types),
+            'start': tasks.created_at.strftime('%Y-%m-%d'),
+            'url': reverse("tms:staff_tasks_details", args=[tasks.id]),
+            'color': color
+        })
+        if tasks.next_date:
+            events.append({
+                "title": f"{tasks.tasks_types} - Next ({tasks.task_frequency})",
+                "start": tasks.next_date.strftime("%Y-%m-%d"),
+                "url": reverse("tms:admin_tasks_details", args=[tasks.id]),
+                'color': color
+            })
+    upcoming_tasks = Tasks.objects.filter(next_date__gt=now()).order_by('next_date')[:5]
     context = {
-        'tasks': tasks.order_by('-created_at'),
         'current_user': user,
-        'assigned_tasks': staff_tasks,
-        'open': open,
-        'open_count': open_count,
-        'complete': completed,
-        'comp_count': complete_count,
-        'progress': in_progress,
-        'pro_count': progress_count,
+        'date': date.today(),
+        'all_tasks': staff_tasks,
+        "calendar_events": json.dumps(events, cls=DjangoJSONEncoder),
+        'upcoming': upcoming_tasks,
     }
     view_name = request.resolver_match.view_name
     if view_name == "tms:staff_dashboard" and user_role == 'User':
@@ -163,39 +222,6 @@ def load_tasks_staffs(request):
     department_id = request.GET.get('department')
     staff = CustomUsers.objects.filter(department_id=department_id, role='User').values('id', 'username')
     return JsonResponse(list(staff), safe=False)
-
-# Raised a Task View.
-def TasksView(request):
-    if request.method == 'POST':
-        form = TasksForm(request.POST, request.FILES, user=request.user)
-
-        if form.is_valid():
-            new_task = form.save(commit=False)
-            new_task.created_by = request.user
-            department = form.cleaned_data.get('department')
-            task_type = form.cleaned_data.get('tasks_types')
-            assigned_user = form.cleaned_data.get('assigned_to')
-            if not task_type:
-                types = TasksTypes.objects.filter(department=department)
-                if types.count() == 1:
-                    form.instance.task_type = types.first()
-                elif types.count() > 1 and types == 'others':
-                    form.add_error('task_type', 'Please select a task type.')
-                    return render(request, 'raised_tasks.html', {'form', form})
-            if assigned_user:
-                if assigned_user.status.strip().lower() == 'vacant':
-                    new_task.assigned_to = assigned_user
-                    assigned_user.status = 'engaged'
-                    assigned_user.save()
-                else:
-                    form.add_error('assigned_to', f"{assigned_user.username} is not vacant.")
-                    return render(request, 'raised_tasks.html', {'form': form})
-            new_task.save()
-            return redirect('tms:tasks')
-    else:
-        form = TasksForm(user=request.user)
-    context = {'form': form}
-    return render(request, 'raised_tasks.html', context)
 
 # All Tasks View.
 def AllTasks(request):
@@ -225,29 +251,11 @@ def MyTasks(request):
         user_role = user.role
     except:
         raise PermissionDenied("User profile not found")
-    my_tasks = Tasks.objects.filter(
-        Q(assigned_to = user) & 
-        Q(
-            Q(status='In Progress') | 
-            Q(status='Waiting') | 
-            Q(status='Rejected') |
-            Q(status='Completed')
-        )
-    )
+    my_tasks = Tasks.objects.filter(assigned_to = user).order_by('created_at')
 
     page_number = request.GET.get('page')
     paginator = Paginator(my_tasks, 10)
     page_obj = paginator.get_page(page_number)
-
-    for tasks in my_tasks:
-        if tasks.status == 'Waiting':
-            current_time = timezone.now()
-            elapsed = current_time - tasks.waiting_time
-            if elapsed > timedelta(seconds=180):
-                tasks.assigned_to.status = 'vacant'
-                tasks.assigned_to.save()
-
-        tasks.save()
 
     context = {
         'page_obj': page_obj
@@ -343,7 +351,7 @@ def UpdateStatus(request, id):
     raise PermissionDenied("You are not authorized to view this page.")    
 
 # Task Remark View.
-def RemarkComplaint(request, task_id):
+def TaskRemark(request, task_id):
     task = get_object_or_404(Tasks, id=task_id)
     if request.method == 'POST':
         form = RemarkForm(request.POST, request.FILES)
@@ -366,3 +374,8 @@ def RemarkComplaint(request, task_id):
         'task': task
     }
     return render(request, 'remark.html', context)
+
+# calender
+def GenerateCalendar(year, month, week, day):
+    cal = calendar.HTMLCalendar(calendar.MONDAY)
+    return mark_safe(cal.formatmonth(year, month, week, day))

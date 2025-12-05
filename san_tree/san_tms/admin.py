@@ -18,13 +18,13 @@ class TaskTypeAdmin(ImportExportModelAdmin):
 class TasksResources(resources.ModelResource):
     class Meta:
         models = Tasks
-        fields = ('id', 'tasks_number', 'tasks_types', 'location', 'status', 'priority', 'department', 'created_by', 'assigned_to', 'created_at', 'completed_at', 'waiting_time', 'attachment')
+        fields = ('id', 'tasks_number', 'tasks_types', 'location', 'status', 'task_frequency', 'department', 'created_by', 'assigned_to', 'created_at', 'next_date', 'attachment')
 
 @admin.register(Tasks)
 class TasksAdmin(ImportExportModelAdmin):
     resource_class = TasksResources
-    list_display = ('tasks_number', 'tasks_types', 'location', 'status', 'priority', 'department', 'created_by', 'assigned_to', 'created_at', 'completed_at', 'waiting_time', 'attachment')
-    list_filter = ('status', 'priority', 'created_at', 'completed_at')
+    list_display = ('tasks_number', 'tasks_types', 'location', 'status', 'task_frequency', 'department', 'created_by', 'assigned_to', 'created_at', 'next_date', 'attachment')
+    list_filter = ('status', 'created_at', 'next_date')
 
 # tasks remarks resources.
 class TasksRemarksResources(resources.ModelResource):

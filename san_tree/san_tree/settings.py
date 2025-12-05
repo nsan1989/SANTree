@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'san_tms.apps.SanTmsConfig',
     'san_cms.apps.SanCmsConfig',
     'san_srm.apps.SanSrmConfig',
+    'san_ams.apps.SanAmsConfig',
 ]
 
 MIDDLEWARE = [
@@ -159,8 +160,11 @@ CRISPY_TEMPLATE_PACK = 'bootstrap5'
 
 # Session controller
 # SESSION_COOKIE_AGE = 1800
-
+SESSION_COOKIE_AGE = 60 * 60 * 24 * 30
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False
 SESSION_SAVE_EVERY_REQUEST = True
+SESSION_COOKIE_SAMESITE = "None"
+SESSION_COOKIE_SECURE = True
 
 # Gmail SMTP configuration
 EMAIL_BACKEND = os.environ['EMAIL_BACKEND']

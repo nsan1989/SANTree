@@ -380,7 +380,7 @@ def AllTasksPieChart(request):
         fig, ax = plt.subplots(figsize=(6, 3), facecolor=bg_color) 
         ax.pie(sizes, labels=labels, autopct='%1.1f%%', colors=colors, startangle=90, textprops={'color': 'white'})
         ax.axis('equal')
-        ax.set_title("Complaint Pie Chart", color='white', fontsize=10)
+        ax.set_title("Task Pie Chart", color='white', fontsize=10)
         plt.savefig(buffer, format='png', facecolor=fig.get_facecolor())
         plt.close(fig)
     
@@ -423,7 +423,7 @@ def AllServicePieChart(request):
         fig, ax = plt.subplots(figsize=(6, 3), facecolor=bg_color) 
         ax.pie(sizes, labels=labels, autopct='%1.1f%%', colors=colors, startangle=90, textprops={'color': 'white'})
         ax.axis('equal')
-        ax.set_title("Complaint Pie Chart", color='white', fontsize=10)
+        ax.set_title("Service Pie Chart", color='white', fontsize=10)
         plt.savefig(buffer, format='png', facecolor=fig.get_facecolor())
         plt.close(fig)
     

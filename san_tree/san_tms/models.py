@@ -4,8 +4,11 @@ from PIL import Image
 from io import BytesIO
 from django.core.files.base import ContentFile
 import os
+from datetime import timedelta
+from dateutil.relativedelta import relativedelta 
+from django.utils.timezone import now
 
-# Predefined Tasks Model.
+# Tasks Types.
 class TasksTypes(models.Model):
     name = models.CharField(max_length=255)
     department = models.ForeignKey(Departments, on_delete=models.CASCADE, related_name='tasks_types')
@@ -16,22 +19,21 @@ class TasksTypes(models.Model):
     class Meta:
         verbose_name_plural = 'Tasks Types'
 
-# Status Choices.
-STATUS_CHOICES = (
-    ('open', 'Open'),
-    ('in_progress', 'In Progress'),
-    ('waiting', 'Waiting'),
-    ('review', 'Review'),
-    ('rejected', 'Rejected'),
-    ('completed', 'Completed'),
-    ('halt', 'Halt'),
+# Tasks Frequency.
+TASKS_FREQUENCY = (
+    ('Daily', 'Daily'),
+    ('Weekly', 'Weekly'),
+    ('Monthly', 'Monthly'),
 )
 
-# Prority Choices.
-PRIORITY_CHOICES = (
-    ('high', 'High'),
-    ('mid', 'Mid'),
-    ('low', 'Low')
+# Status Choices.
+STATUS_CHOICES = (
+    ('Waiting', 'Waiting'),
+    ('In Progress', 'In Progress'),
+    ('Postponed', 'Postponed'),
+    ('Overdue', 'Overdue'),
+    ('Completed', 'Completed'),
+    ('Cancelled', 'Cancelled'),
 )
 
 def task_image_path(instance, filename):
@@ -42,29 +44,32 @@ def task_image_path(instance, filename):
 class Tasks(models.Model):
     tasks_number = models.CharField(max_length=20, unique=True, blank=True)
     tasks_types = models.ForeignKey(TasksTypes, on_delete=models.SET_NULL, null=True, blank=True)
+    task_frequency = models.CharField(max_length=20, choices=TASKS_FREQUENCY, default='Daily')
     location = models.ForeignKey(Location, related_name='tasks_locations', on_delete=models.SET_NULL, null=True, blank=True)
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Open')
-    priority = models.CharField(max_length=20, choices=PRIORITY_CHOICES, default='Low')
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Waiting')
     department = models.ForeignKey(Departments, on_delete=models.CASCADE)
     created_by = models.ForeignKey(CustomUsers, related_name='tms_created_tasks', on_delete=models.CASCADE)
     assigned_to = models.ForeignKey(CustomUsers, related_name='tms_assigned_tasks', on_delete=models.SET_NULL, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
-    completed_at = models.DateTimeField(null=True, blank=True)
-    waiting_time = models.DateTimeField(auto_now=True)
+    next_date = models.DateTimeField(null=True, blank=True)
     attachment = models.ImageField(upload_to=task_image_path, null=True, blank=True)
     
     def __str__(self):
         return str(self.tasks_types)
 
-    @property
-    def time_taken(self):
-        if self.completed_at and self.created_at:
-            return self.completed_at - self.created_at
-        return None
+#    @property
+#    def time_taken(self):
+#        if self.completed_at and self.created_at:
+#            return self.completed_at - self.created_at
+#        return None
 
     # auto assign completed time
     def save(self, *args, **kwargs):
         is_new = self.pk is None
+        old_frequency = None
+        if not is_new:
+            old_frequency = Tasks.objects.get(pk=self.pk).task_frequency
+
         image_changed = False
 
         # Check if attachment has changed (only for existing object)
@@ -94,6 +99,19 @@ class Tasks(models.Model):
 
         # Save instance
         super().save(*args, **kwargs)
+
+        # Auto-set next_date based on frequency ONLY for new or if frequency changed
+        if (is_new or old_frequency != self.task_frequency) or not self.next_date:
+            base_date = self.created_at or now()
+
+            if self.task_frequency == "Daily":
+                self.next_date = base_date + timedelta(days=1)
+            elif self.task_frequency == "Weekly":
+                self.next_date = base_date + timedelta(weeks=1)
+            elif self.task_frequency == "Monthly":
+                self.next_date = base_date + relativedelta(months=1)
+
+            Tasks.objects.filter(pk=self.pk).update(next_date=self.next_date)
 
         # Assign tasks number only once when new
         if is_new and not self.tasks_number:

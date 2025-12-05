@@ -1,0 +1,71 @@
+{% extends 'index.html' %}
+
+{% block title %}
+Licenses
+{% endblock %}
+
+{% block start %}
+
+<style>
+    .header-title h3 {
+        color: wheat;
+    }
+</style>
+
+<div class="container-fluid">
+    <div class="row mb-3">
+        <div class="col-12">
+            <div class="header-title">
+                <h3>License</h3>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        {% if error %}
+        <p style="color: red;">{{ error }}</p>
+        {% endif %}
+        <div class="col-12 table-responsive">
+            <table class="table table-bordered">
+                <thead>
+                    <tr class="table-danger">
+                        <th scope="col">Name</th>
+                        <th scope="col">Manufacturer</th>
+                        <th scope="col">License Key</th>
+                        <th scope="col">Purchase Date</th>
+                        <th scope="col">Expiry Date</th>
+                        <th scope="col">Name</th>
+                        <th scope="col">Phone</th>
+                        <th scope="col">Email</th>
+                        <th scope="col">Quantity</th>
+                        <th scope="col">Cost</th>
+                        <th scope="col">Is Expire</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if licenses %}
+                        {% for license in licenses %}
+                            <tr class="table-info">
+                                <td>{{license.name}}</td>
+                                <td>{{license.manufacturer}}</td>
+                                <td>{{license.product_key}}</td>
+                                <td>{{license.purchase_date}}</td>
+                                <td>{{license.expiry_date}}</td>
+                                <td>{{license.buyer_name}}</td>
+                                <td>{{license.buyer_phone}}</td>
+                                <td>{{license.buyer_email}}</td>
+                                <td>{{license.quantity}}</td>
+                                <td>{{license.cost}}</td>
+                                <td>{{license.is_expire}}</td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
+                    <tr class="table-info">
+                        <td colspan="100%">{{license_message}}</td>
+                    </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

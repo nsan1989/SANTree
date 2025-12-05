@@ -1,4 +1,4 @@
-{% extends 'index.html' %} {% load static %} 
+{% extends 'index.html' %} {% load crispy_forms_tags %} {% load static %}
 {% block title %} Dashboard {% endblock %} {% block start %}
 
 <style>
@@ -6,180 +6,196 @@
     font-family: 'Poppins', sans-serif;
     color: wheat;
   }
-  .card {
-    background-color: rgba(0, 0, 0, 0.6);
-    color: white;
-    font-family: 'Poppins', sans-serif;
+
+  #calendar {
+    max-width: 800px;
+    /* adjust size */
+    margin: auto;
+    font-size: 12px;
+    background: #f3f3f3;
+    /* smaller text */
   }
-  th {
-    font-family: 'Poppins', sans-serif;
-    font-size: 1rem;
-    font-weight: bold;
-  }
-  tr {
-    font-family: 'Poppins', sans-serif;
-    font-size: 0.9rem;
-  }
-  .open-title h5,
-  .completed-title h5 {
-    font-family: 'Poppins', sans-serif;
-    font-size: 1rem;
-    font-weight: bold;
-  }
-  .open_content,
-  .completed_content {
-    font-family: 'Poppins', sans-serif;
-    font-size: 0.9rem;
-  }
-  @media (max-width: 768px) {
-    .engage-title,
-    .vacant-title {
-      font-size: 0.8rem;
-    }
+
+  .btn {
+    width: 8rem;
   }
 </style>
 
-<div class="container-fluid h-100">
-  <div class="row" style="min-height: 40vh;">
-    <div
-      class="col-xs-12 col-sm-12 col-md-8 col-lg-8 col-xl-8 d-flex flex-column"
-    >
-      <div class="dashboard-title">
-        <h1 class="fw-bold mb-0">Dashboard</h1>
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 col-xl-8 d-flex flex-column mb-3">
+      <div class="top-content mb-3">
+        <div class="dashboard-title">
+          <h1 class="fw-bold mb-0">Dashboard</h1>
+        </div>
+        <div class="user-details d-flex flex-column" style="font-family: 'Poppins, sans-serif'">
+          <h5 class="user-name m-0 fw-light text-light">
+            {{current_user.username}}
+          </h5>
+        </div>
       </div>
-      <div
-        class="user-details d-flex flex-column"
-        style="font-family: 'Poppins, sans-serif'"
-      >
-        <h5 class="user-name m-0 fw-light text-light">
-          {{current_user.username}}
-        </h5>
-      </div>
-      <div class="dashboard-card">
-        <div class="row py-3 g-2">
-          <div class="col-12 col-md-4">
-            <div
-              class="card shadow-lg h-100 d-flex flex-column justify-content-center align-items-center"
-              style="min-height: 6rem;"
-            >
-              <div class="card-title fw-bold">Created Tasks</div>
-              <div class="card-content">{{created_tasks}}</div>
-            </div>
-          </div>
-          <div class="col-12 col-md-4">
-            <div
-              class="card shadow-lg h-100 d-flex flex-column justify-content-center align-items-center"
-              style="min-height: 6rem;"
-            >
-              <div class="card-title fw-bold">Completed Tasks</div>
-              <div class="card-content">{{comp_tasks}}</div>
-            </div>
-          </div>
-          <div class="col-12 col-md-4">
-            <div
-              class="card shadow-lg h-100 d-flex flex-column justify-content-center align-items-center"
-              style="min-height: 6rem;"
-            >
-              <div class="card-title fw-bold">Total Users</div>
-              <div class="card-content">{{tot_users}}</div>
-            </div>
-          </div>
+      <div class="bottom-content">
+        <div class="calender-wrapper">
+          <div id="calendar"></div>
         </div>
       </div>
     </div>
-    <div
-      class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 ps-3 pt-2 d-none d-md-flex"
-      style="min-height: 32vh"
-    >
-      <div class="card ps-2 h-100 w-100">
-        <div class="open-title py-2">
-          <h5>Open Tasks</h5>
-        </div>
-        <div class="open_content">
-          {% if request.user.role == 'User' %} {% if staff_open %} 
-          {% for tasks in staff_open %} {{tasks.tasks_types}} {% endfor %} {% else %}
-          <p>Currently, there isn't any tasks!</p>
-          {% endif %} {% else %} {% if incharge_open %} 
-          {% for tasks in incharge_open %} {{tasks.tasks_types}} {% endfor %} {% else %}
-          <p>Currently, there isn't any tasks!</p>
-          {% endif %} {% endif %}
-        </div>
+    <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 d-flex flex-column">
+      <div class="task-create-wrapper d-flex align-items-center gap-4 mb-3">
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createModal"><i
+            class="fa-solid fa-plus"></i>&nbsp;create</button>
+        <p class="mb-0 text-light">click here to create a new task.</p>
       </div>
-    </div>
-  </div>
-  <div class="row pb-3" style="height: 40vh; min-height: 40vh;">
-    <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 col-xl-8">
-      <div class="row g-2 " style="height: 40vh; min-height: 40vh;">
-        <!--Engaged users-->
-        <div class="col-6 d-flex flex-column h-100">
-          <div class="col-title mb-2 d-flex align-items-center engage-title"><i class="fa-solid fa-circle" style="color: #eb0707;"></i>&nbsp;Engaged Users</div>
-          <div class="table-responsive" style="height: 100%;overflow-y: auto;">
-            <table class="table h-100">
-              <thead class="table-danger position-sticky top-0">
-                <tr>
-                  <th scope="col">Staff Name</th>
-                </tr>
-              </thead>
-              <tbody class="table-light">
-                {% if engage %} {% for engage in engage %}
-                <tr>
-                  <td>{{engage.username}}</td>
-                </tr>
-                {% endfor %} {% else %}
-                <tr>
-                  <td colspan="2">No Staff!</td>
-                </tr>
-                {% endif %}
-              </tbody>
-            </table>
-          </div>
+      <div class="calendar-filters d-flex align-items-center gap-4 mb-3">
+        <div class="dropdown">
+          <button id="calendarFilterBtn" class="btn btn-warning dropdown-toggle" type="button"
+            data-bs-toggle="dropdown" aria-expanded="false">
+            select
+          </button>
+          <ul class="dropdown-menu" id="calendarFilterOptions">
+            <li><a class="dropdown-item" data-view="dayGridMonth" href="#">Month</a></li>
+            <li><a class="dropdown-item" data-view="timeGridWeek" href="#">Week</a></li>
+            <li><a class="dropdown-item" data-view="timeGridDay" href="#">Day</a></li>
+          </ul>
         </div>
-        <!--Vacant users-->
-        <div class="col-6 d-flex flex-column h-100">
-          <div class="col-title mb-2 d-flex align-items-center vacant-title"><i class="fa-solid fa-circle" style="color: #4feb07;"></i>&nbsp;Vacant Users</div>
-          <div class="table-responsive" style="height: 100%;overflow-y: auto;">
-            <table class="table h-100">
-              <thead class="table-danger position-sticky top-0">
-                <tr>
-                  <th scope="col">Staff Name</th>
-                </tr>
-              </thead>
-              <tbody class="table-light">
-                {% if vacant %} {% for vacant in vacant %}
-                <tr>
-                  <td>{{vacant.username}}</td>
-                </tr>
-                {% endfor %} {% else %}
-                <tr>
-                  <td colspan="2">No Staff!</td>
-                </tr>
-                {% endif %}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div
-      class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 ps-3 pt-2 d-none d-md-flex"
-      style="min-height: 32vh"
-    >
-      <div class="card ps-2 h-100 w-100">
-        <div class="completed-title py-2">
-          <h5>Completed Tasks</h5>
-        </div>
-        <div class="completed_content">
-          {% if request.user.role == 'User' %} {% if staff_completed %} 
-          {% for tasks in staff_completed %} {{tasks.tasks_types}} {% endfor %} 
-          {% else %}
-          <p>Currently, there isn't any tasks!</p>
-          {% endif %} {% else %} {% if Incharge_completed %} 
-          {% for tasks in Incharge_completed %} {{tasks.tasks_types}} {% endfor %} {% else %}
-          <p>Currently, there isn't any tasks!</p>
-          {% endif %} {% endif %}
-        </div>
+        <p class="mb-0 text-light">click to change calendar view.</p>
       </div>
     </div>
   </div>
 </div>
+
+<div class="modal fade" id="createModal" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-body">
+        <form class="task-form" method="post">
+          {% csrf_token %}
+          <div class="row">
+            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 d-flex flex-column mb-2">
+              <label for="id_department" class="form-label requiredField">
+                Department <span class="asteriskField">*</span>
+              </label>
+              {{ form.department }}
+            </div>
+            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 d-flex flex-column">
+              <label for="id_tasks_types" class="form-label requiredField">
+                Task <span class="asteriskField">*</span>
+              </label>
+              {{ form.tasks_types }}
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 d-flex flex-column mb-2">
+              <label for="id_task_frequency" class="form-label requiredField">
+                Frequency <span class="asteriskField">*</span>
+              </label>
+              {{ form.task_frequency }}
+            </div>
+            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 d-flex flex-column mb-2">
+              <label for="id_location" class="form-label">
+                Location
+              </label>
+              {{ form.location }}
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 d-flex flex-column mb-2">
+              <label for="id_assigned_to" class="form-label requiredField">
+                Assigned To <span class="asteriskField">*</span>
+              </label>
+              {{ form.assigned_to }}
+            </div>
+            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 d-flex flex-column mb-2">
+              <label for="id_attachment" class="form-label">
+                Attachment
+              </label>
+              {{ form.attachment }}
+            </div>
+          </div>
+          <div class="d-grid mt-4">
+            <button type="submit" class="btn btn-primary btn-lg">Submit</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const calendarEl = document.getElementById('calendar');
+
+    const calendar = new FullCalendar.Calendar(calendarEl, {
+      initialView: 'dayGridMonth',
+      headerToolbar: {
+        left: 'prev,next today',
+        center: 'title',
+        right: ''
+      },
+      events: JSON.parse(`{{ calendar_events|escapejs }}`),
+      eventClick: function (info) {
+        window.location.href = info.event.url;
+      }
+    });
+
+    calendar.render();
+
+    // Filtering dropdown logic
+    const filterMenu = document.getElementById("calendarFilterOptions");
+    const filterButton = document.getElementById("calendarFilterBtn");
+
+    if (filterMenu && filterButton) {
+      filterMenu.addEventListener("click", function (e) {
+        if (e.target.matches(".dropdown-item")) {
+          const view = e.target.getAttribute("data-view");
+          calendar.changeView(view);
+          filterButton.innerText = e.target.innerText;
+        }
+      });
+    }
+  });
+</script>
+
+<script>
+  $(document).ready(function () {
+    $("#id_department").change(function () {
+      const departmentId = $(this).val();
+
+      // Load task types
+      $.ajax({
+        url: "{% url 'tms:ajax_load_tasks_types' %}",
+        data: { department: departmentId },
+        success: function (data) {
+          const taskSelect = $("#id_tasks_types");
+          taskSelect.empty();
+          taskSelect.append('<option value="">Select Task Type</option>');
+          data.forEach((item) =>
+            taskSelect.append(
+              `<option value="${item.id}">${item.name}</option>`
+            )
+          );
+        },
+      });
+
+      // Load staff
+      $.ajax({
+        url: "{% url 'tms:ajax_load_staff' %}",
+        data: { department: departmentId },
+        success: function (data) {
+          const staffSelect = $("#id_assigned_to");
+          staffSelect.empty();
+          staffSelect.append('<option value="">Select Staff</option>');
+          data.forEach((item) =>
+            staffSelect.append(
+              `<option value="${item.id}">${item.username}</option>`
+            )
+          );
+        },
+      });
+    });
+  });
+</script>
 {% endblock %}

@@ -34,6 +34,6 @@ def tasks_notification(sender, instance, created, **kwargs):
     if created and instance.assigned_to:
         send_push_notification(
             username=instance.assigned_to.username,
-            title="New Service Assigned",
-            message=f"You have a new service: {instance.tasks_types}"
+            title="New Task Assigned",
+            message=f"You have a new task: {instance.tasks_types}"
         )

@@ -1,0 +1,26 @@
+{% extends 'index.html' %}
+
+{% block title %}
+Access Denied
+{% endblock %}
+
+{% block start %}
+
+<style>
+    .previous-link a {
+        text-decoration: none;
+    }
+</style>
+
+<div class="d-flex flex-column justify-content-center align-items-center h-100">
+    <div class="text-danger text-center">
+        <h2 class="fw-bold">403 - Forbidden</h2>
+        <p>{{ exception }}</p>
+    </div>
+    <div class="previous-link">
+        <a href="javascript:history.back()" class="d-flex align-items-center text-primary">
+            <i class="fa-solid fa-arrow-left"></i>&nbsp;<p class="m-0">Back to previous page!</p>
+        </a>
+    </div>
+</div>
+{% endblock %}

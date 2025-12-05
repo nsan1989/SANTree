@@ -28,6 +28,7 @@ urlpatterns = [
     path('tms/', include(('san_tms.urls', 'san_tms'), namespace='tms')),
     path('cms/', include(('san_cms.urls', 'san_cms'), namespace='cms')),
     path('srm/', include(('san_srm.urls', 'san_srm'), namespace='srm')),
+    path('ams/', include(('san_ams.urls', 'san_ams'), namespace='ams')),
     path('', include('pwa.urls')),
 ]
 

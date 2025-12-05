@@ -6,9 +6,10 @@ from accounts.models import CustomUsers
 class TasksForm(forms.ModelForm):
     class Meta:
         model = Tasks
-        fields = ['department', 'tasks_types', 'location', 'assigned_to', 'attachment']
+        fields = ['department', 'tasks_types', 'task_frequency', 'location', 'assigned_to', 'attachment']
         labels = {
             'tasks_types': 'Tasks',
+            'task_frequency': 'Frequency',
             'assigned_to': 'Assigned To'
         }
     
@@ -20,6 +21,7 @@ class TasksForm(forms.ModelForm):
             self.fields['department'].initial = department
             self.fields['department'].queryset = Departments.objects.filter(id=department.id)
             self.fields['department'].disabled = True 
+            self.fields['location'].required = False
             self.fields['attachment'].required = False
 
             # Filter related fields based on user's department

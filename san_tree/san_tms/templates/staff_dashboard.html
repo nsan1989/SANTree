@@ -2,190 +2,143 @@
 {% block title %} Dashboard {% endblock %} {% block start %}
 <style>
   .dashboard-title h1,
-  .chart-title h5 {
+  .upcoming-title h3 {
     font-family: 'Poppins', sans-serif;
     color: wheat;
   }
 
-  .card {
-    background-color: rgba(0, 0, 0, 0.4);
-    font-family: 'Poppins', sans-serif;
-    color: white;
+  #calendar {
+    max-width: 800px;
+    /* adjust size */
+    margin: auto;
+    font-size: 12px;
+    background: #f3f3f3;
+    /* smaller text */
   }
 
-  .card:hover {
-    background-color: maroon;
-    color: white;
+  .fc-scrollgrid-sync-inner a {
+    text-decoration: none;
   }
 
-  th {
-    font-family: 'Poppins', sans-serif;
-    font-size: 1rem;
-    font-weight: bold;
+  .btn {
+    width: 8rem;
   }
 
-  tr {
+  th, td {
     font-family: 'Poppins', sans-serif;
-    font-size: 0.9rem;
   }
 
-  .open-title h5,
-  .completed-title h5 {
-    font-family: 'Poppins', sans-serif;
-    font-size: 1rem;
-    font-weight: bold;
-  }
-
-  .open_content,
-  .completed_content {
-    font-family: 'Poppins', sans-serif;
-    font-size: 0.9rem;
-  }
-
-  .card-wrapper {
-    min-height: 15rem;
-    background-color: rgba(0, 0, 0, 0.4);
-    font-family: 'Poppins', sans-serif;
-    color: white;
-  }
-
-  Form {
-    font-family: 'Poppins', sans-serif;
+  @media screen and (max-width: 767.98px) {
+    .fc-button-group {
+      margin-bottom: 0.5rem;
+    }
   }
 </style>
 
 <div class="container-fluid">
   <div class="row">
-    <div class="col-xs-12 col-sm-12 col-md-9 col-lg-9 col-xl-9">
-      <div class="dashboard-title">
-        <h1 class="fw-bold mb-0">Welcome</h1>
-      </div>
-      <div class="user-details d-flex flex-column mb-3" style="font-family: 'Poppins, sans-serif'">
-        <h5 class="user-name m-0 fw-light text-light">
-          {{current_user.username}}
-        </h5>
-      </div>
-      <div class="row">
-        <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-3 p-2">
-          <div class="card shadow-lg h-100 d-flex flex-column justify-content-center align-items-center"
-            style="min-height: 6rem;">
-            <div class="card-title text-center">Assigned</div>
-            <div class="card-content">{{assigned_tasks}}</div>
-          </div>
+    <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 col-xl-8">
+      <div class="top-content">
+        <div class="dashboard-title">
+          <h1 class="fw-bold mb-0">Welcome</h1>
         </div>
-        <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-3 p-2">
-          <div class="card shadow-lg h-100 d-flex flex-column justify-content-center align-items-center"
-            style="min-height: 6rem;">
-            <div class="card-title text-center">Completed</div>
-            <div class="card-content">{{comp_count}}</div>
-          </div>
-        </div>
-        <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-3 p-2">
-          <div class="card shadow-lg h-100 d-flex flex-column justify-content-center align-items-center"
-            style="min-height: 6rem;">
-            <div class="card-title text-center">Progress</div>
-            <div class="card-content">{{pro_count}}</div>
-          </div>
-        </div>
-        <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-3 p-2">
-          <div class="card shadow-lg h-100 d-flex flex-column justify-content-center align-items-center"
-            style="min-height: 6rem;">
-            <div class="card-title text-center">Open</div>
-            <div class="card-content">{{open_count}}</div>
-          </div>
+        <div class="user-details d-flex flex-column mb-3" style="font-family: 'Poppins, sans-serif'">
+          <h5 class="user-name m-0 fw-light text-light">
+            {{current_user.username}}
+          </h5>
         </div>
       </div>
-      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6">
-        <div class="chart-title py-2">
-          <h5>Task Chart</h5>
-        </div>
-        <!-- Filter form -->
-        <form method="get" class="row g-2 align-items-end mb-3">
-          <div class="col-auto">
-            <label for="start_date" class="form-label small mb-1">Start</label>
-            <input type="date" id="start_date" name="start_date" class="form-control form-control-sm"
-              value="{{ request.GET.start_date }}">
-          </div>
-
-          <div class="col-auto">
-            <label for="end_date" class="form-label small mb-1">End</label>
-            <input type="date" id="end_date" name="end_date" class="form-control form-control-sm"
-              value="{{ request.GET.end_date }}">
-          </div>
-
-          <div class="col-auto">
-            <button type="submit" class="btn btn-primary btn-sm">
-              Filter
-            </button>
-          </div>
-        </form>
-        <div class="chart-content">
-          <img class="img-fluid rounded-2 w-100"
-            src="{% url 'tms:all_tasks_pie_chart' %}?start_date={{ request.GET.start_date }}&end_date={{ request.GET.end_date }}&v={{ now }}"
-            alt="Tasks Pie Chart" />
+      <div class="bottom-content">
+        <div class="calender-wrapper">
+          <div class="p-2 rounded" id="calendar"></div>
         </div>
       </div>
     </div>
-    <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-3">
-      <div class="open-card p-2">
-        <div class="card-wrapper p-2 rounded">
-          <div class="open-title py-2">
-            <h5>Open Tasks</h5>
-          </div>
-          <div class="open_content">
-            {% if open %}
-            {% for open_tasks in open %}
-            <small>{{open_tasks.tasks_types}}</small>
-            {% endfor %}
-            {% else %}
-            <small>Currently, there isn't any open tasks!</small>
-            {% endif %}
-          </div>
+    <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4">
+      <div class="calendar-filters d-flex align-items-center gap-4 mb-3">
+        <div class="dropdown">
+          <button id="calendarFilterBtn" class="btn btn-warning dropdown-toggle" type="button" data-bs-toggle="dropdown"
+            aria-expanded="false">
+            select
+          </button>
+          <ul class="dropdown-menu" id="calendarFilterOptions">
+            <li><a class="dropdown-item" data-view="dayGridMonth" href="#">Month</a></li>
+            <li><a class="dropdown-item" data-view="timeGridWeek" href="#">Week</a></li>
+            <li><a class="dropdown-item" data-view="timeGridDay" href="#">Day</a></li>
+          </ul>
         </div>
+        <p class="mb-0 text-warning">change calendar view.</p>
       </div>
-      <div class="complete-card p-2">
-        <div class="card-wrapper p-2 rounded">
-          <div class="completed-title py-2">
-            <h5>Completed Tasks</h5>
-          </div>
-          <div class="completed_content">
-            {% if complete %}
-            {% for comp in complete %}
-            <small>{{comp.tasks_types}}</small>
-            {% endfor %}
-            {% else %}
-            <small>Currently, there isn't any complete tasks!</small>
-            {% endif %}
-          </div>
+      <div class="upcoming-task-wrapper mb-3 d-flex flex-column">
+        <div class="upcoming-title">
+          <h3>Upcoming Task</h3>
         </div>
-      </div>
-      <div class="progress-card p-2">
-        <div class="card-wrapper p-2 rounded">
-          <div class="progress-title py-2">
-            <h5>Progress Tasks</h5>
-          </div>
-          <div class="progress_content">
-            {% if progress %}
-            {% for prog in progress %}
-            <small>{{prog.tasks_types}}</small>
-            {% endfor %}
-            {% else %}
-            <small>Currently, there isn't any progress tasks!</small>
-            {% endif %}
-          </div>
+        <div class="upcoming-tasks">
+          <table class="table">
+            <thead>
+              <tr class="table-danger">
+                <th scope="col">Task Number</th>
+                <th scope="col">Task</th>
+                <th scope="col">DATE</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% if upcoming %}
+                {% for task in upcoming %}
+                  <tr class="table-info">
+                    <td>{{task.tasks_number}}</td>
+                    <td>{{task.tasks_types.name}}</td>
+                    <td>{{task.next_date}}</td>
+                  </tr>
+                {% endfor %}
+              {% else %}
+                <tr>
+                  <td>no upcoming task!</td>
+                </tr>
+              {% endif %}
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
 <script>
-  document.getElementById('task-chart-filters').addEventListener('submit', function (e) {
-    e.preventDefault();
-    const params = new URLSearchParams(new FormData(this));
-    params.append('v', Date.now());
-    const chart = document.getElementById('task-chart-img');
-    chart.src = `{% url 'tms:all_tasks_pie_chart' %}?${params.toString()}`;
+  document.addEventListener('DOMContentLoaded', function () {
+    const calendarEl = document.getElementById('calendar');
+
+    const calendar = new FullCalendar.Calendar(calendarEl, {
+      initialView: 'dayGridMonth',
+      headerToolbar: {
+        left: 'prev,next today',
+        center: 'title',
+        right: ''
+      },
+      events: JSON.parse(`{{ calendar_events|escapejs }}`),
+      eventClick: function (info) {
+        window.location.href = info.event.url;
+      }
+    });
+
+    calendar.render();
+
+    // Filtering dropdown logic
+    const filterMenu = document.getElementById("calendarFilterOptions");
+    const filterButton = document.getElementById("calendarFilterBtn");
+
+    if (filterMenu && filterButton) {
+      filterMenu.addEventListener("click", function (e) {
+        if (e.target.matches(".dropdown-item")) {
+          const view = e.target.getAttribute("data-view");
+          calendar.changeView(view);
+          filterButton.innerText = e.target.innerText;
+        }
+      });
+    }
   });
 </script>
 

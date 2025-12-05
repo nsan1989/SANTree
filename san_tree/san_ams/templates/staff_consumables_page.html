@@ -1,0 +1,66 @@
+{% extends 'index.html' %}
+
+{% block title %}
+Consumables
+{% endblock %}
+
+{% block start %}
+
+<style>
+    .header-title h3 {
+        color: wheat;
+    }
+</style>
+
+<div class="container-fluid">
+    <div class="row mb-3">
+        <div class="col-12">
+            <div class="header-title">
+                <h3>Consumables</h3>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        {% if error %}
+        <p style="color: red;">{{ error }}</p>
+        {% endif %}
+        <div class="col-12 table-responsive">
+            <table class="table table-bordered">
+                <thead>
+                    <tr class="table-danger">
+                        <th scope="col">Name</th>
+                        <th scope="col">Category</th>
+                        <th scope="col">Model No.</th>
+                        <th scope="col">Manufacturer</th>
+                        <th scope="col">Image</th>
+                        <th scope="col">Purchase Date</th>
+                        <th scope="col">Cost</th>
+                        <th scope="col">Quantity</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if consumables %}
+                        {% for consumable in consumables %}
+                            <tr class="table-info">
+                                <td>{{consumable.name}}</td>
+                                <td>{{consumable.category}}</td>
+                                <td>{{consumable.model_number}}</td>
+                                <td>{{consumable.manufacturer}}</td>
+                                <td>{{consumable.image}}</td>
+                                <td>{{consumable.purchase_date}}</td>
+                                <td>{{consumable.cost}}</td>
+                                <td>{{consumable.quantity}}</td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
+                    <tr class="table-info">
+                        <td colspan="100%">{{consumables_message}}</td>
+                    </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

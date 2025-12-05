@@ -73,10 +73,12 @@ My Tasks
             <tr>
               <th scope="col">Tasks No.</th>
               <th scope="col">Tasks</th>
+              <th scope="col">Frequency</th>
               <th scope="col">Location</th>
               <th scope="col">Status</th>
-              <th scope="col">Completed At</th>
-              <th scope="col">TAT</th>
+              {% if request.user.role == 'User' %}
+                <th scope="col">Update Status</th>
+              {% endif %}
               <th scope="col">Remark</th>
               <th scope="col">Details</th>
             </tr>
@@ -96,11 +98,30 @@ My Tasks
             >
               <td>{{ task.tasks_number}}</td>
               <td>{{ task.tasks_types.name }}</td>
-              <td>{{ task.location }}</td>
+              <td>{{ task.task_frequency }}</td>
+              {% if task.location %}
+                <td>{{ task.location }}</td>
+                  {% else %}
+                <td>NA</td>
+              {% endif %}
               <td>{{ task.status }}</td>
-              <td>{{ task.completed_at }}</td>
-              <td>{{ task.time_taken|duration_display }}</td>
-              {% if task.status != 'Waiting' and task.status != 'Completed' %}
+              {% if task.status != 'Completed' and task.status != 'Postponed' %}
+                <td>
+                  <form method="POST" action="{% url 'tms:staff_update_task_status' task.id %}">
+                  {% csrf_token %}
+                    <select class="mb-2" name="status" required>
+                      <option value="">select</option>
+                      <option value="In Progress" {% if tasks.status == 'In Progress' %} selected {% endif %}>In Progress</option>
+                      <option value="Postponed" {% if tasks.status == 'Postponed' %} selected {% endif %}>Postponed</option>
+                      <option value="Completed" {% if tasks.status == 'Completed' %} selected {% endif %}>Completed</option>
+                    </select>
+                    <button class="btn btn-sm btn-primary" type="submit">Update</button>
+                  </form>
+                </td>
+              {% else %}
+              <td>--</td>
+              {% endif %}
+              {% if task.status != 'Postponed' and task.status != 'Completed' %}
               <td class="text-center"><a class="open-modal" data-url="{% url 'tms:tasks_remarks' task.id %}"><i class="fa-solid fa-pen"></i></a></td>
               {% else %}
               <td>--</td>

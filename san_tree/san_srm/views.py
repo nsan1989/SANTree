@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.db.models import Q, F
+from django.db.models import Q, Min
 from django.core.exceptions import PermissionDenied
 from .models import *
 from .forms import *
@@ -314,7 +314,7 @@ def free_up_staff():
 #        ano_service = AnonymousServiceGenerate.objects.filter(status='In Progress')
         if prog_service.exists():
             for service in prog_service:
-                if service.started_at <= timezone.now() - timedelta(minutes=30):
+                if service.started_at <= timezone.now() - timedelta(minutes=15):
                     staff = service.assigned_to.shift_staffs
                     if staff and staff.status == 'engaged':
                         staff.status = 'vacant'
@@ -390,7 +390,7 @@ def free_up_completed_staff(request, id):
 # Assigned Service to the vacant staff from the queue.
 def assign_service_from_queue(vacant_staff):
     try:
-        next_service_request = ServiceRequestQueue.objects.first()
+        next_service_request = ServiceRequestQueue.objects.order_by('created_at').first()
         if not next_service_request:
             return
         
@@ -403,23 +403,35 @@ def assign_service_from_queue(vacant_staff):
         now_local = timezone.localtime(timezone.now())
         assigned = False
 
-        schedule_qs = ShiftSchedule.objects.filter(
-            shift_block=service.service_block,
-            shift_staffs=vacant_staff
-        )
+#        schedule_qs = ShiftSchedule.objects.filter(
+#            shift_block=service.service_block,
+#            shift_staffs_id=vacant_staff.id
+#        )
+
+        schedule_qs = (
+            ShiftSchedule.objects.filter(
+                shift_block = service.service_block,
+                shift_staffs__status = 'vacant'
+            ).annotate(
+                last_completed=Min(
+                    'srm_service_staff__completed_at', filter=Q(srm_service_staff__status='Completed')
+                )
+            ).order_by('last_completed')
+            )
 
         for s in schedule_qs:
             s_start = timezone.localtime(s.start_time)
             s_end = timezone.localtime(s.end_time)
 
-            if s_start <= s_end:
-                active = s_start <= now_local <= s_end
-            else:
-                active = now_local >= s_start or now_local <= s_end
+#            if s_start <= s_end:
+#                active = s_start <= now_local <= s_end
+#            else:
+#                active = now_local >= s_start or now_local <= s_end
+            active = s_start <= now_local <= s_end
 
             if active:
                 service.assigned_to = s
-                service.status = 'Open'
+                service.status = 'In Progress'
                 service.save()
 
                 vacant_staff.status = 'engaged'

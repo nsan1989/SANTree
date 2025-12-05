@@ -32,9 +32,6 @@
             <div class="all-tasks-title">
                 <h1 class="fw-bold">All Tasks</h1>
             </div>
-            <div class="raised-tasks">
-                <p class="text-light">Assigned a new task&nbsp;<a class="text-warning" href="{% url 'tms:assigned_tasks' %}" style="text-decoration: none;">Assign Here.</a></p>
-            </div>
         </div>
         <div class="row mb-2">
     <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 mb-2">
@@ -73,15 +70,13 @@
                 <table class="table table-bordered">
                     <thead class="table-danger">
                         <tr>
-                            <th scope="col" style="width: 25%;">Task No.</th>
-                            <th scope="col" style="width: 25%;">Title</th>
-                            <th scope="col" style="width: 15%;">Status</th>
-                            <th scope="col" style="width: 15%;">Assigned To</th>
-                            <th scope="col" style="width: 15%;">Completed At</th>
-                            <th scope="col" style="width: 15%;">TAT</th>
-                            <th scope="col" style="width: 15%;">Update</th>
-                            <th scope="col" style="width: 15%;">Remarks</th>
-                            <th scope="col" style="width: 15%;">Details</th>
+                            <th scope="col">Task No.</th>
+                            <th scope="col">Title</th>
+                            <th scope="col">Frequency</th>
+                            <th scope="col">Status</th>
+                            <th scope="col">Assigned To</th>
+                            <th scope="col">Remarks</th>
+                            <th scope="col">Details</th>
                         </tr>
                     </thead>
                     <tbody class="table-primary">
@@ -98,33 +93,16 @@
                                 class="status-cancelled"
                                 {% endif %}
                             >
-                                <td style="width: 25%;">{{task.tasks_number}}</td>
-                                <td style="width: 25%;">{{task.tasks_types}}</td>
-                                <td style="width: 15%;">{{task.status}}</td>
-                                <td style="width: 15%;">{{task.assigned_to}}</td>
-                                <td style="width: 15%;">{{task.completed_at}}</td>
-                                <td style="width: 15%;">{{ task.time_taken|duration_display }}</td>
-                                {% if task.status != 'Completed' %}
-                                <td>
-                                    <form method="POST" action="{% url 'tms:admin_update_task_status' task.id %}">
-                                        {% csrf_token %}
-                                        <select class="mb-2" name="status" required>
-                                            <option value="">select</option>
-                                            <option value="Rejected" {% if task.status == 'Rejected' %} selected {% endif %}>Rejected</option>
-                                            <option value="Completed" {% if task.status == 'Completed' %} selected {% endif %}>Completed</option>
-                                        </select>
-                                        <button class="btn btn-sm btn-primary" type="submit">Update</button>
-                                    </form>
-                                </td>
-                                {% else %}
-                                <td>{{ task.status }}</td>
-                                {% endif %}
-
+                                <td>{{task.tasks_number}}</td>
+                                <td>{{task.tasks_types}}</td>
+                                <td>{{ task.task_frequency }}</td>
+                                <td>{{task.status}}</td>
+                                <td>{{task.assigned_to}}</td>
                                 <td class="text-center"><a class="open-modal" data-url="{% url 'tms:tasks_remarks' task.id %}">
                                   <i class="fa-solid fa-pen text-primary"></i>
                                   </a>
                                 </td>
-                                <td style="width: 15%;">
+                                <td>
                                     {% if task.id %}
                                         <a href="{% url 'tms:admin_tasks_details' task.id %}"><i class="fa-solid fa-eye text-primary"></i></a>
                                     {% else %}
