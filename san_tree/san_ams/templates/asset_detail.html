@@ -1,0 +1,64 @@
+{% extends 'index.html' %}
+
+{% block title %}
+Asset Detail
+{% endblock %}
+
+{% block start %}
+<style>
+
+</style>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12 table-responsive">
+            <table class="table table-bordered">
+                <thead>
+                    <tr class="table-danger">
+                        <th scope="col">Name</th>
+                        <th scope="col">Manufacturer</th>
+                        <th scope="col">Model Number</th>
+                        <th scope="col">Serial Number</th>
+                        <th scope="col">Image</th>
+                        <th scope="col">Purchase Date</th>
+                        <th scope="col">Cost</th>
+                        <th scope="col">Expiry Date</th>
+                        <th scope="col">Depreciation</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">Handler</th>
+                        <th scope="col">Department</th>
+                        <th scope="col">Location</th>
+                        <th scope="col">Requestable</th>
+                        <th scope="col">Assigned To</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if asset %}
+                        <tr class="table-info">
+                            <td>{{asset.name}}</td>
+                            <td>{{asset.manufacturer}}</td>
+                            <td>{{asset.model_number}}</td>
+                            <td>{{asset.serial_number}}</td>
+                            <td>{{asset.image}}</td>
+                            <td>{{asset.purchase_date}}</td>
+                            <td>{{asset.cost}}</td>
+                            <td>{{asset.expiry_date}}</td>
+                            <td>{{asset.depreciation}}</td>
+                            <td>{{asset.status}}</td>
+                            <td>{{asset.handler}}</td>
+                            <td>{{asset.department}}</td>
+                            <td>{{asset.location}}</td>
+                            <td>{{asset.requestable}}</td>
+                            <td>{{asset.assigned_to}}</td>
+                        </tr>
+                    {% else %}
+                        <tr class="table-info">
+                            <td colspan="100%" class="text-center">No assets found.</td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

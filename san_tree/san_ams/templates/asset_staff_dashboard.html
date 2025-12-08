@@ -132,15 +132,15 @@ Staff Dashboard
                     </thead>
                     <tbody>
                         {% if activities %}
-                            {% for activity in activities %}
-                                <tr class="table-info">
-                                    <td>{{activity.created_at}}</td>
-                                    <td>{{activity.status}}</td>
-                                    <td>{{activity.created_by}}</td>
-                                    <td>{{activity.name}}</td>
-                                    <td>{{activity.requested_to}}</td>
-                                </tr>
-                            {% endfor %}
+                        {% for activity in activities %}
+                        <tr class="table-info">
+                            <td>{{activity.created_at}}</td>
+                            <td>{{activity.status}}</td>
+                            <td>{{activity.created_by}}</td>
+                            <td>{{activity.name}}</td>
+                            <td>{{activity.requested_to}}</td>
+                        </tr>
+                        {% endfor %}
                         {% else %}
                         <tr>
                             <td colspan="100%">{{activity_message}}</td>

@@ -54,3 +54,23 @@ class AddAssetForm(forms.ModelForm):
     class Meta:
         model = AssetModel
         fields = ['name', 'category', 'manufacturer', 'model_number', 'serial_number', 'image', 'purchase_date', 'cost', 'expiry_date', 'depreciation', 'residual_value']
+
+# Assigned License Form
+class AssignedLicenseForm(forms.ModelForm):
+    
+    assigned_to = forms.ModelChoiceField(
+        queryset=CustomUsers.objects.all(),
+        label="Assign License To",
+        required=True
+    )
+
+    class Meta:
+        model = LicenseModel
+        fields = ['assigned_to']
+
+# Assigned Asset Form
+class AssignedAssetForm(forms.ModelForm):
+    class Meta:
+        model = AssetModel
+        fields = ['assigned_to']
+    

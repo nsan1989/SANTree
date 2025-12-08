@@ -1,0 +1,182 @@
+{% extends 'index.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}
+Add Asset
+{% endblock %}
+
+{% block start %}
+
+<style>
+    .header-title {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        color: wheat;
+    }
+
+    .form-wrapper {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        background-color: #fff;
+        padding: 1rem;
+    }
+
+    .form-title h4 {
+        text-transform: uppercase;
+        font-weight: bold;
+    }
+
+    .col-12 {
+        display: flex;
+        flex-direction: column;
+    }
+</style>
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-center align-items-center">
+        <span>
+            <div class="mb-3">
+                <a href="javascript:history.back()" class="d-flex align-items-center text-warning"
+                    style="text-decoration: none">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    &nbsp;back
+                </a>
+            </div>
+        </span>
+    </div>
+    <div class="row mb-3">
+        <div class="col-12">
+            <div class="header-title">
+                <h3 class="mb-0">Add Assets</h3>
+                <p class="mb-0">Please enter the details to add an asset!</p>
+            </div>
+        </div>
+    </div>
+    <div class="row d-flex justify-content-center">
+        <div class="col-12 col-md-6 col-lg-4">
+            <div class="form-wrapper rounded">
+                <div class="form-title mb-2">
+                    <h4>asset form</h4>
+                </div>
+                <div class="form-content">
+                    <form class="asset-form" method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="row w-100 mb-1">
+                            <div class="col-12 col-md-6">
+                                <label for="id-name" class="form-lable requiredField">
+                                    Name
+                                    <span class="asteriskField">*</span>
+                                </label>
+                                <input type="text" name="name">
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label for="id-category" class="form-lable requiredField">
+                                    Category
+                                    <span class="asteriskField">*</span>
+                                </label>
+                                <select name="category" class="form-select" required id="id-category">
+                                    <option value="" selected>select</option>
+                                    {% for cat in category %}
+                                    <option value="{{ cat.id }}">{{ cat.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row w-100 mb-1">
+                            <div class="col-12 col-md-6">
+                                <label for="id-manufacturer" class="form-lable requiredField">
+                                    Manufacturer
+                                    <span class="asteriskField">*</span>
+                                </label>
+                                <input type="text" name="manufacturer">
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label for="id-model_number" class="form-lable requiredField">
+                                    Model No.
+                                    <span class="asteriskField">*</span>
+                                </label>
+                                <input type="text" name="model_number">
+                            </div>
+                        </div>
+                        <div class="row w-100 mb-1">
+                            <div class="col-12 col-md-6">
+                                <label for="id-serial_number" class="form-label requiredField">
+                                    Serial No.
+                                    <span class="asteriskField">*</span>
+                                </label>
+                                <input type="text" name="serial_number">
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label for="id-image" class="form-lable requiredField">
+                                    Image
+                                    <span class="asteriskField">*</span>
+                                </label>
+                                <input type="text" name="image">
+                            </div>
+                        </div>
+                        <div class="row w-100 mb-1">
+                            <div class="col-12 col-md-6">
+                                <label for="id-purchase_date" class="form-label requiredField">
+                                    Purchase Date
+                                    <span class="asteriskField">*</span>
+                                </label>
+                                <input type="text" name="purchase_date">
+                            </div>
+                            <div class="col-12 col-md-6" class="form-lable requiredField">
+                                <label for="id-cost">
+                                    Cost
+                                    <span class="asteriskField">*</span>
+                                </label>
+                                <input type="text" name="cost">
+                            </div>
+                        </div>
+                        <div class="row w-100 mb-1">
+                            <div class="col-12 col-md-6">
+                                <label for="id-expiry_date" class="form-label requiredField">
+                                    Expiry Date
+                                    <span class="asteriskField">*</span>
+                                </label>
+                                <input type="text" name="expiry_date">
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label for="id-depreciation" class="form-label requiredField">
+                                    Depreciation
+                                    <span class="asteriskField">*</span>
+                                </label>
+                                <input type="text" name="depreciation">
+                            </div>
+                        </div>
+                        <div class="row w-100 mb-1">
+                            <div class="col-12 col-md-6">
+                                <label for="id-residual_value" class="form-label requiredField">
+                                    Residual Value
+                                    <span class="asteriskField">*</span>
+                                </label>
+                                <input type="text" name="residual_value">
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <div class="d-grid mt-4">
+                                    <button type="submit" id="submitBtn" class="btn btn-primary btn-sm">Submit</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const form = document.getElementById("asset-form");
+    const submitBtn = document.getElementById("submitBtn");
+    form.addEventListener("submit", function(event) {
+      submitBtn.disabled = true;
+      submitBtn.innerText = "Submitting...";
+    });
+  });
+</script>
+{% endblock %}

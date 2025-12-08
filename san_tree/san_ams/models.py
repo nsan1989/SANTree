@@ -3,6 +3,16 @@ import os
 from django.utils import timezone
 from accounts.models import Departments, Location, CustomUsers
 
+# license status choices.
+LICENSE_STATUS = [
+    ('active', 'Active'),
+    ('assigned', 'Assigned'),
+    ('available', 'Available'),
+    ('renewal due', 'Renewal Due'),
+    ('expired', 'Expired'),
+    ('revoked', 'Revoked'),
+]
+
 # license model.
 class LicenseModel(models.Model):
     name = models.CharField(max_length=100)
@@ -16,6 +26,10 @@ class LicenseModel(models.Model):
     quantity = models.PositiveSmallIntegerField(default=0)
     cost = models.DecimalField(max_digits=6, decimal_places=2)
     is_expire = models.BooleanField(default=False)
+    status = models.CharField(max_length=20, choices=LICENSE_STATUS, default='active')
+    assigned_to = models.ForeignKey(CustomUsers, on_delete=models.CASCADE, null=True, blank=True, related_name='license_user')
+    department = models.ForeignKey(Departments, on_delete=models.CASCADE, null=True, blank=True, related_name='license_user_department')
+    location = models.ForeignKey(Location, on_delete=models.CASCADE, null=True, blank=True, related_name='license_user_location')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -183,8 +197,9 @@ class AssetModel(models.Model):
     created_by = models.ForeignKey(CustomUsers, on_delete=models.CASCADE, null=True, blank=True, related_name='asset_request_by')
     requested_to = models.ForeignKey(CustomUsers, on_delete=models.CASCADE, null=True, blank=True, related_name='asset_request_to')
     assigned_to = models.ForeignKey(CustomUsers, on_delete=models.CASCADE, null=True, blank=True, related_name='asset_user')
+    department = models.ForeignKey(Departments, on_delete=models.CASCADE, null=True, blank=True, related_name='asset_department')
     location = models.ForeignKey(Location, on_delete=models.CASCADE, null=True, blank=True, related_name='asset_location')
-    resquestable = models.BooleanField(default=True)
+    requestable = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     is_active = models.BooleanField(default=True)

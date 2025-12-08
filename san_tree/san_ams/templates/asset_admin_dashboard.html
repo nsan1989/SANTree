@@ -32,9 +32,20 @@ Admin Dashboard
         color: white;
     }
 
+    .count-title h5 {
+        font-size: 1rem;
+        text-align: center;
+        font-weight: bold;
+    }
+
     .count-link a {
         text-decoration: none;
         color: orange;
+    }
+
+    th {
+        font-size: 0.8rem;
+        font-weight: bold;
     }
 </style>
 
@@ -48,87 +59,87 @@ Admin Dashboard
     </div>
     <div class="row mb-3">
         <!--asset card-->
-        <div class="col-12 col-md-2">
+        <div class="col-12 col-md-2 mb-2">
             <div class="card-wrapper">
                 <div class="count-card rounded">
                     <div class="count-title">
-                        <h5>Total Assets</h5>
+                        <h5>Assets</h5>
                     </div>
                     <div class="count-value">
                         <p class="m-0">{{asset|default:0}}</p>
                     </div>
                     <div class="count-link">
-                        <a href="">view</a>
+                        <a href="{% url 'ams:admin_assets' %}">view</a>
                     </div>
                 </div>
             </div>
         </div>
         <!--license card-->
-        <div class="col-12 col-md-2">
+        <div class="col-12 col-md-2 mb-2">
             <div class="card-wrapper">
                 <div class="count-card rounded">
                     <div class="count-title">
-                        <h5>Total Licenses</h5>
+                        <h5>Licenses</h5>
                     </div>
                     <div class="count-value">
                         <p class="m-0">{{license|default:0}}</p>
                     </div>
                     <div class="count-link">
-                        <a href="">view</a>
+                        <a href="{% url 'ams:all_licenses' %}">view</a>
                     </div>
                 </div>
             </div>
         </div>
         <!--component card-->
-        <div class="col-12 col-md-2">
+        <div class="col-12 col-md-2 mb-2">
             <div class="card-wrapper">
                 <div class="count-card rounded">
                     <div class="count-title">
-                        <h5>Total Components</h5>
+                        <h5>Components</h5>
                     </div>
                     <div class="count-value">
                         <p class="m-0">{{component|default:0}}</p>
                     </div>
                     <div class="count-link">
-                        <a href="">view</a>
+                        <a href="{% url 'ams:admin_components' %}">view</a>
                     </div>
                 </div>
             </div>
         </div>
         <!--accessory card-->
-        <div class="col-12 col-md-2">
+        <div class="col-12 col-md-2 mb-2">
             <div class="card-wrapper">
                 <div class="count-card rounded">
                     <div class="count-title">
-                        <h5>Total Accessories</h5>
+                        <h5>Accessories</h5>
                     </div>
                     <div class="count-value">
                         <p class="m-0">{{accessory|default:0}}</p>
                     </div>
                     <div class="count-link">
-                        <a href="">view</a>
+                        <a href="{% url 'ams:admin_accessories' %}">view</a>
                     </div>
                 </div>
             </div>
         </div>
         <!--consumable card-->
-        <div class="col-12 col-md-2">
+        <div class="col-12 col-md-2 mb-2">
             <div class="card-wrapper">
                 <div class="count-card rounded">
                     <div class="count-title">
-                        <h5>Total Consumables</h5>
+                        <h5>Consumables</h5>
                     </div>
                     <div class="count-value">
                         <p class="m-0">{{consumable|default:0}}</p>
                     </div>
                     <div class="count-link">
-                        <a href="">view</a>
+                        <a href="{% url 'ams:admin_consumables' %}">view</a>
                     </div>
                 </div>
             </div>
         </div>
         <!--asset users card-->
-        <div class="col-12 col-md-2">
+        <div class="col-12 col-md-2 mb-2">
             <div class="card-wrapper">
                 <div class="count-card rounded">
                     <div class="count-title">
@@ -138,7 +149,7 @@ Admin Dashboard
                         <p class="m-0">{{asset_users|default:0}}</p>
                     </div>
                     <div class="count-link">
-                        <a href="">view</a>
+                        <a href="{% url 'ams:admin_asset_users' %}">view</a>
                     </div>
                 </div>
             </div>
@@ -187,7 +198,12 @@ Admin Dashboard
                 <h5>Asset By Status</h5>
             </div>
             <div class="column-content">
-                chart
+                <div class="chart-content d-flex justify-content-center">
+                    <img
+                    class="img-fluid w-100"
+                    src="{% url 'ams:asset_chart' %}" alt="asset Pie Chart"
+                    />
+                </div>
             </div>
         </div>
     </div>
