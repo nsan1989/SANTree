@@ -14,9 +14,20 @@ Assets
 
 <div class="container-fluid">
     <div class="row mb-3">
-        <div class="col-12">
+        <div class="col-12 col-md-6">
             <div class="header-title">
                 <h3>Assets</h3>
+            </div>
+        </div>
+        <div class="col-6 col-md-6">
+            <div class="asset-filters d-flex align-items-center">
+                <label for="statusFilter" class="form-label mb-0 me-3">Filter by Status:</label>
+                <select id="statusFilter" class="form-select form-select-sm w-auto">
+                    <option value="">--select--</option>
+                    {% for status in statuses %}
+                        <option value="{{ status }}">{{ status|title }}</option>
+                    {% endfor %}
+                </select>
             </div>
         </div>
     </div>
@@ -25,6 +36,7 @@ Assets
             <table class="table table-bordered">
                 <thead>
                     <tr class="table-danger">
+                        <th scope="col">Asset No.</th>
                         <th scope="col">Name</th>
                         <th scope="col">Image</th>
                         <th scope="col">Status</th>
@@ -39,7 +51,8 @@ Assets
                 <tbody>
                     {% if assets %}
                         {% for asset in assets %}
-                        <tr class="table-info">
+                        <tr class="table-info asset-row" data-status="{{ asset.status }}">
+                            <td>{{asset.asset_tag|default:"N/A"}}</td>
                             <td>{{asset.name}}</td>
                             <td>{{asset.image}}</td>
                             <td>{{asset.status}}</td>
@@ -119,5 +132,42 @@ Assets
         });
     });
 </script>
+
+<!--asset filtering script-->
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+
+    const filter = document.getElementById("statusFilter");
+    const rows = document.querySelectorAll(".asset-row");
+
+    filter.addEventListener("change", function() {
+        let selected = this.value.toLowerCase();
+        let visibleCount = 0;
+
+        rows.forEach(row => {
+            let rowStatus = row.dataset.status.toLowerCase();
+
+            if (!selected || rowStatus === selected) {
+                row.style.display = "";
+                visibleCount++;
+            } else {
+                row.style.display = "none";
+            }
+        });
+
+        // Optional no-results message
+        let msg = document.getElementById("noResults");
+        if (!msg) {
+            msg = document.createElement("tr");
+            msg.id = "noResults";
+            msg.innerHTML = `<td colspan="100%" class="text-center text-muted">No matching assets found</td>`;
+            document.querySelector("tbody").appendChild(msg);
+        }
+        msg.style.display = visibleCount === 0 ? "" : "none";
+    });
+
+});
+</script>
+
 
 {% endblock %}

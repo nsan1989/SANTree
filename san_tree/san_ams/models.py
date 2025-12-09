@@ -2,6 +2,7 @@ from django.db import models
 import os
 from django.utils import timezone
 from accounts.models import Departments, Location, CustomUsers
+from datetime import date
 
 # license status choices.
 LICENSE_STATUS = [
@@ -177,6 +178,7 @@ ASSET_STATUS = [
 
 # asset model.
 class AssetModel(models.Model):
+    asset_tag = models.CharField(max_length=20, unique=True, blank=True)
     name = models.CharField(max_length=100)
     category = models.ForeignKey(AssetCategoryModel, on_delete=models.CASCADE, related_name='asset_category')
     manufacturer = models.CharField(max_length=100)
@@ -184,10 +186,8 @@ class AssetModel(models.Model):
     serial_number = models.CharField(max_length=100, unique=True)
     image = models.ImageField(upload_to=asset_image_path, null=True, blank=True)
     purchase_date = models.DateField(default=timezone.now)
-    cost = models.DecimalField(max_digits=10, decimal_places=2)
     expiry_date = models.DateField(default=timezone.now)
-    depreciation = models.PositiveIntegerField(default=5)
-    residual_value = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    cost = models.DecimalField(max_digits=10, decimal_places=2)
     asset_component = models.ManyToManyField(ComponentModel, blank=True, related_name='asset_components')
     asset_consumable = models.ManyToManyField(ConsumableModel, blank=True, related_name='asset_consumables')
     asset_accessory = models.ManyToManyField(AccessoryModel, blank=True, related_name='asset_accessories')
@@ -210,3 +210,29 @@ class AssetModel(models.Model):
     class Meta:
         ordering = ['name']
         verbose_name_plural = 'Assets'
+
+    @property
+    def useful_life_years(self):
+        days = (self.expiry_date - self.purchase_date).days
+        return max(days / 365, 1)
+    
+    @property
+    def annual_depreciation(self):
+        return float(self.cost) / self.useful_life_years
+    
+    @property
+    def accumulated_depreciation(self):
+        elapsed_years = (date.today() - self.purchase_date).days / 365
+        depreciation = self.annual_depreciation * elapsed_years
+        return min(depreciation, float(self.cost))
+    
+    @property
+    def current_value(self):
+        return max(float(self.cost) - self.accumulated_depreciation, 0)
+    
+    def save(self, *args, **kwargs):
+        if not self.asset_tag:
+            last_id = AssetModel.objects.aggregate(models.Max('id'))['id__max'] or 0
+            self.asset_tag = f"ASSET{str(last_id + 1).zfill(5)}"
+        super().save(*args, **kwargs)
+        

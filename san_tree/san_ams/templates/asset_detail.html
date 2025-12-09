@@ -1,4 +1,5 @@
 {% extends 'index.html' %}
+{% load static %}
 
 {% block title %}
 Asset Detail
@@ -6,59 +7,119 @@ Asset Detail
 
 {% block start %}
 <style>
+    .header-title h3 {
+        color: wheat;
+        font-weight: bold;
+    }
 
+    .asset-title {
+        display: inline-block;
+        width: 8rem;
+        padding: 4px;
+    }
 </style>
 
 <div class="container-fluid">
-    <div class="row">
-        <div class="col-12 table-responsive">
-            <table class="table table-bordered">
-                <thead>
-                    <tr class="table-danger">
-                        <th scope="col">Name</th>
-                        <th scope="col">Manufacturer</th>
-                        <th scope="col">Model Number</th>
-                        <th scope="col">Serial Number</th>
-                        <th scope="col">Image</th>
-                        <th scope="col">Purchase Date</th>
-                        <th scope="col">Cost</th>
-                        <th scope="col">Expiry Date</th>
-                        <th scope="col">Depreciation</th>
-                        <th scope="col">Status</th>
-                        <th scope="col">Handler</th>
-                        <th scope="col">Department</th>
-                        <th scope="col">Location</th>
-                        <th scope="col">Requestable</th>
-                        <th scope="col">Assigned To</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% if asset %}
-                        <tr class="table-info">
-                            <td>{{asset.name}}</td>
-                            <td>{{asset.manufacturer}}</td>
-                            <td>{{asset.model_number}}</td>
-                            <td>{{asset.serial_number}}</td>
-                            <td>{{asset.image}}</td>
-                            <td>{{asset.purchase_date}}</td>
-                            <td>{{asset.cost}}</td>
-                            <td>{{asset.expiry_date}}</td>
-                            <td>{{asset.depreciation}}</td>
-                            <td>{{asset.status}}</td>
-                            <td>{{asset.handler}}</td>
-                            <td>{{asset.department}}</td>
-                            <td>{{asset.location}}</td>
-                            <td>{{asset.requestable}}</td>
-                            <td>{{asset.assigned_to}}</td>
-                        </tr>
-                    {% else %}
-                        <tr class="table-info">
-                            <td colspan="100%" class="text-center">No assets found.</td>
-                        </tr>
-                    {% endif %}
-                </tbody>
-            </table>
+    <div>
+        <span>
+            <div class="mb-3">
+                <a href="javascript:history.back()" class="d-flex align-items-center text-warning"
+                    style="text-decoration: none">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    &nbsp;back
+                </a>
+            </div>
+        </span>
+    </div>
+    <div class="row mb-3">
+        <div class="col-12">
+            <div class="header-title">
+                <h3>Asset Detail</h3>
+            </div>
         </div>
+    </div>
+    <div class="card p-4">
+        {% if asset %}
+        <div class="row">
+            <!--asset details-->
+            <div class="col-12 col-md-8 card shadow-sm p-4">
+                <div class="row">
+                    <div class="col-12 col-md-6">
+                        <div>
+                            <strong class="asset-title">Asset No.</strong>&colon;&nbsp;{{ asset.asset_tag|default:"N/A" }}
+                        </div>
+                        <div>
+                            <strong class="asset-title">Name</strong>&colon;&nbsp;{{ asset.name|default:"N/A" }}
+                        </div>
+                        <div>
+                            <strong class="asset-title">Category</strong>&colon;&nbsp;{{ asset.category.name|default:"N/A" }}
+                        </div>
+                        <div>
+                            <strong class="asset-title">Manufacturer</strong>&colon;&nbsp;{{ asset.manufacturer|default:"N/A" }}
+                        </div>
+                        <div>
+                            <strong class="asset-title">Model Number</strong>&colon;&nbsp;{{ asset.model_number|default:"N/A" }}
+                        </div>
+                        <div>
+                            <strong class="asset-title">Serial Number</strong>&colon;&nbsp;{{ asset.serial_number|default:"N/A" }}
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <div>
+                            <strong class="asset-title">Status</strong>&colon;&nbsp;{{ asset.status|default:"N/A" }}
+                        </div>
+                        <div>
+                            <strong class="asset-title">Handler</strong>&colon;&nbsp;{{ asset.handler|default:"N/A" }}
+                        </div>
+                        <div>
+                            <strong class="asset-title">Assigned To</strong>&colon;&nbsp;{{ asset.assigned_to|default:"N/A" }}
+                        </div>
+                        <div>
+                            <strong class="asset-title">Department</strong>&colon;&nbsp;{{ asset.department|default:"N/A" }}
+                        </div>
+                        <div>
+                            <strong class="asset-title">Location</strong>&colon;&nbsp;{{ asset.location|default:"N/A" }}
+                        </div>
+                    </div>
+                </div>
+                <hr />
+                <div class="row">
+                    <div class="col-12 col-md-6">
+                        <div>
+                            <strong class="asset-title">Purchase Date</strong>&colon;&nbsp;{{ asset.purchase_date|date:"F j, Y"|default:"N/A" }}
+                        </div>
+                        <div>
+                            <strong class="asset-title">Expiry Date</strong>&colon;&nbsp;{{ asset.expiry_date|date:"F j, Y"|default:"N/A" }}
+                        </div>
+                        <div>
+                            <strong class="asset-title">Cost</strong>&colon;&nbsp;$.&nbsp;{{ asset.cost|default:"N/A" }}
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <div>
+                            <strong class="asset-title">Accumulated Depreciation</strong>&colon;&nbsp;$.&nbsp;{{ asset.accumulated_depreciation|floatformat:2|default:"N/A" }}
+                        </div>
+                        <div>
+                            <strong class="asset-title">Annual Depreciation</strong>&colon;&nbsp;$.&nbsp;{{ asset.annual_depreciation|floatformat:2|default:"N/A" }}
+                        </div>
+                        <div>
+                            <strong class="asset-title">Current Value</strong>&colon;&nbsp;$.&nbsp;{{ asset.current_value|floatformat:2|default:"N/A" }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--asset image-->
+            <div class="col-12 col-md-4 d-flex align-items-center justify-content-center">
+                {% if asset.image %}
+                <img class="img-fluid" src="{{ asset.image.url }}" alt="Asset Image"
+                    style="max-width: 150px; max-height: 150px;">
+                {% else %}
+                <img class="img-fluid" src="{% static 'images/default_image.png' %}" alt="Default Image"
+                    style="max-width: 150px; max-height: 150px;">
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
     </div>
 </div>
 {% endblock %}

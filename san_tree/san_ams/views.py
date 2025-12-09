@@ -61,9 +61,8 @@ def StaffDashboardView(request):
     except:
         raise PermissionDenied("User profile not found")
     context = {}
-    # asset handler
     try:
-        activity = AssetModel.objects.all()
+        activity = AssetModel.objects.filter(handler = current_user)
         if activity.exists():
             context["activities"] = activity[:10]
         else:
@@ -82,15 +81,6 @@ def StaffDashboardView(request):
             'component': total_components,
             'accessory': total_assessories,
         })
-    except Exception as e:
-        context["error"] = f"An unexpected error occurred: {e}"
-    # asset requester
-    try:
-        assets_requested = AssetModel.objects.filter(created_by = current_user).order_by('created_at')
-        if assets_requested.exists():
-            context.update["assets"] = assets_requested[:10]
-        else:
-            context.update["assets_message"] = "No asset have been requested!"
     except Exception as e:
         context["error"] = f"An unexpected error occurred: {e}"
     view_name = request.resolver_match.view_name
@@ -316,8 +306,12 @@ def AssetView(request):
     context = {}
     try:
         assets = AssetModel.objects.all()
+        statuses = [choice[0] for choice in ASSET_STATUS]
         if assets.exists():
-            context["assets"] = assets
+            context = {
+                "assets": assets,
+                "statuses": statuses,
+            }
         else:
             context["assets_message"] = "No assets found!"
     except Exception as e:

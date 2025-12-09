@@ -53,7 +53,7 @@ class AddAssetCategoryForm(forms.ModelForm):
 class AddAssetForm(forms.ModelForm):
     class Meta:
         model = AssetModel
-        fields = ['name', 'category', 'manufacturer', 'model_number', 'serial_number', 'image', 'purchase_date', 'cost', 'expiry_date', 'depreciation', 'residual_value']
+        fields = ['name', 'category', 'manufacturer', 'model_number', 'serial_number', 'image', 'purchase_date', 'cost', 'expiry_date']
 
 # Assigned License Form
 class AssignedLicenseForm(forms.ModelForm):
