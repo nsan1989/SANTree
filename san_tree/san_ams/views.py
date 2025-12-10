@@ -279,22 +279,28 @@ def AddAssetCategoryView(request):
 
 # Add Asset Form
 def AddAssetView(request):
+    category = AssetCategoryModel.objects.all()
     if request.method == 'POST':
         form = AddAssetForm(request.POST)
         if form.is_valid():
             asset = form.save(commit=False)
-            exists = AssetCategoryModel.objects.filter(name__iexact=asset.name).exists()
+            exists = AssetModel.objects.filter(name__iexact=asset.name).exists()
             if exists:
-                messages.error(request, 'Asset category already exist!')
+                messages.error(request, 'Asset already exist!')
             else:
                 asset.save()
-                messages.error(request, 'Asset category added successfully!')
+                messages.error(request, 'Asset added successfully!')
         else:
             messages.error(request, 'Please correct the errors below.')
     else:
         form = AddAssetForm()
 
-    return render(request, 'asset_form_templates/asset_form.html', {'form': form})
+    context = {
+        'form': form,
+        'category': category,
+    }
+
+    return render(request, 'asset_form_templates/asset_form.html', context)
 
 # Asset View.
 def AssetView(request):
@@ -321,6 +327,35 @@ def AssetView(request):
         return render(request, 'admin_assets.html', context)
     if view_name == "ams:staff_assets" and current_user_role == 'User':
         return render(request, 'staff_assets.html', context)
+    raise PermissionDenied("You are not authorized to view this page. Please contact administrator!")
+
+# Asset Request View.
+def AssetRequestView(request):
+    current_user = request.user
+    try:
+        current_user_role = current_user.role
+    except:
+        raise PermissionDenied("User profile not found")
+    context = {}
+    form = AssetRequestForm(request.POST or None)
+    try:
+        if request.method == 'POST':
+            if form.is_valid():
+                asset_request = form.save(commit=False)
+                asset_request.requested_by = current_user
+                asset_request.save()
+                context["success"] = "Asset request submitted successfully."
+                return redirect("ams:admin_asset_requests" if current_user_role == 'Admin' else "ams:staff_asset_requests")
+        context = {
+            "form": form,
+        }
+    except Exception as e:
+        context["error"] = f"An unexpected error occurred: {e}"
+    view_name = request.resolver_match.view_name
+    if view_name == "ams:admin_asset_requests" and current_user_role == 'Admin':
+        return render(request, 'asset_request.html', context)
+    if view_name == "ams:staff_asset_requests" and current_user_role == 'User':
+        return render(request, 'asset_request.html', context)
     raise PermissionDenied("You are not authorized to view this page. Please contact administrator!")
 
 # Assigned Asset View.

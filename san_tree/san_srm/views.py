@@ -131,6 +131,10 @@ def StaffDashboard(request):
     open_created_service = Service.objects.filter(created_by = user, status = 'Open').count()
     progress_created_service = Service.objects.filter(created_by = user, status = 'In Progress').count()
     completed_created_service = Service.objects.filter(created_by = user, status = 'Completed').count()
+    user_services = Service.objects.filter(
+        Q(assigned_to__shift_staffs=user) | Q(created_by=user),
+        Q(status__in=['Open', 'In Progress', 'On Hold', 'Completed'])
+    ).order_by('-created_at')[:10]
     assign_service = Service.objects.filter(assigned_to__shift_staffs = user).all().count()
     open_assign_service = Service.objects.filter(assigned_to__shift_staffs = user, status = 'Open').count()
     progress_assign_service = Service.objects.filter(assigned_to__shift_staffs = user, status = 'In Progress').count()
@@ -192,6 +196,7 @@ def StaffDashboard(request):
         'open_created_serv': open_created_service,
         'prog_created_serv': progress_created_service,
         'comp_created_serv': completed_created_service,
+        'user_services': user_services,
         'total_assign_service': assign_service,
         'open_assign_service': open_assign_service,
         'prog_assign_serv': progress_assign_service,
@@ -431,7 +436,7 @@ def assign_service_from_queue(vacant_staff):
 
             if active:
                 service.assigned_to = s
-                service.status = 'In Progress'
+                service.status = 'Open'
                 service.save()
 
                 vacant_staff.status = 'engaged'

@@ -59,22 +59,22 @@ MENU_STRUCTURE = {
         'user': [
             {"name": "Dashboard", "url_name": "ams:staff_dashboard", "view_name": "StaffDashboardView", "icon": "fa-solid fa-chart-line"},
             {"name": "Assets", "url_name": "ams:staff_assets", "view_name": "AssetView", "icon": "fa-solid fa-warehouse"},
-            {"name": "Accessories", "url_name": "ams:staff_accessories", "view_name": "AccessoriesView", "icon": "fa-solid fa-keyboard"},
-            {"name": "Consumables", "url_name": "ams:staff_consumables", "view_name": "ConsumablesView", "icon": "fa-solid fa-paperclip"},
-            {"name": "Components", "url_name": "ams:staff_components", "view_name": "ComponentsView", "icon": "fa-solid fa-microchip"},
-            {"name": "Asset Users", "url_name": "ams:staff_asset_users", "view_name": "AssetUsersView", "icon": "fa-solid fa-users"},
-            {"name": "Settings", "url_name": None, "view_name": None, "icon": "fa-solid fa-gear", 
-             "children": [
-                {"name": "Assets", "url_name": "ams:add_asset", "view_name": "AddAssetView", "icon": "fa-solid fa-plus"},
-                {"name": "Accessory Category", "url_name": "ams:add_asset_category", "view_name": "AddAccessoryCategoryView", "icon": "fa-solid fa-plus"},
-                {"name": "Accessory", "url_name": "ams:add_accessory", "view_name": "AddAccessoryView", "icon": "fa-solid fa-plus"},
-                {"name": "Components Category", "url_name": "ams:add_component_category", "view_name": "AddComponentCategoryView", "icon": "fa-solid fa-plus"},
-                {"name": "Components", "url_name": "ams:add_component", "view_name": "AddAccessoryView", "icon": "fa-solid fa-plus"},
-                {"name": "Consumables Category", "url_name": "ams:add_consumable_category", "view_name": "AddConsumableCategoryView", "icon": "fa-solid fa-plus"},
-                {"name": "Consumables", "url_name": "ams:add_consumable", "view_name": "AddConsumableView", "icon": "fa-solid fa-plus"},
-                {"name": "Licenses", "url_name": "ams:add_license", "view_name": "AddLicenseView", "icon": "fa-solid fa-plus"},
-             ]
-             },
+#            {"name": "Accessories", "url_name": "ams:staff_accessories", "view_name": "AccessoriesView", "icon": "fa-solid fa-keyboard"},
+#            {"name": "Consumables", "url_name": "ams:staff_consumables", "view_name": "ConsumablesView", "icon": "fa-solid fa-paperclip"},
+#            {"name": "Components", "url_name": "ams:staff_components", "view_name": "ComponentsView", "icon": "fa-solid fa-microchip"},
+#            {"name": "Asset Users", "url_name": "ams:staff_asset_users", "view_name": "AssetUsersView", "icon": "fa-solid fa-users"},
+#            {"name": "Settings", "url_name": None, "view_name": None, "icon": "fa-solid fa-gear", 
+#             "children": [
+#                {"name": "Assets", "url_name": "ams:add_asset", "view_name": "AddAssetView", "icon": "fa-solid fa-plus"},
+#                {"name": "Accessory Category", "url_name": "ams:add_asset_category", "view_name": "AddAccessoryCategoryView", "icon": "fa-solid fa-plus"},
+#                {"name": "Accessory", "url_name": "ams:add_accessory", "view_name": "AddAccessoryView", "icon": "fa-solid fa-plus"},
+#                {"name": "Components Category", "url_name": "ams:add_component_category", "view_name": "AddComponentCategoryView", "icon": "fa-solid fa-plus"},
+#                {"name": "Components", "url_name": "ams:add_component", "view_name": "AddAccessoryView", "icon": "fa-solid fa-plus"},
+#                {"name": "Consumables Category", "url_name": "ams:add_consumable_category", "view_name": "AddConsumableCategoryView", "icon": "fa-solid fa-plus"},
+#                {"name": "Consumables", "url_name": "ams:add_consumable", "view_name": "AddConsumableView", "icon": "fa-solid fa-plus"},
+#                {"name": "Licenses", "url_name": "ams:add_license", "view_name": "AddLicenseView", "icon": "fa-solid fa-plus"},
+#                ]
+#            },
         ]
     },
 }

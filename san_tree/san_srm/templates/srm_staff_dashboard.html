@@ -44,7 +44,8 @@ Dashboard
         font-weight: 600;
     }
 
-    .shift-title h3 {
+    .shift-title h3,
+    .activity-title h3 {
         font-family: 'Poppins', sans-serif;
         color: wheat;
     }
@@ -194,6 +195,42 @@ Dashboard
     {% endif %}
 
     <div class="row mb-3">
+        <!--recent activity-->
+        <div class="col-12 col-md-8">
+            <div class="activity-title">
+                <h3>Recent Activity</h3>
+            </div>
+            <div class="activity-content table-responsive">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr class="table-danger">
+                            <th>Service No.</th>
+                            <th>Services</th>
+                            <th>Status</th>
+                            <th>From</th>
+                            <th>To</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if user_services %}
+                            {% for service in user_services %}
+                            <tr class="table-info">
+                                <td>{{service.service_number}}</td>
+                                <td>{{service.service_type}}</td>
+                                <td>{{service.status}}</td>
+                                <td>{{service.from_location}}</td>
+                                <td>{{service.to_location}}</td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                        <tr>
+                            <td colspan="100%">No recent activities!</td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
         {% if request.user.department.name == 'GDA' or request.user.department.name == 'General Duty Assistant' %}
         <div class="col-12 col-md-4">
             <div class="row h-100">
@@ -239,34 +276,35 @@ Dashboard
                 </div>
             </div>
         </div>
-        {% endif %}
+        {% else %}
         <div class="col-12 col-md-4">
             <div class="chart-title mb-2">
                 <h3>Service Pie Chart</h3>
             </div>
             <!-- Filter form -->
-        <form method="get" class="row g-2 align-items-end mb-3">
-          <div class="col-auto">
-            <label for="start_date" class="form-label small mb-1">Start</label>
-            <input type="date" id="start_date" name="start_date" class="form-control form-control-sm"
-              value="{{ request.GET.start_date }}">
-          </div>
+            <form method="get" class="row g-2 align-items-end mb-3">
+                <div class="col-auto">
+                    <label for="start_date" class="form-label small mb-1">Start</label>
+                    <input type="date" id="start_date" name="start_date" class="form-control form-control-sm"
+                    value="{{ request.GET.start_date }}">
+                </div>
 
-          <div class="col-auto">
-            <label for="end_date" class="form-label small mb-1">End</label>
-            <input type="date" id="end_date" name="end_date" class="form-control form-control-sm"
-              value="{{ request.GET.end_date }}">
-          </div>
+                <div class="col-auto">
+                    <label for="end_date" class="form-label small mb-1">End</label>
+                    <input type="date" id="end_date" name="end_date" class="form-control form-control-sm"
+                    value="{{ request.GET.end_date }}">
+                </div>
 
-          <div class="col-auto">
-            <button type="submit" class="btn btn-primary btn-sm">
-              Filter
-            </button>
-          </div>
-        </form>
-            <img class="img-fluid rounded-2" src="{% url 'srm:service_pie_chart' %}?start_date={{ request.GET.start_date }}&end_date={{ request.GET.end_date }}&v={{ now }}"
+                <div class="col-auto">
+                    <button type="submit" class="btn btn-primary btn-sm">
+                    Filter
+                    </button>
+                </div>
+            </form>
+            <img class="img-fluid rounded-2 w-100" src="{% url 'srm:service_pie_chart' %}?start_date={{ request.GET.start_date }}&end_date={{ request.GET.end_date }}&v={{ now }}"
                 alt="service Pie Chart" />
         </div>
+        {% endif %}
     </div>
 </div>
 
