@@ -311,7 +311,7 @@ def AssetView(request):
         raise PermissionDenied("User profile not found")
     context = {}
     try:
-        assets = AssetModel.objects.all()
+        assets = AssetModel.objects.filter(department = current_user.department).all()
         statuses = [choice[0] for choice in ASSET_STATUS]
         if assets.exists():
             context = {
@@ -366,15 +366,16 @@ def AssignedAssetView(request, asset_id):
     except:
         raise PermissionDenied("User profile not found")
     asset = get_object_or_404(AssetModel, id=asset_id)
+    users = CustomUsers.objects.exclude(department_id = current_user.department_id)
     context = {"asset": asset}
 
-    form = AssignedAssetForm(request.POST or None)
+    form = AssignedAssetForm(request.POST or None, users=users)
     
     try:
         if request.method == 'POST':
             if form.is_valid():
-                selected_user_id = form.cleaned_data("assigned_to")
-                selected_user = get_object_or_404(CustomUsers, id=selected_user_id)
+                selected_user_id = form.cleaned_data["assigned_to"]
+                selected_user = get_object_or_404(users, id=selected_user_id)
                 asset.assigned_to = selected_user
                 asset.status = 'assigned'
                 asset.save()

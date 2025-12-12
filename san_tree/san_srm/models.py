@@ -36,16 +36,6 @@ class Blocks(models.Model):
     class Meta:
         ordering = ['name']
         verbose_name_plural = 'Blocks'
-    
-# Status Choices.
-STATUS_CHOICES = (
-    ('Open', 'Open'),
-    ('In Progress', 'In Progress'),
-    ('Waiting', 'Waiting'),
-    ('Pending', 'Pending'),
-    ('On Hold', 'On Hold'),
-    ('Completed', 'Completed'),
-)
 
 # Shift Types.
 SHIFT_CHOICES = (
@@ -77,6 +67,17 @@ class ShiftSchedule(models.Model):
         if self.end_time and timezone.is_naive(self.end_time):
             self.end_time = timezone.make_aware(self.end_time, timezone.get_current_timezone())
         super().save(*args, **kwargs)
+
+    
+# Status Choices.
+STATUS_CHOICES = (
+    ('Open', 'Open'),
+    ('In Progress', 'In Progress'),
+    ('Waiting', 'Waiting'),
+    ('Pending', 'Pending'),
+    ('On Hold', 'On Hold'),
+    ('Completed', 'Completed'),
+)
 
 # Request Service Model.
 class Service(models.Model):

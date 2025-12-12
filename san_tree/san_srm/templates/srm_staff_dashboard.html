@@ -44,6 +44,11 @@ Dashboard
         font-weight: 600;
     }
 
+    .card-body a {
+        text-decoration: none;
+        font-family: 'Poppins', sans-serif;
+    }
+
     .shift-title h3,
     .activity-title h3 {
         font-family: 'Poppins', sans-serif;
@@ -123,6 +128,7 @@ Dashboard
                 <div class="card-body">
                     <h5>Request</h5>
                     <p>{{total_assign_service}}</p>
+                    <a class="text-warning" href="{% url 'srm:staff_service' %}">View</a>
                 </div>
             </div>
         </div>
@@ -131,6 +137,7 @@ Dashboard
                 <div class="card-body">
                     <h5>Open</h5>
                     <p class="m-0 p-0">{{open_assign_service}}</p>
+                    <a class="text-warning" href="{% url 'srm:staff_service' %}">View</a>
                 </div>
                 <!--
                 <div class="card-link">
@@ -145,6 +152,7 @@ Dashboard
                 <div class="card-body">
                     <h5>Progress</h5>
                     <p>{{prog_assign_serv}}</p>
+                    <a class="text-warning" href="{% url 'srm:staff_service' %}">View</a>
                 </div>
             </div>
         </div>
@@ -153,6 +161,7 @@ Dashboard
                 <div class="card-body">
                     <h5>Completed</h5>
                     <p>{{comp_assign_serv}}</p>
+                    <a class="text-warning" href="{% url 'srm:staff_service' %}">View</a>
                 </div>
             </div>
         </div>
@@ -236,7 +245,6 @@ Dashboard
             <div class="row h-100">
                 <div 
                 class="col-12 shift-title" 
-                style="height: 3rem;min-height: 3rem;"
                 >
                     <h3>Shift Schedule</h3>
                 </div>

@@ -74,6 +74,13 @@ class AssignedAssetForm(forms.ModelForm):
         model = AssetModel
         fields = ['assigned_to']
 
+    def __init__(self, *args, **kwargs):
+        users = kwargs.pop('users', None)
+        super().__init__(*args, **kwargs)
+
+        if users is not None:
+            self.fields['assigned_to'].queryset = users
+
 # Asset Request Form
 class AssetRequestForm(forms.ModelForm):
     name = forms.ModelChoiceField(

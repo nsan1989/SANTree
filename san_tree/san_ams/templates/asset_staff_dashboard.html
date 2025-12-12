@@ -42,15 +42,14 @@ Staff Dashboard
         color: white;
     }
 
+    .count-title h5 {
+        text-align: center;
+        font-size: 1rem;
+    }
+
     .count-link a {
         text-decoration: none;
         color: orange;
-    }
-</style>
-
-<style>
-    .header-title h3 {
-        color: wheat;
     }
 </style>
 
@@ -74,7 +73,7 @@ Staff Dashboard
                         <p class="m-0">{{asset|default:0}}</p>
                     </div>
                     <div class="count-link">
-                        <a href="">view</a>
+                        <a href="{% url 'ams:staff_assets' %}">view</a>
                     </div>
                 </div>
             </div>
@@ -166,7 +165,12 @@ Staff Dashboard
                 <h5>Asset By Status</h5>
             </div>
             <div class="column-content">
-                chart
+                <div class="chart-content d-flex justify-content-center">
+                    <img
+                    class="img-fluid w-100"
+                    src="{% url 'ams:asset_chart' %}" alt="asset Pie Chart"
+                    />
+                </div>
             </div>
         </div>
     </div>

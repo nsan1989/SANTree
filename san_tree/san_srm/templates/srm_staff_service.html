@@ -45,7 +45,7 @@ Service
         </div>
     </div>
     <div class="row mb-3">
-        <div class="col-12">
+        <div class="col-12 col-md-8">
             <nav>
             <ul class="pagination">
               {% if page_obj.has_previous %}
@@ -70,6 +70,20 @@ Service
               {% endif %}
             </ul>
           </nav>
+        </div>
+        <div class="col-12 col-md-4">
+          <div class="col-12 col-md-4 d-flex align-items-center">
+          <h6 class="mb-0 text-warning">filters</h6>
+          &nbsp;&nbsp;
+          <select class="form-select form-select-sm"
+        style="width: 150px;"
+        onchange="window.location='?status=' + this.value">
+            <option value="">-- select --</option>
+            {% for value, label in status %}
+                <option value="{{ value }}" {% if selected_option == value %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+        </div>
         </div>
     </div>
     <div class="row">
@@ -140,12 +154,12 @@ Service
         </div>
     </div>
     <div class="row mb-3">
-        <div class="col-12">
+        <div class="col-12 col-md-8">
             <nav>
             <ul class="pagination">
               {% if page_obj.has_previous %}
                 <li class="page-item">
-                  <a class="page-link" href="page={{ page_obj.previous_page_number }}">Previous</a>
+                  <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a>
                 </li>
               {% endif %}
               {% for num in page_obj.paginator.page_range %}
@@ -153,18 +167,30 @@ Service
                   <li class="page-item active"><span class="page-link">{{ num }}</span></li>
                 {% else %}
                   <li class="page-item">
-                    <a class="page-link" href="page={{ num }}">{{ num }}</a>
+                    <a class="page-link" href="?page={{ num }}">{{ num }}</a>
                   </li>
                 {% endif %}
               {% endfor %}
         
               {% if page_obj.has_next %}
                 <li class="page-item">
-                  <a class="page-link" href="page={{ page_obj.next_page_number }}">Next</a>
+                  <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
                 </li>
               {% endif %}
             </ul>
           </nav>
+        </div>
+        <div class="col-12 col-md-4 d-flex align-items-center">
+          <h6 class="mb-0 text-warning">filters</h6>
+          &nbsp;&nbsp;
+          <select class="form-select form-select-sm"
+        style="width: 150px;"
+        onchange="window.location='?status=' + this.value">
+            <option value="">-- select --</option>
+            {% for value, label in status %}
+                <option value="{{ value }}" {% if selected_option == value %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
         </div>
     </div>
     <div class="row">

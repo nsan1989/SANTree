@@ -515,13 +515,14 @@ def RequestServiceView(request):
     assign_service = assign_service.annotate(
         latest_remark_text=Subquery(latest_remark_subquery.values('remarks')[:1])
     )
-    selected_option = request.GET.get('serviceType', 'default')
+    selected_option = request.GET.get('status')
     if selected_option == 'request':
-        services = request_service
-    elif selected_option == 'generate':
-        services = assign_service
-    elif selected_option == 'anonymous':
-        services = anonymous_service
+        services = services.filter(status=selected_option)
+#        services = request_service
+#    elif selected_option == 'generate':
+#        services = assign_service
+#    elif selected_option == 'anonymous':
+#        services = anonymous_service
     else:
         if user.department.name in ['GDA', 'General Duty Assistant']:
             services = assign_service
@@ -530,9 +531,11 @@ def RequestServiceView(request):
     page_number = request.GET.get('page')
     paginator = Paginator(services, 10)
     page_obj = paginator.get_page(page_number)
+    service_status = Service._meta.get_field('status').choices
     context = {
         'page_obj': page_obj,
         'selected_option': selected_option,
+        'status': service_status,
     }
     view_name = request.resolver_match.view_name
     if view_name == "srm:admin_service" and user_role == 'Admin':
