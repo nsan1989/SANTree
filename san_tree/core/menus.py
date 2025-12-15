@@ -4,12 +4,12 @@ MENU_STRUCTURE = {
             {"name": "Dashboard", "url_name": "cms:admin_dashboard", "icon": "fa-solid fa-chart-line"},
             {"name": "Complaints", "url_name": "cms:incharge_complaints_history", "icon": "fa-solid fa-person-circle-exclamation"},
             {"name": "Review", "url_name": "cms:review_complaints", "icon": "fa-solid fa-list-check"},
-            {"name": "Tasks", "url_name": "cms:assigned_complaint", "icon": "fa-regular fa-square-check"}
+            {"name": "Assigned", "url_name": "cms:assigned_complaint", "icon": "fa-regular fa-square-check"}
         ],
         'user': [
             {"name": "Dashboard", "url_name": "cms:staff_dashboard", "icon": "fa-solid fa-chart-line"},
             {"name": "Complaints", "url_name": "cms:staff_complaints_history", "icon": "fa-solid fa-person-circle-exclamation"},
-            {"name": "Tasks", "url_name": "cms:staff_assigned_tasks", "icon": "fa fa-tasks"}
+            {"name": "Assigned", "url_name": "cms:staff_assigned_tasks", "icon": "fa fa-tasks"}
         ]
     },
     'tms': {

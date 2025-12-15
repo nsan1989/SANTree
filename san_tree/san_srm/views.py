@@ -408,11 +408,6 @@ def assign_service_from_queue(vacant_staff):
         now_local = timezone.localtime(timezone.now())
         assigned = False
 
-#        schedule_qs = ShiftSchedule.objects.filter(
-#            shift_block=service.service_block,
-#            shift_staffs_id=vacant_staff.id
-#        )
-
         schedule_qs = (
             ShiftSchedule.objects.filter(
                 shift_block = service.service_block,
@@ -427,11 +422,6 @@ def assign_service_from_queue(vacant_staff):
         for s in schedule_qs:
             s_start = timezone.localtime(s.start_time)
             s_end = timezone.localtime(s.end_time)
-
-#            if s_start <= s_end:
-#                active = s_start <= now_local <= s_end
-#            else:
-#                active = now_local >= s_start or now_local <= s_end
             active = s_start <= now_local <= s_end
 
             if active:
@@ -507,7 +497,6 @@ def RequestServiceView(request):
         assign_service = Service.objects.filter(assigned_to__shift_staffs__department__name = user.department).order_by('-created_at')
     else:
         assign_service = Service.objects.filter(assigned_to__shift_staffs = user).order_by('-created_at')
-    anonymous_service = AnonymousServiceGenerate.objects.filter(assigned_to__shift_staffs = user)
     latest_remark_subquery = ServiceRemarks.objects.filter(service=OuterRef('pk')).order_by('-created_at')
     request_service = request_service.annotate(
         latest_remark_text=Subquery(latest_remark_subquery.values('remarks')[:1])
@@ -528,8 +517,11 @@ def RequestServiceView(request):
             services = assign_service
         else:
             services = request_service
-    page_number = request.GET.get('page')
+    selected_option = request.GET.get('status')
+    if selected_option:
+        services = services.filter(status=selected_option)
     paginator = Paginator(services, 10)
+    page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     service_status = Service._meta.get_field('status').choices
     context = {
