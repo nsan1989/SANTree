@@ -14,11 +14,11 @@ MENU_STRUCTURE = {
     },
     'tms': {
         'admin': [
-            {"name": "Dashboard", "url_name": "tms:admin_dashboard", "view_name":"TaskDashboard", "icon": "fa-solid fa-chart-line"},
+            {"name": "Dashboard", "url_name": "tms:tms_admin_dashboard", "view_name":"TaskDashboard", "icon": "fa-solid fa-chart-line"},
             {"name": "Tasks", "url_name": "tms:tasks", "view_name":"AllTasks", "icon": "fa-solid fa-person-circle-exclamation"}
         ],
         'user': [
-            {"name": "Dashboard", "url_name": "tms:staff_dashboard", "view_name":"TaskDashboard", "icon": "fa-solid fa-chart-line"},
+            {"name": "Dashboard", "url_name": "tms:tms_staff_dashboard", "view_name":"TaskDashboard", "icon": "fa-solid fa-chart-line"},
             {"name": "Tasks", "url_name": "tms:my_tasks", "view_name":"MyTasks", "icon": "fa-solid fa-person-circle-exclamation"}
         ]
     },

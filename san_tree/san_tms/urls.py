@@ -4,8 +4,8 @@ from .views import *
 app_name = "tms"
 
 urlpatterns = [
-    path('tasks_admin/dashboard/', TaskDashboard, name='admin_dashboard'),
-    path('tasks_staff/dashboard/', StaffDashboard, name='staff_dashboard'),
+    path('tasks_admin/dashboard/', TaskDashboard, name='tms_admin_dashboard'),
+    path('tasks_staff/dashboard/', StaffDashboard, name='tms_staff_dashboard'),
 #    path('tasks_pie_chart/', TasksPieChart, name='all_tasks_pie_chart'),
     path('tasks_admin/all_tasks/', AllTasks, name='tasks'),
     path('tasks_admin/all_tasks/all_tasks_details/<int:id>/', AllTasksDetails, name='admin_tasks_details'),
