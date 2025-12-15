@@ -164,7 +164,6 @@ def TaskDashboard(request):
     view_name = request.resolver_match.view_name
     if view_name == "tms:admin_dashboard" and user_role == 'Admin':
         return render(request, 'tasks_dashboard.html', context)
-
     raise PermissionDenied("You are not authorized to view this page.")
 
 # Staff Dashboard View.
@@ -210,6 +209,7 @@ def StaffDashboard(request):
     view_name = request.resolver_match.view_name
     if view_name == "tms:staff_dashboard" and user_role == 'User':
         return render(request, 'staff_dashboard.html', context)
+    raise PermissionDenied("You are not authorized to view this page.")
 
 # Load Task Types.
 def load_tasks_types(request):
