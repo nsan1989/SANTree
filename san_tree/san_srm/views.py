@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.db.models import Q, Min
+from django.db.models import Q, Min, Max
 from django.core.exceptions import PermissionDenied
 from .models import *
 from .forms import *
@@ -408,16 +408,10 @@ def assign_service_from_queue(vacant_staff):
         now_local = timezone.localtime(timezone.now())
         assigned = False
 
-        schedule_qs = (
-            ShiftSchedule.objects.filter(
+        schedule_qs = ShiftSchedule.objects.filter(
                 shift_block = service.service_block,
                 shift_staffs__status = 'vacant'
-            ).annotate(
-                last_completed=Min(
-                    'srm_service_staff__completed_at', filter=Q(srm_service_staff__status='Completed')
-                )
-            ).order_by('last_completed')
-            )
+            ).order_by('completed_at')
 
         for s in schedule_qs:
             s_start = timezone.localtime(s.start_time)
