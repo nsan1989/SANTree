@@ -113,16 +113,12 @@ class Service(models.Model):
     def save(self, *args, **kwargs):
         is_new = self.pk is None
 
-        super().save(*args, **kwargs)
-
-        # Assign service number only once when new
-        if is_new and not self.service_number:
-            self.service_number = f"SRM{self.id}"
-            Service.objects.filter(pk=self.pk).update(service_number=self.service_number)
-
+        old_status = None
         if not is_new:
             before = Service.objects.get(pk=self.pk)
             old_status = before.status
+            
+        if not is_new:
             new_status = self.status
 
             if old_status == 'Open' and new_status == 'In Progress':
@@ -133,7 +129,12 @@ class Service(models.Model):
                 if not self.completed_at:
                     self.completed_at = timezone.now()
 
-        super().save(update_fields=['started_at', 'completed_at'])
+        super().save(*args, **kwargs)
+
+        # Assign service number only once when new
+        if is_new and not self.service_number:
+            self.service_number = f"SRM{self.id}"
+            Service.objects.filter(pk=self.pk).update(service_number=self.service_number)
 
 # Service Request Queue Model.
 class ServiceRequestQueue(models.Model):

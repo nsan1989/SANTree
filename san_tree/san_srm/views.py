@@ -236,6 +236,8 @@ def ServiceView(request):
         Q(department__name='General Duty Assistant')
     )
 
+    print('staff', provider_staff)
+
     if request.method == 'POST':
         form = ServiceForm(request.POST, user=request.user)
         if form.is_valid():
@@ -249,6 +251,8 @@ def ServiceView(request):
 
             # to get local time time
             now_local = timezone.localtime(timezone.now())
+
+            print('local time', now_local)
 
             # to store active staff with status vacant
             eligible_shift_schedules = []
@@ -268,6 +272,8 @@ def ServiceView(request):
                     shift_staffs_id=staff.id,
                 )
 
+                
+
                 if is_engaged:
                     continue
 
@@ -277,6 +283,8 @@ def ServiceView(request):
                     active = s_start <= now_local <= s_end
                     if active:
                         eligible_shift_schedules.append(s)
+
+            print('block staffs', eligible_shift_schedules)
 
             if not eligible_shift_schedules:
                 new_service.status = 'Waiting'
