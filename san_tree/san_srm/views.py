@@ -263,13 +263,9 @@ def ServiceView(request):
                     status = "Open"
                 ).exists()
 
-#                today = timezone.localdate()
-#                print('today', today)
-
                 schedule_qs = ShiftSchedule.objects.filter(
                     shift_block=new_service.service_block,
                     shift_staffs_id=staff.id,
-                    #start_time__date = today
                 )
 
                 if is_engaged:
