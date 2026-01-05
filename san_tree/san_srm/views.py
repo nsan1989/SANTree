@@ -314,7 +314,6 @@ def ServiceView(request):
 def free_up_staff():
     try:
         prog_service = Service.objects.filter(status='In Progress')
-#        ano_service = AnonymousServiceGenerate.objects.filter(status='In Progress')
         if prog_service.exists():
             for service in prog_service:
                 if service.started_at <= timezone.now() - timedelta(minutes=15):
@@ -325,16 +324,40 @@ def free_up_staff():
                         service.status = 'Pending'
                         service.save()
                     assign_service_from_queue(staff)
-#        elif ano_service.exists():
-#            for service in ano_service:
-#                if service.generate_at <= timezone.now() - timedelta(minutes=3):
-#                    staff = service.assigned_to.shift_staffs
-#                    if staff and staff.status == 'engaged':
-#                        staff.status = 'vacant'
-#                        staff.save()
-#                        service.status = 'Pending'
-#                        service.save()
                         
+    except Exception as e:
+        log.error("Error freeing up staff", error=str(e))
+
+# Put on hold if the service exceeds creation date
+def hold_service():
+    try:
+        today = timezone.now().date()
+        yesterday = today - timedelta(days=1)
+        start_of_yesterday = timezone.make_aware(
+            datetime.combine(yesterday, datetime.min.time())
+        )
+        end_of_yesterday = timezone.make_aware(
+            datetime.combine(yesterday, datetime.max.time())
+        )
+        
+        services = Service.objects.filter(
+            created_at__range=(start_of_yesterday, end_of_yesterday),
+            status__in=['Open', 'In Progress']
+        )
+
+        for serv in services:
+            staff = getattr(serv.assigned_to, "shift_staffs", None)
+
+            # Free staff if assigned
+            if staff and staff.status == 'engaged':
+                staff.status = 'vacant'
+                staff.save()
+
+            # Put service on hold
+            serv.status = 'On Hold'
+            serv.assigned_to = None
+            serv.save()
+
     except Exception as e:
         log.error("Error freeing up staff", error=str(e))
 
@@ -346,15 +369,10 @@ def free_up_completed_staff(request, id):
     except:
         raise PermissionDenied("User Profile not found.")
     service = None
-#    ano_service = None
     try:
         service = Service.objects.get(id=id)
     except Service.DoesNotExist:
         raise PermissionDenied("Service not found.")
-#        try:
-#            ano_service = AnonymousServiceGenerate.objects.get(id=id)
-#        except AnonymousServiceGenerate.DoesNotExist:
-#            raise PermissionDenied("Service not found.")
 
     if request.method == 'POST':
         obj = service # or ano_service
@@ -379,7 +397,7 @@ def free_up_completed_staff(request, id):
                 return redirect('srm:staff_service')
             elif new_status == 'On Hold':
                 obj.status = new_status
-                assigned_staff.status = 'engaged'
+                assigned_staff.status = 'vacant'
                 assigned_staff.save()
                 obj.save()
                 messages.success(request, "Service status updated successfully.")
@@ -421,7 +439,7 @@ def assign_service_from_queue(vacant_staff):
                 service.status = 'Open'
                 service.save()
 
-                vacant_staff.status = 'engaged'
+                vacant_staff.status = 'vacant'
                 vacant_staff.save()
 
                 next_service_request.delete()
@@ -433,33 +451,6 @@ def assign_service_from_queue(vacant_staff):
             
     except Exception as e:
         log.error("Error freeing up staff", error=str(e))
-
-# Service Genearte View.
-#def GenerateServiceView(request):
-#    if request.method == 'POST':
-#        form = ServiceGenerateForm(request.POST, request.FILES, user=request.user)
-#        if form.is_valid():
-#            new_service = form.save(commit=False)
-#            user = CustomUsers.objects.filter(username = request.user)
-
-#            if user:
-#                new_service.generate_by = user
-#                new_service.save()
-
-#                user.status = 'engaged'
-#                user.save()
-
-#                messages.success(request, "Service generated successfully!")
-#                return redirect('srm:staff_dashboard')
-#            else:
-#                messages.error(request, "There was an error with the form submission.")
-#                return redirect('srm:staff_dashboard')
-#        else:
-#            messages.error(request, "There was an error with the form submission.")
-#    else:
-#        form = ServiceGenerateForm(user=request.user)
-#    context = {'form': form}
-#    return render(request, 'service_generate.html', context)
 
 # All Generated Service
 def AllGeneratedService(request):
@@ -499,11 +490,6 @@ def RequestServiceView(request):
     selected_option = request.GET.get('status')
     if selected_option == 'request':
         services = services.filter(status=selected_option)
-#        services = request_service
-#    elif selected_option == 'generate':
-#        services = assign_service
-#    elif selected_option == 'anonymous':
-#        services = anonymous_service
     else:
         if user.department.name in ['GDA', 'General Duty Assistant']:
             services = assign_service

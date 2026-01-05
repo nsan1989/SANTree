@@ -239,13 +239,23 @@ Service
                                 <td>{{service.start_time|duration_display}}</td>
                                 <td>{{service.time_taken|duration_display}}</td>
                                 <td>{{ service.latest_remark_text|default:"-" }}</td>
-                                {% if service.status != 'Completed' and service.status != 'Pending' %}
+                                {% if service.status != 'Completed' and service.status != 'Pending' and service.status == 'Open' %}
                                 <td>
                                   <form method="POST" action="{% url 'srm:staff_update_service_status' service.id %}">
                                     {% csrf_token %}
                                     <select name="status" class="statusSelect" data-service-id="{{ service.id }}" required>
                                       <option value="">select</option>
                                       <option value="In Progress" {% if service.status == 'In Progress' %} selected {% endif %}>In Progress</option>
+                                    </select>
+                                    <button class="btn btn-sm btn-primary mt-2" type="submit">Update</button>
+                                  </form>
+                                </td>
+                                {% elif service.status != 'Completed' and service.status != 'Pending' and service.status == 'In Progress' %}
+                                <td>
+                                  <form method="POST" action="{% url 'srm:staff_update_service_status' service.id %}">
+                                    {% csrf_token %}
+                                    <select name="status" class="statusSelect" data-service-id="{{ service.id }}" required>
+                                      <option value="">select</option>
                                       <option value="Completed" {% if service.status == 'Completed' %} selected {% endif %}>Completed</option>
                                       <option value="On Hold" {% if service.status == 'On Hold' %} selected {% endif %}>On Hold</option>
                                     </select>
