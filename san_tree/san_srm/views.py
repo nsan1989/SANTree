@@ -317,11 +317,12 @@ def free_up_staff():
         if prog_service.exists():
             for service in prog_service:
                 if service.started_at <= timezone.now() - timedelta(minutes=15):
-                    staff = service.assigned_to.shift_staffs
+                    staff = service.assigned_to.shift_staffs.first()
                     if staff and staff.status == 'engaged':
                         staff.status = 'vacant'
                         staff.save()
                         service.status = 'Pending'
+                        service.assigned_to = None
                         service.save()
                     assign_service_from_queue(staff)
                         
@@ -416,10 +417,6 @@ def assign_service_from_queue(vacant_staff):
             return
         
         service = next_service_request.service_request
-
-        if service.status != 'Waiting':
-            next_service_request.delete()
-            return
         
         now_local = timezone.localtime(timezone.now())
         assigned = False
@@ -438,9 +435,6 @@ def assign_service_from_queue(vacant_staff):
                 service.assigned_to = s
                 service.status = 'Open'
                 service.save()
-
-                vacant_staff.status = 'vacant'
-                vacant_staff.save()
 
                 next_service_request.delete()
                 assigned = True
