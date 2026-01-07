@@ -8,7 +8,3 @@ class SanSrmConfig(AppConfig):
 
     def ready(self):
         import san_srm.signals
-
-        if os.environ.get("RUN_MAIN", None) == "true":
-            from . import scheduler
-            scheduler.start()

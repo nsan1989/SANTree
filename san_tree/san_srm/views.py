@@ -266,9 +266,7 @@ def ServiceView(request):
                 schedule_qs = ShiftSchedule.objects.filter(
                     shift_block=new_service.service_block,
                     shift_staffs_id=staff.id,
-                )
-
-                
+                )               
 
                 if is_engaged:
                     continue
@@ -342,7 +340,7 @@ def hold_service():
         )
         
         services = Service.objects.filter(
-            created_at__range=(start_of_yesterday, end_of_yesterday),
+            created_at__lte=end_of_yesterday,
             status__in=['Open', 'In Progress']
         )
 
@@ -358,6 +356,8 @@ def hold_service():
             serv.status = 'On Hold'
             serv.assigned_to = None
             serv.save()
+
+            assign_service_from_queue(staff)
 
     except Exception as e:
         log.error("Error freeing up staff", error=str(e))
@@ -570,7 +570,6 @@ def ShiftScheduleView(request):
 def free_up_onhold_staff():
     try:
         onhold_service = Service.objects.filter(status='On Hold').all()
-        onhold_ano_service = AnonymousServiceGenerate.objects.filter(status='On Hold').all()
         if onhold_service.exists():
             for service in onhold_service:
                 if service.created_at <= timezone.now() - timedelta(minutes=25):
@@ -581,14 +580,6 @@ def free_up_onhold_staff():
                         
                         service.status = 'Pending'
                         service.save()
-                    assign_service_from_queue(staff)
-        elif onhold_ano_service.exists():
-            for service in onhold_ano_service:
-                if service.generate_at <= timezone.now() - timedelta(minutes=25):
-                    staff = service.assigned_to.shift_staffs
-                    if staff and staff.status == 'engaged':
-                        staff.status = 'vacant'
-                        staff.save()
                     assign_service_from_queue(staff)
 
     except Exception as e:
