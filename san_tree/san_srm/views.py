@@ -420,14 +420,12 @@ def assign_service_from_queue(shift_block):
     ).order_by('-started_at').values('started_at')[:1])
 
     vacant_shifts = (ShiftSchedule.objects.select_for_update(skip_locked=True).filter(
-        shift_block=shift_block,
         shift_staffs__status='vacant',
         start_time__lte=now_local,
         end_time__gte=now_local
     ).annotate(
         last_service_time=Subquery(
-            last_completed_service,
-            output_field=timezone.DateTimeField()
+            last_completed_service
         )
     )
     .order_by('last_service_time', 'id')
