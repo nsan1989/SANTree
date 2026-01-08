@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.db.models import Q, Min, Max
+from django.db.models import Q
 from django.core.exceptions import PermissionDenied
 from .models import *
 from .forms import *
@@ -18,9 +18,7 @@ from threading import Lock
 plot_lock = Lock()
 from django.http import HttpResponse
 from django.db.models import OuterRef, Subquery
-from core.models import AnonymousServiceGenerate
 from datetime import datetime, time
-from django.db import transaction
 
 log = structlog.get_logger()
 
@@ -316,7 +314,7 @@ def free_up_staff():
         if prog_service.exists():
             for service in prog_service:
                 if service.started_at <= timezone.now() - timedelta(minutes=15):
-                    staff = service.assigned_to.shift_staffs.first()
+                    staff = service.assigned_to
                     if staff and staff.status == 'engaged':
                         staff.status = 'vacant'
                         staff.save()
@@ -366,9 +364,7 @@ def hold_service():
 # Free up the staff when service is completed.
 def free_up_completed_staff(request, id):
     user = request.user
-    try:
-        user_role = user.role
-    except:
+    if not hasattr(user, 'role'):
         raise PermissionDenied("User Profile not found.")
     service = None
     try:
@@ -378,80 +374,78 @@ def free_up_completed_staff(request, id):
 
     if request.method == 'POST':
         obj = service # or ano_service
-        assigned_staff = getattr(getattr(obj, "assigned_to", None), "shift_staffs", None)
-        if user_role == 'User' and assigned_staff == user:
-            new_status = request.POST.get('status')
-            if not assigned_staff:
-                raise PermissionDenied("No staff assigned to this service.")
-            if new_status == 'In Progress':
-                obj.status = new_status
-                assigned_staff.status = 'engaged'
-                assigned_staff.save()
-                obj.save()
-                return redirect('srm:staff_service')
-            elif new_status == 'Completed':
-                obj.status = new_status
-                assigned_staff.status = 'vacant'
-                assigned_staff.save()
-                obj.save()
-                messages.success(request, "Service status updated successfully.")
-                assign_service_from_queue(assigned_staff)
-                return redirect('srm:staff_service')
-            elif new_status == 'On Hold':
-                obj.status = new_status
-                assigned_staff.status = 'vacant'
-                assigned_staff.save()
-                obj.save()
-                messages.success(request, "Service status updated successfully.")
-                return redirect('srm:staff_service')
+        assigned_staff = obj.assigned_to
+
+        if not assigned_staff:
+            raise PermissionDenied("No shift assigned.")
+
+        staff = assigned_staff.shift_staffs
+        
+        if user.role != 'User' or staff != user:
+            raise PermissionDenied("You are not authorized.")
+        
+        new_status = request.POST.get('status')
+        
+        if new_status == 'In Progress':
+            obj.status = new_status
+            assigned_staff.status = 'engaged'
+            assigned_staff.save()
+            obj.save()
+            return redirect('srm:staff_service')
+        elif new_status == 'Completed':
+            obj.status = new_status
+            shift_schedule = obj.assigned_to
+            staff = shift_schedule.shift_staffs
+            staff.status = 'vacant'
+            staff.save()
+            obj.save()
+            messages.success(request, "Service status updated successfully.")
+            assign_service_from_queue(staff)
+            return redirect('srm:staff_service')
+        elif new_status == 'On Hold':
+            obj.status = new_status
+            assigned_staff.status = 'vacant'
+            assigned_staff.save()
+            obj.save()
+            messages.success(request, "Service status updated successfully.")
+            return redirect('srm:staff_service')
             
     view_name = request.resolver_match.view_name
-    if view_name == "srm:staff_update_service_status" and user_role == 'User':
+    if view_name == "srm:staff_update_service_status" and user.role == 'User':
         return redirect('srm:staff_service')
     raise PermissionDenied("You are not authorized to perform this action.")
 
 # Assigned Service to the vacant staff from the queue.
-@transaction.atomic
-def assign_service_from_queue(shift_block):
+def assign_service_from_queue(vacant_staff):
     now_local = timezone.localtime(timezone.now())
-    last_completed_service = (Service.objects.filter(
-        assigned_to=OuterRef('shift_staffs'),
-        status__in=['Completed', 'Pending']
-    ).order_by('-started_at').values('started_at')[:1])
+    try:
+        if not vacant_staff or vacant_staff.status != 'vacant':
+            return
+        
+        queue_service = ServiceRequestQueue.objects.order_by('created_at').first()
+        if not queue_service:
+            return
+        
+        service_obj = queue_service.service_request
+        
+        eligible_staff = ShiftSchedule.objects.filter(
+            shift_block=service_obj.service_block,
+            shift_staffs=vacant_staff,
+            start_time__lte=now_local,
+            end_time__gte=now_local
+        ).first()
+        
+        service_obj.assigned_to = eligible_staff
+        service_obj.status = 'Open'
+        service_obj.save()
 
-    vacant_shifts = (ShiftSchedule.objects.select_for_update(skip_locked=True).filter(
-        shift_staffs__status='vacant',
-        start_time__lte=now_local,
-        end_time__gte=now_local
-    ).annotate(
-        last_service_time=Subquery(
-            last_completed_service
-        )
-    )
-    .order_by('last_service_time', 'id')
-    )
+        vacant_staff.status = 'engaged'
+        vacant_staff.save()
 
-    queued_service = (
-        ServiceRequestQueue.objects.select_for_update(skip_locked=True)
-        .order_by('created_at')
-    )
+        queue_service.delete()
 
-    for shift in vacant_shifts:
-        next_req = queued_service.first()
-        if not next_req:
-            break
-
-        staff = shift.shift_staffs
-        service = next_req.service_request
-
-        service.assigned_to = staff
-        service.status = 'Open'
-        service.save()
-
-        staff.status = 'engaged'
-        staff.save()
-
-        next_req.delete()
+    except Exception as e:
+        log.error("Error assigning service from queue", error=str(e))
 
 # All Generated Service
 def AllGeneratedService(request):
