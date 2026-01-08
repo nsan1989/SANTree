@@ -20,6 +20,7 @@ from django.http import HttpResponse
 from django.db.models import OuterRef, Subquery
 from core.models import AnonymousServiceGenerate
 from datetime import datetime, time
+from django.db import transaction
 
 log = structlog.get_logger()
 
@@ -410,41 +411,41 @@ def free_up_completed_staff(request, id):
     raise PermissionDenied("You are not authorized to perform this action.")
 
 # Assigned Service to the vacant staff from the queue.
-def assign_service_from_queue(vacant_staff):
-    try:
-        next_service_request = ServiceRequestQueue.objects.order_by('created_at').first()
+@transaction.atomic
+def assign_service_from_queue(shift_block):
+    now_local = timezone.localtime(timezone.now())
+    vacant_staff_qs = (ShiftSchedule.objects.select_for_update(skip_locked=True).filter(
+        shift_block=shift_block,
+        shift_staffs__status='vacant'
+    ).order_by('last_assigned_at', 'id')
+)
+    
+    if not vacant_staff_qs.exists():
+        return
+    
+    queued_services = ServiceRequestQueue.objects.select_for_update(skip_locked=True).order_by('created_at')
+
+    for staff in vacant_staff_qs:
+        s_start = timezone.localtime(staff.start_time)
+        s_end = timezone.localtime(staff.end_time)
+
+        if not (s_start <= now_local <= s_end):
+            continue
+
+        next_service_request = queued_services.first()
         if not next_service_request:
-            return
-        
-        service = next_service_request.service_request
-        
-        now_local = timezone.localtime(timezone.now())
-        assigned = False
+            break
 
-        schedule_qs = ShiftSchedule.objects.filter(
-                shift_block = service.service_block,
-                shift_staffs__status = 'vacant'
-            )
+        service_request = next_service_request.service_request
+        service_request.assigned_to = staff
+        service_request.status = 'Open'
+        service_request.save()
 
-        for s in schedule_qs:
-            s_start = timezone.localtime(s.start_time)
-            s_end = timezone.localtime(s.end_time)
-            active = s_start <= now_local <= s_end
-
-            if active:
-                service.assigned_to = s
-                service.status = 'Open'
-                service.save()
-
-                next_service_request.delete()
-                assigned = True
-                break
-
-        if not assigned:
-            log.info(f"No active shift found for {vacant_staff}. Service remains in queue.")
-            
-    except Exception as e:
-        log.error("Error freeing up staff", error=str(e))
+        staff.last_assigned_at = timezone.now()
+        staff.shift_staffs.status = 'engaged'
+        staff.shift_staffs.save()
+        staff.save()
+        next_service_request.delete()
 
 # All Generated Service
 def AllGeneratedService(request):
