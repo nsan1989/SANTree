@@ -6,7 +6,7 @@ import django
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'san_tree.settings')
 django.setup()
 
-from san_srm.scheduler import start
+from san_tree.san_srm.tasks import start
 
 logging.basicConfig(
     level=logging.INFO,
