@@ -414,38 +414,46 @@ def free_up_completed_staff(request, id):
 @transaction.atomic
 def assign_service_from_queue(shift_block):
     now_local = timezone.localtime(timezone.now())
-    vacant_staff_qs = (ShiftSchedule.objects.select_for_update(skip_locked=True).filter(
+    last_completed_service = (Service.objects.filter(
+        assigned_to=OuterRef('shift_staffs'),
+        status__in=['Completed', 'Pending']
+    ).order_by('-started_at').values('started_at')[:1])
+
+    vacant_shifts = (ShiftSchedule.objects.select_for_update(skip_locked=True).filter(
         shift_block=shift_block,
-        shift_staffs__status='vacant'
-    ).order_by('last_assigned_at', 'id')
-)
-    
-    if not vacant_staff_qs.exists():
-        return
-    
-    queued_services = ServiceRequestQueue.objects.select_for_update(skip_locked=True).order_by('created_at')
+        shift_staffs__status='vacant',
+        start_time__lte=now_local,
+        end_time__gte=now_local
+    ).annotate(
+        last_service_time=Subquery(
+            last_completed_service,
+            output_field=timezone.DateTimeField()
+        )
+    )
+    .order_by('last_service_time', 'id')
+    )
 
-    for staff in vacant_staff_qs:
-        s_start = timezone.localtime(staff.start_time)
-        s_end = timezone.localtime(staff.end_time)
+    queued_service = (
+        ServiceRequestQueue.objects.select_for_update(skip_locked=True)
+        .order_by('created_at')
+    )
 
-        if not (s_start <= now_local <= s_end):
-            continue
-
-        next_service_request = queued_services.first()
-        if not next_service_request:
+    for shift in vacant_shifts:
+        next_req = queued_service.first()
+        if not next_req:
             break
 
-        service_request = next_service_request.service_request
-        service_request.assigned_to = staff
-        service_request.status = 'Open'
-        service_request.save()
+        staff = shift.shift_staffs
+        service = next_req.service_request
 
-        staff.last_assigned_at = timezone.now()
-        staff.shift_staffs.status = 'engaged'
-        staff.shift_staffs.save()
+        service.assigned_to = staff
+        service.status = 'Open'
+        service.save()
+
+        staff.status = 'engaged'
         staff.save()
-        next_service_request.delete()
+
+        next_req.delete()
 
 # All Generated Service
 def AllGeneratedService(request):
