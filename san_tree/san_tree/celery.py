@@ -2,7 +2,6 @@ from __future__ import absolute_import, unicode_literals
 import os
 from celery import Celery
 from celery.schedules import crontab
-from san_tree.san_srm.tasks import task_free_up_staff, task_free_up_onhold_staff, task_hold_service
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'san_tree.settings')
 
