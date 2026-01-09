@@ -84,7 +84,7 @@ class Service(models.Model):
     service_number = models.CharField(max_length=20, unique=True, null=True, blank=True)
     service_type = models.ForeignKey(ServiceTypes, on_delete=models.SET_NULL, null=True, blank=True)
     service_block = models.ForeignKey(Blocks, related_name='service_blocks', on_delete=models.SET_NULL, null=True, blank=True)
-    UHID = models.CharField(max_length=20, unique=True, null=True, blank=True)
+    UHID = models.CharField(max_length=20, null=True, blank=True)
     from_location = models.ForeignKey(Location, related_name='service_from', on_delete=models.SET_NULL, null=True, blank=True)
     to_location = models.ForeignKey(Location, related_name='service_to', on_delete=models.SET_NULL, null=True, blank=True)
     description = models.TextField(default='enter description here', max_length=100)

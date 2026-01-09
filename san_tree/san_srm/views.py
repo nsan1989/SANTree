@@ -389,14 +389,12 @@ def free_up_completed_staff(request, id):
         
         if new_status == 'In Progress':
             obj.status = new_status
-            assigned_staff.status = 'engaged'
-            assigned_staff.save()
+            staff.status = 'engaged'
+            staff.save()
             obj.save()
             return redirect('srm:staff_service')
         elif new_status == 'Completed':
             obj.status = new_status
-            shift_schedule = obj.assigned_to
-            staff = shift_schedule.shift_staffs
             staff.status = 'vacant'
             staff.save()
             obj.save()
@@ -405,8 +403,8 @@ def free_up_completed_staff(request, id):
             return redirect('srm:staff_service')
         elif new_status == 'On Hold':
             obj.status = new_status
-            assigned_staff.status = 'vacant'
-            assigned_staff.save()
+            staff.status = 'vacant'
+            staff.save()
             obj.save()
             messages.success(request, "Service status updated successfully.")
             return redirect('srm:staff_service')
