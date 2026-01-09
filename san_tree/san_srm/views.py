@@ -314,7 +314,8 @@ def free_up_staff():
         if prog_service.exists():
             for service in prog_service:
                 if service.started_at <= timezone.now() - timedelta(minutes=15):
-                    staff = service.assigned_to
+                    shift = service.assigned_to
+                    staff = shift.shift_staffs
                     if staff and staff.status == 'engaged':
                         staff.status = 'vacant'
                         staff.save()
@@ -570,18 +571,37 @@ def ShiftScheduleView(request):
 # Free up the staff if service status is 'On Hold' and exceeds timestamp.
 def free_up_onhold_staff():
     try:
-        onhold_service = Service.objects.filter(status='On Hold').all()
+        onhold_service = Service.objects.filter(status='On Hold')
         if onhold_service.exists():
             for service in onhold_service:
                 if service.created_at <= timezone.now() - timedelta(minutes=25):
-                    staff = service.assigned_to.shift_staffs
-                    if staff and staff.status == 'engaged':
+                    continue
+
+                shift = service.assigned_to
+                if not shift:
+                    log.warning(
+                        "On-hold service has no assigned shift",
+                        service_id=service.id
+                    )
+                    continue
+
+                staffs = shift.shift_staffs.all()
+
+                freed_any = False
+
+                for staff in staffs:
+                    if staff.status == 'engaged':
                         staff.status = 'vacant'
                         staff.save()
-                        
-                        service.status = 'Pending'
-                        service.save()
-                    assign_service_from_queue(staff)
+                        freed_any = True
+                            
+                service.status = 'Pending'
+                service.assigned_to = None
+                service.save()
+
+                if freed_any:
+                    for staff in staffs:
+                        assign_service_from_queue(staff)
 
     except Exception as e:
         log.error("Error freeing up staff", error=str(e))
