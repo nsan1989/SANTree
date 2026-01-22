@@ -131,15 +131,15 @@ Complaint
             <td>{{complaint.complaint.completed_at}}</td>
             <td>{{ complaint.complaint.time_taken|duration_display }}</td>
             {% if request.user.role == 'User' %}
-            <td><a href="{% url 'cms:staff_complaints_details' complaint.id %}" style="text-decoration: none;" onclick="event.stopPropagation();"><i class="fa-solid fa-eye"></i></a></td>
+            <td><a href="{% url 'cms:staff_complaints_details' complaint.id %}" style="text-decoration: none;"><i class="fa-solid fa-eye"></i></a></td>
             {% elif request.user.role == 'Admin' %}
-            <td><a href="{% url 'cms:incharge_complaints_details' complaint.id %}" style="text-decoration: none;" onclick="event.stopPropagation();"><i class="fa-solid fa-eye"></i></a></td>
+            <td><a href="{% url 'cms:incharge_complaints_details' complaint.id %}" style="text-decoration: none;"><i class="fa-solid fa-eye"></i></a></td>
             {% endif %}
           </tr>
           {% endfor %}
           {% else %}
           <tr>
-            <td colspan="100%">No complaints have been raised!</td>
+            <td colspan="9">No complaints have been raised!</td>
           </tr>
           {% endif %}
         </tbody>

@@ -51,20 +51,20 @@
       <ul class="ps-0">
         <li class="d-flex">
           <span class="fw-bold detail-title">Complaint No.:</span>&nbsp;
-          <p class="m-0">{{complaint.complaint_number}}</p>
+          <p class="m-0">{{complaint.complaint.complaint_number}}</p>
         </li>
         <li class="d-flex">
           <span class="fw-bold detail-title">Complaint:</span>&nbsp;
-          <p class="m-0">{{complaint.complaint_type}}</p>
+          <p class="m-0">{{complaint.complaint.complaint_type}}</p>
         </li>
         <li class="d-flex">
           <span class="fw-bold detail-title">Location:</span>&nbsp;
-          <p class="m-0">{{complaint.location}}</p>
+          <p class="m-0">{{complaint.complaint.location}}</p>
         </li>
         <li class="d-flex">
           <span class="fw-bold detail-title">Description:</span>&nbsp;
-            {% if complaint.description %}
-              <p class="m-0">{{complaint.description}}</p>
+            {% if complaint.complaint.description %}
+              <p class="m-0">{{complaint.complaint.description}}</p>
             {% else %}
               <p class="m-0">No Description!</p>
             {% endif %}
@@ -75,7 +75,7 @@
         </li>
         <li class="d-flex">
           <spna class="fw-bold detail-title">Assigned To:</spna>&nbsp;
-          <p class="m-0">{{complaint.assigned_to}}</p>
+          <p class="m-0">{{complaint.complaint.assigned_to}}</p>
         </li>
         <li class="d-flex">
           <spna class="fw-bold detail-title">Attachment:</spna>&nbsp;
