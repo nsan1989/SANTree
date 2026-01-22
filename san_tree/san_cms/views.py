@@ -596,8 +596,8 @@ def ComplaintDetails(request, id):
         user_role = user.role
     except:
         raise PermissionDenied("User profile not found.")
-    complaint = get_object_or_404(ComplaintHistory, complaint_id=id)
-    remark = ComplaintRemarks.objects.filter(complaint_id=id)
+    complaint = get_object_or_404(Complaint, complaint_number=id)
+    remark = ComplaintRemarks.objects.filter(complaint_number=id)
     
     context = {
         'complaint': complaint,
