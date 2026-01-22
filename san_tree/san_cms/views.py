@@ -597,6 +597,7 @@ def ComplaintDetails(request, id):
         raise PermissionDenied("User profile not found.")
 
     complaint = get_object_or_404(Complaint, id=id)
+    print('Complaint Number', complaint)
     remarks = ComplaintRemarks.objects.filter(complaint=complaint)
     history = ComplaintHistory.objects.filter(complaint=complaint).order_by("-timestamp")
 
