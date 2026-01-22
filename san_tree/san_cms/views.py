@@ -592,16 +592,18 @@ def CancelComplaint(request, id):
 # Complaint Details View.
 def ComplaintDetails(request, id):
     user = request.user
-    try:
-        user_role = user.role
-    except:
+    user_role = getattr(user, "role", None)
+    if not user_role:
         raise PermissionDenied("User profile not found.")
-    complaint = get_object_or_404(ComplaintHistory, complaint_id=id)
-    remark = ComplaintRemarks.objects.filter(complaint_id=id)
-    
+
+    complaint = get_object_or_404(Complaint, id=id)
+    remarks = ComplaintRemarks.objects.filter(complaint=complaint)
+    history = ComplaintHistory.objects.filter(complaint=complaint).order_by("-timestamp")
+
     context = {
-        'complaint': complaint,
-        'remarks': remark
+        "complaint": complaint,
+        "remarks": remarks,
+        "history": history,
     }
     
     view_name = request.resolver_match.view_name
