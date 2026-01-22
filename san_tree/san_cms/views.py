@@ -346,14 +346,15 @@ def ReviewComplaints(request):
         user_role = user.role
     except:
         raise PermissionDenied("User profile not found.")
-    complaints = ComplaintHistory.objects.filter(
-        Q(complaint__created_by__department=user.department) &
-        (Q(complaint__status='Waiting') |
-        Q(complaint__status='Rejected') |
-        Q(complaint__status='Halt') |
-        Q(complaint__status='Open')
+    complaints = (
+        ComplaintHistory.objects
+        .filter(
+            complaint__created_by__department=user.department,
+            complaint__status='Waiting'
         )
-        ).order_by('complaint__created_at')
+        .exclude(complaint__created_by=user)
+        .order_by('complaint__created_at')
+    )
     page_number = request.GET.get('page')
     paginator = Paginator(complaints, 10)  
     page_obj = paginator.get_page(page_number)

@@ -79,6 +79,7 @@ Complaint
       <table class="table table-bordered">
         <thead class="table-danger">
           <tr>
+            <th scope="col">Complaint No.</th>
             <th scope="col">Department</th>
             <th scope="col">Created On</th>
             <th scope="col">Status</th>
@@ -104,6 +105,7 @@ Complaint
               class="status-cancelled"
             {% endif %}
           >
+            <td>{{complaint.complaint.complaint_number}}</td>
             <td>{{complaint.complaint.department}}</td>
             <td>{{complaint.complaint.created_at}}</td>
             <td>{{complaint.complaint.status}}</td>
@@ -137,7 +139,7 @@ Complaint
           {% endfor %}
           {% else %}
           <tr>
-            <td colspan="9">No complaints have been raised!</td>
+            <td colspan="100%">No complaints have been raised!</td>
           </tr>
           {% endif %}
         </tbody>
