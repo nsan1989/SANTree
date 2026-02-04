@@ -235,4 +235,29 @@ class AssetModel(models.Model):
             last_id = AssetModel.objects.aggregate(models.Max('id'))['id__max'] or 0
             self.asset_tag = f"ASSET{str(last_id + 1).zfill(5)}"
         super().save(*args, **kwargs)
-        
+
+# asset request model.
+class AssetRequest(models.Model):
+    asset = models.ForeignKey(AssetModel, on_delete=models.CASCADE, related_name='requests')
+    requested_by = models.ForeignKey(CustomUsers, on_delete=models.CASCADE, null=True, blank=True, related_name='asset_requests_made')
+    requested_to = models.ForeignKey(CustomUsers, on_delete=models.CASCADE, null=True, blank=True, related_name='asset_requests_received')
+    department = models.ForeignKey(Departments, on_delete=models.SET_NULL, null=True, blank=True)
+    status = models.CharField(
+        max_length=20,
+        choices=[
+            ('PENDING', 'Pending'),
+            ('APPROVED', 'Approved'),
+            ('REJECTED', 'Rejected'),
+            ('DEPLOYED', 'Deployed'),
+        ],
+        default='PENDING'
+    )
+    remarks = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.asset.name
+    
+    class Meta:
+        ordering = ['created_at']
+        verbose_name_plural = 'Asset Requests'

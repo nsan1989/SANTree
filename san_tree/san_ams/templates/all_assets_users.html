@@ -1,0 +1,53 @@
+{% extends 'index.html' %}
+
+{% block title %}
+Assets Requests
+{% endblock %}
+
+{% block start %}
+<style>
+    .header-title h3 {
+        color: wheat;
+    }
+</style>
+
+<div class="container-fluid">
+    <div class="row mb-3">
+        <div class="col-12">
+            <div class="header-title">
+                <h3>Assets Requested</h3>
+            </div>
+        </div>
+    </div>
+    <div class="row mb-3">
+        <div class="col-12 table-responsive">
+            <table class="table table-bordered">
+                <thead>
+                    <tr class="table-danger">
+                        <th scope="col">Asset No.</th>
+                        <th scope="col">Name</th>
+                        <th scope="col">Image</th>
+                        <th scope="col">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if request_assets %}
+                    {% for asset in request_assets %}
+                    <tr class="table-info asset-row" data-status="{{ asset.status }}">
+                        <td>{{asset.asset_tag|default:"N/A"}}</td>
+                        <td>{{asset.name}}</td>
+                        <td>{{asset.image}}</td>
+                        <td>{{asset.status}}</td>
+                    </tr>
+                    {% endfor %}
+                    {% else %}
+                    <tr class="table-info">
+                        <td colspan="100%">{{assets_message}}</td>
+                    </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

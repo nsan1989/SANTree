@@ -10,6 +10,7 @@ plot_lock = Lock()
 from django.http import HttpResponse
 from datetime import timedelta
 import logging
+from django.db import IntegrityError
 
 logger = logging.getLogger(__name__)
 
@@ -281,15 +282,21 @@ def AddAssetCategoryView(request):
 def AddAssetView(request):
     category = AssetCategoryModel.objects.all()
     if request.method == 'POST':
-        form = AddAssetForm(request.POST)
+        form = AddAssetForm(request.POST, request.FILES)
         if form.is_valid():
-            asset = form.save(commit=False)
-            exists = AssetModel.objects.filter(name__iexact=asset.name).exists()
-            if exists:
-                messages.error(request, 'Asset already exist!')
+            asset_name = form.cleaned_data['name']
+
+            if AssetModel.objects.filter(name__iexact=asset_name).exists():
+                messages.error(request, 'Asset already exists!')
             else:
-                asset.save()
-                messages.error(request, 'Asset added successfully!')
+                try:
+                    form.save()
+                    messages.success(request, 'Asset added successfully!')
+                except IntegrityError:
+                    messages.error(
+                        request,
+                        'Asset with same model number or serial number already exists!'
+                    )
         else:
             messages.error(request, 'Please correct the errors below.')
     else:
@@ -344,6 +351,15 @@ def AssetRequestView(request):
                 asset_request = form.save(commit=False)
                 asset_request.requested_by = current_user
                 asset_request.save()
+                asset_admin = CustomUsers.objects.filter( role='Admin', department=asset_request.department, is_active=True ).first()
+                request_asset = AssetRequest.objects.create(
+                    asset=asset_request,
+                    requested_by=current_user,
+                    requested_to=asset_admin,
+                    department=asset_request.department,
+                    status='pending'
+                )
+                request_asset.save()
                 context["success"] = "Asset request submitted successfully."
                 return redirect("ams:admin_asset_requests" if current_user_role == 'Admin' else "ams:staff_asset_requests")
         context = {
@@ -609,3 +625,27 @@ def AssetUsersView(request):
     if view_name == "ams:staff_asset_users" and current_user_role == 'User':
         return render(request, 'staff_asset_users.html', context)
     raise PermissionDenied("You are not authorized to view this page. Please contact administrator!")
+
+# All Assets Request View.
+def AllAssetsRequestsView(request):
+    current_user = request.user
+    try:
+        current_user_role = current_user.role
+    except:
+        raise PermissionDenied("User profile not found")
+    context = {}
+    try:
+        request_assets = AssetModel.objects.filter(
+            requested_to = current_user
+        )
+        if request_assets.exists():
+            context["request_assets"] = request_assets
+        else:
+            context["asset_requests_message"] = "No assets requests!"
+    except Exception as e:
+        context["error"] = f"An unexpected error occurred: {e}"
+    view_name = request.resolver_match.view_name
+    if view_name == "ams:admin_asset_requests" and current_user_role == 'Admin':
+        return render(request, 'all_assets_users.html', context)
+    raise PermissionDenied("You are not authorized to view this page. Please contact administrator!")
+

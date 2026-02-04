@@ -43,6 +43,7 @@ MENU_STRUCTURE = {
             {"name": "Consumables", "url_name": "ams:admin_consumables", "view_name": "ConsumablesView", "icon": "fa-solid fa-paperclip"},
             {"name": "Components", "url_name": "ams:admin_components", "view_name": "ComponentsView", "icon": "fa-solid fa-microchip"},
             {"name": "Asset Users", "url_name": "ams:admin_asset_users", "view_name": "AssetUsersView", "icon": "fa-solid fa-users"},
+            {"name": "Requests", "url_name": "ams:admin_asset_requests", "view_name": "AssetRequestsView", "icon": "fa-solid fa-users"},
             {"name": "Settings", "url_name": None, "view_name": None, "icon": "fa-solid fa-gear", "dropdown_icon": "fa-solid fa-angle-down", 
              "children": [
                 {"name": "Assets", "url_name": "ams:add_asset", "view_name": "AddAssetView", "icon": "fa-solid fa-plus"},

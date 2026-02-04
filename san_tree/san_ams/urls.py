@@ -35,4 +35,5 @@ urlpatterns = [
     path('staff/components/', ComponentsView, name='staff_components'),
     path('admin/asset_users/', AssetUsersView, name='admin_asset_users'),
     path('staff/asset_users/', AssetUsersView, name='staff_asset_users'),
+    path('admin/asset_requests/', AllAssetsRequestsView, name='admin_asset_requests'),
 ]

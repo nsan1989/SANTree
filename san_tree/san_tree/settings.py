@@ -193,3 +193,8 @@ CELERY_RESULT_SERIALIZER = 'json'
 # Timezone settings
 CELERY_TIMEZONE = 'Asia/Kolkata'
 CELERY_ENABLE_UTC = False
+
+# MSG91 Settings
+MSG91_API_KEY = os.getenv("MSG91_API_KEY")
+MSG91_SENDER_ID = os.getenv("MSG91_SENDER_ID")
+MSG91_SMS_TEMPLATE_ID = os.getenv("MSG91_SMS_TEMPLATE_ID")

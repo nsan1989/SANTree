@@ -62,7 +62,13 @@ Add Asset
                     <h4>asset form</h4>
                 </div>
                 <div class="form-content">
-                    <form class="asset-form" method="post" enctype="multipart/form-data">
+                    <form id="asset-form" class="asset-form" method="post" enctype="multipart/form-data">
+                        {% if form.errors %}
+                        <div class="alert alert-danger">
+                            <strong>Form Errors:</strong>
+                            {{ form.errors }}
+                        </div>
+                        {% endif %}
                         {% csrf_token %}
                         <div class="row w-100 mb-1">
                             <div class="col-12 col-md-6">
@@ -110,36 +116,34 @@ Add Asset
                                 <input type="text" name="serial_number">
                             </div>
                             <div class="col-12 col-md-6">
-                                <label for="id-image" class="form-lable requiredField">
+                                <label for="id-image" class="form-label">
                                     Image
-                                    <span class="asteriskField">*</span>
                                 </label>
-                                <input type="text" name="image">
+                                <input type="file" name="image" class="form-control">
                             </div>
                         </div>
                         <div class="row w-100 mb-1">
                             <div class="col-12 col-md-6">
-                                <label for="id-purchase_date" class="form-label requiredField">
-                                    Purchase Date
-                                    <span class="asteriskField">*</span>
+                                <label for="id_purchase_date" class="form-label requiredField">
+                                    Purchase Date <span class="asteriskField">*</span>
                                 </label>
-                                <input type="text" name="purchase_date">
+                                <input type="date" name="purchase_date" id="id_purchase_date" class="form-control"
+                                    required>
                             </div>
-                            <div class="col-12 col-md-6" class="form-lable requiredField">
-                                <label for="id-cost">
-                                    Cost
-                                    <span class="asteriskField">*</span>
+                            <div class="col-12 col-md-6">
+                                <label for="id_cost" class="form-label requiredField">
+                                    Cost <span class="asteriskField">*</span>
                                 </label>
-                                <input type="text" name="cost">
+                                <input type="number" name="cost" id="id_cost" class="form-control" step="0.01" min="0"
+                                    required>
                             </div>
                         </div>
                         <div class="row w-100 mb-1">
                             <div class="col-12 col-md-6">
-                                <label for="id-expiry_date" class="form-label requiredField">
-                                    Expiry Date
-                                    <span class="asteriskField">*</span>
+                                <label for="id_expiry_date" class="form-label requiredField">
+                                    Expiry Date <span class="asteriskField">*</span>
                                 </label>
-                                <input type="text" name="expiry_date">
+                                <input type="date" name="expiry_date" id="id_expiry_date" class="form-control" required>
                             </div>
                             <div class="col-12 col-md-6">
                                 <div class="d-grid mt-4">
@@ -154,13 +158,13 @@ Add Asset
     </div>
 </div>
 <script>
-  document.addEventListener("DOMContentLoaded", function() {
-    const form = document.getElementById("asset-form");
-    const submitBtn = document.getElementById("submitBtn");
-    form.addEventListener("submit", function(event) {
-      submitBtn.disabled = true;
-      submitBtn.innerText = "Submitting...";
+    document.addEventListener("DOMContentLoaded", function () {
+        const form = document.getElementById("asset-form");
+        const submitBtn = document.getElementById("submitBtn");
+        form.addEventListener("submit", function (event) {
+            submitBtn.disabled = true;
+            submitBtn.innerText = "Submitting...";
+        });
     });
-  });
 </script>
 {% endblock %}
