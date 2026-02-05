@@ -176,9 +176,9 @@ DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 # Web Push Settings
 WEBPUSH_SETTINGS = {
-    "VAPID_PUBLIC_KEY": "BKOA9k7roz79cDnYCEDOP7jMWYPLOv7nlK7-H717V7b8muRL7caXVWpkSQNq1tQEpSTjTZLKOO_KtAf_HthSDRA",
-    "VAPID_PRIVATE_KEY": "p2OzkyI9cuqFc_p2OikmXEwvWeNq-EWohroFSV6DBzA",
-    "VAPID_ADMIN_EMAIL": "mis.shija2025@gmail.com"
+    "VAPID_PUBLIC_KEY": os.environ["VAPID_PUBLIC_KEY"],
+    "VAPID_PRIVATE_KEY": os.environ["VAPID_PRIVATE_KEY"],
+    "VAPID_ADMIN_EMAIL": os.environ["VAPID_ADMIN_EMAIL"],
 }
 
 # Celery Configuration
