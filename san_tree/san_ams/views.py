@@ -1,3 +1,4 @@
+
 from django.shortcuts import get_object_or_404, render, redirect
 from .models import *
 from .forms import *
@@ -11,6 +12,7 @@ from django.http import HttpResponse
 from datetime import timedelta
 import logging
 from django.db import IntegrityError
+from accounts.models import Departments
 
 logger = logging.getLogger(__name__)
 
@@ -281,6 +283,7 @@ def AddAssetCategoryView(request):
 # Add Asset Form
 def AddAssetView(request):
     category = AssetCategoryModel.objects.all()
+
     if request.method == 'POST':
         form = AddAssetForm(request.POST, request.FILES)
         if form.is_valid():
@@ -290,6 +293,9 @@ def AddAssetView(request):
                 messages.error(request, 'Asset already exists!')
             else:
                 try:
+                    asset_name = form.save(commit=False)
+                    asset_name.department = request.user.department
+                    asset_name.created_by = request.user
                     form.save()
                     messages.success(request, 'Asset added successfully!')
                 except IntegrityError:
@@ -298,6 +304,7 @@ def AddAssetView(request):
                         'Asset with same model number or serial number already exists!'
                     )
         else:
+            print(form.errors) 
             messages.error(request, 'Please correct the errors below.')
     else:
         form = AddAssetForm()
@@ -350,29 +357,23 @@ def AssetRequestView(request):
             if form.is_valid():
                 asset_request = form.save(commit=False)
                 asset_request.requested_by = current_user
+                asset_admin = CustomUsers.objects.filter( role='Admin', department=asset_request.asset.department, is_active=True ).first()
+                asset_request.requested_to = asset_admin
+                asset_request.department = asset_request.asset.department
+                asset_request.status = 'pending'
                 asset_request.save()
-                asset_admin = CustomUsers.objects.filter( role='Admin', department=asset_request.department, is_active=True ).first()
-                request_asset = AssetRequest.objects.create(
-                    asset=asset_request,
-                    requested_by=current_user,
-                    requested_to=asset_admin,
-                    department=asset_request.department,
-                    status='pending'
-                )
-                request_asset.save()
                 context["success"] = "Asset request submitted successfully."
-                return redirect("ams:admin_asset_requests" if current_user_role == 'Admin' else "ams:staff_asset_requests")
+                return redirect("ams:asset_requests")
+        else:
+            form = AssetRequestForm()
+
         context = {
             "form": form,
         }
     except Exception as e:
         context["error"] = f"An unexpected error occurred: {e}"
-    view_name = request.resolver_match.view_name
-    if view_name == "ams:admin_asset_requests" and current_user_role == 'Admin':
-        return render(request, 'asset_request.html', context)
-    if view_name == "ams:staff_asset_requests" and current_user_role == 'User':
-        return render(request, 'asset_request.html', context)
-    raise PermissionDenied("You are not authorized to view this page. Please contact administrator!")
+
+    return render(request, 'asset_request.html', context)
 
 # Assigned Asset View.
 def AssignedAssetView(request, asset_id):
@@ -635,7 +636,7 @@ def AllAssetsRequestsView(request):
         raise PermissionDenied("User profile not found")
     context = {}
     try:
-        request_assets = AssetModel.objects.filter(
+        request_assets = AssetRequest.objects.filter(
             requested_to = current_user
         )
         if request_assets.exists():
@@ -646,6 +647,6 @@ def AllAssetsRequestsView(request):
         context["error"] = f"An unexpected error occurred: {e}"
     view_name = request.resolver_match.view_name
     if view_name == "ams:admin_asset_requests" and current_user_role == 'Admin':
-        return render(request, 'all_assets_users.html', context)
+        return render(request, 'all_assets_request.html', context)
     raise PermissionDenied("You are not authorized to view this page. Please contact administrator!")
 

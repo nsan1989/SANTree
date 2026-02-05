@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'san_cms.apps.SanCmsConfig',
     'san_srm.apps.SanSrmConfig',
     'san_ams.apps.SanAmsConfig',
+    'san_vms.apps.SanVmsConfig',
 ]
 
 MIDDLEWARE = [

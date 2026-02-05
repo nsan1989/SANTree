@@ -25,6 +25,8 @@ Assets Requests
                 <thead>
                     <tr class="table-danger">
                         <th scope="col">Asset No.</th>
+                        <th scope="col">Requested By</th>
+                        <th scope="col">Department</th>
                         <th scope="col">Name</th>
                         <th scope="col">Image</th>
                         <th scope="col">Status</th>
@@ -34,9 +36,17 @@ Assets Requests
                     {% if request_assets %}
                     {% for asset in request_assets %}
                     <tr class="table-info asset-row" data-status="{{ asset.status }}">
-                        <td>{{asset.asset_tag|default:"N/A"}}</td>
-                        <td>{{asset.name}}</td>
-                        <td>{{asset.image}}</td>
+                        <td>{{asset.asset.asset_tag|default:"N/A"}}</td>
+                        <td>{{asset.requested_by}}</td>
+                        <td>{{asset.department.name}}</td>
+                        <td>{{asset.asset.name}}</td>
+                        {% if asset.asset.image %}
+                        <td>
+                            <img class="img-fluid" src="{{ asset.asset.image.url }}" alt="Asset Image" width="100">
+                        </td>
+                        {% else %}
+                        <td>No image</td>
+                        {% endif %}
                         <td>{{asset.status}}</td>
                     </tr>
                     {% endfor %}

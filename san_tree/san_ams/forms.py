@@ -83,10 +83,10 @@ class AssignedAssetForm(forms.ModelForm):
 
 # Asset Request Form
 class AssetRequestForm(forms.ModelForm):
-    name = forms.ModelChoiceField(
+    asset = forms.ModelChoiceField(
         queryset=AssetModel.objects.all(),
         empty_label="Select an asset"
     )
     class Meta:
-        model = AssetModel
-        fields = ['name']
+        model = AssetRequest
+        fields = ['asset']

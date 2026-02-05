@@ -159,8 +159,9 @@
       >
         {% if request.user.role == 'Admin' %}
         <a
-          href="{% url 'ams:admin_dashboard' %}"
+          href=""
           class="text-white text-decoration-none w-100 h-100 d-flex align-items-center justify-content-center"
+          title="coming soon!"
         >
           <div class="d-flex flex-column align-items-center">
             <div class="card-image mb-2">
@@ -178,8 +179,9 @@
         </a>
         {% else %}
         <a
-          href="{% url 'ams:staff_dashboard' %}"
+          href=""
           class="text-white text-decoration-none w-100 h-100 d-flex align-items-center justify-content-center"
+          title="coming soon!"
         >
           <div class="d-flex flex-column align-items-center">
             <div class="card-image mb-2">
@@ -191,6 +193,55 @@
             <div class="card-title">
               <p class="fw-bold mb-0 text-center">
                 Asset Management System
+              </p>
+            </div>
+          </div>
+        </a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  <!--transport-->
+    <div class="col-xs-6 col-sm-6 col-md-3 col-lg-3 col-xl-3">
+      <div
+        class="shadow-sm d-flex align-items-center justify-content-center rounded text-white glass-card h-100"
+      >
+        {% if request.user.role == 'Admin' %}
+        <a
+          href=""
+          class="text-white text-decoration-none w-100 h-100 d-flex align-items-center justify-content-center"
+          title="coming soon!"
+        >
+          <div class="d-flex flex-column align-items-center">
+            <div class="card-image mb-2">
+              <img
+                class="img-fluid"
+                src="../../static/images/cab_icon.png"
+              />
+            </div>
+            <div class="card-title">
+              <p class="fw-bold mb-0 text-center">
+                Transport Management System
+              </p>
+            </div>
+          </div>
+        </a>
+        {% else %}
+        <a
+          href=""
+          class="text-white text-decoration-none w-100 h-100 d-flex align-items-center justify-content-center"
+          title="coming soon!"
+        >
+          <div class="d-flex flex-column align-items-center">
+            <div class="card-image mb-2">
+              <img
+                class="img-fluid"
+                src="../../static/images/cab_icon.png"
+              />
+            </div>
+            <div class="card-title">
+              <p class="fw-bold mb-0 text-center">
+                Transport Management System
               </p>
             </div>
           </div>

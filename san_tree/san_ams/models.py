@@ -3,6 +3,7 @@ import os
 from django.utils import timezone
 from accounts.models import Departments, Location, CustomUsers
 from datetime import date
+from django.db import transaction
 
 # license status choices.
 LICENSE_STATUS = [
@@ -168,6 +169,7 @@ def asset_image_path(instance, filename):
 
 # asset status choices.
 ASSET_STATUS = [
+    ('available', 'Available'),
     ('requested', 'Requested'),
     ('deployed', 'Deployed'),
     ('ready to deploy', 'Ready to Deploy'),
@@ -178,7 +180,7 @@ ASSET_STATUS = [
 
 # asset model.
 class AssetModel(models.Model):
-    asset_tag = models.CharField(max_length=20, unique=True, blank=True)
+    asset_tag = models.CharField(max_length=20, unique=True, blank=True, null=True)
     name = models.CharField(max_length=100)
     category = models.ForeignKey(AssetCategoryModel, on_delete=models.CASCADE, related_name='asset_category')
     manufacturer = models.CharField(max_length=100)
@@ -194,8 +196,7 @@ class AssetModel(models.Model):
     asset_license = models.ManyToManyField(LicenseModel, blank=True, related_name='asset_licenses')
     status = models.CharField(max_length=20, choices=ASSET_STATUS, default='available')
     handler = models.ForeignKey(CustomUsers, on_delete=models.CASCADE, null=True, blank=True, related_name='asset_handler')
-    created_by = models.ForeignKey(CustomUsers, on_delete=models.CASCADE, null=True, blank=True, related_name='asset_request_by')
-    requested_to = models.ForeignKey(CustomUsers, on_delete=models.CASCADE, null=True, blank=True, related_name='asset_request_to')
+    created_by = models.ForeignKey(CustomUsers, on_delete=models.CASCADE, null=True, blank=True, related_name='asset_created_by')
     assigned_to = models.ForeignKey(CustomUsers, on_delete=models.CASCADE, null=True, blank=True, related_name='asset_user')
     department = models.ForeignKey(Departments, on_delete=models.CASCADE, null=True, blank=True, related_name='asset_department')
     location = models.ForeignKey(Location, on_delete=models.CASCADE, null=True, blank=True, related_name='asset_location')
@@ -232,9 +233,23 @@ class AssetModel(models.Model):
     
     def save(self, *args, **kwargs):
         if not self.asset_tag:
-            last_id = AssetModel.objects.aggregate(models.Max('id'))['id__max'] or 0
-            self.asset_tag = f"ASSET{str(last_id + 1).zfill(5)}"
-        super().save(*args, **kwargs)
+            with transaction.atomic():
+                last_asset = (
+                    AssetModel.objects
+                    .select_for_update()
+                    .order_by('-created_at')
+                    .first()
+                )
+
+                if last_asset and last_asset.asset_tag:
+                    last_number = int(last_asset.asset_tag.replace('ASSET', ''))
+                    self.asset_tag = f"ASSET{last_number + 1:05d}"
+                else:
+                    self.asset_tag = "ASSET00001"
+
+                super().save(*args, **kwargs)
+        else:
+            super().save(*args, **kwargs)
 
 # asset request model.
 class AssetRequest(models.Model):

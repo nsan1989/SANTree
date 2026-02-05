@@ -1,6 +1,6 @@
 {% load crispy_forms_tags %}
 
-<form id="assignForm" class="assigned_form" method="post" novalidate>
+<form id="assignForm" class="assigned_form"  method="post" enctype="multipart/form-data">
     {% csrf_token %}
     {{ form|crispy }}
     <button type="submit" id="submitBtn" class="btn btn-primary">Request</button>
