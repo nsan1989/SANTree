@@ -1,0 +1,56 @@
+{% extends 'index.html' %}
+
+{% block title %}
+Cab Request
+{% endblock %}
+
+{% block start %}
+<div class="container-fluid">
+    <div class="all_trips_header mb-3">
+        <h3 class="mb-0">Cab Request</h3>
+        <p class="mb-0"></p>
+    </div>
+    <div class="all_trips_content">
+        <div class="row">
+            <div class="col-12 table-responsive">
+                <table class="table table-bordered">
+                    <thead class="table-danger">
+                        <tr>
+                            <th>Booking ID</th>
+                            <th>Type</th>
+                            <th>Pickup</th>
+                            <th>Drop</th>
+                            <th>Slot</th>
+                            <th>Cargo</th>
+                            <th>Vehicle</th>
+                            <th>Driver</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody class="table-info">
+                        {% if all_requests %}
+                        {% for request in all_requests %}
+                        <tr>
+                            <td>{{ request.id }}</td>
+                            <td>{{ request.booking_type }}</td>
+                            <td>{{ request.pickup_location }}</td>
+                            <td>{{ request.drop_location }}</td>
+                            <td>{{ request.slot }}</td>
+                            <td>{{ request.cargo }}</td>
+                            <td>{{ request.vehicle }}</td>
+                            <td>{{ request.driver }}</td>
+                            <td>{{ request.status }}</td>
+                        </tr>
+                        {% endfor %}
+                        {% else %}
+                        <tr>
+                            <td colspan="100%">No requests available</td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

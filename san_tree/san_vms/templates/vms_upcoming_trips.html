@@ -1,0 +1,52 @@
+{% extends 'index.html' %}
+
+{% block title %}
+Upcoming Trips
+{% endblock %}
+
+{% block start %}
+    <div class="container-fluid">
+        <div class="upcoming-header mb-3">
+            <h3 class="mb-0 fw-bold">Upcoming Trips</h3>
+            <p class="mb-0">list of upcoming trips</p>
+        </div>
+        <div class="upcoming-content">
+            <div class="row">
+                <div class="col-12 table-responsive">
+                    <table class="table table-bordered">
+                        <thead class="table-danger">
+                            <tr>
+                                <td>Booking ID</td>
+                                <td>Type</td>
+                                <td>Pickup Location</td>
+                                <td>Drop Location</td>
+                                <td>Timing</td>
+                                <td>Vehicle</td>
+                                <td>Driver</td>
+                            </tr>
+                        </thead>
+                        <tbody class="table-info">
+                            {% if upcoming %}
+                            {% for trip in upcoming %}
+                            <tr>
+                                <td>{{ trip.id }}</td>
+                                <td>{{ trip.booking_type }}</td>
+                                <td>{{ trip.pickup_location }}</td>
+                                <td>{{ trip.drop_location }}</td>
+                                <td>{{ trip.slot }}</td>
+                                <td>{{ trip.vehicle }}</td>
+                                <td>{{ trip.driver }}</td>
+                            </tr>
+                            {% endfor %}
+                            {% else %}
+                            <tr>
+                                <td colspan="100%">No upcoming trips found.</td>
+                            </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

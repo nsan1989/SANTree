@@ -1,0 +1,52 @@
+{% extends 'index.html' %}
+
+{% block title %}
+Staff Dashboard
+{% endblock %}
+
+{% block start %}
+<div class="container-fluid">
+    <div class="dashboard-header mb-3">
+        <h1 class="header-title mb-0">Staff Dashboard</h1>
+        <p class="mb-0">Welcome to your staff dashboard. Here you can manage your trips and view recent activity.</p>
+    </div>
+    <div class="cab-request d-flex align-items-center mb-3">
+        <p class="mb-0">Request a cab</p>&nbsp;<a class="text-warning" href="{% url 'vms:vms_cab_request' %}">click here</a>
+    </div>
+    <div class="dashboard-content">
+        <div class="content-header">
+            <h3>Recent Activity</h3>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <table class="table table-bordered">
+                    <thead class="table-danger">
+                        <tr>
+                            <th>Trip ID</th>
+                            <th>Destination</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody class="table-info">
+                        {% if bookings %}
+                        {% for booking in bookings %}
+                        <tr>
+                            <td>{{ booking.id }}</td>
+                            <td>{{ booking.drop_location }}</td>
+                            <td>{{ booking.slot }}</td>
+                            <td>{{ booking.status }}</td>
+                        </tr>
+                        {% endfor %}
+                        {% else %}
+                        <tr>
+                            <td colspan="100%">No bookings available.</td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

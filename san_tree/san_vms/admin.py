@@ -1,3 +1,11 @@
 from django.contrib import admin
+from .models import *
 
-# Register your models here.
+# Registered models.
+admin.site.register(Vehicle)
+admin.site.register(Driver)
+admin.site.register(Slot)
+admin.site.register(Cargo)
+admin.site.register(Booking)
+admin.site.register(DriverSchedule)
+admin.site.register(VehicleMaintenance)
