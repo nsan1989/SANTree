@@ -1,0 +1,67 @@
+{% extends 'index.html' %}
+
+{% block title %}
+All Cab Requests
+{% endblock %}
+
+{% block start %}
+    <div class="container-fluid">
+        <div class="content-header mb-3">
+            <h3 class="mb-0">All Cab Requests</h3>
+            <p class="mb-0">below are all cab requests</p>
+        </div>
+        <div class="content-body">
+            <div class="row">
+                <div class="col-12 table-responsive">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Type</th>
+                                <th>Pick Up Location</th>
+                                <th>Drop Location</th>
+                                <th>Pick Up Time</th>
+                                <th>Cargo</th>
+                                <th>Booked By</th>
+                                <th>Status</th>
+                                <th>Update Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if all_requests %}
+                            {% for request in all_requests %}
+                            <tr>
+                                <td>{{ request.booking_type }}</td>
+                                <td>{{ request.pickup_location }}</td>
+                                <td>{{ request.drop_location }}</td>
+                                <td>{{ request.pickup_time }}</td>
+                                <td>{{ request.cargo }}</td>
+                                <td>{{ request.booked_by }}</td>
+                                <td>{{ request.status }}</td>
+                                {% if request.status != 'COMPLETED' and request.status != 'CANCELLED' %}
+                                <td>
+                                    <form action="{% url 'vms:update_booking_status' request.id %}" method="post">
+                                        {% csrf_token %}
+                                        <select name="status" class="form-select form-select-sm mb-2">
+                                            <option value="CONFIRMED" {% if request.status == 'CONFIRMED' %}selected{% endif %}>Confirmed</option>
+                                            <option value="CANCELLED" {% if request.status == 'CANCELLED' %}selected{% endif %}>Cancelled</option>
+                                        </select>
+                                        <button type="submit" class="btn btn-primary btn-sm">Update</button>
+                                    </form>
+                                </td>
+                                {% else %}
+                                <td>NA</td>
+                                {% endif %}
+                            </tr>
+                            {% endfor %}
+                            {% else %}
+                            <tr>
+                                <td colspan="100%" class="text-center">No requests available</td>
+                            </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,56 @@
+{% extends 'index.html' %}
+
+{% block title %}
+Admin Dashboard
+{% endblock %}
+
+{% block start %}
+    <div class="container-fluid">
+        <div class="content-header mb-3">
+            <h3 class="mb-0">All Trips</h3>
+            <p class="mb-0">View all completed trips in the system.</p>
+        </div>
+        <div class="content-body">
+            <div class="row">
+                <div class="col-12">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Type</th>
+                                <th>Pick Up</th>
+                                <th>Drop Off</th>
+                                <th>Pickup Time</th>
+                                <th>Drop Time</th>
+                                <th>Vehicle</th>
+                                <th>Driver</th>
+                                <th>Booked By</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if all_trips %}
+                            {% for trip in all_trips %}
+                            <tr>
+                                <td>{{ trip.booking_type }}</td>
+                                <td>{{ trip.pickup_location }}</td>
+                                <td>{{ trip.drop_location }}</td>
+                                <td>{{ trip.pickup_time }}</td>
+                                <td>{{ trip.drop_time }}</td>
+                                <td>{{ trip.vehicle }}</td>
+                                <td>{{ trip.driver }}</td>
+                                <td>{{ trip.booked_by }}</td>
+                                <td>{{ trip.status }}</td>
+                            </tr>
+                            {% endfor %}
+                            {% else %}
+                            <tr>
+                                <td colspan="100%" class="text-center">No completed trips found.</td>
+                            </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

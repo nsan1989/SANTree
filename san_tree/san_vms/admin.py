@@ -4,7 +4,6 @@ from .models import *
 # Registered models.
 admin.site.register(Vehicle)
 admin.site.register(Driver)
-admin.site.register(Slot)
 admin.site.register(Cargo)
 admin.site.register(Booking)
 admin.site.register(DriverSchedule)

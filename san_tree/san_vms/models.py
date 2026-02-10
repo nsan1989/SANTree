@@ -17,6 +17,7 @@ class DriverStatus(models.TextChoices):
 
 # Booking status.
 class BookingStatus(models.TextChoices):
+    WAITING = "WAITING", "Waiting"
     CONFIRMED = "CONFIRMED", "Confirmed"
     IN_PROGRESS = "IN_PROGRESS", "In Progress"
     COMPLETED = "COMPLETED", "Completed"
@@ -58,15 +59,7 @@ class Driver(models.Model):
     shift_end = models.TimeField()
 
     def __str__(self):
-        return self.name
-
-# Slot model.
-class Slot(models.Model):
-    start_time = models.DateTimeField()
-    end_time = models.DateTimeField()
-
-    def __str__(self):
-        return f"{self.start_time} - {self.end_time}"
+        return self.user.username
 
 # Cargo model.
 class Cargo(models.Model):
@@ -84,27 +77,15 @@ class Booking(models.Model):
     booking_type = models.CharField(max_length=20, choices=BookingTypes.choices)
     pickup_location = models.CharField(max_length=255)
     drop_location = models.CharField(max_length=255, blank=True)
-    slot = models.ForeignKey(Slot, on_delete=models.CASCADE)
+    pickup_time = models.DateTimeField(null=True, blank=True)
+    drop_time = models.DateTimeField(null=True, blank=True)
     cargo = models.ForeignKey(Cargo, on_delete=models.CASCADE)
     vehicle = models.ForeignKey(Vehicle, on_delete=models.SET_NULL, null=True, blank=True, related_name="bookings")
     driver = models.ForeignKey(Driver, on_delete=models.SET_NULL, null=True, blank=True, related_name="bookings_driver")
     booked_by = models.ForeignKey(CustomUsers, on_delete=models.SET_NULL, null=True, blank=True, related_name="bookings_user")
-    status = models.CharField(max_length=20, choices=BookingStatus.choices, default=BookingStatus.CONFIRMED)
+    assigned_to = models.ForeignKey(CustomUsers, on_delete=models.SET_NULL, null=True, blank=True, related_name="bookings_assigned")
+    status = models.CharField(max_length=20, choices=BookingStatus.choices, default=BookingStatus.WAITING)
     created_at = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        constraints = [
-            models.UniqueConstraint(
-                fields=["slot", "vehicle"],
-                condition=models.Q(vehicle__isnull=False),
-                name="unique_vehicle_per_slot"
-            ),
-            models.UniqueConstraint(
-                fields=["slot", "driver"],
-                condition=models.Q(driver__isnull=False),
-                name="unique_driver_per_slot"
-            ),
-        ]
 
     def __str__(self):
         return f"Booking {self.id}"
@@ -112,11 +93,10 @@ class Booking(models.Model):
 # Driver schedule.
 class DriverSchedule(models.Model):
     driver = models.ForeignKey(Driver, on_delete=models.CASCADE)
-    slot = models.ForeignKey(Slot, on_delete=models.CASCADE)
     booking = models.OneToOneField(Booking, on_delete=models.CASCADE)
 
-    class Meta:
-        unique_together = ('driver', 'slot')
+    def __str__(self):
+        return self.driver.user.username
 
 # Vehicle maintenance.
 class VehicleMaintenance(models.Model):

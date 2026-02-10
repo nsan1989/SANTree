@@ -81,6 +81,8 @@ MENU_STRUCTURE = {
     'vms': {
         'admin': [
             {"name": "Dashboard", "url_name": "vms:vms_admin_dashboard", "view_name": "AdminDashboardView", "icon": "fa-solid fa-chart-line"},
+            {"name": "Requests", "url_name": "vms:vms_admin_cab_requests", "view_name": "AdminCabRequestView", "icon": "fa-solid fa-calendar"},
+            {"name": "Trips", "url_name": "vms:vms_admin_trips", "view_name": "AdminTripsView", "icon": "fa-solid fa-car"},
         ],
         'user': [
             {"name": "Dashboard", "url_name": "vms:vms_staff_dashboard", "view_name": "StaffDashboardView", "icon": "fa-solid fa-chart-line"},

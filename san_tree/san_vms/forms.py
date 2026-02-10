@@ -44,15 +44,46 @@ class DriverForm(forms.ModelForm):
     
 # Booking form.
 class BookingForm(forms.ModelForm):
+
+    pickup_time = forms.DateTimeField(
+        required=False,
+        widget=forms.DateTimeInput(
+            attrs={'type': 'datetime-local'},
+            format='%Y-%m-%dT%H:%M'
+        )
+    )
+
+    drop_time = forms.DateTimeField(
+        required=False,
+        widget=forms.DateTimeInput(
+            attrs={'type': 'datetime-local'},
+            format='%Y-%m-%dT%H:%M'
+        )
+    )
+
     class Meta:
         model = Booking
-        fields = ['booking_type', 'pickup_location', 'drop_location', 'slot', 'cargo']
-    
+        fields = [
+            'booking_type',
+            'pickup_location',
+            'drop_location',
+            'pickup_time',
+            'drop_time',
+            'cargo'
+        ]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['pickup_time'].input_formats = ['%Y-%m-%dT%H:%M']
+        self.fields['drop_time'].input_formats = ['%Y-%m-%dT%H:%M']
+
     def clean(self):
         cleaned_data = super().clean()
         booking_type = cleaned_data.get("booking_type")
         pickup = cleaned_data.get("pickup_location")
         drop = cleaned_data.get("drop_location")
+        pickup_time = cleaned_data.get("pickup_time")
+        drop_time = cleaned_data.get("drop_time")
 
         if booking_type == BookingTypes.PICKUP and not pickup:
             raise forms.ValidationError("Pickup location is required.")
@@ -63,4 +94,11 @@ class BookingForm(forms.ModelForm):
         ] and not drop:
             raise forms.ValidationError("Drop location is required.")
 
+        # Optional but recommended
+        if pickup_time and drop_time and drop_time < pickup_time:
+            raise forms.ValidationError(
+                "Drop time cannot be earlier than pickup time."
+            )
+
         return cleaned_data
+

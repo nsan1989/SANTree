@@ -1,7 +1,7 @@
 import requests
 from django.conf import settings
 
-def send_sms(phone, service_type, from_location, to_location):
+def send_sms(phone, var1, var2, var3):
     url = "https://control.msg91.com/api/v5/flow"
 
     payload = {
@@ -10,9 +10,9 @@ def send_sms(phone, service_type, from_location, to_location):
         "recipients": [
             {
                 "mobiles": f"91{phone}",
-                "VAR1": service_type,
-                "VAR2": from_location,
-                "VAR3": to_location
+                "VAR1": var1,
+                "VAR2": var2,
+                "VAR3": var3
             }
         ]
     }
