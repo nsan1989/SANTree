@@ -67,6 +67,7 @@ class CustomUsers(AbstractUser):
     department = models.ForeignKey(Departments, on_delete=models.SET_NULL, null=True, blank=True)
     designation = models.CharField(max_length=25, choices=DESIGNATION_CHOICES, default='staff')
     employee_id = models.CharField(max_length=20, unique=True, default='EMP_ID')
+    phone_number = models.CharField(max_length=15, null=True, blank=True)
 
     def __str__(self):
         # f string is a way to embed expressions inside string literals using curly braces

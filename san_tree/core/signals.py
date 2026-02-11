@@ -8,6 +8,11 @@ from san_srm.models import Service
 from django.db.models.signals import pre_save, post_save
 from django.dispatch import receiver
 from accounts.models import CustomUsers
+from utils.message import send_sms
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
+import json
+from django.http import JsonResponse
 
 @receiver(pre_save, sender=Complaint)
 def cache_old_status(sender, instance, **kwargs):
@@ -217,6 +222,7 @@ def ServiceGmailHandler(sender, instance, created, **kwargs):
 
     staff_name = getattr(staff, "username", "Staff Member")
     staff_email = getattr(staff, "email", None)
+    staff_phone = getattr(staff, "phone_number", None)
 
     if not staff_email:
         return
@@ -238,3 +244,67 @@ def ServiceGmailHandler(sender, instance, created, **kwargs):
         [staff_email],
         fail_silently=False,
     )
+
+    if staff_phone:
+        try:
+            service_type = str(instance.service_type) if instance.service_type else ""
+            from_loc = instance.from_location.name if instance.from_location else ""
+            to_loc = instance.to_location.name if instance.to_location else ""
+
+            send_sms(
+                phone=staff_phone,
+                service_type=service_type,
+                location_1=from_loc,
+                location_2=to_loc
+            )
+
+        except Exception as e:
+            raise RuntimeError(
+                f"SMS sending failed for Service ID {instance.id}, "
+                f"Staff: {staff.username if staff else 'Unknown'}, "
+                f"Phone: {staff_phone}"
+            ) from e
+
+#------ SMS ------
+@csrf_exempt
+@require_POST
+def send_sms_view(request):
+    try:
+        data = json.loads(request.body)
+
+        phone = data.get("phone")
+        service_type = data.get("service_type")
+        location_1 = data.get("location_1")
+        location_2 = data.get("location_2")
+
+        if not all([phone, service_type, location_1, location_2]):
+            return JsonResponse(
+                {
+                    "error": "phone, service_type, location_1, location_2 are required"
+                },
+                status=400
+            )
+
+        response = send_sms(
+            phone=phone,
+            service_type=service_type,
+            location_1=location_1,
+            location_2=location_2
+        )
+
+        return JsonResponse({
+            "message": "SMS sent successfully",
+            "msg91_response": response
+        })
+
+    except json.JSONDecodeError:
+        return JsonResponse(
+            {"error": "Invalid JSON body"},
+            status=400
+        )
+
+    except Exception as e:
+        return JsonResponse(
+            {"error": str(e)},
+            status=500
+        )
