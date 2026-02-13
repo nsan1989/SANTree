@@ -7,13 +7,89 @@ Cab Request
 
 {% block start %}
 
+<style>
+  #cabForm {
+    font-family: 'poppins', sans-serif;
+  }
+</style>
+
 <div class="container-fluid">
   <div class="row d-flex justify-content-center align-items-center" style="min-height: 80vh;">
     <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4">
-      <form id="cabForm" class="cab_form bg-light p-4 rounded" method="post" enctype="multipart/form-data">
+      <form id="cabForm" class="cab_form bg-light p-2 rounded" method="post" enctype="multipart/form-data">
         {% csrf_token %}
-        {{ form|crispy }}
-        <button type="submit" id="submitBtn" class="btn btn-primary">Request</button>
+        <div class="row mb-3">
+          <div class="col-6" id="div_id_booking_type">
+            <label for="id_booking_type" class="form-label required">
+              Type
+              <span class="asteriskField">*</span>
+            </label>
+            <select name="booking_type" id="id_booking_type" required class="select form-select">
+              <option value="">Select</option>
+              <option value="PICKUP">Pickup</option>
+              <option value="DROP">Drop</option>
+              <option value="DROP_AND_PICKUP">Drop and Pickup</option>
+            </select>
+          </div>
+          <div class="col-6" id="div_id_priority">
+            <label for="id_priority" class="form-label required">
+              Priority
+              <span class="asteriskField">*</span>
+            </label>
+            <select name="priority" id="id_priority" required class="select form-select">
+              <option value="">Select</option>
+              <option value="NORMAL">NORMAL</option>
+              <option value="HIGH">HIGH</option>
+              <option value="CRITICAL">CRITICAL</option>
+            </select>
+          </div>
+        </div>
+        <div class="row mb-3">
+          <div class="col-6" id="div_id_pickup_location">
+            <label for="id_pickup_location" class="form-label required">
+              Pickup
+              <span class="asteriskField">*</span>
+            </label>
+            <input type="text" name="pickup_location" id="id_pickup_location" required class="text form-control">
+          </div>
+          <div class="col-6" id="div_id_drop_location">
+            <label for="id_drop_location" class="form-label required">
+              Drop
+              <span class="asteriskField">*</span>
+            </label>
+            <input type="text" name="drop_location" id="id_drop_location" required class="text form-control">
+          </div>
+        </div>
+        <div class="row mb-3">
+          <div class="col-6" id="div_id_pickup_time">
+            <label for="id_pickup_time" class="form-label required">
+              Pickup Time
+              <span class="asteriskField">*</span>
+            </label>
+            <input type="datetime-local" name="pickup_time" id="id_pickup_time" required class="datetime form-control">
+          </div>
+          <div class="col-6" id="div_id_drop_time">
+            <label for="id_drop_time" class="form-label required">
+              Drop Time
+              <span class="asteriskField">*</span>
+            </label>
+            <input type="datetime-local" name="drop_time" id="id_drop_time" required class="datetime form-control">
+          </div>
+        </div>
+        <div class="row mb-3">
+          <div class="col-12" id="div_id_cargo">
+            <label for="id_cargo" class="form-label">
+              Cargo
+            </label>
+            <select name="cargo" id="id_cargo" class="select form-select">
+              <option value="">Select</option>
+              {% for cargo in cargos %}
+                <option value="{{ cargo.id }}">{{ cargo.cargo_type }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+        <button type="submit" id="submitBtn" class="btn btn-primary">Book Cab</button>
       </form>
     </div>
   </div>

@@ -5,7 +5,62 @@ Admin Dashboard
 {% endblock %}
 
 {% block start %}
-    <div class="container-fluid">
-        <p>Admin Page</p>
+
+<style>
+    .content-header {
+        color: wheat;
+        font-family: 'Poppins', sans-serif;
+    }
+    .cab-request,
+    .table {
+        font-family: 'Poppins', sans-serif;
+    }
+    .cab-request a {
+        text-decoration: none;
+    }
+</style>
+
+<div class="container-fluid">
+    <div class="content-header mb-3">
+        <h1 class="header-title mb-0">Dashboard</h1>
+        <p class="mb-0 text-light">Welcome! You can view your recent activity here.</p>
     </div>
+    <div class="dashboard-content">
+        <div class="content-header">
+            <h3>Recent Activity</h3>
+        </div>
+        <div class="row">
+            <div class="col-12 table-responsive">
+                <table class="table table-bordered">
+                    <thead class="table-danger">
+                        <tr>
+                            <th>Trip ID</th>
+                            <th>Pickup Location</th>
+                            <th>Drop Location</th>
+                            <th>Pickup Time</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody class="table-info">
+                        {% if page_obj %}
+                        {% for booking in page_obj %}
+                        <tr>
+                            <td>{{ booking.id }}</td>
+                            <td>{{ booking.pickup_location }}</td>
+                            <td>{{ booking.drop_location }}</td>
+                            <td>{{ booking.pickup_time }}</td>
+                            <td>{{ booking.status }}</td>
+                        </tr>
+                        {% endfor %}
+                        {% else %}
+                        <tr>
+                            <td colspan="100%">No bookings available.</td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

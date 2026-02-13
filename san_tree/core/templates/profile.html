@@ -1,68 +1,81 @@
-{% extends 'index.html' %} 
-{% load static %} 
+{% extends 'index.html' %}
+{% load static %}
 
-{% block title %} Home {% endblock %} 
+{% block title %} Home {% endblock %}
 
 {% block start %}
 
 <style>
-    .profile-container {
-        background-color: rgba(0, 0, 0, 0.6);
-        color: #fff;
-    }
-    .profile-title {
-        text-align: right;
+    .card-body {
         font-family: 'Poppins', sans-serif;
-        font-size: 0.9rem;
-        font-weight: bold;
+        padding: 0.5rem;
     }
-    ul {
-        list-style-type: none;
-    }
-    ul li {
-    word-break: break-word;
-    }
-    .profile-content {
-        font-family: 'Poppins', sans-serif;
-        font-size: 0.9rem;
+
+    .content-header h5 {
+        color: #6b1d20;
     }
 </style>
 
 <div class="container-fluid">
     <div class="mb-3">
-      <a
-        href="javascript:history.back()"
-        class="col-12 d-flex align-items-center justify-content-center text-warning"
-        style="text-decoration: none"
-      >
-        <i class="fa-solid fa-arrow-left"></i>
-        &nbsp;back
-      </a>
+        <a href="javascript:history.back()" class="col-12 d-flex align-items-center justify-content-start text-warning"
+            style="text-decoration: none">
+            <i class="fa-solid fa-arrow-left"></i>
+            &nbsp;back
+        </a>
     </div>
-    <div class="row d-flex justify-content-center">
-        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4">
-            <div class="row p-2">
-                <div class="profile-container d-flex rounded">
-                    <div class="col-6">
-                        <ul class="profile-title d-flex flex-column p-0" style="max-width: auto;">
-                            <li>Username&nbsp;:&nbsp;</li>
-                            <li>Department&nbsp;:&nbsp;</li>
-                            <li>Designation&nbsp;:&nbsp;</li>
-                            <li>Emp. ID&nbsp;:&nbsp;</li>
-                            <li>Email&nbsp;:&nbsp;</li>
-                        </ul>
+    <div class="row justify-content-center">
+        <div class="col-12 col-sm-10 col-md-6 col-lg-5">
+
+            <div class="card shadow-sm border-0 rounded-2">
+                <div class="card-body">
+
+                    <!-- Header -->
+                    <div class="content-header d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="fw-bold mb-0">Profile</h5>
+                        <a href="" class="btn btn-sm btn-outline-primary d-flex align-items-center gap-1"
+                            title="Edit Profile">
+                            <i class="bi bi-pencil"></i>
+                            <span>Edit</span>
+                        </a>
                     </div>
-                    <div class="col-6">
-                        <ul class="profile-content d-flex flex-column p-0" style="max-width: auto;">
-                            <li>{{ user.username }}</li>
-                            <li>{{ user.department }}</li>
-                            <li>{{ user.designation }}</li>
-                            <li>{{ user.employee_id }}</li>
-                            <li>{{ user.email }}</li>
-                        </ul>
+
+                    <hr>
+
+                    <!-- Profile Info -->
+                    <div class="row mb-2">
+                        <div class="col-5 text-dark fw-semibold">Username</div>
+                        <div class="col-7">{{ user.username }}</div>
                     </div>
+
+                    <div class="row mb-2">
+                        <div class="col-5 text-dark fw-semibold">Department</div>
+                        <div class="col-7">{{ user.department }}</div>
+                    </div>
+
+                    <div class="row mb-2">
+                        <div class="col-5 text-dark fw-semibold">Designation</div>
+                        <div class="col-7">{{ user.designation }}</div>
+                    </div>
+
+                    <div class="row mb-2">
+                        <div class="col-5 text-dark fw-semibold">Emp. ID</div>
+                        <div class="col-7">{{ user.employee_id }}</div>
+                    </div>
+
+                    <div class="row mb-2">
+                        <div class="col-5 text-dark fw-semibold">Phone</div>
+                        <div class="col-7">{{ user.phone_number }}</div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-5 text-dark fw-semibold">Email</div>
+                        <div class="col-7">{{ user.email }}</div>
+                    </div>
+
                 </div>
             </div>
+
         </div>
     </div>
 </div>

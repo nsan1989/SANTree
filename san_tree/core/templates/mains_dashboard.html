@@ -1,10 +1,22 @@
 {% extends 'index.html' %} {% load static %} {% block title %} Home {% endblock %} {% block start %}
 <style>
-  col-12 {
-    min-height: 10rem;
+  .card-title p {
+    font-size: 1rem;
   }
+
   .modal {
     font-family: 'Poppins', sans-serif;
+  }
+
+  @media (max-width: 768px) {
+    .card-image img {
+      width: 32px;
+      height: 32px;
+    }
+
+    .card-title p {
+      font-size: 0.8rem;
+    }
   }
 </style>
 
@@ -16,7 +28,8 @@
     <div class="col-12 d-flex align-items-center justify-content-center">
       <p class="mb-0 text-light">Track your complaint/task here</p>
       &nbsp;
-      <button type="button" class="btn btn-sm btn-warning text-white" data-bs-toggle="modal" data-bs-target="#trackingModal">
+      <button type="button" class="btn btn-sm btn-warning text-white" data-bs-toggle="modal"
+        data-bs-target="#trackingModal">
         Track
       </button>
     </div>
@@ -25,15 +38,11 @@
 
   <div class="row w-100 g-3 pb-3">
     <!--Task-->
-    <div class="col-xs-6 col-sm-6 col-md-3 col-lg-3 col-xl-3">
-      <div
-        class="shadow-sm d-flex align-items-center justify-content-center rounded text-white glass-card h-100"
-      >
+    <div class="col-6 col-sm-6 col-md-4 col-lg-3">
+      <div class="shadow-sm d-flex align-items-center justify-content-center rounded text-white glass-card h-100">
         {% if request.user.role == 'Admin' %}
-        <a
-          href="{% url 'tms:tms_admin_dashboard' %}"
-          class="text-white text-decoration-none w-100 h-100 d-flex align-items-center justify-content-center"
-        >
+        <a href="{% url 'tms:tms_admin_dashboard' %}"
+          class="text-white text-decoration-none w-100 h-100 d-flex align-items-center justify-content-center">
           <div class="d-flex flex-column align-items-center">
             <div class="card-image mb-2">
               <img class="img-fluid" src="../../static/images/task-icon.png" />
@@ -44,10 +53,8 @@
           </div>
         </a>
         {% else %}
-        <a
-          href="{% url 'tms:tms_staff_dashboard' %}"
-          class="text-white text-decoration-none w-100 h-100 d-flex align-items-center justify-content-center"
-        >
+        <a href="{% url 'tms:tms_staff_dashboard' %}"
+          class="text-white text-decoration-none w-100 h-100 d-flex align-items-center justify-content-center">
           <div class="d-flex flex-column align-items-center">
             <div class="card-image mb-2">
               <img class="img-fluid" src="../../static/images/task-icon.png" />
@@ -61,21 +68,14 @@
       </div>
     </div>
     <!--Complaint-->
-    <div class="col-xs-6 col-sm-6 col-md-3 col-lg-3 col-xl-3">
-      <div
-        class="shadow-sm d-flex align-items-center justify-content-center rounded text-white glass-card h-100"
-      >
+    <div class="col-6 col-sm-6 col-md-4 col-lg-3">
+      <div class="shadow-sm d-flex align-items-center justify-content-center rounded text-white glass-card h-100">
         {% if request.user.role == 'Admin' %}
-        <a
-          href="{% url 'cms:admin_dashboard' %}"
-          class="text-white text-decoration-none w-100 h-100 d-flex align-items-center justify-content-center"
-        >
+        <a href="{% url 'cms:admin_dashboard' %}"
+          class="text-white text-decoration-none w-100 h-100 d-flex align-items-center justify-content-center">
           <div class="d-flex flex-column align-items-center">
             <div class="card-image mb-2">
-              <img
-                class="img-fluid"
-                src="../../static/images/complaint-icon.png"
-              />
+              <img class="img-fluid" src="../../static/images/complaint-icon.png" />
             </div>
             <div class="card-title">
               <p class="fw-bold mb-0 text-center">
@@ -85,16 +85,11 @@
           </div>
         </a>
         {% else %}
-        <a
-          href="{% url 'cms:staff_dashboard' %}"
-          class="text-white text-decoration-none w-100 h-100 d-flex align-items-center justify-content-center"
-        >
+        <a href="{% url 'cms:staff_dashboard' %}"
+          class="text-white text-decoration-none w-100 h-100 d-flex align-items-center justify-content-center">
           <div class="d-flex flex-column align-items-center">
             <div class="card-image mb-2">
-              <img
-                class="img-fluid"
-                src="../../static/images/complaint-icon.png"
-              />
+              <img class="img-fluid" src="../../static/images/complaint-icon.png" />
             </div>
             <div class="card-title">
               <p class="fw-bold mb-0 text-center">
@@ -107,21 +102,14 @@
       </div>
     </div>
     <!--Service-->
-    <div class="col-xs-6 col-sm-6 col-md-3 col-lg-3 col-xl-3">
-      <div
-        class="shadow-sm d-flex align-items-center justify-content-center rounded text-white glass-card h-100"
-      >
+    <div class="col-6 col-sm-6 col-md-4 col-lg-3">
+      <div class="shadow-sm d-flex align-items-center justify-content-center rounded text-white glass-card h-100">
         {% if request.user.role == 'Admin' %}
-        <a
-          href="{% url 'srm:admin_dashboard' %}"
-          class="text-white text-decoration-none w-100 h-100 d-flex align-items-center justify-content-center"
-        >
+        <a href="{% url 'srm:admin_dashboard' %}"
+          class="text-white text-decoration-none w-100 h-100 d-flex align-items-center justify-content-center">
           <div class="d-flex flex-column align-items-center">
             <div class="card-image mb-2">
-              <img
-                class="img-fluid"
-                src="../../static/images/service-icon.png"
-              />
+              <img class="img-fluid" src="../../static/images/service-icon.png" />
             </div>
             <div class="card-title">
               <p class="fw-bold mb-0 text-center">
@@ -131,16 +119,11 @@
           </div>
         </a>
         {% else %}
-        <a
-          href="{% url 'srm:staff_dashboard' %}"
-          class="text-white text-decoration-none w-100 h-100 d-flex align-items-center justify-content-center"
-        >
+        <a href="{% url 'srm:staff_dashboard' %}"
+          class="text-white text-decoration-none w-100 h-100 d-flex align-items-center justify-content-center">
           <div class="d-flex flex-column align-items-center">
             <div class="card-image mb-2">
-              <img
-                class="img-fluid"
-                src="../../static/images/service-icon.png"
-              />
+              <img class="img-fluid" src="../../static/images/service-icon.png" />
             </div>
             <div class="card-title">
               <p class="fw-bold mb-0 text-center">
@@ -153,22 +136,14 @@
       </div>
     </div>
     <!--asset-->
-    <div class="col-xs-6 col-sm-6 col-md-3 col-lg-3 col-xl-3">
-      <div
-        class="shadow-sm d-flex align-items-center justify-content-center rounded text-white glass-card h-100"
-      >
+    <div class="col-6 col-sm-6 col-md-4 col-lg-3">
+      <div class="shadow-sm d-flex align-items-center justify-content-center rounded text-white glass-card h-100">
         {% if request.user.role == 'Admin' %}
-        <a
-          href=""
-          class="text-white text-decoration-none w-100 h-100 d-flex align-items-center justify-content-center"
-          title="coming soon!"
-        >
+        <a href="" class="text-white text-decoration-none w-100 h-100 d-flex align-items-center justify-content-center"
+          title="coming soon!">
           <div class="d-flex flex-column align-items-center">
             <div class="card-image mb-2">
-              <img
-                class="img-fluid"
-                src="../../static/images/asset-icon.png"
-              />
+              <img class="img-fluid" src="../../static/images/asset-icon.png" />
             </div>
             <div class="card-title">
               <p class="fw-bold mb-0 text-center">
@@ -178,17 +153,11 @@
           </div>
         </a>
         {% else %}
-        <a
-          href=""
-          class="text-white text-decoration-none w-100 h-100 d-flex align-items-center justify-content-center"
-          title="coming soon!"
-        >
+        <a href="" class="text-white text-decoration-none w-100 h-100 d-flex align-items-center justify-content-center"
+          title="coming soon!">
           <div class="d-flex flex-column align-items-center">
             <div class="card-image mb-2">
-              <img
-                class="img-fluid"
-                src="../../static/images/asset-icon.png"
-              />
+              <img class="img-fluid" src="../../static/images/asset-icon.png" />
             </div>
             <div class="card-title">
               <p class="fw-bold mb-0 text-center">
@@ -200,24 +169,16 @@
         {% endif %}
       </div>
     </div>
-  </div>
-  <!--transport-->
-    <div class="col-xs-6 col-sm-6 col-md-3 col-lg-3 col-xl-3">
-      <div
-        class="shadow-sm d-flex align-items-center justify-content-center rounded text-white glass-card h-100"
-      >
+    <!--transport-->
+    <div class="col-6 col-sm-6 col-md-4 col-lg-3">
+      <div class="shadow-sm d-flex align-items-center justify-content-center rounded text-white glass-card h-100">
         {% if request.user.role == 'Admin' %}
-        <a
-          href="{% url 'vms:vms_admin_dashboard' %}"
+        <a href="{% url 'vms:vms_admin_dashboard' %}"
           class="text-white text-decoration-none w-100 h-100 d-flex align-items-center justify-content-center"
-          title="coming soon!"
-        >
+          title="coming soon!">
           <div class="d-flex flex-column align-items-center">
             <div class="card-image mb-2">
-              <img
-                class="img-fluid"
-                src="../../static/images/cab_icon.png"
-              />
+              <img class="img-fluid" src="../../static/images/cab_icon.png" />
             </div>
             <div class="card-title">
               <p class="fw-bold mb-0 text-center">
@@ -227,17 +188,12 @@
           </div>
         </a>
         {% else %}
-        <a
-          href="{% url 'vms:vms_staff_dashboard' %}"
+        <a href="{% url 'vms:vms_staff_dashboard' %}"
           class="text-white text-decoration-none w-100 h-100 d-flex align-items-center justify-content-center"
-          title="coming soon!"
-        >
+          title="coming soon!">
           <div class="d-flex flex-column align-items-center">
             <div class="card-image mb-2">
-              <img
-                class="img-fluid"
-                src="../../static/images/cab_icon.png"
-              />
+              <img class="img-fluid" src="../../static/images/cab_icon.png" />
             </div>
             <div class="card-title">
               <p class="fw-bold mb-0 text-center">
@@ -250,6 +206,7 @@
       </div>
     </div>
   </div>
+</div>
 </div>
 
 <!-- Modal -->
@@ -270,14 +227,14 @@
     </div>
   </div>
 </div>
-  
-<!-- ✅ Load your script first -->
-  <script src="{% static 'js/push-notification.js' %}"></script>
 
-  <script>
-    const publicKey = "{{ vapid_key |escapejs }}".trim();
-    subscribeToPush(publicKey);
-  </script>
+<!-- ✅ Load your script first -->
+<script src="{% static 'js/push-notification.js' %}"></script>
+
+<script>
+  const publicKey = "{{ vapid_key |escapejs }}".trim();
+  subscribeToPush(publicKey);
+</script>
 
 <script>
   document.getElementById('universal-track-form').addEventListener('submit', function (e) {

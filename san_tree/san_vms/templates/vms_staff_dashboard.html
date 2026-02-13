@@ -5,20 +5,35 @@ Staff Dashboard
 {% endblock %}
 
 {% block start %}
+
+<style>
+    .content-header {
+        color: wheat;
+        font-family: 'Poppins', sans-serif;
+    }
+    .cab-request,
+    .table {
+        font-family: 'Poppins', sans-serif;
+    }
+    .cab-request a {
+        text-decoration: none;
+    }
+</style>
+
 <div class="container-fluid">
-    <div class="dashboard-header mb-3">
-        <h1 class="header-title mb-0">Staff Dashboard</h1>
-        <p class="mb-0">Welcome to your staff dashboard. Here you can manage your trips and view recent activity.</p>
+    <div class="content-header mb-3">
+        <h1 class="header-title mb-0">Dashboard</h1>
+        <p class="mb-0 text-light">Welcome! You can view your recent activity here.</p>
     </div>
     <div class="cab-request d-flex align-items-center mb-3">
-        <p class="mb-0">Request a cab</p>&nbsp;<a class="text-warning" href="{% url 'vms:vms_cab_request' %}">click here</a>
+        <p class="mb-0 text-light">Booked a cab</p>&nbsp;<a class="btn btn-warning" href="{% url 'vms:vms_cab_request' %}">Book Now</a>
     </div>
     <div class="dashboard-content">
         <div class="content-header">
             <h3>Recent Activity</h3>
         </div>
         <div class="row">
-            <div class="col-12">
+            <div class="col-12 table-responsive">
                 <table class="table table-bordered">
                     <thead class="table-danger">
                         <tr>

@@ -65,6 +65,7 @@ class BookingForm(forms.ModelForm):
         model = Booking
         fields = [
             'booking_type',
+            'priority',
             'pickup_location',
             'drop_location',
             'pickup_time',
@@ -80,6 +81,7 @@ class BookingForm(forms.ModelForm):
     def clean(self):
         cleaned_data = super().clean()
         booking_type = cleaned_data.get("booking_type")
+        priority = cleaned_data.get("priority")
         pickup = cleaned_data.get("pickup_location")
         drop = cleaned_data.get("drop_location")
         pickup_time = cleaned_data.get("pickup_time")

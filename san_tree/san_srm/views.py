@@ -282,11 +282,23 @@ def ServiceView(request):
                 new_service.save()
                 ServiceRequestQueue.objects.create(service_request=new_service)
             else:
-                staff_loads = [
-                    (s, Service.objects.filter(assigned_to=s).count())
-                    for s in eligible_shift_schedules
-                ]
-                selected_shift = sorted(staff_loads, key=lambda x: x[1])[0][0]
+#                staff_loads = [
+#                    (s, Service.objects.filter(assigned_to=s).count())
+#                    for s in eligible_shift_schedules
+#                ]
+                shift_free_times = []
+                for s in eligible_shift_schedules:
+                    last_completed_service = Service.objects.filter(
+                        assigned_to=s,
+                        status='Completed'
+                    ).order_by('-created_at').first()
+
+                    if last_completed_service and last_completed_service.created_at:
+                        free_time = timezone.localtime(last_completed_service.completed_at)
+                    else:
+                        free_time = timezone.make_aware(datetime.min, timezone.get_current_timezone())
+                    shift_free_times.append((s, free_time))
+                selected_shift = sorted(shift_free_times, key=lambda x: x[1])[0][0]
 
                 new_service.assigned_to = selected_shift
                 new_service.status = 'Open'
