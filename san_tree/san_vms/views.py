@@ -77,6 +77,7 @@ def AdminUpdateBookingStatusView(request, booking_id):
         booking = get_object_or_404(Booking, id=booking_id)
         old_driver = booking.driver
         old_vehicle = booking.vehicle
+
         status = request.POST.get("status")
         if status:
             booking.status = status
@@ -98,6 +99,10 @@ def AdminUpdateBookingStatusView(request, booking_id):
             new_driver.user.save()
         else:
             booking.driver = None
+
+        if booking.priority == "CRITICAL" and booking.vehicle:
+            HandleCriticalBooking(booking)
+            
         booking.save()
 
         if old_driver and old_driver != booking.driver:
@@ -119,9 +124,6 @@ def AdminUpdateBookingStatusView(request, booking_id):
             booking.driver = None
             booking.vehicle = None
             booking.save()
-
-        if booking.status == "CRITICAL" and not booking.vehicle:
-            HandleCriticalBooking(booking)
 
     return redirect('vms:vms_admin_cab_requests')
 
