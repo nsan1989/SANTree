@@ -36,11 +36,11 @@ Complaints
           <div class="card shadow-lg border-0 rounded-4">
             <div class="card-body p-4">
               <h4 class="card-title text-center mb-4">Complaint Form</h4>
-              <form class="complaint-form" method="post" enctype="multipart/form-data">
+              <form id="complaintForm" class="complaint-form" method="post" enctype="multipart/form-data">
                 {% csrf_token %}
                 {{ form|crispy }}
                 <div class="d-grid mt-4">
-                  <button type="submit" class="btn btn-lg" style="border: 1px solid #800000; color: #800000;">Submit</button>
+                  <button type="submit" id="submitBtn" class="btn btn-lg" style="border: 1px solid #800000; color: #800000;">Submit</button>
                 </div>
               </form>
             </div>
@@ -73,6 +73,16 @@ Complaints
           }
         }
       });
+    });
+  });
+
+  //submit button script
+  document.addEventListener("DOMContentLoaded", function() {
+    const form = document.getElementById("complaintForm");
+    const submitBtn = document.getElementById("submitBtn");
+    form.addEventListener("submit", function(event) {
+      submitBtn.disabled = true;
+      submitBtn.innerText = "Submitting...";
     });
   });
 </script>

@@ -20,6 +20,7 @@
 
               <div class="d-grid mt-4">
                 <button
+                  id="submitBtn"
                   type="submit"
                   class="btn btn-lg"
                   style="border: 1px solid #800000; color: #800000"
@@ -33,5 +34,17 @@
       </div>
   </div>
 </div>
+
+<script>
+  //submit button script
+  document.addEventListener("DOMContentLoaded", function() {
+    const form = document.getElementById("reassignForm");
+    const submitBtn = document.getElementById("submitBtn");
+    form.addEventListener("submit", function(event) {
+      submitBtn.disabled = true;
+      submitBtn.innerText = "Submitting...";
+    });
+  });
+</script>
 
 {% endblock %}
