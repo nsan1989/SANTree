@@ -229,12 +229,6 @@ def ServiceView(request):
     blocks = Blocks.objects.all()
     locations = Location.objects.all()
 
-    # filter GDA or General Duty Staff.
-    provider_staff = CustomUsers.objects.filter(role='User').filter(
-        Q(department__name='GDA') |
-        Q(department__name='General Duty Assistant')
-    )
-
     if request.method == 'POST':
         form = ServiceForm(request.POST, user=request.user)
         if form.is_valid():
@@ -246,46 +240,39 @@ def ServiceView(request):
             if new_service.pk is None:
                 raise ValueError("Service not saved properly; missing required fields!")
 
-            # to get local time time
+            # to get local time
             now_local = timezone.localtime(timezone.now())
 
-            # to store active staff with status vacant
-            eligible_shift_schedules = []
+            eligible_shift_schedules = ShiftSchedule.objects.select_related(
+                "shift_staffs",
+                "shift_block"
+            ).filter(
+                shift_block=new_service.service_block,
+                shift_staffs__status__iexact="vacant",
+                shift_staffs__role="User",
+                start_time__lte=now_local,
+                end_time__gte=now_local,
+            ).filter(
+                Q(shift_staffs__department__name="GDA") |
+                Q(shift_staffs__department__name="General Duty Assistant")
+            )
 
-            for staff in provider_staff:
-                staff_status = (staff.status or '').strip().lower()
-                if staff_status != 'vacant':
-                    continue
+            engaged_shift_ids = Service.objects.filter(
+                status="Open",
+                assigned_to__isnull=False
+            ).values_list("assigned_to_id", flat=True)
 
-                is_engaged = Service.objects.filter(
-                    assigned_to__shift_staffs_id = staff.id,
-                    status = "Open"
-                ).exists()
+            eligible_shift_schedules = eligible_shift_schedules.exclude(
+                id__in=engaged_shift_ids
+            )
 
-                schedule_qs = ShiftSchedule.objects.filter(
-                    shift_block=new_service.service_block,
-                    shift_staffs_id=staff.id,
-                )               
-
-                if is_engaged:
-                    continue
-
-                for s in schedule_qs:
-                    s_start = timezone.localtime(s.start_time)
-                    s_end = timezone.localtime(s.end_time)
-                    active = s_start <= now_local <= s_end
-                    if active:
-                        eligible_shift_schedules.append(s)
+            eligible_shift_schedules = list(eligible_shift_schedules)
 
             if not eligible_shift_schedules:
                 new_service.status = 'Waiting'
                 new_service.save()
                 ServiceRequestQueue.objects.create(service_request=new_service)
             else:
-#                staff_loads = [
-#                    (s, Service.objects.filter(assigned_to=s).count())
-#                    for s in eligible_shift_schedules
-#                ]
                 shift_free_times = []
                 for s in eligible_shift_schedules:
                     last_completed_service = Service.objects.filter(

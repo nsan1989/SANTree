@@ -19,7 +19,7 @@
     <div class="col-12 col-md-4 w-100">
       <div class="card shadow-lg border-0 rounded-4">
         <div class="card-body p-4">
-          <form id="remarksForm" method="post" enctype="multipart/form-data" action="{% url 'srm:shift_schedule' %}">
+          <form id="submitForm" method="post" enctype="multipart/form-data" action="{% url 'srm:shift_schedule' %}">
             {% csrf_token %}
 
             <div class="row">
@@ -85,7 +85,7 @@
             </div>
 
             <div class="d-grid mt-4">
-              <button type="submit" class="btn btn-lg" style="border: 1px solid #800000; color: #800000">
+              <button id="submitBtn" type="submit" class="btn btn-lg" style="border: 1px solid #800000; color: #800000">
                 Submit
               </button>
             </div>
@@ -95,4 +95,15 @@
     </div>
   </div>
 </div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const form = document.getElementById("submitForm");
+    const submitBtn = document.getElementById("submitBtn");
+    form.addEventListener("submit", function(event) {
+      submitBtn.disabled = true;
+      submitBtn.innerText = "Submitting...";
+    });
+  });
+</script>
 {% endblock %}
