@@ -45,8 +45,24 @@ SHIFT_CHOICES = (
     ('night', 'Night'),
 )
 
+#Shift Manager
+class ShiftManager(models.Manager):
+   def active_now(self):
+        now = timezone.now()
+        return self.filter(
+            status="ongoing",
+            start_time__lte=now,
+            end_time__gte=now
+        )
+
 # Shift Model.
 class ShiftSchedule(models.Model):
+    SHIFT_STATUS = [
+        ('scheduled', 'Scheduled'),
+        ('ongoing', 'Ongoing'),
+        ('completed', 'Completed'),
+        ('cancelled', 'Cancelled'),
+    ]
     shift_type = models.CharField(max_length=20, choices=SHIFT_CHOICES, default='Morning')
     shift_block = models.ForeignKey(Blocks, related_name='shift_blocks', on_delete=models.CASCADE, default=None)
     shift_staffs = models.ForeignKey(
@@ -57,18 +73,30 @@ class ShiftSchedule(models.Model):
         )
     start_time = models.DateTimeField()
     end_time = models.DateTimeField()
+    status = models.CharField(max_length=20, choices=SHIFT_STATUS, default='scheduled')
+
+    objects = ShiftManager()
+
+    @classmethod
+    def update_shift_statuses(cls):
+        now = timezone.now()
+
+        cls.objects.filter(
+            start_time__gt=now
+        ).update(status="scheduled")
+
+        cls.objects.filter(
+            start_time__lte=now,
+            end_time__gte=now
+        ).update(status="ongoing")
+
+        cls.objects.filter(
+            end_time__lt=now
+        ).update(status="completed")
 
     def __str__(self):
-        return f"{self.shift_staffs} - {self.shift_type}"
-    
-    def save(self, *args, **kwargs):
-        if self.start_time and timezone.is_naive(self.start_time):
-            self.start_time = timezone.make_aware(self.start_time, timezone.get_current_timezone())
-        if self.end_time and timezone.is_naive(self.end_time):
-            self.end_time = timezone.make_aware(self.end_time, timezone.get_current_timezone())
-        super().save(*args, **kwargs)
+        return f"{self.shift_staffs} - {self.shift_type} ({self.status})"
 
-    
 # Status Choices.
 STATUS_CHOICES = (
     ('Open', 'Open'),
@@ -87,10 +115,11 @@ class Service(models.Model):
     UHID = models.CharField(max_length=20, null=True, blank=True)
     from_location = models.ForeignKey(Location, related_name='service_from', on_delete=models.SET_NULL, null=True, blank=True)
     to_location = models.ForeignKey(Location, related_name='service_to', on_delete=models.SET_NULL, null=True, blank=True)
-    description = models.TextField(default='enter description here', max_length=100)
+    description = models.TextField(default='enter description here', max_length=100, null=True, blank=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Open')
     started_at = models.DateTimeField(null=True, blank=True)
     assigned_to = models.ForeignKey(ShiftSchedule, related_name='srm_service_staff', on_delete=models.SET_NULL, null=True, blank=True)
+    handled_by = models.ForeignKey(CustomUsers, null=True, blank=True, on_delete=models.SET_NULL, related_name="handled_services")
     created_by = models.ForeignKey(CustomUsers, related_name='srm_created_service', on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     completed_at = models.DateTimeField(null=True, blank=True)

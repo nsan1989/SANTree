@@ -24,6 +24,7 @@ class UsersResource(resources.ModelResource):
 class UsersAdmin(ImportExportModelAdmin):
     resource_class = UsersResource
     list_display = ('username', 'role', 'department', 'designation', 'employee_id', 'status')
+    search_fields = ('username', 'employee_id')
 
 # Users location class
 class UsersResource(resources.ModelResource):

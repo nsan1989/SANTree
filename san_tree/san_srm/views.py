@@ -19,6 +19,7 @@ plot_lock = Lock()
 from django.http import HttpResponse
 from django.db.models import OuterRef, Subquery
 from datetime import datetime, time
+from django.db import transaction
 
 log = structlog.get_logger()
 
@@ -141,8 +142,7 @@ def StaffDashboard(request):
     service_generated_by = GenerateService.objects.filter(generate_by__shift_staffs = user).count()
     my_shift = ShiftSchedule.objects.filter(
         shift_staffs = user, 
-        start_time__gte=today, 
-        end_time__lt=tomorrow
+        status="ongoing"
         ).all()
     start_date = request.GET.get('start_date')
     end_date = request.GET.get('end_date')
@@ -240,18 +240,14 @@ def ServiceView(request):
             if new_service.pk is None:
                 raise ValueError("Service not saved properly; missing required fields!")
 
-            # to get local time
-            now_local = timezone.localtime(timezone.now())
-
             eligible_shift_schedules = ShiftSchedule.objects.select_related(
                 "shift_staffs",
                 "shift_block"
             ).filter(
                 shift_block=new_service.service_block,
+                status="ongoing",
                 shift_staffs__status__iexact="vacant",
                 shift_staffs__role="User",
-                start_time__lte=now_local,
-                end_time__gte=now_local,
             ).filter(
                 Q(shift_staffs__department__name="GDA") |
                 Q(shift_staffs__department__name="General Duty Assistant")
@@ -366,9 +362,11 @@ def free_up_completed_staff(request, id):
     user = request.user
     if not hasattr(user, 'role'):
         raise PermissionDenied("User Profile not found.")
-    service = None
+    
     try:
-        service = Service.objects.get(id=id)
+        service = Service.objects.select_related(
+            "assigned_to__shift_staffs"
+        ).get(id=id)
     except Service.DoesNotExist:
         raise PermissionDenied("Service not found.")
 
@@ -386,27 +384,41 @@ def free_up_completed_staff(request, id):
         
         new_status = request.POST.get('status')
         
-        if new_status == 'In Progress':
-            obj.status = new_status
-            staff.status = 'engaged'
-            staff.save()
-            obj.save()
-            return redirect('srm:staff_service')
-        elif new_status == 'Completed':
-            obj.status = new_status
-            staff.status = 'vacant'
-            staff.save()
-            obj.save()
-            messages.success(request, "Service status updated successfully.")
+        with transaction.atomic():
+
+            if new_status=="In Progress":
+                obj.status = "In Progress"
+                staff.status = "engaged"
+
+                staff.save(update_fields=["status"])
+                obj.save()
+
+                return redirect('srm:staff_service')
+            
+            elif new_status=="Completed":
+                obj.status = "Completed"
+                obj.handled_by = staff
+                staff.status = "vacant"
+
+                staff.save(update_fields=["status"])
+                obj.save()
+
+            elif new_status=="On Hold":
+                obj.status="On Hold"
+                obj.handled_by =staff
+                staff.status="vacant"
+
+                staff.save(update_fields=["status"])
+                obj.save()
+
+            else:
+                raise PermissionDenied("Invalid status.")
+
+        if new_status in ['Completed', 'On Hold']:
             assign_service_from_queue(staff)
-            return redirect('srm:staff_service')
-        elif new_status == 'On Hold':
-            obj.status = new_status
-            staff.status = 'vacant'
-            staff.save()
-            obj.save()
-            messages.success(request, "Service status updated successfully.")
-            return redirect('srm:staff_service')
+
+        messages.success(request, "Service status updated successfully.")
+        return redirect('srm:staff_service')                
             
     view_name = request.resolver_match.view_name
     if view_name == "srm:staff_update_service_status" and user.role == 'User':
@@ -415,33 +427,55 @@ def free_up_completed_staff(request, id):
 
 # Assigned Service to the vacant staff from the queue.
 def assign_service_from_queue(vacant_staff):
-    now_local = timezone.localtime(timezone.now())
+
     try:
-        if not vacant_staff or vacant_staff.status != 'vacant':
+        if not vacant_staff:
             return
         
-        queue_service = ServiceRequestQueue.objects.order_by('created_at').first()
-        if not queue_service:
+        ShiftSchedule.update_shift_statuses()
+
+        if Service.objects.filter(
+            assigned_to__shift_staffs=vacant_staff,
+            status="Open"
+        ).exists():
             return
         
-        service_obj = queue_service.service_request
+        queue_services = (
+            ServiceRequestQueue.objects
+            .select_related("service_request")
+            .order_by("created_at")
+        )
+
+        now = timezone.now()
+
+        for queue_service in queue_services:
+
+            service_obj = queue_service.service_request
+
+            eligible_shift = (
+                ShiftSchedule.objects
+                .active_now()
+                .filter(
+                    shift_block_id=service_obj.service_block_id,
+                    shift_staffs_id=vacant_staff.id,
+                )
+                .first()
+            )
+
+            if not eligible_shift:
+                continue
+
+            # assign
+            service_obj.assigned_to = eligible_shift
+            service_obj.status = "Open"
+            service_obj.save(update_fields=["assigned_to", "status"])
+
+            vacant_staff.status = "engaged"
+            vacant_staff.save(update_fields=["status"])
+
+            queue_service.delete()
+            return
         
-        eligible_staff = ShiftSchedule.objects.filter(
-            shift_block=service_obj.service_block,
-            shift_staffs=vacant_staff,
-            start_time__lte=now_local,
-            end_time__gte=now_local
-        ).first()
-        
-        service_obj.assigned_to = eligible_staff
-        service_obj.status = 'Open'
-        service_obj.save()
-
-        vacant_staff.status = 'engaged'
-        vacant_staff.save()
-
-        queue_service.delete()
-
     except Exception as e:
         log.error("Error assigning service from queue", error=str(e))
 
@@ -514,13 +548,12 @@ def ShiftSchedules(request):
         user_role = user.role
     except:
         raise PermissionDenied("User profile not found")
-    today = timezone.localdate()
-    start_of_day = timezone.make_aware(timezone.datetime.combine(today, time(0, 0, 0)))
-    end_of_day = timezone.make_aware(timezone.datetime.combine(today, time(23, 59, 59)))
+    now = timezone.localtime(timezone.now())
     schedules = ShiftSchedule.objects.filter(
     Q(shift_staffs__department__name__in=['GDA', 'General Duty Assistant']),
-    start_time__gte=start_of_day,
-    end_time__lte=end_of_day
+    start_time__lte = now,
+    end_time__gte=now,
+    status="ongoing"
     ).order_by("-id")
     page_number = request.GET.get('page')
     paginator = Paginator(schedules, 10) 

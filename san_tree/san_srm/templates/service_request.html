@@ -110,6 +110,28 @@
 </div>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
+  document.addEventListener("DOMContentLoaded", function () {
+
+    const serviceCheckboxes = document.querySelectorAll(
+      'input[name="service_type"]'
+    );
+
+    serviceCheckboxes.forEach((checkbox) => {
+      checkbox.addEventListener("change", function () {
+
+        if (this.checked) {
+          serviceCheckboxes.forEach((cb) => {
+            if (cb !== this) {
+              cb.checked = false;
+            }
+          });
+        }
+
+      });
+    });
+
+  });
+
   document.addEventListener("DOMContentLoaded", function() {
     const form = document.getElementById("servForm");
     const submitBtn = document.getElementById("submitBtn");
