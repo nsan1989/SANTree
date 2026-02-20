@@ -173,7 +173,7 @@
     <div class="col-6 col-sm-6 col-md-4 col-lg-3">
       <div class="shadow-sm d-flex align-items-center justify-content-center rounded text-white glass-card h-100">
         {% if request.user.role == 'Admin' %}
-        <a href=""
+        <a href="{% url 'vms:vms_admin_dashboard' %}"
           class="text-white text-decoration-none w-100 h-100 d-flex align-items-center justify-content-center"
           title="coming soon!">
           <div class="d-flex flex-column align-items-center">
@@ -188,7 +188,7 @@
           </div>
         </a>
         {% else %}
-        <a href=""
+        <a href="{% url 'vms:vms_staff_dashboard' %}"
           class="text-white text-decoration-none w-100 h-100 d-flex align-items-center justify-content-center"
           title="coming soon!">
           <div class="d-flex flex-column align-items-center">

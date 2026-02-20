@@ -29,7 +29,7 @@ class UsersAdmin(ImportExportModelAdmin):
 # Users location class
 class UsersResource(resources.ModelResource):
     class Meta:
-        model = CustomUsers
+        model = Location
         fields = ('id', 'name')
 
 @admin.register(Location)
