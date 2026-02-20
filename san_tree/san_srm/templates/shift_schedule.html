@@ -129,13 +129,7 @@
         <tbody>
           {% if page_obj %}
           {% for schedule in page_obj %}
-          <tr
-            {% if service.status == "vacant" %}
-              class="status-vacant"
-            {% elif service.status == "engage" %}
-              class="status-engage"
-            {% endif %}
-          >
+          <tr>
             <td>{{schedule.shift_staffs}}</td>
             <td>{{schedule.shift_type}}</td>
             <td>{{schedule.shift_block}}</td>

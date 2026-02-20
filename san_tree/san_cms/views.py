@@ -20,6 +20,7 @@ plot_lock = Lock()
 from django.utils import timezone
 from datetime import datetime, timedelta
 from accounts.models import ENGAGED, VACANT
+import random
 
 # Admin Complaint Dashboard view.
 def AdminComplaintDashboard(request):
@@ -291,12 +292,13 @@ def ComplaintView(request):
                 new_complaint.save()
             
             if  user.role == 'Admin':
-                assigned_user = CustomUsers.objects.filter(department=department, role='Admin').first()
-                if assigned_user:
+                admins = CustomUsers.objects.filter(department=department, role='Admin')
+                if admins.exists():
+                    assigned_user = random.choice(list(admins))
+
                     new_complaint.assigned_to = assigned_user
                     new_complaint.status = 'Open'
-                    assigned_user.save()
-                new_complaint.save()
+                    new_complaint.save()
 
             ComplaintHistory.objects.create(
                 complaint=new_complaint,

@@ -147,6 +147,7 @@ Assigned Complaint
             {% else %}
             <td>--</td>
             {% endif %}
+            {% if complaints.complaint.assigned_to == request.user %}
             {% if complaints.complaint.status == 'Resolved' %}
             <td class="text-center">--</td>
             {% else %}
@@ -159,6 +160,9 @@ Assigned Complaint
                 <i class="fa-solid fa-building"></i>
               </a>
             </td>
+            {% endif %}
+            {% else %}
+            <td>--</td>
             {% endif %}
             {% if complaints.complaint.status == 'Resolved' %}
             <td class="text-center">--</td>

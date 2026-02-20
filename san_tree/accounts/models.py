@@ -57,6 +57,11 @@ class Location(models.Model):
     def __str__(self):
         return self.name
     
+    def save(self, *args, **kwargs):
+        if Location.objects.filter(name__iexact=self.name).exclude(pk=self.pk).exists():
+            raise ValidationError(f"A location with the name '{self.name}' already exists.")
+        super().save(*args, **kwargs)
+    
     class Meta:
         ordering = ['name']
 
@@ -72,6 +77,11 @@ class CustomUsers(AbstractUser):
     def __str__(self):
         # f string is a way to embed expressions inside string literals using curly braces
         return f'{self.username} {self.department}'  
+    
+    def save(self, *args, **kwargs):
+        if CustomUsers.objects.filter(employee_id__iexact=self.employee_id, phone_number__iexact=self.phone_number).exclude(pk=self.pk).exists():
+            raise ValidationError(f"A user with the same '{self.employee_id}' and '{self.phone_number}' already exists.")
+        super().save(*args, **kwargs)
     
     class Meta:
         ordering = ['username']

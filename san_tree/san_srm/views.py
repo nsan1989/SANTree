@@ -542,19 +542,37 @@ def RequestServiceView(request):
     raise PermissionDenied("You are not authorized to view this page.")
 
 # Shift Schedule View.
-def ShiftSchedules(request): 
+def ShiftSchedules(request):
+    ShiftSchedule.update_shift_statuses() 
     user = request.user
     try:
         user_role = user.role
     except:
         raise PermissionDenied("User profile not found")
-    now = timezone.localtime(timezone.now())
-    schedules = ShiftSchedule.objects.filter(
-    Q(shift_staffs__department__name__in=['GDA', 'General Duty Assistant']),
-    start_time__lte = now,
-    end_time__gte=now,
-    status="ongoing"
-    ).order_by("-id")
+    now = timezone.now()
+    if user_role == 'User':
+        schedules = ShiftSchedule.objects.filter(
+            Q(shift_staffs__department__name__in=['GDA', 'General Duty Assistant']),
+            start_time__lte=now,
+            end_time__gte=now,
+            status="ongoing"
+        ).order_by("-id")
+    else:
+        schedules = ShiftSchedule.objects.filter(
+            Q(shift_staffs__department__name__in=['GDA', 'General Duty Assistant']) &
+            (
+                Q(
+                    start_time__lte=now,
+                    end_time__gte=now,
+                    status="ongoing"
+                )
+                |
+                Q(
+                    start_time__gt=now,
+                    status="scheduled"
+                )
+            )
+        ).order_by("-id")
     page_number = request.GET.get('page')
     paginator = Paginator(schedules, 10) 
     page_obj = paginator.get_page(page_number)
