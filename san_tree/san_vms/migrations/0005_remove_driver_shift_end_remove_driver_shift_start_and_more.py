@@ -6,26 +6,26 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('san_vms', '0004_alter_booking_cargo'),
+        ("san_vms", "0004_alter_booking_cargo"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='driver',
-            name='shift_end',
+            model_name="driver",
+            name="shift_end",
         ),
         migrations.RemoveField(
-            model_name='driver',
-            name='shift_start',
+            model_name="driver",
+            name="shift_start",
         ),
         migrations.AddField(
-            model_name='driverschedule',
-            name='shift_end',
+            model_name="driverschedule",
+            name="shift_end",
             field=models.TimeField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='driverschedule',
-            name='shift_start',
+            model_name="driverschedule",
+            name="shift_start",
             field=models.TimeField(blank=True, null=True),
         ),
     ]

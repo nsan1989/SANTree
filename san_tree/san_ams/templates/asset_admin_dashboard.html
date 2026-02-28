@@ -1,211 +1,211 @@
 {% extends 'index.html' %}
 
 {% block title %}
-Admin Dashboard
+    Admin Dashboard
 {% endblock %}
 
 {% block start %}
 
-<style>
-    .header-title h3,
-    .column-title h5 {
-        color: wheat;
-    }
+    <style>
+        .header-title h3,
+        .column-title h5 {
+            color: wheat;
+        }
 
-    .card-wrapper {
-        width: 100%;
-    }
+        .card-wrapper {
+            width: 100%;
+        }
 
-    .count-card {
-        width: 100%;
-        min-height: 6rem;
-        background-color: rgba(0, 0, 0, 0.4);
-        color: white;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-    }
+        .count-card {
+            width: 100%;
+            min-height: 6rem;
+            background-color: rgba(0, 0, 0, 0.4);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
 
-    .count-card:hover {
-        background-color: #6b1d20;
-        color: white;
-    }
+        .count-card:hover {
+            background-color: #6b1d20;
+            color: white;
+        }
 
-    .count-title h5 {
-        font-size: 1rem;
-        text-align: center;
-        font-weight: bold;
-    }
+        .count-title h5 {
+            font-size: 1rem;
+            text-align: center;
+            font-weight: bold;
+        }
 
-    .count-link a {
-        text-decoration: none;
-        color: orange;
-    }
+        .count-link a {
+            text-decoration: none;
+            color: orange;
+        }
 
-    th {
-        font-size: 0.8rem;
-        font-weight: bold;
-    }
-</style>
+        th {
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+    </style>
 
-<div class="container-fluid">
-    <div class="row mb-3">
-        <div class="col-12">
-            <div class="header-title">
-                <h3>Dashboard</h3>
+    <div class="container-fluid">
+        <div class="row mb-3">
+            <div class="col-12">
+                <div class="header-title">
+                    <h3>Dashboard</h3>
+                </div>
             </div>
         </div>
-    </div>
-    <div class="row mb-3">
+        <div class="row mb-3">
         <!--asset card-->
-        <div class="col-12 col-md-2 mb-2">
-            <div class="card-wrapper">
-                <div class="count-card rounded">
-                    <div class="count-title">
-                        <h5>Assets</h5>
-                    </div>
-                    <div class="count-value">
-                        <p class="m-0">{{asset|default:0}}</p>
-                    </div>
-                    <div class="count-link">
-                        <a href="{% url 'ams:admin_assets' %}">view</a>
+            <div class="col-12 col-md-2 mb-2">
+                <div class="card-wrapper">
+                    <div class="count-card rounded">
+                        <div class="count-title">
+                            <h5>Assets</h5>
+                        </div>
+                        <div class="count-value">
+                            <p class="m-0">{{asset|default:0}}</p>
+                        </div>
+                        <div class="count-link">
+                            <a href="{% url 'ams:admin_assets' %}">view</a>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
         <!--license card-->
-        <div class="col-12 col-md-2 mb-2">
-            <div class="card-wrapper">
-                <div class="count-card rounded">
-                    <div class="count-title">
-                        <h5>Licenses</h5>
-                    </div>
-                    <div class="count-value">
-                        <p class="m-0">{{license|default:0}}</p>
-                    </div>
-                    <div class="count-link">
-                        <a href="{% url 'ams:all_licenses' %}">view</a>
+            <div class="col-12 col-md-2 mb-2">
+                <div class="card-wrapper">
+                    <div class="count-card rounded">
+                        <div class="count-title">
+                            <h5>Licenses</h5>
+                        </div>
+                        <div class="count-value">
+                            <p class="m-0">{{license|default:0}}</p>
+                        </div>
+                        <div class="count-link">
+                            <a href="{% url 'ams:all_licenses' %}">view</a>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
         <!--component card-->
-        <div class="col-12 col-md-2 mb-2">
-            <div class="card-wrapper">
-                <div class="count-card rounded">
-                    <div class="count-title">
-                        <h5>Components</h5>
-                    </div>
-                    <div class="count-value">
-                        <p class="m-0">{{component|default:0}}</p>
-                    </div>
-                    <div class="count-link">
-                        <a href="{% url 'ams:admin_components' %}">view</a>
+            <div class="col-12 col-md-2 mb-2">
+                <div class="card-wrapper">
+                    <div class="count-card rounded">
+                        <div class="count-title">
+                            <h5>Components</h5>
+                        </div>
+                        <div class="count-value">
+                            <p class="m-0">{{component|default:0}}</p>
+                        </div>
+                        <div class="count-link">
+                            <a href="{% url 'ams:admin_components' %}">view</a>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
         <!--accessory card-->
-        <div class="col-12 col-md-2 mb-2">
-            <div class="card-wrapper">
-                <div class="count-card rounded">
-                    <div class="count-title">
-                        <h5>Accessories</h5>
-                    </div>
-                    <div class="count-value">
-                        <p class="m-0">{{accessory|default:0}}</p>
-                    </div>
-                    <div class="count-link">
-                        <a href="{% url 'ams:admin_accessories' %}">view</a>
+            <div class="col-12 col-md-2 mb-2">
+                <div class="card-wrapper">
+                    <div class="count-card rounded">
+                        <div class="count-title">
+                            <h5>Accessories</h5>
+                        </div>
+                        <div class="count-value">
+                            <p class="m-0">{{accessory|default:0}}</p>
+                        </div>
+                        <div class="count-link">
+                            <a href="{% url 'ams:admin_accessories' %}">view</a>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
         <!--consumable card-->
-        <div class="col-12 col-md-2 mb-2">
-            <div class="card-wrapper">
-                <div class="count-card rounded">
-                    <div class="count-title">
-                        <h5>Consumables</h5>
-                    </div>
-                    <div class="count-value">
-                        <p class="m-0">{{consumable|default:0}}</p>
-                    </div>
-                    <div class="count-link">
-                        <a href="{% url 'ams:admin_consumables' %}">view</a>
+            <div class="col-12 col-md-2 mb-2">
+                <div class="card-wrapper">
+                    <div class="count-card rounded">
+                        <div class="count-title">
+                            <h5>Consumables</h5>
+                        </div>
+                        <div class="count-value">
+                            <p class="m-0">{{consumable|default:0}}</p>
+                        </div>
+                        <div class="count-link">
+                            <a href="{% url 'ams:admin_consumables' %}">view</a>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
         <!--asset users card-->
-        <div class="col-12 col-md-2 mb-2">
-            <div class="card-wrapper">
-                <div class="count-card rounded">
-                    <div class="count-title">
-                        <h5>Assets Users</h5>
-                    </div>
-                    <div class="count-value">
-                        <p class="m-0">{{asset_users|default:0}}</p>
-                    </div>
-                    <div class="count-link">
-                        <a href="{% url 'ams:admin_asset_users' %}">view</a>
+            <div class="col-12 col-md-2 mb-2">
+                <div class="card-wrapper">
+                    <div class="count-card rounded">
+                        <div class="count-title">
+                            <h5>Assets Users</h5>
+                        </div>
+                        <div class="count-value">
+                            <p class="m-0">{{asset_users|default:0}}</p>
+                        </div>
+                        <div class="count-link">
+                            <a href="{% url 'ams:admin_asset_users' %}">view</a>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-    <div class="row">
-        <div class="col-12 col-md-8">
-            <div class="column-title mb-2">
-                <h5>Recent Activity</h5>
-            </div>
-            <div class="column-content table-responsive">
-                <table class="table table-bordered">
-                    <thead>
-                        <tr class="table-danger">
-                            <th scope="col">Date</th>
-                            <th scope="col">Activity</th>
-                            <th scope="col">Requested By</th>
-                            <th scope="col">Asset</th>
-                            <th scope="col">Asset Handler</th>
-                            <th scope="col">Target</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% if activities %}
-                            {% for activity in activities %}
-                                <tr class="table-info">
-                                    <td>{{activity.created_at}}</td>
-                                    <td>{{activity.status}}</td>
-                                    <td>{{activity.created_by}}</td>
-                                    <td>{{activity.name}}</td>
-                                    <td>{{activity.handler}}</td>
-                                    <td>{{activity.requested_to}}</td>
+        <div class="row">
+            <div class="col-12 col-md-8">
+                <div class="column-title mb-2">
+                    <h5>Recent Activity</h5>
+                </div>
+                <div class="column-content table-responsive">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr class="table-danger">
+                                <th scope="col">Date</th>
+                                <th scope="col">Activity</th>
+                                <th scope="col">Requested By</th>
+                                <th scope="col">Asset</th>
+                                <th scope="col">Asset Handler</th>
+                                <th scope="col">Target</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if activities %}
+                                {% for activity in activities %}
+                                    <tr class="table-info">
+                                        <td>{{activity.created_at}}</td>
+                                        <td>{{activity.status}}</td>
+                                        <td>{{activity.created_by}}</td>
+                                        <td>{{activity.name}}</td>
+                                        <td>{{activity.handler}}</td>
+                                        <td>{{activity.requested_to}}</td>
+                                    </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="100%">{{activity_message}}</td>
                                 </tr>
-                            {% endfor %}
-                        {% else %}
-                        <tr>
-                            <td colspan="100%">{{activity_message}}</td>
-                        </tr>
-                        {% endif %}
-                    </tbody>
-                </table>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
             </div>
-        </div>
-        <div class="col-12 col-md-4">
-            <div class="column-title mb-2">
-                <h5>Asset By Status</h5>
-            </div>
-            <div class="column-content">
-                <div class="chart-content d-flex justify-content-center">
-                    <img
-                    class="img-fluid w-100"
-                    src="{% url 'ams:asset_chart' %}" alt="asset Pie Chart"
-                    />
+            <div class="col-12 col-md-4">
+                <div class="column-title mb-2">
+                    <h5>Asset By Status</h5>
+                </div>
+                <div class="column-content">
+                    <div class="chart-content d-flex justify-content-center">
+                        <img
+                            class="img-fluid w-100"
+                            src="{% url 'ams:asset_chart' %}" alt="asset Pie Chart"
+                        />
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 {% endblock %}

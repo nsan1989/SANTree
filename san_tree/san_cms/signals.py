@@ -2,9 +2,11 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from webpush import send_user_notification
 from webpush.models import PushInformation
+
 from accounts.models import CustomUsers
 
 from .models import Complaint
+
 
 def send_push_notification(username, title, message):
 
@@ -22,11 +24,12 @@ def send_push_notification(username, title, message):
             payload = {
                 "title": title,
                 "body": message,
-                "icon": "/static/images/icons/192X192.png"
+                "icon": "/static/images/icons/192X192.png",
             }
             send_user_notification(user=user_obj, payload=payload, ttl=1000)
         except Exception as e:
             print(f"Failed to send to subscription {sub.endpoint}: {e}")
+
 
 # ----- Complaints -----
 @receiver(post_save, sender=Complaint)
@@ -35,5 +38,5 @@ def complaint_notification(sender, instance, created, **kwargs):
         send_push_notification(
             username=instance.assigned_to.username,
             title="New Complaint Assigned",
-            message=f"You have a new complaint: {instance.complaint_type}"
+            message=f"You have a new complaint: {instance.complaint_type}",
         )

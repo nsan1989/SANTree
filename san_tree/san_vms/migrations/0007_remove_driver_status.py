@@ -6,12 +6,12 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('san_vms', '0006_alter_driver_status'),
+        ("san_vms", "0006_alter_driver_status"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='driver',
-            name='status',
+            model_name="driver",
+            name="status",
         ),
     ]

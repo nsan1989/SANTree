@@ -1,68 +1,68 @@
 {% extends 'index.html' %}
 
 {% block title %}
-Components
+    Components
 {% endblock %}
 
 {% block start %}
 
-<style>
-    .header-title h3 {
-        color: wheat;
-    }
-</style>
+    <style>
+        .header-title h3 {
+            color: wheat;
+        }
+    </style>
 
-<div class="container-fluid">
-    <div class="row mb-3">
-        <div class="col-12">
-            <div class="header-title">
-                <h3>Components</h3>
+    <div class="container-fluid">
+        <div class="row mb-3">
+            <div class="col-12">
+                <div class="header-title">
+                    <h3>Components</h3>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            {% if error %}
+                <p style="color: red;">{{ error }}</p>
+            {% endif %}
+            <div class="col-12 table-responsive">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr class="table-danger">
+                            <th scope="col">Name</th>
+                            <th scope="col">Category</th>
+                            <th scope="col">Image</th>
+                            <th scope="col">Serial No.</th>
+                            <th scope="col">Model No.</th>
+                            <th scope="col">Manufacturer</th>
+                            <th scope="col">Quantity</th>
+                            <th scope="col">Cost</th>
+                            <th scope="col">Purchase Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if components %}
+                            {% for component in components %}
+                                <tr class="table-info">
+                                    <td>{{component.name}}</td>
+                                    <td>{{component.category}}</td>
+                                    <td>{{component.image}}</td>
+                                    <td>{{component.serial_number}}</td>
+                                    <td>{{component.model_number}}</td>
+                                    <td>{{component.manufacturer}}</td>
+                                    <td>{{component.quantity}}</td>
+                                    <td>{{component.cost}}</td>
+                                    <td>{{component.purchase_date}}</td>
+                                </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr class="table-info">
+                                <td colspan="100%">{{components_message}}</td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
-    <div class="row">
-        {% if error %}
-        <p style="color: red;">{{ error }}</p>
-        {% endif %}
-        <div class="col-12 table-responsive">
-            <table class="table table-bordered">
-                <thead>
-                    <tr class="table-danger">
-                        <th scope="col">Name</th>
-                        <th scope="col">Category</th>
-                        <th scope="col">Image</th>
-                        <th scope="col">Serial No.</th>
-                        <th scope="col">Model No.</th>
-                        <th scope="col">Manufacturer</th>
-                        <th scope="col">Quantity</th>
-                        <th scope="col">Cost</th>
-                        <th scope="col">Purchase Date</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% if components %}
-                        {% for component in components %}
-                            <tr class="table-info">
-                                <td>{{component.name}}</td>
-                                <td>{{component.category}}</td>
-                                <td>{{component.image}}</td>
-                                <td>{{component.serial_number}}</td>
-                                <td>{{component.model_number}}</td>
-                                <td>{{component.manufacturer}}</td>
-                                <td>{{component.quantity}}</td>
-                                <td>{{component.cost}}</td>
-                                <td>{{component.purchase_date}}</td>
-                            </tr>
-                        {% endfor %}
-                    {% else %}
-                    <tr class="table-info">
-                        <td colspan="100%">{{components_message}}</td>
-                    </tr>
-                    {% endif %}
-                </tbody>
-            </table>
-        </div>
-    </div>
-</div>
 
 {% endblock %}

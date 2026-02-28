@@ -28,13 +28,13 @@
         <div class="row pt-3">
             <div>
                 <a
-        href="javascript:history.back()"
-        class="col-12 d-flex align-items-center text-warning"
-        style="text-decoration: none"
-      >
-        <i class="fa-solid fa-arrow-left text-warning"></i>
-        &nbsp;back
-      </a>
+                    href="javascript:history.back()"
+                    class="col-12 d-flex align-items-center text-warning"
+                    style="text-decoration: none"
+                >
+                    <i class="fa-solid fa-arrow-left text-warning"></i>
+                    &nbsp;back
+                </a>
             </div>
             <div class="col-12 col-md-6 tasks-details-title">
                 <h3 class="fw-bold py-2">Tasks Details</h3>
@@ -55,14 +55,14 @@
                     </thead>
                     <tbody>
                         {% if tasks %}
-                        <tr>
-                            <td>{{tasks.tasks_types.name}}</td>
-                            <td>{{tasks.task_frequency}}</td>
-                            <td>{{tasks.location}}</td>
-                            <td>{{tasks.created_at}}</td>
-                            <td>{{tasks.next_date}}</td>
-                            <td>{{tasks.status}}</td>
-                        </tr>
+                            <tr>
+                                <td>{{tasks.tasks_types.name}}</td>
+                                <td>{{tasks.task_frequency}}</td>
+                                <td>{{tasks.location}}</td>
+                                <td>{{tasks.created_at}}</td>
+                                <td>{{tasks.next_date}}</td>
+                                <td>{{tasks.status}}</td>
+                            </tr>
                         {% endif %}
                     </tbody>
                 </table>
@@ -78,27 +78,27 @@
                 <table class="table table-bordered">
                     <thead class="table-danger">
                         <tr>
-                        <th scope="col">Remarks</th>
-                        <th scope="col">Attachment</th>
-                        <th scope="col">Created By</th>
-                        <th scope="col">Created At</th>
+                            <th scope="col">Remarks</th>
+                            <th scope="col">Attachment</th>
+                            <th scope="col">Created By</th>
+                            <th scope="col">Created At</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% if remark %}
                             {% for remarks in remark %}
-                            <tr>
-                            <td>{{remarks.remarks}}</td>
-                            {% if remarks.attachment %}
-                            <td>
-                            <img src="{{ remarks.attachment.url }}" alt="Remark Attachment" style="max-width: 20vw; height: 16vh;" />
-                            </td>
-                            {% else %}
-                            <td>No Image!</td>
-                            {% endif %}
-                            <td>{{remarks.created_by}}</td>
-                            <td>{{remarks.created_at}}</td>
-                            </tr>
+                                <tr>
+                                    <td>{{remarks.remarks}}</td>
+                                    {% if remarks.attachment %}
+                                        <td>
+                                            <img src="{{ remarks.attachment.url }}" alt="Remark Attachment" style="max-width: 20vw; height: 16vh;" />
+                                        </td>
+                                    {% else %}
+                                        <td>No Image!</td>
+                                    {% endif %}
+                                    <td>{{remarks.created_by}}</td>
+                                    <td>{{remarks.created_at}}</td>
+                                </tr>
                             {% endfor %}
                         {% else %}
                             <tr>

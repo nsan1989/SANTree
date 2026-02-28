@@ -8,28 +8,46 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('san_ams', '0009_assetrequest'),
+        ("san_ams", "0009_assetrequest"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='assetmodel',
-            name='requested_to',
+            model_name="assetmodel",
+            name="requested_to",
         ),
         migrations.AlterField(
-            model_name='assetmodel',
-            name='asset_tag',
+            model_name="assetmodel",
+            name="asset_tag",
             field=models.CharField(blank=True, max_length=20, null=True, unique=True),
         ),
         migrations.AlterField(
-            model_name='assetmodel',
-            name='created_by',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='asset_created_by', to=settings.AUTH_USER_MODEL),
+            model_name="assetmodel",
+            name="created_by",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="asset_created_by",
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
         migrations.AlterField(
-            model_name='assetmodel',
-            name='status',
-            field=models.CharField(choices=[('available', 'Available'), ('requested', 'Requested'), ('deployed', 'Deployed'), ('ready to deploy', 'Ready to Deploy'), ('repair', 'Repair'), ('broken', 'Broken'), ('waiting', 'Waiting')], default='available', max_length=20),
+            model_name="assetmodel",
+            name="status",
+            field=models.CharField(
+                choices=[
+                    ("available", "Available"),
+                    ("requested", "Requested"),
+                    ("deployed", "Deployed"),
+                    ("ready to deploy", "Ready to Deploy"),
+                    ("repair", "Repair"),
+                    ("broken", "Broken"),
+                    ("waiting", "Waiting"),
+                ],
+                default="available",
+                max_length=20,
+            ),
         ),
     ]

@@ -1,124 +1,124 @@
 {% extends 'index.html' %}
 
 {% block title %}
-Licenses
+    Licenses
 {% endblock %}
 
 {% block start %}
 
-<style>
-    .header-title h3 {
-        color: wheat;
-    }
-</style>
+    <style>
+        .header-title h3 {
+            color: wheat;
+        }
+    </style>
 
-<div class="container-fluid">
-    <div class="row mb-3">
-        <div class="col-12">
-            <div class="header-title">
-                <h3>License</h3>
+    <div class="container-fluid">
+        <div class="row mb-3">
+            <div class="col-12">
+                <div class="header-title">
+                    <h3>License</h3>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            {% if error %}
+                <p style="color: red;">{{ error }}</p>
+            {% endif %}
+            <div class="col-12 table-responsive">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr class="table-danger">
+                            <th scope="col">Name</th>
+                            <th scope="col">Manufacturer</th>
+                            <th scope="col">License Key</th>
+                            <th scope="col">Expiry Date</th>
+                            <th scope="col">License User</th>
+                            <th scope="col">Department</th>
+                            <th scope="col">Location</th>
+                            <th scope="col">Is Expire</th>
+                            <th scope="col">Details</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if licenses %}
+                            {% for license in licenses %}
+                                <tr class="table-info">
+                                    <td>{{license.name}}</td>
+                                    <td>{{license.manufacturer}}</td>
+                                    <td>{{license.product_key}}</td>
+                                    <td>{{license.expiry_date}}</td>
+                                    <td>{{license.assigned_to}}</td>
+                                    <td>{{license.department}}</td>
+                                    <td>{{license.location}}</td>
+                                    <td>{{license.is_expire}}</td>
+                                    <td class="d-flex align-items-center">
+                                        <div class="assign_license_icon">
+                                            <a data-url="{% url 'ams:assigned_license' %}"
+                                               class="open-modal"
+                                            >
+                                                <i class="fa-solid fa-arrow-rotate-right"></i>
+                                            </a>
+                                        </div>
+                                        <div class="view_detail_icon">
+                                            <a data-url="{% url 'ams:license_detail' %} {{ license.id }}"
+                                               class="open-modal"
+                                            >
+                                                <i class="fa-solid fa-eye"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr class="table-info">
+                                <td colspan="100%">{{license_message}}</td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
-    <div class="row">
-        {% if error %}
-        <p style="color: red;">{{ error }}</p>
-        {% endif %}
-        <div class="col-12 table-responsive">
-            <table class="table table-bordered">
-                <thead>
-                    <tr class="table-danger">
-                        <th scope="col">Name</th>
-                        <th scope="col">Manufacturer</th>
-                        <th scope="col">License Key</th>
-                        <th scope="col">Expiry Date</th>
-                        <th scope="col">License User</th>
-                        <th scope="col">Department</th>
-                        <th scope="col">Location</th>
-                        <th scope="col">Is Expire</th>
-                        <th scope="col">Details</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% if licenses %}
-                        {% for license in licenses %}
-                            <tr class="table-info">
-                                <td>{{license.name}}</td>
-                                <td>{{license.manufacturer}}</td>
-                                <td>{{license.product_key}}</td>
-                                <td>{{license.expiry_date}}</td>
-                                <td>{{license.assigned_to}}</td>
-                                <td>{{license.department}}</td>
-                                <td>{{license.location}}</td>
-                                <td>{{license.is_expire}}</td>
-                                <td class="d-flex align-items-center">
-                                    <div class="assign_license_icon">
-                                        <a data-url="{% url 'ams:assigned_license' %}"
-                                        class="open-modal"
-                                        >
-                                            <i class="fa-solid fa-arrow-rotate-right"></i>
-                                        </a>
-                                    </div>
-                                    <div class="view_detail_icon">
-                                        <a data-url="{% url 'ams:license_detail' %} {{ license.id }}"
-                                        class="open-modal"
-                                        >
-                                            <i class="fa-solid fa-eye"></i>
-                                        </a>
-                                    </div>
-                                </td>
-                            </tr>
-                        {% endfor %}
-                    {% else %}
-                    <tr class="table-info">
-                        <td colspan="100%">{{license_message}}</td>
-                    </tr>
-                    {% endif %}
-                </tbody>
-            </table>
-        </div>
-    </div>
-</div>
 
 <!--Dynamic Modal-->
-<div class="modal fade dynamic-modal" tabindex="-1">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Detail</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body" id="modalContent">
-        <p>Modal body text goes here.</p>
-      </div>
+    <div class="modal fade dynamic-modal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Detail</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="modalContent">
+                    <p>Modal body text goes here.</p>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
-</div>
 
 <!--Script-->
-<script>
-    document.addEventListener("DOMContentLoaded", function() {
-        const modal = new bootstrap.Modal(document.querySelector('.dynamic-modal'));
-        const modalBody = document.getElementById('modalContent');
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const modal = new bootstrap.Modal(document.querySelector('.dynamic-modal'));
+            const modalBody = document.getElementById('modalContent');
 
-        document.querySelectorAll(".open-modal").forEach(link => {
-            link.addEventListener("click", function(event) {
-                event.preventDefault();
-                const url = this.getAttribute("data-url");
-                modalBody.innerHTML = `<div class="text-center p-3">Loading...</div>`;
+            document.querySelectorAll(".open-modal").forEach(link => {
+                link.addEventListener("click", function(event) {
+                    event.preventDefault();
+                    const url = this.getAttribute("data-url");
+                    modalBody.innerHTML = `<div class="text-center p-3">Loading...</div>`;
 
-                fetch(url)
-                    .then(response => response.text())
-                    .then(html => {
-                        modalBody.innerHTML = html;
-                        modal.show();
-                    })
-                    .catch(error => {
-                        modalBody.innerHTML = `<div class="text-danger p-3">An error occurred while loading content.</div>`;
-                    });
+                    fetch(url)
+                        .then(response => response.text())
+                        .then(html => {
+                            modalBody.innerHTML = html;
+                            modal.show();
+                        })
+                        .catch(error => {
+                            modalBody.innerHTML = `<div class="text-danger p-3">An error occurred while loading content.</div>`;
+                        });
+                });
             });
         });
-    });
-</script>
+    </script>
 
 {% endblock %}

@@ -2,205 +2,205 @@
 {% load static %}
 
 {% block title %}
-Dashboard
+    Dashboard
 {% endblock %}
 
 {% block start %}
 
-<style>
-    .dashboard-title {
-        color: wheat;
-    }
+    <style>
+        .dashboard-title {
+            color: wheat;
+        }
 
-    .card {
-        background-color: rgba(0, 0, 0, 0.6);
-        min-height: 6rem;
-    }
+        .card {
+            background-color: rgba(0, 0, 0, 0.6);
+            min-height: 6rem;
+        }
 
-    .card-title {
-        font-family: 'poppins', sans-serif;
-        font-size: 1rem;
-        color: #fff;
-    }
+        .card-title {
+            font-family: 'poppins', sans-serif;
+            font-size: 1rem;
+            color: #fff;
+        }
 
-    .card-body p {
-        font-family: 'poppins', sans-serif;
-        font-size: 0.9rem;
-        font-weight: bold;
-        color: #fff;
-    }
+        .card-body p {
+            font-family: 'poppins', sans-serif;
+            font-size: 0.9rem;
+            font-weight: bold;
+            color: #fff;
+        }
 
-    .table-title h4 {
-        font-family: 'poppins', sans-serif;
-        font-size: 1rem;
-        font-weight: bold;
-        color: wheat;
-    }
+        .table-title h4 {
+            font-family: 'poppins', sans-serif;
+            font-size: 1rem;
+            font-weight: bold;
+            color: wheat;
+        }
 
-    th,
-    tr {
-        font-family: 'Poppins', sans-serif;
-    }
+        th,
+        tr {
+            font-family: 'Poppins', sans-serif;
+        }
 
-    th {
-        font-size: 0.9rem;
-    }
+        th {
+            font-size: 0.9rem;
+        }
 
-    tr {
-        font-size: 0.8rem;
-    }
+        tr {
+            font-size: 0.8rem;
+        }
 
-    .chart-title h3 {
-        font-family: 'poppins', sans-serif;
-        color: wheat;
-    }
-</style>
+        .chart-title h3 {
+            font-family: 'poppins', sans-serif;
+            color: wheat;
+        }
+    </style>
 
-<div class="container-fluid">
-    <div class="row mb-3">
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6">
-            <div class="dashboard-title">
-                <h1 class="fw-bold mb-0">Welcome</h1>
-                <p class="mb-0">{{current_user.username}}</p>
+    <div class="container-fluid">
+        <div class="row mb-3">
+            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6">
+                <div class="dashboard-title">
+                    <h1 class="fw-bold mb-0">Welcome</h1>
+                    <p class="mb-0">{{current_user.username}}</p>
+                </div>
             </div>
+            {% if current_user.department.name != 'General Duty Assistant' and current_user.department.name != 'GDA' and current_user.role == 'Admin' %}
+                <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6">
+                    <div class="service-request-form">
+                        <p class="mb-0 text-light">
+                            Request a service &nbsp;<a class="text-warning fw-bold" href="{% url 'srm:admin_request_service' %}"
+                                                       style="text-decoration: none;">click here.</a>
+                        </p>
+                    </div>
+                </div>
+            {% endif %}
         </div>
-        {% if current_user.department.name != 'General Duty Assistant' and current_user.department.name != 'GDA' and current_user.role == 'Admin' %}
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6">
-            <div class="service-request-form">
-                <p class="mb-0 text-light">
-                    Request a service &nbsp;<a class="text-warning fw-bold" href="{% url 'srm:admin_request_service' %}"
-                        style="text-decoration: none;">click here.</a>
-                </p>
+        <div class="row d-flex mb-3 g-2">
+            <div class="col-12 col-md-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h5 class="card-title">Total Service</h5>
+                        <p>{{total_service}}</p>
+                    </div>
+                </div>
             </div>
-        </div>
-        {% endif %}
-    </div>
-    <div class="row d-flex mb-3 g-2">
-        <div class="col-12 col-md-3">
-            <div class="card text-center">
-                <div class="card-body">
-                    <h5 class="card-title">Total Service</h5>
-                    <p>{{total_service}}</p>
+            <div class="col-12 col-md-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h5 class="card-title">Total Users</h5>
+                        <p>{{all_users}}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h5 class="card-title">Engage Users</h5>
+                        <p>{{engaged}}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h5 class="card-title">Vacant Users</h5>
+                        <p>{{vacants}}</p>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="col-12 col-md-3">
-            <div class="card text-center">
-                <div class="card-body">
-                    <h5 class="card-title">Total Users</h5>
-                    <p>{{all_users}}</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-12 col-md-3">
-            <div class="card text-center">
-                <div class="card-body">
-                    <h5 class="card-title">Engage Users</h5>
-                    <p>{{engaged}}</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-12 col-md-3">
-            <div class="card text-center">
-                <div class="card-body">
-                    <h5 class="card-title">Vacant Users</h5>
-                    <p>{{vacants}}</p>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="row mb-3 user-tables">
+        <div class="row mb-3 user-tables">
         <!-- Engage User -->
-        <div class="col-12 col-md-6">
-            <div class="col-title d-flex align-items-center table-title mb-2">
-                <i class="fa-solid fa-circle fa-sm text-danger"></i>
-                <h4 class="ms-2 mb-0">Engage User</h4>
+            <div class="col-12 col-md-6">
+                <div class="col-title d-flex align-items-center table-title mb-2">
+                    <i class="fa-solid fa-circle fa-sm text-danger"></i>
+                    <h4 class="ms-2 mb-0">Engage User</h4>
+                </div>
+                <div class="col-table table-responsive" style="max-height: 16rem;overflow-y: auto">
+                    <table class="table">
+                        <thead class="table-danger position-sticky top-0">
+                            <tr>
+                                <th scope="col">Username</th>
+                            </tr>
+                        </thead>
+                        <tbody class="table-light">
+                            {% if engage_user %}
+                                {% for engage in engage_user %}
+                                    <tr>
+                                        <td>{{ engage.username }}</td>
+                                    </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td>No engage users!</td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
             </div>
-            <div class="col-table table-responsive" style="max-height: 16rem;overflow-y: auto">
-                <table class="table">
-                    <thead class="table-danger position-sticky top-0">
-                        <tr>
-                            <th scope="col">Username</th>
-                        </tr>
-                    </thead>
-                    <tbody class="table-light">
-                        {% if engage_user %}
-                        {% for engage in engage_user %}
-                        <tr>
-                            <td>{{ engage.username }}</td>
-                        </tr>
-                        {% endfor %}
-                        {% else %}
-                        <tr>
-                            <td>No engage users!</td>
-                        </tr>
-                        {% endif %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
 
         <!-- Vacant User -->
-        <div class="col-12 col-md-6">
-            <div class="col-title d-flex align-items-center table-title mb-2">
-                <i class="fa-solid fa-circle fa-sm text-success"></i>
-                <h4 class="ms-2 mb-0">Vacant User</h4>
-            </div>
-            <div class="col-table table-responsive" style="max-height: 16rem;overflow-y: auto">
-                <table class="table">
-                    <thead class="table-danger position-sticky top-0">
-                        <tr>
-                            <th scope="col">Username</th>
-                        </tr>
-                    </thead>
-                    <tbody class="table-light">
-                        {% if vacant_user %}
-                        {% for vacant in vacant_user %}
-                        <tr>
-                            <td>{{ vacant.username }}</td>
-                        </tr>
-                        {% endfor %}
-                        {% else %}
-                        <tr>
-                            <td>No vacant users!</td>
-                        </tr>
-                        {% endif %}
-                    </tbody>
-                </table>
+            <div class="col-12 col-md-6">
+                <div class="col-title d-flex align-items-center table-title mb-2">
+                    <i class="fa-solid fa-circle fa-sm text-success"></i>
+                    <h4 class="ms-2 mb-0">Vacant User</h4>
+                </div>
+                <div class="col-table table-responsive" style="max-height: 16rem;overflow-y: auto">
+                    <table class="table">
+                        <thead class="table-danger position-sticky top-0">
+                            <tr>
+                                <th scope="col">Username</th>
+                            </tr>
+                        </thead>
+                        <tbody class="table-light">
+                            {% if vacant_user %}
+                                {% for vacant in vacant_user %}
+                                    <tr>
+                                        <td>{{ vacant.username }}</td>
+                                    </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td>No vacant users!</td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
-    </div>
 
-    <div class="row mb-3">
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6">
-            <div class="chart-title mb-2">
-                <h3>Service Chart</h3>
-            </div>
-            <div class="chart-content">
+        <div class="row mb-3">
+            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6">
+                <div class="chart-title mb-2">
+                    <h3>Service Chart</h3>
+                </div>
+                <div class="chart-content">
                 <!-- Filter form -->
-                <form method="get" class="row g-2 align-items-end mb-3">
-                    <div class="col-auto">
-                        <label for="start_date" class="form-label small mb-1">Start</label>
-                        <input type="date" id="start_date" name="start_date" class="form-control form-control-sm"
-                            value="{{ request.GET.start_date }}">
-                    </div>
+                    <form method="get" class="row g-2 align-items-end mb-3">
+                        <div class="col-auto">
+                            <label for="start_date" class="form-label small mb-1">Start</label>
+                            <input type="date" id="start_date" name="start_date" class="form-control form-control-sm"
+                                   value="{{ request.GET.start_date }}">
+                        </div>
 
-                    <div class="col-auto">
-                        <label for="end_date" class="form-label small mb-1">End</label>
-                        <input type="date" id="end_date" name="end_date" class="form-control form-control-sm"
-                            value="{{ request.GET.end_date }}">
-                    </div>
+                        <div class="col-auto">
+                            <label for="end_date" class="form-label small mb-1">End</label>
+                            <input type="date" id="end_date" name="end_date" class="form-control form-control-sm"
+                                   value="{{ request.GET.end_date }}">
+                        </div>
 
-                    <div class="col-auto">
-                        <button type="submit" class="btn btn-primary btn-sm">
-                            Filter
-                        </button>
-                    </div>
-                </form>
-                <img class="img-fluid rounded-2" src="{% url 'srm:service_pie_chart' %}?start_date={{ request.GET.start_date }}&end_date={{ request.GET.end_date }}&v={{ now }}"
-                    alt="Complaint Pie Chart" />
+                        <div class="col-auto">
+                            <button type="submit" class="btn btn-primary btn-sm">
+                                Filter
+                            </button>
+                        </div>
+                    </form>
+                    <img class="img-fluid rounded-2" src="{% url 'srm:service_pie_chart' %}?start_date={{ request.GET.start_date }}&end_date={{ request.GET.end_date }}&v={{ now }}"
+                         alt="Complaint Pie Chart" />
+                </div>
             </div>
         </div>
     </div>
-</div>
 {% endblock %}

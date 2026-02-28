@@ -1,45 +1,52 @@
-
-from django.shortcuts import get_object_or_404, render, redirect
-from .models import *
-from .forms import *
-from django.core.exceptions import PermissionDenied
-from django.contrib import messages
 import io
-import matplotlib.pyplot as plt
 from threading import Lock
+
+import matplotlib.pyplot as plt
+from django.contrib import messages
+from django.core.exceptions import PermissionDenied
+from django.shortcuts import get_object_or_404, redirect, render
+
+from .forms import *
+from .models import *
+
 plot_lock = Lock()
-from django.http import HttpResponse
-from datetime import timedelta
 import logging
+from datetime import timedelta
+
 from django.db import IntegrityError
+from django.http import HttpResponse
+
 from accounts.models import Departments
 
 logger = logging.getLogger(__name__)
 
+
 # Asset Pie Chart.
 def AssetPieChart(request):
     current_user = request.user
-    dept_asset = AssetModel.objects.filter(department = current_user.department).all()
-    deploy_asset = dept_asset.filter(status = 'deployed').count()
-    ready_asset = dept_asset.filter(status='ready to deploy').count()
-    repair_asset = dept_asset.filter(status='repair').count()
-    broken_asset = dept_asset.filter(status='broken').count()
+    dept_asset = AssetModel.objects.filter(department=current_user.department).all()
+    deploy_asset = dept_asset.filter(status="deployed").count()
+    ready_asset = dept_asset.filter(status="ready to deploy").count()
+    repair_asset = dept_asset.filter(status="repair").count()
+    broken_asset = dept_asset.filter(status="broken").count()
     if deploy_asset + ready_asset + repair_asset + broken_asset == 0:
-        labels = ['No Data']
+        labels = ["No Data"]
         sizes = [1]
-        colors = ['#d3d3d3']
+        colors = ["#d3d3d3"]
     else:
         raw_data = [
-            ('Deployed', deploy_asset, '#006600'),
-            ('Ready to Deploy', ready_asset, '#0066ff'),
-            ('Repair', repair_asset, '#ff6600'),
-            ('Broken', broken_asset, '#eb0707')
+            ("Deployed", deploy_asset, "#006600"),
+            ("Ready to Deploy", ready_asset, "#0066ff"),
+            ("Repair", repair_asset, "#ff6600"),
+            ("Broken", broken_asset, "#eb0707"),
         ]
-        filtered_data = [(label, size, color) for label, size, color in raw_data if size > 0]
+        filtered_data = [
+            (label, size, color) for label, size, color in raw_data if size > 0
+        ]
         if not filtered_data:
-            labels = ['No Data']
+            labels = ["No Data"]
             sizes = [1]
-            colors = ['#d3d3d3']
+            colors = ["#d3d3d3"]
         else:
             labels, sizes, colors = zip(*filtered_data)
 
@@ -47,14 +54,22 @@ def AssetPieChart(request):
 
     with plot_lock:
         bg_color = (0, 0, 0, 0.4)
-        fig, ax = plt.subplots(figsize=(4, 2), facecolor=bg_color) 
-        ax.pie(sizes, labels=labels, autopct='%1.1f%%', colors=colors, startangle=90, textprops={'color': 'white'})
-        ax.axis('equal')
-        plt.savefig(buffer, format='png', facecolor=fig.get_facecolor())
+        fig, ax = plt.subplots(figsize=(4, 2), facecolor=bg_color)
+        ax.pie(
+            sizes,
+            labels=labels,
+            autopct="%1.1f%%",
+            colors=colors,
+            startangle=90,
+            textprops={"color": "white"},
+        )
+        ax.axis("equal")
+        plt.savefig(buffer, format="png", facecolor=fig.get_facecolor())
         plt.close(fig)
 
     buffer.seek(0)
-    return HttpResponse(buffer.read(), content_type='image/png')
+    return HttpResponse(buffer.read(), content_type="image/png")
+
 
 # Staff Dashboard.
 def StaffDashboardView(request):
@@ -65,31 +80,36 @@ def StaffDashboardView(request):
         raise PermissionDenied("User profile not found")
     context = {}
     try:
-        activity = AssetModel.objects.filter(handler = current_user)
+        activity = AssetModel.objects.filter(handler=current_user)
         if activity.exists():
             context["activities"] = activity[:10]
         else:
             context["activity_message"] = "No current activity!"
         total_asset_users = CustomUsers.objects.filter(
-            id__in=AssetModel.objects.values('assigned_to')
+            id__in=AssetModel.objects.values("assigned_to")
         ).count()
         total_assets = AssetModel.objects.count()
         total_components = ComponentModel.objects.count()
         total_consumables = ConsumableModel.objects.count()
         total_assessories = AccessoryModel.objects.count()
-        context.update ({
-            'asset_users': total_asset_users,
-            'asset': total_assets,
-            'consumable': total_consumables,
-            'component': total_components,
-            'accessory': total_assessories,
-        })
+        context.update(
+            {
+                "asset_users": total_asset_users,
+                "asset": total_assets,
+                "consumable": total_consumables,
+                "component": total_components,
+                "accessory": total_assessories,
+            }
+        )
     except Exception as e:
         context["error"] = f"An unexpected error occurred: {e}"
     view_name = request.resolver_match.view_name
-    if view_name == "ams:staff_dashboard" and current_user_role == 'User':
-        return render(request, 'asset_staff_dashboard.html', context)
-    raise PermissionDenied("You are not authorized to view this page. Please contact administrator!")
+    if view_name == "ams:staff_dashboard" and current_user_role == "User":
+        return render(request, "asset_staff_dashboard.html", context)
+    raise PermissionDenied(
+        "You are not authorized to view this page. Please contact administrator!"
+    )
+
 
 # Admin Dashboard.
 def AdminDashboardView(request):
@@ -106,215 +126,247 @@ def AdminDashboardView(request):
         else:
             context["activity_message"] = "No current activity!"
         total_asset_users = CustomUsers.objects.filter(
-            id__in=AssetModel.objects.values('assigned_to')
+            id__in=AssetModel.objects.values("assigned_to")
         ).count()
         total_assets = AssetModel.objects.count()
         total_licenses = LicenseModel.objects.count()
         total_components = ComponentModel.objects.count()
         total_consumables = ConsumableModel.objects.count()
         total_assessories = AccessoryModel.objects.count()
-        context.update ({
-            'asset_users': total_asset_users,
-            'asset': total_assets,
-            'license': total_licenses,
-            'consumable': total_consumables,
-            'component': total_components,
-            'accessory': total_assessories,
-        })
+        context.update(
+            {
+                "asset_users": total_asset_users,
+                "asset": total_assets,
+                "license": total_licenses,
+                "consumable": total_consumables,
+                "component": total_components,
+                "accessory": total_assessories,
+            }
+        )
     except Exception as e:
         context["error"] = f"An unexpected error occurred: {e}"
     view_name = request.resolver_match.view_name
-    if view_name == "ams:admin_dashboard" and current_user_role == 'Admin':
-        return render(request, 'asset_admin_dashboard.html', context)
-    raise PermissionDenied("You are not authorized to view this page. Please contact administrator!")
+    if view_name == "ams:admin_dashboard" and current_user_role == "Admin":
+        return render(request, "asset_admin_dashboard.html", context)
+    raise PermissionDenied(
+        "You are not authorized to view this page. Please contact administrator!"
+    )
+
 
 # Add License View.
 def AddLicenseView(request):
-    if request.method == 'POST':
+    if request.method == "POST":
         form = AddLicenseForm(request.POST)
         if form.is_valid():
             license = form.save(commit=False)
             exists = LicenseModel.objects.filter(name__iexact=license.name).exists()
             if exists:
-                messages.error(request, 'License already exist!')
+                messages.error(request, "License already exist!")
             else:
                 license.save()
-                messages.success(request, 'License added successfully!')
+                messages.success(request, "License added successfully!")
         else:
-            messages.error(request, 'Please correct the errors below.')
+            messages.error(request, "Please correct the errors below.")
     else:
         form = AddLicenseForm()
 
-    return render(request, 'asset_form_templates/license_form.html', {'form': form})
+    return render(request, "asset_form_templates/license_form.html", {"form": form})
+
 
 # Add Accesspry Category View.
 def AddAccessoryCategoryView(request):
-    if request.method == 'POST':
+    if request.method == "POST":
         form = AddAccessoryCategoryForm(request.POST)
         if form.is_valid():
             accessory = form.save(commit=False)
-            exists = AccessoryCategoryModel.objects.filter(name__iexact=accessory.name).exists()
+            exists = AccessoryCategoryModel.objects.filter(
+                name__iexact=accessory.name
+            ).exists()
             if exists:
-                messages.error(request, 'Accessory Category already exist!')
+                messages.error(request, "Accessory Category already exist!")
             else:
                 accessory.save()
-                messages.error(request, 'Accessory Category added successfully!')
+                messages.error(request, "Accessory Category added successfully!")
         else:
-            messages.error(request, 'Please correct the errors below.')
+            messages.error(request, "Please correct the errors below.")
     else:
         form = AddAccessoryCategoryForm()
 
-    return render(request, 'asset_form_templates/accessory_category_form.html', {'form': form})
+    return render(
+        request, "asset_form_templates/accessory_category_form.html", {"form": form}
+    )
+
 
 # Add Accessory View.
 def AddAccessoryView(request):
-    if request.method == 'POST':
+    if request.method == "POST":
         form = AddAccessoryForm(request.POST)
         if form.is_valid():
             accessory = form.save(commit=False)
             exists = AccessoryModel.objects.filter(name__iexact=accessory.name).exists()
             if exists:
-                messages.error(request, 'Accessory already exist!')
+                messages.error(request, "Accessory already exist!")
             else:
                 accessory.save()
-                messages.error(request, 'Accessory added successfully!')
+                messages.error(request, "Accessory added successfully!")
         else:
-            messages.error(request, 'Please correct the errors below.')
+            messages.error(request, "Please correct the errors below.")
     else:
         form = AddAccessoryCategoryForm()
 
-    return render(request, 'asset_form_templates/accessory_form.html', {'form': form})
+    return render(request, "asset_form_templates/accessory_form.html", {"form": form})
+
 
 # Add Consumable Category Form.
 def AddConsumableCategoryView(request):
-    if request.method == 'POST':
+    if request.method == "POST":
         form = AddConsumableCategoryForm(request.POST)
         if form.is_valid():
             consumable = form.save(commit=False)
-            exists = ConsumableCategoryModel.objects.filter(name__iexact=consumable.name).exists()
+            exists = ConsumableCategoryModel.objects.filter(
+                name__iexact=consumable.name
+            ).exists()
             if exists:
-                messages.error(request, 'Consumable Category already exist!')
+                messages.error(request, "Consumable Category already exist!")
             else:
                 consumable.save()
-                messages.error(request, 'Consumable Category added successfully!')
+                messages.error(request, "Consumable Category added successfully!")
         else:
-            messages.error(request, 'Please correct the errors below.')
+            messages.error(request, "Please correct the errors below.")
     else:
         form = AddConsumableCategoryForm()
 
-    return render(request, 'asset_form_templates/consumable_category_form.html', {'form': form})
+    return render(
+        request, "asset_form_templates/consumable_category_form.html", {"form": form}
+    )
+
 
 # Add Consumable Form
 def AddConsumableView(request):
-    if request.method == 'POST':
+    if request.method == "POST":
         form = AddConsumableForm(request.POST)
         if form.is_valid():
             consumable = form.save(commit=False)
-            exists = ConsumableModel.objects.filter(name__iexact=consumable.name).exists()
+            exists = ConsumableModel.objects.filter(
+                name__iexact=consumable.name
+            ).exists()
             if exists:
-                messages.error(request, 'Consumable already exist!')
+                messages.error(request, "Consumable already exist!")
             else:
                 consumable.save()
-                messages.error(request, 'Consumable added successfully!')
+                messages.error(request, "Consumable added successfully!")
         else:
-            messages.error(request, 'Please correct the errors below.')
+            messages.error(request, "Please correct the errors below.")
     else:
         form = AddConsumableForm()
 
-    return render(request, 'asset_form_templates/consumable_form.html', {'form': form})
+    return render(request, "asset_form_templates/consumable_form.html", {"form": form})
+
 
 # Add Component Category Form
 def AddComponentCategoryView(request):
-    if request.method == 'POST':
+    if request.method == "POST":
         form = AddComponentCategoryForm(request.POST)
         if form.is_valid():
             component = form.save(commit=False)
-            exists = ComponentCategoryModel.objects.filter(name__iexact=component.name).exists()
+            exists = ComponentCategoryModel.objects.filter(
+                name__iexact=component.name
+            ).exists()
             if exists:
-                messages.error(request, 'Component Category already exist!')
+                messages.error(request, "Component Category already exist!")
             else:
                 component.save()
-                messages.error(request, 'Component Category added successfully!')
+                messages.error(request, "Component Category added successfully!")
         else:
-            messages.error(request, 'Please correct the errors below.')
+            messages.error(request, "Please correct the errors below.")
     else:
         form = AddComponentCategoryForm()
 
-    return render(request, 'asset_form_templates/component_category_form.html', {'form': form})
+    return render(
+        request, "asset_form_templates/component_category_form.html", {"form": form}
+    )
+
 
 # Add Component Form
 def AddComponentView(request):
-    if request.method == 'POST':
+    if request.method == "POST":
         form = AddComponentForm(request.POST)
         if form.is_valid():
             component = form.save(commit=False)
             exists = ComponentModel.objects.filter(name__iexact=component.name).exists()
             if exists:
-                messages.error(request, 'Component already exist!')
+                messages.error(request, "Component already exist!")
             else:
                 component.save()
-                messages.error(request, 'Component added successfully!')
+                messages.error(request, "Component added successfully!")
         else:
-            messages.error(request, 'Please correct the errors below.')
+            messages.error(request, "Please correct the errors below.")
     else:
         form = AddComponentForm()
 
-    return render(request, 'asset_form_templates/component_category_form.html', {'form': form})
+    return render(
+        request, "asset_form_templates/component_category_form.html", {"form": form}
+    )
+
 
 # Add Asset Category Form
 def AddAssetCategoryView(request):
-    if request.method == 'POST':
+    if request.method == "POST":
         form = AddAssetCategoryForm(request.POST)
         if form.is_valid():
             asset = form.save(commit=False)
             exists = AssetCategoryModel.objects.filter(name__iexact=asset.name).exists()
             if exists:
-                messages.error(request, 'Asset category already exist!')
+                messages.error(request, "Asset category already exist!")
             else:
                 asset.save()
-                messages.error(request, 'Asset category added successfully!')
+                messages.error(request, "Asset category added successfully!")
         else:
-            messages.error(request, 'Please correct the errors below.')
+            messages.error(request, "Please correct the errors below.")
     else:
         form = AddAssetCategoryForm()
 
-    return render(request, 'asset_form_templates/asset_category_form.html', {'form': form})
+    return render(
+        request, "asset_form_templates/asset_category_form.html", {"form": form}
+    )
+
 
 # Add Asset Form
 def AddAssetView(request):
     category = AssetCategoryModel.objects.all()
 
-    if request.method == 'POST':
+    if request.method == "POST":
         form = AddAssetForm(request.POST, request.FILES)
         if form.is_valid():
-            asset_name = form.cleaned_data['name']
+            asset_name = form.cleaned_data["name"]
 
             if AssetModel.objects.filter(name__iexact=asset_name).exists():
-                messages.error(request, 'Asset already exists!')
+                messages.error(request, "Asset already exists!")
             else:
                 try:
                     asset_name = form.save(commit=False)
                     asset_name.department = request.user.department
                     asset_name.created_by = request.user
                     form.save()
-                    messages.success(request, 'Asset added successfully!')
+                    messages.success(request, "Asset added successfully!")
                 except IntegrityError:
                     messages.error(
                         request,
-                        'Asset with same model number or serial number already exists!'
+                        "Asset with same model number or serial number already exists!",
                     )
         else:
-            print(form.errors) 
-            messages.error(request, 'Please correct the errors below.')
+            print(form.errors)
+            messages.error(request, "Please correct the errors below.")
     else:
         form = AddAssetForm()
 
     context = {
-        'form': form,
-        'category': category,
+        "form": form,
+        "category": category,
     }
 
-    return render(request, 'asset_form_templates/asset_form.html', context)
+    return render(request, "asset_form_templates/asset_form.html", context)
+
 
 # Asset View.
 def AssetView(request):
@@ -325,7 +377,7 @@ def AssetView(request):
         raise PermissionDenied("User profile not found")
     context = {}
     try:
-        assets = AssetModel.objects.filter(department = current_user.department).all()
+        assets = AssetModel.objects.filter(department=current_user.department).all()
         statuses = [choice[0] for choice in ASSET_STATUS]
         if assets.exists():
             context = {
@@ -337,11 +389,14 @@ def AssetView(request):
     except Exception as e:
         context["error"] = f"An unexpected error occurred: {e}"
     view_name = request.resolver_match.view_name
-    if view_name == "ams:admin_assets" and current_user_role == 'Admin':
-        return render(request, 'admin_assets.html', context)
-    if view_name == "ams:staff_assets" and current_user_role == 'User':
-        return render(request, 'staff_assets.html', context)
-    raise PermissionDenied("You are not authorized to view this page. Please contact administrator!")
+    if view_name == "ams:admin_assets" and current_user_role == "Admin":
+        return render(request, "admin_assets.html", context)
+    if view_name == "ams:staff_assets" and current_user_role == "User":
+        return render(request, "staff_assets.html", context)
+    raise PermissionDenied(
+        "You are not authorized to view this page. Please contact administrator!"
+    )
+
 
 # Asset Request View.
 def AssetRequestView(request):
@@ -353,14 +408,18 @@ def AssetRequestView(request):
     context = {}
     form = AssetRequestForm(request.POST or None)
     try:
-        if request.method == 'POST':
+        if request.method == "POST":
             if form.is_valid():
                 asset_request = form.save(commit=False)
                 asset_request.requested_by = current_user
-                asset_admin = CustomUsers.objects.filter( role='Admin', department=asset_request.asset.department, is_active=True ).first()
+                asset_admin = CustomUsers.objects.filter(
+                    role="Admin",
+                    department=asset_request.asset.department,
+                    is_active=True,
+                ).first()
                 asset_request.requested_to = asset_admin
                 asset_request.department = asset_request.asset.department
-                asset_request.status = 'pending'
+                asset_request.status = "pending"
                 asset_request.save()
                 context["success"] = "Asset request submitted successfully."
                 return redirect("ams:asset_requests")
@@ -373,7 +432,8 @@ def AssetRequestView(request):
     except Exception as e:
         context["error"] = f"An unexpected error occurred: {e}"
 
-    return render(request, 'asset_request.html', context)
+    return render(request, "asset_request.html", context)
+
 
 # Assigned Asset View.
 def AssignedAssetView(request, asset_id):
@@ -383,35 +443,40 @@ def AssignedAssetView(request, asset_id):
     except:
         raise PermissionDenied("User profile not found")
     asset = get_object_or_404(AssetModel, id=asset_id)
-    users = CustomUsers.objects.exclude(department_id = current_user.department_id)
+    users = CustomUsers.objects.exclude(department_id=current_user.department_id)
     context = {"asset": asset}
 
     form = AssignedAssetForm(request.POST or None, users=users)
-    
+
     try:
-        if request.method == 'POST':
+        if request.method == "POST":
             if form.is_valid():
                 selected_user_id = form.cleaned_data["assigned_to"]
                 selected_user = get_object_or_404(users, id=selected_user_id)
                 asset.assigned_to = selected_user
-                asset.status = 'assigned'
+                asset.status = "assigned"
                 asset.save()
-                context["success"] = f"Asset assigned to {selected_user.username} successfully."
+                context["success"] = (
+                    f"Asset assigned to {selected_user.username} successfully."
+                )
                 return redirect("ams:admin_assets")
-            
+
         context = {
             "form": form,
             "asset": asset,
         }
-        
+
     except Exception as e:
         context["error"] = f"An unexpected error occurred: {e}"
     view_name = request.resolver_match.view_name
-    if view_name == "ams:admin_assigned_assets" and current_user_role == 'Admin':
-        return render(request, 'assign_asset_form.html', context)
-    if view_name == "ams:staff_assigned_assets" and current_user_role == 'User':
-        return render(request, 'assign_asset_form.html', context)
-    raise PermissionDenied("You are not authorized to view this page. Please contact administrator!")
+    if view_name == "ams:admin_assigned_assets" and current_user_role == "Admin":
+        return render(request, "assign_asset_form.html", context)
+    if view_name == "ams:staff_assigned_assets" and current_user_role == "User":
+        return render(request, "assign_asset_form.html", context)
+    raise PermissionDenied(
+        "You are not authorized to view this page. Please contact administrator!"
+    )
+
 
 # Asset Detail View.
 def AssetDetailView(request, asset_id):
@@ -427,11 +492,14 @@ def AssetDetailView(request, asset_id):
     except Exception as e:
         context["error"] = f"An unexpected error occurred: {e}"
     view_name = request.resolver_match.view_name
-    if view_name == "ams:admin_asset_detail" and current_user_role == 'Admin':
-        return render(request, 'asset_detail.html', context)
-    if view_name == "ams:staff_asset_detail" and current_user_role == 'User':
-        return render(request, 'asset_detail.html', context)
-    raise PermissionDenied("You are not authorized to view this page. Please contact administrator!")
+    if view_name == "ams:admin_asset_detail" and current_user_role == "Admin":
+        return render(request, "asset_detail.html", context)
+    if view_name == "ams:staff_asset_detail" and current_user_role == "User":
+        return render(request, "asset_detail.html", context)
+    raise PermissionDenied(
+        "You are not authorized to view this page. Please contact administrator!"
+    )
+
 
 # License View.
 def LicenseView(request):
@@ -450,9 +518,12 @@ def LicenseView(request):
     except Exception as e:
         context["error"] = f"An unexpected error occurred: {e}"
     view_name = request.resolver_match.view_name
-    if view_name == "ams:all_licenses" and current_user_role == 'Admin':
-        return render(request, 'licenses.html', context)
-    raise PermissionDenied("You are not authorized to view this page. Please contact administrator!")
+    if view_name == "ams:all_licenses" and current_user_role == "Admin":
+        return render(request, "licenses.html", context)
+    raise PermissionDenied(
+        "You are not authorized to view this page. Please contact administrator!"
+    )
+
 
 # Assigned Licenses View.
 def AssignedLicensesView(request):
@@ -463,7 +534,7 @@ def AssignedLicensesView(request):
         raise PermissionDenied("User profile not found")
     context = {}
     try:
-        if request.method == 'POST':
+        if request.method == "POST":
             form = AssignedLicenseForm(request.POST)
             if form.is_valid():
                 selected_user_id = form.cleaned_data.get("user")
@@ -471,13 +542,17 @@ def AssignedLicensesView(request):
 
                 selected_user = get_object_or_404(CustomUsers, id=selected_user_id)
                 selected_license = get_object_or_404(
-                    LicenseModel, id=selected_license_id,
-                    status='available', assigned_to__isnull=True
+                    LicenseModel,
+                    id=selected_license_id,
+                    status="available",
+                    assigned_to__isnull=True,
                 )
                 selected_license.assigned_to = selected_user
                 selected_license.status = "assigned"
                 selected_license.save()
-                context["success"] = f"License assigned to {selected_user.username} successfully."
+                context["success"] = (
+                    f"License assigned to {selected_user.username} successfully."
+                )
                 return redirect("ams:assigned_license")
             else:
                 context["error"] = "Invalid form submission."
@@ -487,9 +562,12 @@ def AssignedLicensesView(request):
     except Exception as e:
         context["error"] = f"An unexpected error occurred: {e}"
     view_name = request.resolver_match.view_name
-    if view_name == "ams:assigned_license" and current_user_role == 'Admin':
-        return render(request, 'assign_license_form.html', context)
-    raise PermissionDenied("You are not authorized to view this page. Please contact administrator!")
+    if view_name == "ams:assigned_license" and current_user_role == "Admin":
+        return render(request, "assign_license_form.html", context)
+    raise PermissionDenied(
+        "You are not authorized to view this page. Please contact administrator!"
+    )
+
 
 # License Update View.
 def LicenseUpdateView():
@@ -498,22 +576,23 @@ def LicenseUpdateView():
     for license in licenses:
         try:
             if current_date > license.expiry_date:
-                license.status = 'expired'
+                license.status = "expired"
                 license.is_expire = True
 
             elif current_date >= (license.expiry_date - timedelta(days=5)):
-                license.status = 'renewal due'
+                license.status = "renewal due"
                 license.is_expire = False
 
             else:
                 license.is_expire = False
-                license.status = 'active'
-                
+                license.status = "active"
+
             license.save()
         except Exception as e:
             logger.error(f"[License Update ERROR] {license} -> {e}")
 
     logger.info("✔ License update job completed.")
+
 
 # License Detail View.
 def LicenseDetailView(request, license_id):
@@ -529,9 +608,12 @@ def LicenseDetailView(request, license_id):
     except Exception as e:
         context["error"] = f"An unexpected error occurred: {e}"
     view_name = request.resolver_match.view_name
-    if view_name == "ams:license_detail" and current_user_role == 'Admin':
-        return render(request, 'license_detail.html', context)
-    raise PermissionDenied("You are not authorized to view this page. Please contact administrator!")
+    if view_name == "ams:license_detail" and current_user_role == "Admin":
+        return render(request, "license_detail.html", context)
+    raise PermissionDenied(
+        "You are not authorized to view this page. Please contact administrator!"
+    )
+
 
 # Accessories View.
 def AccessoriesView(request):
@@ -550,11 +632,14 @@ def AccessoriesView(request):
     except Exception as e:
         context["error"] = f"An unexpected error occurred: {e}"
     view_name = request.resolver_match.view_name
-    if view_name == "ams:admin_accessories" and current_user_role == 'Admin':
-        return render(request, 'admin_accessories_page.html', context)
-    if view_name == "ams:staff_accessories" and current_user_role == 'User':
-        return render(request, 'staff_accessories_page.html', context)
-    raise PermissionDenied("You are not authorized to view this page. Please contact administrator!")
+    if view_name == "ams:admin_accessories" and current_user_role == "Admin":
+        return render(request, "admin_accessories_page.html", context)
+    if view_name == "ams:staff_accessories" and current_user_role == "User":
+        return render(request, "staff_accessories_page.html", context)
+    raise PermissionDenied(
+        "You are not authorized to view this page. Please contact administrator!"
+    )
+
 
 # Consumables View.
 def ConsumablesView(request):
@@ -573,11 +658,14 @@ def ConsumablesView(request):
     except Exception as e:
         context["error"] = f"An unexpected error occurred: {e}"
     view_name = request.resolver_match.view_name
-    if view_name == "ams:admin_consumables" and current_user_role == 'Admin':
-        return render(request, 'admin_consumables_page.html', context)
-    if view_name == "ams:staff_consumables" and current_user_role == 'User':
-        return render(request, 'staff_consumables_page.html', context)
-    raise PermissionDenied("You are not authorized to view this page. Please contact administrator!")
+    if view_name == "ams:admin_consumables" and current_user_role == "Admin":
+        return render(request, "admin_consumables_page.html", context)
+    if view_name == "ams:staff_consumables" and current_user_role == "User":
+        return render(request, "staff_consumables_page.html", context)
+    raise PermissionDenied(
+        "You are not authorized to view this page. Please contact administrator!"
+    )
+
 
 # Components View.
 def ComponentsView(request):
@@ -596,11 +684,14 @@ def ComponentsView(request):
     except Exception as e:
         context["error"] = f"An unexpected error occurred: {e}"
     view_name = request.resolver_match.view_name
-    if view_name == "ams:admin_components" and current_user_role == 'Admin':
-        return render(request, 'admin_components_page.html', context)
-    if view_name == "ams:staff_components" and current_user_role == 'User':
-        return render(request, 'staff_components_page.html', context)
-    raise PermissionDenied("You are not authorized to view this page. Please contact administrator!")
+    if view_name == "ams:admin_components" and current_user_role == "Admin":
+        return render(request, "admin_components_page.html", context)
+    if view_name == "ams:staff_components" and current_user_role == "User":
+        return render(request, "staff_components_page.html", context)
+    raise PermissionDenied(
+        "You are not authorized to view this page. Please contact administrator!"
+    )
+
 
 # Asset Users View.
 def AssetUsersView(request):
@@ -612,8 +703,8 @@ def AssetUsersView(request):
     context = {}
     try:
         asset_users = CustomUsers.objects.filter(
-                id__in=AssetModel.objects.values('assigned_to')
-            )
+            id__in=AssetModel.objects.values("assigned_to")
+        )
         if asset_users.exists():
             context["asset_users"] = asset_users
         else:
@@ -621,11 +712,14 @@ def AssetUsersView(request):
     except Exception as e:
         context["error"] = f"An unexpected error occurred: {e}"
     view_name = request.resolver_match.view_name
-    if view_name == "ams:admin_asset_users" and current_user_role == 'Admin':
-        return render(request, 'admin_asset_users.html', context)
-    if view_name == "ams:staff_asset_users" and current_user_role == 'User':
-        return render(request, 'staff_asset_users.html', context)
-    raise PermissionDenied("You are not authorized to view this page. Please contact administrator!")
+    if view_name == "ams:admin_asset_users" and current_user_role == "Admin":
+        return render(request, "admin_asset_users.html", context)
+    if view_name == "ams:staff_asset_users" and current_user_role == "User":
+        return render(request, "staff_asset_users.html", context)
+    raise PermissionDenied(
+        "You are not authorized to view this page. Please contact administrator!"
+    )
+
 
 # All Assets Request View.
 def AllAssetsRequestsView(request):
@@ -636,9 +730,7 @@ def AllAssetsRequestsView(request):
         raise PermissionDenied("User profile not found")
     context = {}
     try:
-        request_assets = AssetRequest.objects.filter(
-            requested_to = current_user
-        )
+        request_assets = AssetRequest.objects.filter(requested_to=current_user)
         if request_assets.exists():
             context["request_assets"] = request_assets
         else:
@@ -646,7 +738,8 @@ def AllAssetsRequestsView(request):
     except Exception as e:
         context["error"] = f"An unexpected error occurred: {e}"
     view_name = request.resolver_match.view_name
-    if view_name == "ams:admin_asset_requests" and current_user_role == 'Admin':
-        return render(request, 'all_assets_request.html', context)
-    raise PermissionDenied("You are not authorized to view this page. Please contact administrator!")
-
+    if view_name == "ams:admin_asset_requests" and current_user_role == "Admin":
+        return render(request, "all_assets_request.html", context)
+    raise PermissionDenied(
+        "You are not authorized to view this page. Please contact administrator!"
+    )

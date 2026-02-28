@@ -1,219 +1,219 @@
-{% extends 'index.html' %} 
+{% extends 'index.html' %}
 {% load timesince_extra %}
 
-{% block title %} 
-My Tasks
-{% endblock %} 
+{% block title %}
+  My Tasks
+{% endblock %}
 
 {% block start %}
 
-<style>
-  .my-tasks-title h1 {
-    font-family: 'Poppins', sans-serif;
-    color: wheat;
-  }
-  th {
-    font-family: 'Poppins', sans-serif;
-    font-size: 0.9rem;
-    font-weight: bold;
-  }
-  tr {
-    font-family: 'Poppins', sans-serif;
-    font-size: 0.85rem;
-  }
-  .status-completed > td { background-color: #003300; color: #fff; }
-  .status-progress > td { background-color: #ff6600; color: #000; }
-  .status-waiting > td { background-color: #808080; color: #fff; }
-  .status-rejected > td { background-color: #cc0000; color: #fff; }
-</style>
+  <style>
+    .my-tasks-title h1 {
+      font-family: 'Poppins', sans-serif;
+      color: wheat;
+    }
+    th {
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.9rem;
+      font-weight: bold;
+    }
+    tr {
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.85rem;
+    }
+    .status-completed > td { background-color: #003300; color: #fff; }
+    .status-progress > td { background-color: #ff6600; color: #000; }
+    .status-waiting > td { background-color: #808080; color: #fff; }
+    .status-rejected > td { background-color: #cc0000; color: #fff; }
+  </style>
 
-<div class="container-fluid">
-  <div class="row">
-    <div class="col-12 my-tasks-title">
-      <h1 class="fw-bold py-2">My Tasks</h1>
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-12 my-tasks-title">
+        <h1 class="fw-bold py-2">My Tasks</h1>
+      </div>
     </div>
-  </div>
-  <div class="row mb-2">
-    <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 mb-2">
-      <nav>
+    <div class="row mb-2">
+      <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 mb-2">
+        <nav>
           <ul class="pagination">
             {% if page_obj.has_previous %}
-            <li class="page-item">
-              <a class="page-link"
-                href="?page={{ page_obj.previous_page_number }}">Previous</a>
-            </li>
+              <li class="page-item">
+                <a class="page-link"
+                   href="?page={{ page_obj.previous_page_number }}">Previous</a>
+              </li>
             {% endif %}
 
             {% for num in page_obj.paginator.page_range %}
-            {% if page_obj.number == num %}
-            <li class="page-item active"><span class="page-link">{{ num }}</span></li>
-            {% else %}
-            <li class="page-item">
-              <a class="page-link"
-                href="?page={{ num }}">{{ num }}</a>
-            </li>
-            {% endif %}
+              {% if page_obj.number == num %}
+                <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+              {% else %}
+                <li class="page-item">
+                  <a class="page-link"
+                     href="?page={{ num }}">{{ num }}</a>
+                </li>
+              {% endif %}
             {% endfor %}
 
             {% if page_obj.has_next %}
-            <li class="page-item">
-              <a class="page-link"
-                href="?page={{ page_obj.next_page_number }}">Next</a>
-            </li>
+              <li class="page-item">
+                <a class="page-link"
+                   href="?page={{ page_obj.next_page_number }}">Next</a>
+              </li>
             {% endif %}
           </ul>
-      </nav>
+        </nav>
+      </div>
     </div>
-  </div>
-  <div class="row">
-    <div class="col-12 task-table">
-      <div class="table-responsive">
-        <table class="table table-bordered">
-          <thead class="table-danger">
-            <tr>
-              <th scope="col">Tasks No.</th>
-              <th scope="col">Tasks</th>
-              <th scope="col">Frequency</th>
-              <th scope="col">Location</th>
-              <th scope="col">Status</th>
-              {% if request.user.role == 'User' %}
-                <th scope="col">Update Status</th>
-              {% endif %}
-              <th scope="col">Remark</th>
-              <th scope="col">Details</th>
-            </tr>
-          </thead>
-          <tbody class="table-primary">
-            {% if page_obj %} {% for task in page_obj %}
-            <tr
-              {% if task.status == 'Completed' %}
-              class="status-completed"
-              {% elif task.status == 'In Progress' %}
-              class="status-progress"
-              {% elif task.status == 'Waiting' %}
-              class="status-waiting"
-              {% elif task.status == 'Rejected' %}
-              class="status-rejected"
-              {% endif %}
-            >
-              <td>{{ task.tasks_number}}</td>
-              <td>{{ task.tasks_types.name }}</td>
-              <td>{{ task.task_frequency }}</td>
-              {% if task.location %}
-                <td>{{ task.location }}</td>
+    <div class="row">
+      <div class="col-12 task-table">
+        <div class="table-responsive">
+          <table class="table table-bordered">
+            <thead class="table-danger">
+              <tr>
+                <th scope="col">Tasks No.</th>
+                <th scope="col">Tasks</th>
+                <th scope="col">Frequency</th>
+                <th scope="col">Location</th>
+                <th scope="col">Status</th>
+                {% if request.user.role == 'User' %}
+                  <th scope="col">Update Status</th>
+                {% endif %}
+                <th scope="col">Remark</th>
+                <th scope="col">Details</th>
+              </tr>
+            </thead>
+            <tbody class="table-primary">
+              {% if page_obj %} {% for task in page_obj %}
+                <tr
+                  {% if task.status == 'Completed' %}
+                    class="status-completed"
+                  {% elif task.status == 'In Progress' %}
+                    class="status-progress"
+                  {% elif task.status == 'Waiting' %}
+                    class="status-waiting"
+                  {% elif task.status == 'Rejected' %}
+                    class="status-rejected"
+                  {% endif %}
+                >
+                  <td>{{ task.tasks_number}}</td>
+                  <td>{{ task.tasks_types.name }}</td>
+                  <td>{{ task.task_frequency }}</td>
+                  {% if task.location %}
+                    <td>{{ task.location }}</td>
                   {% else %}
-                <td>NA</td>
+                    <td>NA</td>
+                  {% endif %}
+                  <td>{{ task.status }}</td>
+                  {% if task.status != 'Completed' and task.status != 'Postponed' %}
+                    <td>
+                      <form method="POST" action="{% url 'tms:staff_update_task_status' task.id %}">
+                        {% csrf_token %}
+                        <select class="mb-2" name="status" required>
+                          <option value="">select</option>
+                          <option value="In Progress" {% if tasks.status == 'In Progress' %} selected {% endif %}>In Progress</option>
+                          <option value="Postponed" {% if tasks.status == 'Postponed' %} selected {% endif %}>Postponed</option>
+                          <option value="Completed" {% if tasks.status == 'Completed' %} selected {% endif %}>Completed</option>
+                        </select>
+                        <button class="btn btn-sm btn-primary" type="submit">Update</button>
+                      </form>
+                    </td>
+                  {% else %}
+                    <td>--</td>
+                  {% endif %}
+                  {% if task.status != 'Postponed' and task.status != 'Completed' %}
+                    <td class="text-center"><a class="open-modal" data-url="{% url 'tms:tasks_remarks' task.id %}"><i class="fa-solid fa-pen"></i></a></td>
+                  {% else %}
+                    <td>--</td>
+                  {% endif %}
+                  <td>
+                    <a href="{% url 'tms:staff_tasks_details' task.id %}"><i class="fa-solid fa-eye"></i></a>
+                  </td>
+                </tr>
+              {% endfor %} {% else %}
+                <tr>
+                  <td colspan="9">
+                    No tasks have been assigned yet!
+                  </td>
+                </tr>
               {% endif %}
-              <td>{{ task.status }}</td>
-              {% if task.status != 'Completed' and task.status != 'Postponed' %}
-                <td>
-                  <form method="POST" action="{% url 'tms:staff_update_task_status' task.id %}">
-                  {% csrf_token %}
-                    <select class="mb-2" name="status" required>
-                      <option value="">select</option>
-                      <option value="In Progress" {% if tasks.status == 'In Progress' %} selected {% endif %}>In Progress</option>
-                      <option value="Postponed" {% if tasks.status == 'Postponed' %} selected {% endif %}>Postponed</option>
-                      <option value="Completed" {% if tasks.status == 'Completed' %} selected {% endif %}>Completed</option>
-                    </select>
-                    <button class="btn btn-sm btn-primary" type="submit">Update</button>
-                  </form>
-                </td>
-              {% else %}
-              <td>--</td>
-              {% endif %}
-              {% if task.status != 'Postponed' and task.status != 'Completed' %}
-              <td class="text-center"><a class="open-modal" data-url="{% url 'tms:tasks_remarks' task.id %}"><i class="fa-solid fa-pen"></i></a></td>
-              {% else %}
-              <td>--</td>
-              {% endif %}
-              <td>
-                <a href="{% url 'tms:staff_tasks_details' task.id %}"><i class="fa-solid fa-eye"></i></a>
-              </td>
-            </tr>
-            {% endfor %} {% else %}
-            <tr>
-              <td colspan="9">
-                No tasks have been assigned yet!
-              </td>
-            </tr>
-            {% endif %}
-          </tbody>
-        </table>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   </div>
-</div>
 
 <!--Modal Block-->
-<div class="modal fade" id="dynamicModal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-sm"> <!-- Adjust size as needed -->
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body w-100" id="modalBody">
+  <div class="modal fade" id="dynamicModal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm"> <!-- Adjust size as needed -->
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body w-100" id="modalBody">
         <!-- Content loads here -->
+        </div>
       </div>
     </div>
   </div>
-</div>
 <!--------------->
 
 <!--Open Modal Script-->
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-  const modalElement = document.getElementById('dynamicModal');
-  const modalBody = document.getElementById('modalBody');
-  document.querySelectorAll('.open-modal').forEach(function (el) {
-    el.addEventListener('click', function (e) {
-      e.preventDefault();
-      const url = this.getAttribute('data-url');
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const modalElement = document.getElementById('dynamicModal');
+      const modalBody = document.getElementById('modalBody');
+      document.querySelectorAll('.open-modal').forEach(function (el) {
+        el.addEventListener('click', function (e) {
+          e.preventDefault();
+          const url = this.getAttribute('data-url');
 
       // Fetch content and show modal
-      fetch(url)
-        .then(response => response.text())
-        .then(html => {
-          modalBody.innerHTML = html;
-          const modal = new bootstrap.Modal(modalElement);
-          modal.show();
+          fetch(url)
+            .then(response => response.text())
+            .then(html => {
+              modalBody.innerHTML = html;
+              const modal = new bootstrap.Modal(modalElement);
+              modal.show();
 
           // Attach form handler AFTER modal content loads
-          const form = modalBody.querySelector('form');
-          if (form) {
-            form.addEventListener('submit', function (e) {
-              e.preventDefault();
+              const form = modalBody.querySelector('form');
+              if (form) {
+                form.addEventListener('submit', function (e) {
+                  e.preventDefault();
 
-              const formData = new FormData(form);
-              fetch(form.action, {
-                method: 'POST',
-                body: formData,
-                headers: {
-                  'X-Requested-With': 'XMLHttpRequest',
-                }
-              })
-              .then(response => {
+                  const formData = new FormData(form);
+                  fetch(form.action, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                      'X-Requested-With': 'XMLHttpRequest',
+                    }
+                  })
+                    .then(response => {
                 // If redirected (success), reload or redirect
-                if (response.redirected) {
-                  window.location.href = response.url;
-                } else {
-                  return response.text().then(html => {
-                    modalBody.innerHTML = html; // re-render form if error
-                  });
-                }
-              })
-              .catch(error => {
-                modalBody.innerHTML = '<div class="alert alert-danger">Error submitting form.</div>';
-              });
+                      if (response.redirected) {
+                        window.location.href = response.url;
+                      } else {
+                        return response.text().then(html => {
+                          modalBody.innerHTML = html; // re-render form if error
+                        });
+                      }
+                    })
+                    .catch(error => {
+                      modalBody.innerHTML = '<div class="alert alert-danger">Error submitting form.</div>';
+                    });
+                });
+              }
+            })
+            .catch(error => {
+              modalBody.innerHTML = '<p>Error loading content.</p>';
+              const modal = new bootstrap.Modal(modalElement);
+              modal.show();
             });
-          }
-        })
-        .catch(error => {
-          modalBody.innerHTML = '<p>Error loading content.</p>';
-          const modal = new bootstrap.Modal(modalElement);
-          modal.show();
         });
+      });
     });
-  });
-});
-</script>
+  </script>
 {% endblock %}

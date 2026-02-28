@@ -1,66 +1,66 @@
 {% extends 'index.html' %}
 
 {% block title %}
-Accessories
+    Accessories
 {% endblock %}
 
 {% block start %}
 
-<style>
-    .header-title h3 {
-        color: wheat;
-    }
-</style>
+    <style>
+        .header-title h3 {
+            color: wheat;
+        }
+    </style>
 
-<div class="container-fluid">
-    <div class="row mb-3">
-        <div class="col-12">
-            <div class="header-title">
-                <h3>Accessories</h3>
+    <div class="container-fluid">
+        <div class="row mb-3">
+            <div class="col-12">
+                <div class="header-title">
+                    <h3>Accessories</h3>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            {% if error %}
+                <p style="color: red;">{{ error }}</p>
+            {% endif %}
+            <div class="col-12 table-responsive">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr class="table-danger">
+                            <th scope="col">Name</th>
+                            <th scope="col">Category</th>
+                            <th scope="col">Model No.</th>
+                            <th scope="col">Manufacturer</th>
+                            <th scope="col">Image</th>
+                            <th scope="col">Purchase Date</th>
+                            <th scope="col">Cost</th>
+                            <th scope="col">Quantity</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if accessories %}
+                            {% for accessory in accessories %}
+                                <tr class="table-info">
+                                    <td>{{accessory.name}}</td>
+                                    <td>{{accessory.category}}</td>
+                                    <td>{{accessory.model_number}}</td>
+                                    <td>{{accessory.manufacturer}}</td>
+                                    <td>{{accessory.image}}</td>
+                                    <td>{{accessory.purchase_date}}</td>
+                                    <td>{{accessory.cost}}</td>
+                                    <td>{{accessory.quantity}}</td>
+                                </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr class="table-info">
+                                <td colspan="100%">{{accessories_message}}</td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
-    <div class="row">
-        {% if error %}
-        <p style="color: red;">{{ error }}</p>
-        {% endif %}
-        <div class="col-12 table-responsive">
-            <table class="table table-bordered">
-                <thead>
-                    <tr class="table-danger">
-                        <th scope="col">Name</th>
-                        <th scope="col">Category</th>
-                        <th scope="col">Model No.</th>
-                        <th scope="col">Manufacturer</th>
-                        <th scope="col">Image</th>
-                        <th scope="col">Purchase Date</th>
-                        <th scope="col">Cost</th>
-                        <th scope="col">Quantity</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% if accessories %}
-                        {% for accessory in accessories %}
-                            <tr class="table-info">
-                                <td>{{accessory.name}}</td>
-                                <td>{{accessory.category}}</td>
-                                <td>{{accessory.model_number}}</td>
-                                <td>{{accessory.manufacturer}}</td>
-                                <td>{{accessory.image}}</td>
-                                <td>{{accessory.purchase_date}}</td>
-                                <td>{{accessory.cost}}</td>
-                                <td>{{accessory.quantity}}</td>
-                            </tr>
-                        {% endfor %}
-                    {% else %}
-                    <tr class="table-info">
-                        <td colspan="100%">{{accessories_message}}</td>
-                    </tr>
-                    {% endif %}
-                </tbody>
-            </table>
-        </div>
-    </div>
-</div>
 
 {% endblock %}

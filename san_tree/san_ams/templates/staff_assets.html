@@ -1,160 +1,160 @@
 {% extends 'index.html' %}
 
 {% block title %}
-Asset
+    Asset
 {% endblock %}
 
 {% block start %}
 
-<style>
-    .header-title h3 {
-        color: wheat;
-    }
+    <style>
+        .header-title h3 {
+            color: wheat;
+        }
 
-    .header-title p {
-        color: wheat;
-    }
-</style>
+        .header-title p {
+            color: wheat;
+        }
+    </style>
 
-<div class="container-fluid">
-    <div class="row mb-3">
-        <div class="col-12">
-            <div class="header-title">
-                <h3 class="mb-0">Assets</h3>
-                <p class="mb-0">track all of your assets here!</p>
+    <div class="container-fluid">
+        <div class="row mb-3">
+            <div class="col-12">
+                <div class="header-title">
+                    <h3 class="mb-0">Assets</h3>
+                    <p class="mb-0">track all of your assets here!</p>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 table-responsive">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr class="table-danger">
+                            <th>Asset No.</th>
+                            <th>Name</th>
+                            <th>Image</th>
+                            <th>Status</th>
+                            <th>Assigned To</th>
+                            <th>Location</th>
+                            <th>Details</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if assets %}
+                            {% for asset in assets %}
+                                <tr class="table-info">
+                                    <td>{{asset.asset_tag}}</td>
+                                    <td>{{asset.name}}</td>
+                                    {% if asset.image %}
+                                        <td>{{asset.image}}</td>
+                                    {% else %}
+                                        <td>NA</td>
+                                    {% endif %}
+                                    <td>{{asset.status}}</td>
+                                    <td>{{asset.assigned_to}}</td>
+                                    <td>{{asset.location}}</td>
+                                    <td class="d-flex align-items-center gap-3">
+                                        <div class="assign_license_icon">
+                                            <a data-url="{% url 'ams:staff_assigned_assets' asset.id %}"
+                                               class="open-modal"
+                                            >
+                                                <i class="fa-solid fa-arrow-rotate-right" title="Assigned Asset" style="cursor: pointer;"></i>
+                                            </a>
+                                        </div>
+                                        <div class="view_detail_icon">
+                                            <a href="{% url 'ams:staff_asset_detail' asset.id %}"
+                                            >
+                                                <i class="fa-solid fa-eye" title="Asset Detail" style="cursor: pointer;"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="100%">No assets found!</td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
-    <div class="row">
-        <div class="col-12 table-responsive">
-            <table class="table table-bordered">
-                <thead>
-                    <tr class="table-danger">
-                        <th>Asset No.</th>
-                        <th>Name</th>
-                        <th>Image</th>
-                        <th>Status</th>
-                        <th>Assigned To</th>
-                        <th>Location</th>
-                        <th>Details</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% if assets %}
-                        {% for asset in assets %}
-                        <tr class="table-info">
-                            <td>{{asset.asset_tag}}</td>
-                            <td>{{asset.name}}</td>
-                            {% if asset.image %}
-                                <td>{{asset.image}}</td>
-                            {% else %}
-                                <td>NA</td>
-                            {% endif %}
-                            <td>{{asset.status}}</td>
-                            <td>{{asset.assigned_to}}</td>
-                            <td>{{asset.location}}</td>
-                            <td class="d-flex align-items-center gap-3">
-                                <div class="assign_license_icon">
-                                    <a data-url="{% url 'ams:staff_assigned_assets' asset.id %}"
-                                    class="open-modal"
-                                    >
-                                        <i class="fa-solid fa-arrow-rotate-right" title="Assigned Asset" style="cursor: pointer;"></i>
-                                    </a>
-                                </div>
-                                <div class="view_detail_icon">
-                                    <a href="{% url 'ams:staff_asset_detail' asset.id %}"
-                                    >
-                                        <i class="fa-solid fa-eye" title="Asset Detail" style="cursor: pointer;"></i>
-                                    </a>
-                                </div>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    {% else %}
-                    <tr>
-                        <td colspan="100%">No assets found!</td>
-                    </tr>
-                    {% endif %}
-                </tbody>
-            </table>
-        </div>
-    </div>
-</div>
 
 <!--Dynamic Modal-->
-<div class="modal fade dynamic-modal" tabindex="-1">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body" id="modalContent">
+    <div class="modal fade dynamic-modal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="modalContent">
         <!--Model Content Goes Here!-->
-      </div>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
-</div>
 
 <!--Script-->
-<script>
-    document.addEventListener("DOMContentLoaded", function() {
-        const modal = new bootstrap.Modal(document.querySelector('.dynamic-modal'));
-        const modalBody = document.getElementById('modalContent');
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const modal = new bootstrap.Modal(document.querySelector('.dynamic-modal'));
+            const modalBody = document.getElementById('modalContent');
 
-        document.querySelectorAll(".open-modal").forEach(link => {
-            link.addEventListener("click", function(event) {
-                event.preventDefault();
-                const url = this.getAttribute("data-url");
-                modalBody.innerHTML = `<div class="text-center p-3">Loading...</div>`;
+            document.querySelectorAll(".open-modal").forEach(link => {
+                link.addEventListener("click", function(event) {
+                    event.preventDefault();
+                    const url = this.getAttribute("data-url");
+                    modalBody.innerHTML = `<div class="text-center p-3">Loading...</div>`;
 
-                fetch(url)
-                    .then(response => response.text())
-                    .then(html => {
-                        modalBody.innerHTML = html;
-                        modal.show();
-                    })
-                    .catch(error => {
-                        modalBody.innerHTML = `<div class="text-danger p-3">An error occurred while loading content.</div>`;
-                    });
+                    fetch(url)
+                        .then(response => response.text())
+                        .then(html => {
+                            modalBody.innerHTML = html;
+                            modal.show();
+                        })
+                        .catch(error => {
+                            modalBody.innerHTML = `<div class="text-danger p-3">An error occurred while loading content.</div>`;
+                        });
+                });
             });
         });
-    });
-</script>
+    </script>
 
 <!--asset filtering script-->
-<script>
-document.addEventListener("DOMContentLoaded", function() {
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
 
-    const filter = document.getElementById("statusFilter");
-    const rows = document.querySelectorAll(".asset-row");
+            const filter = document.getElementById("statusFilter");
+            const rows = document.querySelectorAll(".asset-row");
 
-    filter.addEventListener("change", function() {
-        let selected = this.value.toLowerCase();
-        let visibleCount = 0;
+            filter.addEventListener("change", function() {
+                let selected = this.value.toLowerCase();
+                let visibleCount = 0;
 
-        rows.forEach(row => {
-            let rowStatus = row.dataset.status.toLowerCase();
+                rows.forEach(row => {
+                    let rowStatus = row.dataset.status.toLowerCase();
 
-            if (!selected || rowStatus === selected) {
-                row.style.display = "";
-                visibleCount++;
-            } else {
-                row.style.display = "none";
-            }
-        });
+                    if (!selected || rowStatus === selected) {
+                        row.style.display = "";
+                        visibleCount++;
+                    } else {
+                        row.style.display = "none";
+                    }
+                });
 
         // Optional no-results message
-        let msg = document.getElementById("noResults");
-        if (!msg) {
-            msg = document.createElement("tr");
-            msg.id = "noResults";
-            msg.innerHTML = `<td colspan="100%" class="text-center text-muted">No matching assets found</td>`;
-            document.querySelector("tbody").appendChild(msg);
-        }
-        msg.style.display = visibleCount === 0 ? "" : "none";
-    });
+                let msg = document.getElementById("noResults");
+                if (!msg) {
+                    msg = document.createElement("tr");
+                    msg.id = "noResults";
+                    msg.innerHTML = `<td colspan="100%" class="text-center text-muted">No matching assets found</td>`;
+                    document.querySelector("tbody").appendChild(msg);
+                }
+                msg.style.display = visibleCount === 0 ? "" : "none";
+            });
 
-});
-</script>
+        });
+    </script>
 
 {% endblock %}

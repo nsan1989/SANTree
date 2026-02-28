@@ -1,7 +1,7 @@
 {% extends 'index.html' %}
 
 {% block title %}
-Admin Dashboard
+    Admin Dashboard
 {% endblock %}
 
 {% block start %}
@@ -29,23 +29,23 @@ Admin Dashboard
                         </thead>
                         <tbody>
                             {% if all_trips %}
-                            {% for trip in all_trips %}
-                            <tr>
-                                <td>{{ trip.booking_type }}</td>
-                                <td>{{ trip.pickup_location }}</td>
-                                <td>{{ trip.drop_location }}</td>
-                                <td>{{ trip.pickup_time }}</td>
-                                <td>{{ trip.drop_time }}</td>
-                                <td>{{ trip.vehicle }}</td>
-                                <td>{{ trip.driver }}</td>
-                                <td>{{ trip.booked_by }}</td>
-                                <td>{{ trip.status }}</td>
-                            </tr>
-                            {% endfor %}
+                                {% for trip in all_trips %}
+                                    <tr>
+                                        <td>{{ trip.booking_type }}</td>
+                                        <td>{{ trip.pickup_location }}</td>
+                                        <td>{{ trip.drop_location }}</td>
+                                        <td>{{ trip.pickup_time }}</td>
+                                        <td>{{ trip.drop_time }}</td>
+                                        <td>{{ trip.vehicle }}</td>
+                                        <td>{{ trip.driver }}</td>
+                                        <td>{{ trip.booked_by }}</td>
+                                        <td>{{ trip.status }}</td>
+                                    </tr>
+                                {% endfor %}
                             {% else %}
-                            <tr>
-                                <td colspan="100%" class="text-center">No completed trips found.</td>
-                            </tr>
+                                <tr>
+                                    <td colspan="100%" class="text-center">No completed trips found.</td>
+                                </tr>
                             {% endif %}
                         </tbody>
                     </table>

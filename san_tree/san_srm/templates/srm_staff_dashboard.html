@@ -3,93 +3,93 @@
 {% load static %}
 
 {% block title %}
-Dashboard
+    Dashboard
 {% endblock %}
 
 {% block start %}
 
-<style>
-    .dashboard-title h1 {
-        font-family: 'Poppins', sans-serif;
-        color: wheat;
-    }
+    <style>
+        .dashboard-title h1 {
+            font-family: 'Poppins', sans-serif;
+            color: wheat;
+        }
 
-    .dashboard-title p {
-        font-family: 'Poppins', sans-serif;
-        color: #fff;
-    }
+        .dashboard-title p {
+            font-family: 'Poppins', sans-serif;
+            color: #fff;
+        }
 
-    .card {
-        background-color: rgba(0, 0, 0, 0.4);
-        font-family: 'Poppins', sans-serif;
-        font-size: 0.9rem;
-        color: #fff;
-        min-height: 8rem;
-    }
+        .card {
+            background-color: rgba(0, 0, 0, 0.4);
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.9rem;
+            color: #fff;
+            min-height: 8rem;
+        }
 
-    .card:hover {
-        background-color: #990000;
-        color: #fff;
-    }
+        .card:hover {
+            background-color: #990000;
+            color: #fff;
+        }
 
-    .card-body {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-    }
+        .card-body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
 
-    .card-body h5 {
-        font-size: 1rem;
-        font-weight: 600;
-    }
+        .card-body h5 {
+            font-size: 1rem;
+            font-weight: 600;
+        }
 
-    .card-body a {
-        text-decoration: none;
-        font-family: 'Poppins', sans-serif;
-    }
+        .card-body a {
+            text-decoration: none;
+            font-family: 'Poppins', sans-serif;
+        }
 
-    .shift-title h3,
-    .activity-title h3 {
-        font-family: 'Poppins', sans-serif;
-        color: wheat;
-    }
+        .shift-title h3,
+        .activity-title h3 {
+            font-family: 'Poppins', sans-serif;
+            color: wheat;
+        }
 
-    th,
-    td {
-        font-family: 'Poppins', sans-serif;
-        font-size: 0.9rem;
-    }
+        th,
+        td {
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.9rem;
+        }
 
-    .chart-title h3 {
-        font-family: 'Poppins', sans-serif;
-        color: wheat;
-    }
+        .chart-title h3 {
+            font-family: 'Poppins', sans-serif;
+            color: wheat;
+        }
 
-    .generated_service_link {
-        text-decoration: none;
-        font-family: 'Poppins', sans-serif;
-    }
-</style>
+        .generated_service_link {
+            text-decoration: none;
+            font-family: 'Poppins', sans-serif;
+        }
+    </style>
 
-<div class="container-fluid">
-    <div class="row mb-3">
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6">
-            <div class="dashboard-title">
-                <h1 class="fw-bold mb-0">Welcome</h1>
-                <p class="mb-0">{{current_user.username}}</p>
+    <div class="container-fluid">
+        <div class="row mb-3">
+            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6">
+                <div class="dashboard-title">
+                    <h1 class="fw-bold mb-0">Welcome</h1>
+                    <p class="mb-0">{{current_user.username}}</p>
+                </div>
             </div>
-        </div>
-        {% if current_user.department.name != 'General Duty Assistant' and current_user.department.name != 'GDA' %}
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 d-flex align-items-center">
-            <div class="service-request-form">
-                <p class="mb-0 text-light">
-                    Request a service &nbsp;<a class="text-warning fw-bold" href="{% url 'srm:request_service' %}"
-                        style="text-decoration: none;">click here.</a>
-                </p>
-            </div>
-        </div>
-        {% else %}
+            {% if current_user.department.name != 'General Duty Assistant' and current_user.department.name != 'GDA' %}
+                <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 d-flex align-items-center">
+                    <div class="service-request-form">
+                        <p class="mb-0 text-light">
+                            Request a service &nbsp;<a class="text-warning fw-bold" href="{% url 'srm:request_service' %}"
+                                                       style="text-decoration: none;">click here.</a>
+                        </p>
+                    </div>
+                </div>
+            {% else %}
         <!--
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 d-flex align-items-center">
             <div class="service-generate-btn d-flex align-items-center">
@@ -119,298 +119,298 @@ Dashboard
             </div>
         </div>
         -->
-        {% endif %}
-    </div>
-    {% if request.user.department.name == 'GDA' or request.user.department.name == 'General Duty Assistant' %}
-    <div class="row mb-3">
-        <div class="col-12 col-md-3 p-2">
-            <div class="card text-center">
-                <div class="card-body">
-                    <h5>Request</h5>
-                    <p>{{total_assign_service}}</p>
-                    <a class="text-warning" href="{% url 'srm:staff_service' %}">View</a>
-                </div>
-            </div>
+            {% endif %}
         </div>
-        <div class="col-12 col-md-3 p-2">
-            <div class="card text-center">
-                <div class="card-body">
-                    <h5>Open</h5>
-                    <p class="m-0 p-0">{{open_assign_service}}</p>
-                    <a class="text-warning" href="{% url 'srm:staff_service' %}">View</a>
+        {% if request.user.department.name == 'GDA' or request.user.department.name == 'General Duty Assistant' %}
+            <div class="row mb-3">
+                <div class="col-12 col-md-3 p-2">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <h5>Request</h5>
+                            <p>{{total_assign_service}}</p>
+                            <a class="text-warning" href="{% url 'srm:staff_service' %}">View</a>
+                        </div>
+                    </div>
                 </div>
+                <div class="col-12 col-md-3 p-2">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <h5>Open</h5>
+                            <p class="m-0 p-0">{{open_assign_service}}</p>
+                            <a class="text-warning" href="{% url 'srm:staff_service' %}">View</a>
+                        </div>
                 <!--
                 <div class="card-link">
                     <a class="generated_service_link text-warning" href="{% url 'srm:all_generate_service' %}">view
                         all</a>
                 </div>
                 -->
-            </div>
-        </div>
-        <div class="col-12 col-md-3 p-2">
-            <div class="card text-center">
-                <div class="card-body">
-                    <h5>Progress</h5>
-                    <p>{{prog_assign_serv}}</p>
-                    <a class="text-warning" href="{% url 'srm:staff_service' %}">View</a>
+                    </div>
+                </div>
+                <div class="col-12 col-md-3 p-2">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <h5>Progress</h5>
+                            <p>{{prog_assign_serv}}</p>
+                            <a class="text-warning" href="{% url 'srm:staff_service' %}">View</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-md-3 p-2">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <h5>Completed</h5>
+                            <p>{{comp_assign_serv}}</p>
+                            <a class="text-warning" href="{% url 'srm:staff_service' %}">View</a>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="col-12 col-md-3 p-2">
-            <div class="card text-center">
-                <div class="card-body">
-                    <h5>Completed</h5>
-                    <p>{{comp_assign_serv}}</p>
-                    <a class="text-warning" href="{% url 'srm:staff_service' %}">View</a>
+        {% else %}
+            <div class="row mb-3">
+                <div class="col-12 col-md-3 p-2">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <h5>Created</h5>
+                            <p>{{total_created_service}}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-md-3 p-2">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <h5>Open</h5>
+                            <p>{{open_created_serv}}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-md-3 p-2">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <h5>Progress</h5>
+                            <p>{{prog_created_serv}}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-md-3 p-2">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <h5>Completed</h5>
+                            <p>{{comp_created_serv}}</p>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-    </div>
-    {% else %}
-    <div class="row mb-3">
-        <div class="col-12 col-md-3 p-2">
-            <div class="card text-center">
-                <div class="card-body">
-                    <h5>Created</h5>
-                    <p>{{total_created_service}}</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-12 col-md-3 p-2">
-            <div class="card text-center">
-                <div class="card-body">
-                    <h5>Open</h5>
-                    <p>{{open_created_serv}}</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-12 col-md-3 p-2">
-            <div class="card text-center">
-                <div class="card-body">
-                    <h5>Progress</h5>
-                    <p>{{prog_created_serv}}</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-12 col-md-3 p-2">
-            <div class="card text-center">
-                <div class="card-body">
-                    <h5>Completed</h5>
-                    <p>{{comp_created_serv}}</p>
-                </div>
-            </div>
-        </div>
-    </div>
-    {% endif %}
+        {% endif %}
 
-    <div class="row mb-3">
+        <div class="row mb-3">
         <!--recent activity-->
-        <div class="col-12 col-md-8">
-            <div class="activity-title">
-                <h3>Recent Activity</h3>
-            </div>
-            <div class="activity-content table-responsive">
-                <table class="table table-bordered">
-                    <thead>
-                        <tr class="table-danger">
-                            <th>Service No.</th>
-                            <th>Services</th>
-                            <th>Status</th>
-                            <th>From</th>
-                            <th>To</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% if user_services %}
-                            {% for service in user_services %}
-                            <tr class="table-info">
-                                <td>{{service.service_number}}</td>
-                                <td>{{service.service_type}}</td>
-                                <td>{{service.status}}</td>
-                                <td>{{service.from_location}}</td>
-                                <td>{{service.to_location}}</td>
-                            </tr>
-                            {% endfor %}
-                        {% else %}
-                        <tr>
-                            <td colspan="100%">No recent activities!</td>
-                        </tr>
-                        {% endif %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        {% if request.user.department.name == 'GDA' or request.user.department.name == 'General Duty Assistant' %}
-        <div class="col-12 col-md-4">
-            <div class="row h-100">
-                <div 
-                class="col-12 shift-title" 
-                >
-                    <h3>Shift Schedule</h3>
+            <div class="col-12 col-md-8">
+                <div class="activity-title">
+                    <h3>Recent Activity</h3>
                 </div>
-                <div 
-                class="col-12 table-responsive"
-                style="height: calc(100% - 3rem);min-height: calc(100% - 3rem); overflow-y: auto;"
-                >
-                    <table 
-                    class="table h-100"
-                    style="overflow-y: auto;"
-                    >
-                        <thead class="table-dark position-sticky top-0">
-                            <tr>
-                                <th scope="col">Shift</th>
-                                <th scope="col">Location</th>
-                                <th scope="col">Start</th>
-                                <th scope="col">End</th>
+                <div class="activity-content table-responsive">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr class="table-danger">
+                                <th>Service No.</th>
+                                <th>Services</th>
+                                <th>Status</th>
+                                <th>From</th>
+                                <th>To</th>
                             </tr>
                         </thead>
-                        <tbody class="table-info">
-                            {% if shifts %}
-                            {% for shift in shifts %}
-                            <tr>
-                                <td>{{shift.shift_type}}</td>
-                                <td>{{shift.shift_block}} </td>
-                                <td>{{ shift.start_time|date:"H:i" }}</td>
-                                <td>{{ shift.end_time|date:"H:i" }}</td>
-                            </tr>
-                            {% endfor %}
+                        <tbody>
+                            {% if user_services %}
+                                {% for service in user_services %}
+                                    <tr class="table-info">
+                                        <td>{{service.service_number}}</td>
+                                        <td>{{service.service_type}}</td>
+                                        <td>{{service.status}}</td>
+                                        <td>{{service.from_location}}</td>
+                                        <td>{{service.to_location}}</td>
+                                    </tr>
+                                {% endfor %}
                             {% else %}
-                            <tr>
-                                <td colspan="100%" class="text-center">No shifts assigned.</td>
-                            </tr>
+                                <tr>
+                                    <td colspan="100%">No recent activities!</td>
+                                </tr>
                             {% endif %}
                         </tbody>
                     </table>
                 </div>
             </div>
-        </div>
-        {% else %}
-        <div class="col-12 col-md-4">
-            <div class="chart-title mb-2">
-                <h3>Service Pie Chart</h3>
-            </div>
+            {% if request.user.department.name == 'GDA' or request.user.department.name == 'General Duty Assistant' %}
+                <div class="col-12 col-md-4">
+                    <div class="row h-100">
+                        <div
+                            class="col-12 shift-title"
+                        >
+                            <h3>Shift Schedule</h3>
+                        </div>
+                        <div
+                            class="col-12 table-responsive"
+                            style="height: calc(100% - 3rem);min-height: calc(100% - 3rem); overflow-y: auto;"
+                        >
+                            <table
+                                class="table h-100"
+                                style="overflow-y: auto;"
+                            >
+                                <thead class="table-dark position-sticky top-0">
+                                    <tr>
+                                        <th scope="col">Shift</th>
+                                        <th scope="col">Location</th>
+                                        <th scope="col">Start</th>
+                                        <th scope="col">End</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="table-info">
+                                    {% if shifts %}
+                                        {% for shift in shifts %}
+                                            <tr>
+                                                <td>{{shift.shift_type}}</td>
+                                                <td>{{shift.shift_block}} </td>
+                                                <td>{{ shift.start_time|date:"H:i" }}</td>
+                                                <td>{{ shift.end_time|date:"H:i" }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    {% else %}
+                                        <tr>
+                                            <td colspan="100%" class="text-center">No shifts assigned.</td>
+                                        </tr>
+                                    {% endif %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <div class="col-12 col-md-4">
+                    <div class="chart-title mb-2">
+                        <h3>Service Pie Chart</h3>
+                    </div>
             <!-- Filter form -->
-            <form method="get" class="row g-2 align-items-end mb-3">
-                <div class="col-auto">
-                    <label for="start_date" class="form-label small mb-1">Start</label>
-                    <input type="date" id="start_date" name="start_date" class="form-control form-control-sm"
-                    value="{{ request.GET.start_date }}">
-                </div>
+                    <form method="get" class="row g-2 align-items-end mb-3">
+                        <div class="col-auto">
+                            <label for="start_date" class="form-label small mb-1">Start</label>
+                            <input type="date" id="start_date" name="start_date" class="form-control form-control-sm"
+                                   value="{{ request.GET.start_date }}">
+                        </div>
 
-                <div class="col-auto">
-                    <label for="end_date" class="form-label small mb-1">End</label>
-                    <input type="date" id="end_date" name="end_date" class="form-control form-control-sm"
-                    value="{{ request.GET.end_date }}">
-                </div>
+                        <div class="col-auto">
+                            <label for="end_date" class="form-label small mb-1">End</label>
+                            <input type="date" id="end_date" name="end_date" class="form-control form-control-sm"
+                                   value="{{ request.GET.end_date }}">
+                        </div>
 
-                <div class="col-auto">
-                    <button type="submit" class="btn btn-primary btn-sm">
-                    Filter
-                    </button>
+                        <div class="col-auto">
+                            <button type="submit" class="btn btn-primary btn-sm">
+                                Filter
+                            </button>
+                        </div>
+                    </form>
+                    <img class="img-fluid rounded-2 w-100" src="{% url 'srm:service_pie_chart' %}?start_date={{ request.GET.start_date }}&end_date={{ request.GET.end_date }}&v={{ now }}"
+                         alt="service Pie Chart" />
                 </div>
-            </form>
-            <img class="img-fluid rounded-2 w-100" src="{% url 'srm:service_pie_chart' %}?start_date={{ request.GET.start_date }}&end_date={{ request.GET.end_date }}&v={{ now }}"
-                alt="service Pie Chart" />
+            {% endif %}
         </div>
-        {% endif %}
     </div>
-</div>
 
-<script>
-  document.getElementById('serv-chart-filters').addEventListener('submit', function (e) {
-    e.preventDefault();
-    const params = new URLSearchParams(new FormData(this));
-    params.append('v', Date.now());
-    const chart = document.getElementById('serv-chart-img');
-    chart.src = `{% url 'srm:service_pie_chart' %}?${params.toString()}`;
-  });
-</script>
+    <script>
+        document.getElementById('serv-chart-filters').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const params = new URLSearchParams(new FormData(this));
+            params.append('v', Date.now());
+            const chart = document.getElementById('serv-chart-img');
+            chart.src = `{% url 'srm:service_pie_chart' %}?${params.toString()}`;
+        });
+    </script>
 
 <!--Modal-->
-<div id="serviceModal" class="modal fade" tabindex="-1">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-body" id="serviceModalContent">
-        <p>Loading...</p>
-      </div>
+    <div id="serviceModal" class="modal fade" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body" id="serviceModalContent">
+                    <p>Loading...</p>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
-</div>
 
-<script>
-    document.addEventListener("DOMContentLoaded", () => {
-        const generateBtn = document.getElementById("generateBtn");
-        const completeBtn = document.getElementById("completeBtn");
-        const holdBtn = document.getElementById("holdBtn");
-        let timeOutId = null;
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const generateBtn = document.getElementById("generateBtn");
+            const completeBtn = document.getElementById("completeBtn");
+            const holdBtn = document.getElementById("holdBtn");
+            let timeOutId = null;
 
         //update user status
-        const updateStatusOnServer = (newStatus) => {
-            fetch("{% url 'srm:update_status' %}", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/x-www-form-urlencoded",
-                    "X-CSRFToken": "{{ csrf_token }}"
-                },
-                body: `status=${newStatus}`
-            });
-        };
+            const updateStatusOnServer = (newStatus) => {
+                fetch("{% url 'srm:update_status' %}", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded",
+                        "X-CSRFToken": "{{ csrf_token }}"
+                    },
+                    body: `status=${newStatus}`
+                });
+            };
 
-        if (generateBtn) {
-            generateBtn.addEventListener("click", () => {
-                updateStatusOnServer("engaged");
+            if (generateBtn) {
+                generateBtn.addEventListener("click", () => {
+                    updateStatusOnServer("engaged");
 
                 // Start 30-minute timer (30*60*1000 ms)
-                timeoutId = setTimeout(() => {
-                    resetToVacant();
-                }, 30 * 60 * 1000);
+                    timeoutId = setTimeout(() => {
+                        resetToVacant();
+                    }, 30 * 60 * 1000);
 
                 // Hide Generate button
-                generateBtn.style.display = "none";
-                completeBtn.style.display = "inline-block";
-                holdBtn.style.display = "inline-block";
-            });
-        }
+                    generateBtn.style.display = "none";
+                    completeBtn.style.display = "inline-block";
+                    holdBtn.style.display = "inline-block";
+                });
+            }
 
-        if (completeBtn) {
-            completeBtn.addEventListener("click", () => {
-                updateStatusOnServer("vacant");
+            if (completeBtn) {
+                completeBtn.addEventListener("click", () => {
+                    updateStatusOnServer("vacant");
 
-                completeBtn.style.display = "none";
-                holdBtn.style.display = "none";
+                    completeBtn.style.display = "none";
+                    holdBtn.style.display = "none";
 
-                generateBtn.style.display = "inline-block";
+                    generateBtn.style.display = "inline-block";
 
-                const modalE1 = document.getElementById("serviceModal");
-                const modal = new bootstrap.Modal(modalE1);
-                modal.show();
+                    const modalE1 = document.getElementById("serviceModal");
+                    const modal = new bootstrap.Modal(modalE1);
+                    modal.show();
 
-                const content = document.getElementById("serviceModalContent");
-                content.innerHTML = "<p>Loading...</p>";
+                    const content = document.getElementById("serviceModalContent");
+                    content.innerHTML = "<p>Loading...</p>";
 
-                fetch("")
-                    .then(res => res.text())
-                    .then(html => {
-                        content.innerHTML = html;
-                    })
-                    .catch(() => {
-                        content.innerHTML = "<p class='text-danger'>Error loading content.</p>";
-                    });
-            });
-        }
+                    fetch("")
+                        .then(res => res.text())
+                        .then(html => {
+                            content.innerHTML = html;
+                        })
+                        .catch(() => {
+                            content.innerHTML = "<p class='text-danger'>Error loading content.</p>";
+                        });
+                });
+            }
 
-        if (holdBtn) {
-            holdBtn.addEventListener("click", () => {
-                updateServiceStatusOnServer("On Hold")
+            if (holdBtn) {
+                holdBtn.addEventListener("click", () => {
+                    updateServiceStatusOnServer("On Hold")
 
-                timeOutId = setTimeout(() => {
-                    resetToVacant();
-                }, 20 * 60 * 1000);
+                    timeOutId = setTimeout(() => {
+                        resetToVacant();
+                    }, 20 * 60 * 1000);
 
-                btnContainer.innerHTML = "";
-            })
-        }
-    });
-</script>
+                    btnContainer.innerHTML = "";
+                })
+            }
+        });
+    </script>
 
 {% endblock %}

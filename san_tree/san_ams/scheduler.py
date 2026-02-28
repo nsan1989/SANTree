@@ -1,9 +1,12 @@
-from apscheduler.schedulers.background import BackgroundScheduler
-from .views import LicenseUpdateView
 import atexit
+
+from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.interval import IntervalTrigger
 
+from .views import LicenseUpdateView
+
 scheduler = BackgroundScheduler(timezone="Asia/Kolkata")
+
 
 def start():
     scheduler.add_job(

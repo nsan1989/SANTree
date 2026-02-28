@@ -1,36 +1,37 @@
 from django.contrib.auth.models import AbstractUser
-from django.db import models
 from django.core.exceptions import ValidationError
+from django.db import models
 
-SUPER_ADMIN = 'Super Admin'
-ADMIN = 'Admin'
-USER = 'User'
+SUPER_ADMIN = "Super Admin"
+ADMIN = "Admin"
+USER = "User"
 
-INCHARGE = 'In Charge'
-STAFF = 'Staff'
+INCHARGE = "In Charge"
+STAFF = "Staff"
 
-ENGAGED = 'engaged'
-VACANT = 'vacant'
+ENGAGED = "engaged"
+VACANT = "vacant"
 
 # Role Choices.
 # SUPER_ADMIN is store in DB and also use for compare. While, super admin is use for display like in options
 ROLE_CHOICES = (
-    (SUPER_ADMIN, 'super admin'),
-    (ADMIN, 'admin'),
-    (USER, 'user'),
+    (SUPER_ADMIN, "super admin"),
+    (ADMIN, "admin"),
+    (USER, "user"),
 )
 
 # Designation Choices.
 DESIGNATION_CHOICES = [
-    (INCHARGE, 'incharge'),
-    (STAFF, 'staff'),
+    (INCHARGE, "incharge"),
+    (STAFF, "staff"),
 ]
 
 # Status Choices.
 STATUS_CHOICES = (
-    (ENGAGED, 'Engaged'),
-    (VACANT, 'Vacant'),
+    (ENGAGED, "Engaged"),
+    (VACANT, "Vacant"),
 )
+
 
 # Department Model.
 class Departments(models.Model):
@@ -39,50 +40,75 @@ class Departments(models.Model):
     # Method to define string representation of an object.
     def __str__(self):
         return self.name
-    
+
     def save(self, *args, **kwargs):
         # Check for duplicate department names (case-insensitive)
-        if Departments.objects.filter(name__iexact=self.name).exclude(pk=self.pk).exists():
-            raise ValidationError(f"A department with the name '{self.name}' already exists.")
+        if (
+            Departments.objects.filter(name__iexact=self.name)
+            .exclude(pk=self.pk)
+            .exists()
+        ):
+            raise ValidationError(
+                f"A department with the name '{self.name}' already exists."
+            )
         super().save(*args, **kwargs)
 
     class Meta:
-        ordering = ['name']
-        verbose_name_plural = 'Departments'
-    
+        ordering = ["name"]
+        verbose_name_plural = "Departments"
+
+
 # Location Model.
 class Location(models.Model):
     name = models.CharField(max_length=50)
 
     def __str__(self):
         return self.name
-    
+
     def save(self, *args, **kwargs):
         if Location.objects.filter(name__iexact=self.name).exclude(pk=self.pk).exists():
-            raise ValidationError(f"A location with the name '{self.name}' already exists.")
+            raise ValidationError(
+                f"A location with the name '{self.name}' already exists."
+            )
         super().save(*args, **kwargs)
-    
+
     class Meta:
-        ordering = ['name']
+        ordering = ["name"]
+
 
 # User Model.
 class CustomUsers(AbstractUser):
-    role = models.CharField(max_length=25, choices=ROLE_CHOICES, default='user')
-    status = models.CharField(max_length=25, choices=STATUS_CHOICES, default=VACANT, null=True, blank=True)
-    department = models.ForeignKey(Departments, on_delete=models.SET_NULL, null=True, blank=True)
-    designation = models.CharField(max_length=25, choices=DESIGNATION_CHOICES, default='staff')
-    employee_id = models.CharField(max_length=20, unique=True, default='EMP_ID')
+    role = models.CharField(max_length=25, choices=ROLE_CHOICES, default="user")
+    status = models.CharField(
+        max_length=25, choices=STATUS_CHOICES, default=VACANT, null=True, blank=True
+    )
+    department = models.ForeignKey(
+        Departments, on_delete=models.SET_NULL, null=True, blank=True
+    )
+    designation = models.CharField(
+        max_length=25, choices=DESIGNATION_CHOICES, default="staff"
+    )
+    employee_id = models.CharField(max_length=20, unique=True, default="EMP_ID")
     phone_number = models.CharField(max_length=15, null=True, blank=True)
 
     def __str__(self):
         # f string is a way to embed expressions inside string literals using curly braces
-        return f'{self.username} {self.department}'  
-    
+        return f"{self.username} {self.department}"
+
     def save(self, *args, **kwargs):
-        if CustomUsers.objects.filter(employee_id__iexact=self.employee_id, phone_number__iexact=self.phone_number).exclude(pk=self.pk).exists():
-            raise ValidationError(f"A user with the same '{self.employee_id}' and '{self.phone_number}' already exists.")
+        if (
+            CustomUsers.objects.filter(
+                employee_id__iexact=self.employee_id,
+                phone_number__iexact=self.phone_number,
+            )
+            .exclude(pk=self.pk)
+            .exists()
+        ):
+            raise ValidationError(
+                f"A user with the same '{self.employee_id}' and '{self.phone_number}' already exists."
+            )
         super().save(*args, **kwargs)
-    
+
     class Meta:
-        ordering = ['username']
-        verbose_name_plural = 'Custom Users'
+        ordering = ["username"]
+        verbose_name_plural = "Custom Users"

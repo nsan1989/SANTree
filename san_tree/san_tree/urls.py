@@ -14,23 +14,25 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from django.contrib import admin
-from django.urls import path, include
-from core.views import Home
+
 from django.conf import settings
 from django.conf.urls.static import static
+from django.contrib import admin
+from django.urls import include, path
+
+from core.views import Home
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('', Home, name='home'),
-    path('', include('core.urls')),
-    path('', include('accounts.urls')),
-    path('tms/', include(('san_tms.urls', 'san_tms'), namespace='tms')),
-    path('cms/', include(('san_cms.urls', 'san_cms'), namespace='cms')),
-    path('srm/', include(('san_srm.urls', 'san_srm'), namespace='srm')),
-    path('ams/', include(('san_ams.urls', 'san_ams'), namespace='ams')),
-    path('vms/', include(('san_vms.urls', 'san_vms'), namespace='vms')),
-    path('', include('pwa.urls')),
+    path("admin/", admin.site.urls),
+    path("", Home, name="home"),
+    path("", include("core.urls")),
+    path("", include("accounts.urls")),
+    path("tms/", include(("san_tms.urls", "san_tms"), namespace="tms")),
+    path("cms/", include(("san_cms.urls", "san_cms"), namespace="cms")),
+    path("srm/", include(("san_srm.urls", "san_srm"), namespace="srm")),
+    path("ams/", include(("san_ams.urls", "san_ams"), namespace="ams")),
+    path("vms/", include(("san_vms.urls", "san_vms"), namespace="vms")),
+    path("", include("pwa.urls")),
 ]
 
 if settings.DEBUG:

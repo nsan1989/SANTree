@@ -1,10 +1,12 @@
-from django.shortcuts import render, redirect, get_object_or_404
-from .services.dispatch import HandleCriticalBooking
-from .models import *
-from .forms import *
 from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator
 from django.db import transaction
+from django.shortcuts import get_object_or_404, redirect, render
+
+from .forms import *
+from .models import *
+from .services.dispatch import HandleCriticalBooking
+
 
 # Admin Dashboard.
 def AdminDashboardView(request):
@@ -15,17 +17,22 @@ def AdminDashboardView(request):
         raise PermissionDenied("User profile not found")
     context = {}
     try:
-        all_bookings = Booking.objects.filter(assigned_to=current_user).order_by('-created_at')
-        page_number = request.GET.get('page')
+        all_bookings = Booking.objects.filter(assigned_to=current_user).order_by(
+            "-created_at"
+        )
+        page_number = request.GET.get("page")
         paginator = Paginator(all_bookings, 10)
         page_obj = paginator.get_page(page_number)
-        context['page_obj'] = page_obj
+        context["page_obj"] = page_obj
     except Exception as e:
-        context['error'] = str(e)
+        context["error"] = str(e)
     view_name = request.resolver_match.view_name
-    if view_name == "vms:vms_admin_dashboard" and current_user_role == 'Admin':
-        return render(request, 'vms_admin_dashboard.html', context)
-    raise PermissionDenied("You are not authorized to view this page. Please contact administrator!")
+    if view_name == "vms:vms_admin_dashboard" and current_user_role == "Admin":
+        return render(request, "vms_admin_dashboard.html", context)
+    raise PermissionDenied(
+        "You are not authorized to view this page. Please contact administrator!"
+    )
+
 
 # All bookings view for admin.
 def AdminCabRequestsView(request):
@@ -38,19 +45,24 @@ def AdminCabRequestsView(request):
     vehicles = Vehicle.objects.all()
     driver = Driver.objects.all()
     try:
-        all_requests = Booking.objects.filter(assigned_to=current_user).order_by('-created_at')
-        page_number = request.GET.get('page')
+        all_requests = Booking.objects.filter(assigned_to=current_user).order_by(
+            "-created_at"
+        )
+        page_number = request.GET.get("page")
         paginator = Paginator(all_requests, 10)
         page_obj = paginator.get_page(page_number)
-        context['page_obj'] = page_obj
-        context['vehicles'] = vehicles
-        context['drivers'] = driver
+        context["page_obj"] = page_obj
+        context["vehicles"] = vehicles
+        context["drivers"] = driver
     except Exception as e:
-        context['error'] = str(e)
+        context["error"] = str(e)
     view_name = request.resolver_match.view_name
-    if view_name == "vms:vms_admin_cab_requests" and current_user_role == 'Admin':
-        return render(request, 'vms_admin_requests.html', context)
-    raise PermissionDenied("You are not authorized to view this page. Please contact administrator!")
+    if view_name == "vms:vms_admin_cab_requests" and current_user_role == "Admin":
+        return render(request, "vms_admin_requests.html", context)
+    raise PermissionDenied(
+        "You are not authorized to view this page. Please contact administrator!"
+    )
+
 
 # All trips view for admin.
 def AdminTripsView(request):
@@ -61,14 +73,19 @@ def AdminTripsView(request):
         raise PermissionDenied("User profile not found")
     context = {}
     try:
-        all_trips = Booking.objects.filter(status=BookingStatus.COMPLETED).order_by('-created_at')
+        all_trips = Booking.objects.filter(status=BookingStatus.COMPLETED).order_by(
+            "-created_at"
+        )
     except Exception as e:
-        context['error'] = str(e)
+        context["error"] = str(e)
     view_name = request.resolver_match.view_name
-    if view_name == "vms:vms_admin_trips" and current_user_role == 'Admin':
-        context['all_trips'] = all_trips
-        return render(request, 'vms_admin_trips.html', context)
-    raise PermissionDenied("You are not authorized to view this page. Please contact administrator!")
+    if view_name == "vms:vms_admin_trips" and current_user_role == "Admin":
+        context["all_trips"] = all_trips
+        return render(request, "vms_admin_trips.html", context)
+    raise PermissionDenied(
+        "You are not authorized to view this page. Please contact administrator!"
+    )
+
 
 # Admin update booking status view.
 @transaction.atomic
@@ -102,7 +119,7 @@ def AdminUpdateBookingStatusView(request, booking_id):
 
         if booking.priority == "CRITICAL" and booking.vehicle:
             HandleCriticalBooking(booking)
-            
+
         booking.save()
 
         if old_driver and old_driver != booking.driver:
@@ -125,7 +142,8 @@ def AdminUpdateBookingStatusView(request, booking_id):
             booking.vehicle = None
             booking.save()
 
-    return redirect('vms:vms_admin_cab_requests')
+    return redirect("vms:vms_admin_cab_requests")
+
 
 # Staff Dashboard.
 def StaffDashboardView(request):
@@ -138,12 +156,15 @@ def StaffDashboardView(request):
     try:
         all_bookings = Booking.objects.filter(booked_by=current_user)
     except Exception as e:
-        context['error'] = str(e)
+        context["error"] = str(e)
     view_name = request.resolver_match.view_name
-    if view_name == "vms:vms_staff_dashboard" and current_user_role == 'User':
-        context['bookings'] = all_bookings
-        return render(request, 'vms_staff_dashboard.html', context)
-    raise PermissionDenied("You are not authorized to view this page. Please contact administrator!")
+    if view_name == "vms:vms_staff_dashboard" and current_user_role == "User":
+        context["bookings"] = all_bookings
+        return render(request, "vms_staff_dashboard.html", context)
+    raise PermissionDenied(
+        "You are not authorized to view this page. Please contact administrator!"
+    )
+
 
 # Cap request view.
 def CabRequestView(request):
@@ -154,36 +175,38 @@ def CabRequestView(request):
     except:
         raise PermissionDenied("User profile not found")
 
-    if current_user_role != 'User':
+    if current_user_role != "User":
         raise PermissionDenied("Unauthorized access")
-    
+
     cargos = Cargo.objects.all()
 
-    if request.method == 'POST':
+    if request.method == "POST":
         form = BookingForm(request.POST)
         if form.is_valid():
             with transaction.atomic():
                 booking = form.save(commit=False)
 
                 dept_admin = CustomUsers.objects.filter(
-                    role='Admin',
-                    department__name__iexact='Transport'
+                    role="Admin", department__name__iexact="Transport"
                 )
 
                 booking.booked_by = current_user
-                booking.assigned_to = dept_admin.first() if dept_admin.exists() else None
+                booking.assigned_to = (
+                    dept_admin.first() if dept_admin.exists() else None
+                )
                 booking.save()
 
-#                if booking.priority == BookingPriority.CRITICAL:
-#                    HandleCriticalBooking(booking)
+            #                if booking.priority == BookingPriority.CRITICAL:
+            #                    HandleCriticalBooking(booking)
 
-            return redirect('vms:vms_cab_request')  
+            return redirect("vms:vms_cab_request")
     else:
         form = BookingForm()
 
-    context = {'form': form, 'cargos': cargos}
+    context = {"form": form, "cargos": cargos}
 
-    return render(request, 'vms_booking_request.html', context)
+    return render(request, "vms_booking_request.html", context)
+
 
 # All trips view.
 def AllTripsView(request):
@@ -194,17 +217,22 @@ def AllTripsView(request):
         raise PermissionDenied("User profile not found")
     context = {}
     try:
-        all_requests = Booking.objects.filter(booked_by=current_user, status=BookingStatus.COMPLETED).order_by('-created_at')
-        page_number = request.GET.get('page')
+        all_requests = Booking.objects.filter(
+            booked_by=current_user, status=BookingStatus.COMPLETED
+        ).order_by("-created_at")
+        page_number = request.GET.get("page")
         paginator = Paginator(all_requests, 10)
         page_obj = paginator.get_page(page_number)
-        context['page_obj'] = page_obj
+        context["page_obj"] = page_obj
     except Exception as e:
-        context['error'] = str(e)
+        context["error"] = str(e)
     view_name = request.resolver_match.view_name
-    if view_name == "vms:vms_all_trips" and current_user_role == 'User':
-        return render(request, 'vms_all_trips.html', context)
-    raise PermissionDenied("You are not authorized to view this page. Please contact administrator!")
+    if view_name == "vms:vms_all_trips" and current_user_role == "User":
+        return render(request, "vms_all_trips.html", context)
+    raise PermissionDenied(
+        "You are not authorized to view this page. Please contact administrator!"
+    )
+
 
 # upcoming trips view.
 def UpcomingTripsView(request):
@@ -215,17 +243,22 @@ def UpcomingTripsView(request):
         raise PermissionDenied("User profile not found")
     context = {}
     try:
-        upcoming = Booking.objects.filter(booked_by=current_user, status=BookingStatus.CONFIRMED).order_by('-created_at')
-        page_number = request.GET.get('page')
+        upcoming = Booking.objects.filter(
+            booked_by=current_user, status=BookingStatus.CONFIRMED
+        ).order_by("-created_at")
+        page_number = request.GET.get("page")
         paginator = Paginator(upcoming, 10)
         page_obj = paginator.get_page(page_number)
-        context['page_obj'] = page_obj
+        context["page_obj"] = page_obj
     except Exception as e:
-        context['error'] = str(e)
+        context["error"] = str(e)
     view_name = request.resolver_match.view_name
-    if view_name == "vms:vms_upcoming_trips" and current_user_role == 'User':
-        return render(request, 'vms_upcoming_trips.html', context)
-    raise PermissionDenied("You are not authorized to view this page. Please contact administrator!")
+    if view_name == "vms:vms_upcoming_trips" and current_user_role == "User":
+        return render(request, "vms_upcoming_trips.html", context)
+    raise PermissionDenied(
+        "You are not authorized to view this page. Please contact administrator!"
+    )
+
 
 # Staff update booking status view.
 def StaffUpdateBookingStatusView(request, booking_id):
@@ -233,5 +266,4 @@ def StaffUpdateBookingStatusView(request, booking_id):
         booking = get_object_or_404(Booking, id=booking_id)
         booking.status = request.POST.get("status")
         booking.save()
-    return redirect('vms:vms_staff_dashboard')
-
+    return redirect("vms:vms_staff_dashboard")

@@ -6,13 +6,15 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('san_srm', '0005_service_handled_by'),
+        ("san_srm", "0005_service_handled_by"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='service',
-            name='description',
-            field=models.TextField(blank=True, default='enter description here', max_length=100, null=True),
+            model_name="service",
+            name="description",
+            field=models.TextField(
+                blank=True, default="enter description here", max_length=100, null=True
+            ),
         ),
     ]

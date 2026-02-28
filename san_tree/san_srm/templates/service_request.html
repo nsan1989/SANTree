@@ -1,144 +1,144 @@
 {% extends 'index.html' %} {% load crispy_forms_tags %}
 {% load static %} {% block title %} Service Request {% endblock %} {% block start %}
 
-<style>
-  .task-form {
-    font-family: 'Poppins', sans-serif;
-  }
-</style>
+  <style>
+    .task-form {
+      font-family: 'Poppins', sans-serif;
+    }
+  </style>
 
-<div class="container">
-  <div class="row d-flex flex-column justify-content-center align-items-center pt-3 px-3">
-    <span style="width: auto;">
-      <div class="mb-3">
-        <a href="{% url 'srm:staff_dashboard' %}" class="d-flex align-items-center text-warning"
-          style="text-decoration: none">
-          <i class="fa-solid fa-arrow-left"></i>
-          &nbsp;back
-        </a>
-      </div>
-    </span>
-    <div class="col-12 col-md-5 card shadow-lg p-3">
-      <form id="servForm" class="service-form" method="post">
-        {% csrf_token %}
+  <div class="container">
+    <div class="row d-flex flex-column justify-content-center align-items-center pt-3 px-3">
+      <span style="width: auto;">
+        <div class="mb-3">
+          <a href="{% url 'srm:staff_dashboard' %}" class="d-flex align-items-center text-warning"
+             style="text-decoration: none">
+            <i class="fa-solid fa-arrow-left"></i>
+            &nbsp;back
+          </a>
+        </div>
+      </span>
+      <div class="col-12 col-md-5 card shadow-lg p-3">
+        <form id="servForm" class="service-form" method="post">
+          {% csrf_token %}
 
         <!-- Service Type -->
-        <div class="mb-3">
-          <label for="id_service_type" class="form-label requiredField">
-            Service <span class="asteriskField">*</span>
-          </label>
-          <div class="d-flex flex-wrap gap-2">
-            {% for service in service_types %}
-            <div class="form-check">
-              <input class="form-check-input" type="checkbox" name="service_type" id="service_type_{{ service.id }}"
-                value="{{ service.id }}">
-              <label class="form-check-label" for="service_type_{{ service.id }}">
-                {{ service.name }}
-              </label>
+          <div class="mb-3">
+            <label for="id_service_type" class="form-label requiredField">
+              Service <span class="asteriskField">*</span>
+            </label>
+            <div class="d-flex flex-wrap gap-2">
+              {% for service in service_types %}
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" name="service_type" id="service_type_{{ service.id }}"
+                         value="{{ service.id }}">
+                  <label class="form-check-label" for="service_type_{{ service.id }}">
+                    {{ service.name }}
+                  </label>
+                </div>
+              {% empty %}
+                <p class="text-muted">No service types available.</p>
+              {% endfor %}
             </div>
-            {% empty %}
-            <p class="text-muted">No service types available.</p>
-            {% endfor %}
           </div>
-        </div>
 
         <!-- Service Block -->
-        <div class="mb-3">
-          <label for="id_service_block" class="form-label requiredField">
-            Service Block <span class="asteriskField">*</span>
-          </label>
-          <select name="service_block" class="form-select" required id="id_service_block">
-            <option value="" selected>select</option>
-            {% for block in blocks %}
-            <option value="{{ block.id }}">{{ block.name }}</option>
-            {% endfor %}
-          </select>
-        </div>
-
-        <div class="row d-flex">
-          <!-- From Location -->
-          <div class="col-12 col-md-6 mb-3">
-            <label for="id_from_location" class="form-label requiredField">
-              From<span class="asteriskField">*</span>
+          <div class="mb-3">
+            <label for="id_service_block" class="form-label requiredField">
+              Service Block <span class="asteriskField">*</span>
             </label>
-            <select name="from_location" class="form-select" required id="id_from_location">
+            <select name="service_block" class="form-select" required id="id_service_block">
               <option value="" selected>select</option>
-              {% for location in locations %}
-              <option value="{{location.id}}">{{location.name}}</option>
+              {% for block in blocks %}
+                <option value="{{ block.id }}">{{ block.name }}</option>
               {% endfor %}
             </select>
           </div>
+
+          <div class="row d-flex">
+          <!-- From Location -->
+            <div class="col-12 col-md-6 mb-3">
+              <label for="id_from_location" class="form-label requiredField">
+                From<span class="asteriskField">*</span>
+              </label>
+              <select name="from_location" class="form-select" required id="id_from_location">
+                <option value="" selected>select</option>
+                {% for location in locations %}
+                  <option value="{{location.id}}">{{location.name}}</option>
+                {% endfor %}
+              </select>
+            </div>
 
           <!-- To Location -->
-          <div class="col-12 col-md-6 mb-3">
-            <label for="id_to_location" class="form-label requiredField">
-              To<span class="asteriskField">*</span>
-            </label>
-            <select name="to_location" class="form-select" required id="id_to_location">
-              <option value="" selected>select</option>
-              {% for location in locations %}
-              <option value="{{location.id}}">{{location.name}}</option>
-              {% endfor %}
-            </select>
+            <div class="col-12 col-md-6 mb-3">
+              <label for="id_to_location" class="form-label requiredField">
+                To<span class="asteriskField">*</span>
+              </label>
+              <select name="to_location" class="form-select" required id="id_to_location">
+                <option value="" selected>select</option>
+                {% for location in locations %}
+                  <option value="{{location.id}}">{{location.name}}</option>
+                {% endfor %}
+              </select>
+            </div>
           </div>
-        </div>
 
-        <div class="row d-flex">
+          <div class="row d-flex">
           <!-- UHID -->
-          <div class="col-12 col-md-6 mb-3">
-            <label for="id_uhid" class="form-label requiredField">
-              UHID<span class="asteriskField">*</span>
-            </label>
-            <input type="text" name="UHID" class="form-control" placeholder="SHRI." aria-label="uhid">
-          </div>
+            <div class="col-12 col-md-6 mb-3">
+              <label for="id_uhid" class="form-label requiredField">
+                UHID<span class="asteriskField">*</span>
+              </label>
+              <input type="text" name="UHID" class="form-control" placeholder="SHRI." aria-label="uhid">
+            </div>
 
           <!-- Description -->
-          <div class="col-12 col-md-6 mb-3">
-            <label for="id_description" class="form-label">
-              Description
-            </label>
-            <textarea name="description" class="form-control" id="id_description" rows="2" placeholder="enter description here..."></textarea>
+            <div class="col-12 col-md-6 mb-3">
+              <label for="id_description" class="form-label">
+                Description
+              </label>
+              <textarea name="description" class="form-control" id="id_description" rows="2" placeholder="enter description here..."></textarea>
+            </div>
           </div>
-        </div>
 
-        <div class="d-grid mt-4">
-          <button type="submit" id="submitBtn" class="btn btn-primary btn-lg">Submit</button>
-        </div>
-      </form>
+          <div class="d-grid mt-4">
+            <button type="submit" id="submitBtn" class="btn btn-primary btn-lg">Submit</button>
+          </div>
+        </form>
+      </div>
     </div>
   </div>
-</div>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script>
-  document.addEventListener("DOMContentLoaded", function () {
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
 
-    const serviceCheckboxes = document.querySelectorAll(
-      'input[name="service_type"]'
-    );
+      const serviceCheckboxes = document.querySelectorAll(
+        'input[name="service_type"]'
+      );
 
-    serviceCheckboxes.forEach((checkbox) => {
-      checkbox.addEventListener("change", function () {
+      serviceCheckboxes.forEach((checkbox) => {
+        checkbox.addEventListener("change", function () {
 
-        if (this.checked) {
-          serviceCheckboxes.forEach((cb) => {
-            if (cb !== this) {
-              cb.checked = false;
-            }
-          });
-        }
+          if (this.checked) {
+            serviceCheckboxes.forEach((cb) => {
+              if (cb !== this) {
+                cb.checked = false;
+              }
+            });
+          }
 
+        });
+      });
+
+    });
+
+    document.addEventListener("DOMContentLoaded", function() {
+      const form = document.getElementById("servForm");
+      const submitBtn = document.getElementById("submitBtn");
+      form.addEventListener("submit", function(event) {
+        submitBtn.disabled = true;
+        submitBtn.innerText = "Submitting...";
       });
     });
-
-  });
-
-  document.addEventListener("DOMContentLoaded", function() {
-    const form = document.getElementById("servForm");
-    const submitBtn = document.getElementById("submitBtn");
-    form.addEventListener("submit", function(event) {
-      submitBtn.disabled = true;
-      submitBtn.innerText = "Submitting...";
-    });
-  });
-</script>
+  </script>
 {% endblock %}

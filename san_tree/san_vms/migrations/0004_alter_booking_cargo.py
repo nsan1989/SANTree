@@ -7,13 +7,18 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('san_vms', '0003_remove_vehicle_current_location_and_more'),
+        ("san_vms", "0003_remove_vehicle_current_location_and_more"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='booking',
-            name='cargo',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='san_vms.cargo'),
+            model_name="booking",
+            name="cargo",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="san_vms.cargo",
+            ),
         ),
     ]

@@ -1,10 +1,11 @@
-from django.apps import AppConfig
 import os
+
+from django.apps import AppConfig
 
 
 class SanSrmConfig(AppConfig):
-    default_auto_field = 'django.db.models.BigAutoField'
-    name = 'san_srm'
+    default_auto_field = "django.db.models.BigAutoField"
+    name = "san_srm"
 
     def ready(self):
         import san_srm.signals

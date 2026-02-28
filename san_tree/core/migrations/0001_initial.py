@@ -9,24 +9,93 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('accounts', '0001_initial'),
-        ('san_srm', '__first__'),
+        ("accounts", "0001_initial"),
+        ("san_srm", "__first__"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='AnonymousServiceGenerate',
+            name="AnonymousServiceGenerate",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('service_number', models.CharField(blank=True, max_length=20, unique=True)),
-                ('status', models.CharField(choices=[('Open', 'Open'), ('In Progress', 'In Progress'), ('Waiting', 'Waiting'), ('Pending', 'Pending'), ('On Hold', 'On Hold'), ('Completed', 'Completed')], default='In Progress', max_length=20)),
-                ('generate_at', models.DateTimeField(auto_now_add=True)),
-                ('completed_at', models.DateTimeField(blank=True, null=True)),
-                ('assigned_to', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='anonymous_service_staff', to='san_srm.shiftschedule')),
-                ('block', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='anonymous_blocks', to='san_srm.blocks')),
-                ('from_location', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='anonymous_service_from', to='accounts.location')),
-                ('service_type', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='san_srm.servicetypes')),
-                ('to_location', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='anonymous_service_to', to='accounts.location')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "service_number",
+                    models.CharField(blank=True, max_length=20, unique=True),
+                ),
+                (
+                    "status",
+                    models.CharField(
+                        choices=[
+                            ("Open", "Open"),
+                            ("In Progress", "In Progress"),
+                            ("Waiting", "Waiting"),
+                            ("Pending", "Pending"),
+                            ("On Hold", "On Hold"),
+                            ("Completed", "Completed"),
+                        ],
+                        default="In Progress",
+                        max_length=20,
+                    ),
+                ),
+                ("generate_at", models.DateTimeField(auto_now_add=True)),
+                ("completed_at", models.DateTimeField(blank=True, null=True)),
+                (
+                    "assigned_to",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="anonymous_service_staff",
+                        to="san_srm.shiftschedule",
+                    ),
+                ),
+                (
+                    "block",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="anonymous_blocks",
+                        to="san_srm.blocks",
+                    ),
+                ),
+                (
+                    "from_location",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="anonymous_service_from",
+                        to="accounts.location",
+                    ),
+                ),
+                (
+                    "service_type",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        to="san_srm.servicetypes",
+                    ),
+                ),
+                (
+                    "to_location",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="anonymous_service_to",
+                        to="accounts.location",
+                    ),
+                ),
             ],
         ),
     ]

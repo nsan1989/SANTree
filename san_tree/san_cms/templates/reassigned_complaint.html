@@ -1,16 +1,16 @@
 {% load crispy_forms_tags %}
 {% block start %}
 <!--styles-->
-<style>
-  .card-title,
-  #reassignForm {
-    font-family: 'Poppins', sans-serif;
-  }
-</style>
+  <style>
+    .card-title,
+    #reassignForm {
+      font-family: 'Poppins', sans-serif;
+    }
+  </style>
 <!---------->
 
-<div class="container">
-  <div class="row d-flex justify-content-center py-3">
+  <div class="container">
+    <div class="row d-flex justify-content-center py-3">
       <div class="col-md-6 col-lg-4 w-100">
         <div class="card shadow-lg border-0 rounded-4">
           <div class="card-body p-2">
@@ -32,19 +32,19 @@
           </div>
         </div>
       </div>
+    </div>
   </div>
-</div>
 
-<script>
+  <script>
   //submit button script
-  document.addEventListener("DOMContentLoaded", function() {
-    const form = document.getElementById("reassignForm");
-    const submitBtn = document.getElementById("submitBtn");
-    form.addEventListener("submit", function(event) {
-      submitBtn.disabled = true;
-      submitBtn.innerText = "Submitting...";
+    document.addEventListener("DOMContentLoaded", function() {
+      const form = document.getElementById("reassignForm");
+      const submitBtn = document.getElementById("submitBtn");
+      form.addEventListener("submit", function(event) {
+        submitBtn.disabled = true;
+        submitBtn.innerText = "Submitting...";
+      });
     });
-  });
-</script>
+  </script>
 
 {% endblock %}

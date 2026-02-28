@@ -8,14 +8,20 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('san_srm', '0004_alter_shiftschedule_status'),
+        ("san_srm", "0004_alter_shiftschedule_status"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='service',
-            name='handled_by',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='handled_services', to=settings.AUTH_USER_MODEL),
+            model_name="service",
+            name="handled_by",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name="handled_services",
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
     ]

@@ -6,13 +6,21 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('san_vms', '0005_remove_driver_shift_end_remove_driver_shift_start_and_more'),
+        ("san_vms", "0005_remove_driver_shift_end_remove_driver_shift_start_and_more"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='driver',
-            name='status',
-            field=models.CharField(choices=[('AVAILABLE', 'Available'), ('ENGAGED', 'Engaged'), ('OFF_DUTY', 'Off Duty')], default='AVAILABLE', max_length=20),
+            model_name="driver",
+            name="status",
+            field=models.CharField(
+                choices=[
+                    ("AVAILABLE", "Available"),
+                    ("ENGAGED", "Engaged"),
+                    ("OFF_DUTY", "Off Duty"),
+                ],
+                default="AVAILABLE",
+                max_length=20,
+            ),
         ),
     ]

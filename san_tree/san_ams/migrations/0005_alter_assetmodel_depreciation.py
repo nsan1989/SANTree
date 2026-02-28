@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('san_ams', '0004_rename_resquestable_assetmodel_requestable_and_more'),
+        ("san_ams", "0004_rename_resquestable_assetmodel_requestable_and_more"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='assetmodel',
-            name='depreciation',
+            model_name="assetmodel",
+            name="depreciation",
             field=models.DecimalField(decimal_places=2, default=0.0, max_digits=10),
         ),
     ]

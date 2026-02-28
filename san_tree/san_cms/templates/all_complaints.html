@@ -1,57 +1,57 @@
-{% extends 'index.html' %} 
+{% extends 'index.html' %}
 {% load time_extra %}
 {% load static %}
 
 {% block title %}
-Complaint
+  Complaint
 {% endblock %}
 
 {% block start %}
 
-<style>
-  .content-title h3 {
-    color: wheat;
-    font-family: 'Poppins', sans-serif;
-    font-weight: bold;
-  }
-  th {
-    font-family: 'Poppins', sans-serif;
-    font-size: 0.9rem;
-  }
-  td {
-    font-family: 'Poppins', sans-serif;
-    font-size: 0.85rem;
-  }
-  .table-responsive {
-    overflow-x: auto !important;
-  }
-  .status-resolved > td { background-color: #003300; color: white; }
-  .status-progress > td { background-color: #ff6600; color: white; }
-  .status-closed > td { background-color: #666666; color: white; }
-  .status-cancelled > td { background-color: #cc0000; color: white; }
-</style>
+  <style>
+    .content-title h3 {
+      color: wheat;
+      font-family: 'Poppins', sans-serif;
+      font-weight: bold;
+    }
+    th {
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.9rem;
+    }
+    td {
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.85rem;
+    }
+    .table-responsive {
+      overflow-x: auto !important;
+    }
+    .status-resolved > td { background-color: #003300; color: white; }
+    .status-progress > td { background-color: #ff6600; color: white; }
+    .status-closed > td { background-color: #666666; color: white; }
+    .status-cancelled > td { background-color: #cc0000; color: white; }
+  </style>
 
-<link rel="stylesheet" href="{% static 'styles/common.css' %}" />
+  <link rel="stylesheet" href="{% static 'styles/common.css' %}" />
 
-<div class="container-fluid">
-  <div class="row">
-    <div class="col-12 d-flex flex-column align-items-start mb-3">
-      <div class="content-title mb-2 mb-md-0">
-        <h3 class="mb-0">All Complaints</h3>
-      </div>
-      <div class="complaint-link">
-        <p class="mb-0 text-light">
-          Raise a complaint &nbsp;<a class="text-warning fw-bold" href="{% url 'cms:complaints' %}" style="text-decoration: none;">click here.</a>
-        </p>
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-12 d-flex flex-column align-items-start mb-3">
+        <div class="content-title mb-2 mb-md-0">
+          <h3 class="mb-0">All Complaints</h3>
+        </div>
+        <div class="complaint-link">
+          <p class="mb-0 text-light">
+            Raise a complaint &nbsp;<a class="text-warning fw-bold" href="{% url 'cms:complaints' %}" style="text-decoration: none;">click here.</a>
+          </p>
+        </div>
       </div>
     </div>
-  </div>    
-  {% if messages %}
-    {% for message in messages %}
-      <div class="all-complaints-alert alert-{{ message.tags }}">{{ message }}</div>
-    {% endfor %}
-  {% endif %}
-  <nav class="mb-3">
+    {% if messages %}
+      {% for message in messages %}
+        <div class="all-complaints-alert alert-{{ message.tags }}">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+    <nav class="mb-3">
       <ul class="pagination">
         {% if page_obj.has_previous %}
           <li class="page-item">
@@ -59,12 +59,14 @@ Complaint
           </li>
         {% endif %}
         {% for num in page_obj.paginator.page_range %}
-          {% if page_obj.number == num %}
-            <li class="page-item active"><span class="page-link">{{ num }}</span></li>
-          {% else %}
-            <li class="page-item">
-              <a class="page-link" href="?page={{ num }}">{{ num }}</a>
-            </li>
+          {% if num >= page_obj.number|add:'-2' and num <= page_obj.number|add:'2' %}
+            {% if page_obj.number == num %}
+              <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+            {% else %}
+              <li class="page-item">
+                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+              </li>
+            {% endif %}
           {% endif %}
         {% endfor %}
         {% if page_obj.has_next %}
@@ -73,78 +75,78 @@ Complaint
           </li>
         {% endif %}
       </ul>
-  </nav>
-  <div class="row px-2">
-    <div class="col-12 table-responsive p-0">
-      <table class="table table-bordered">
-        <thead class="table-danger">
-          <tr>
-            <th scope="col">Complaint No.</th>
-            <th scope="col">Department</th>
-            <th scope="col">Created On</th>
-            <th scope="col">Status</th>
-            <th scope="col">Cancel Complaint</th>
-            <th scope="col">Priority</th>
-            <th scope="col">Updated At</th>
-            <th scope="col">Completed At</th>
-            <th scope="col">TAT</th>
-            <th scope="col">View Details</th>
-          </tr>
-        </thead>
-        <tbody>      
-          {% if page_obj %}
-          {% for complaint in page_obj %}
-          <tr
-            {% if complaint.complaint.status == 'In Progress' %}
-              class="status-progress"
-            {% elif complaint.complaint.status == 'Resolved' %}
-              class="status-resolved"
-            {% elif complaint.complaint.status == 'Closed' %}
-              class="status-closed"
-            {% elif complaint.complaint.status == 'Cancelled' %}
-              class="status-cancelled"
-            {% endif %}
-          >
-            <td>{{complaint.complaint.complaint_number}}</td>
-            <td>{{complaint.complaint.department}}</td>
-            <td>{{complaint.complaint.created_at}}</td>
-            <td>{{complaint.complaint.status}}</td>
-            {% if complaint.status_changed_to != 'Cancelled' %}
-            {% if complaint.complaint.status != 'In Progress' and complaint.complaint.status != 'Resolved' and complaint.complaint.status != 'Closed'  %}
-            <td>
-              <form method="POST" action="{% url 'cms:cancel_complaint' complaint.id %}">
-                {% csrf_token %}
-                <input type="hidden" name="status" value="Cancelled">
-                <button class="btn btn-danger" type="submit" aria-label="Cancel Complaint">Cancel</button>
-              </form>
-            </td>
+    </nav>
+    <div class="row px-2">
+      <div class="col-12 table-responsive p-0">
+        <table class="table table-bordered">
+          <thead class="table-danger">
+            <tr>
+              <th scope="col">Complaint No.</th>
+              <th scope="col">Department</th>
+              <th scope="col">Created On</th>
+              <th scope="col">Status</th>
+              <th scope="col">Cancel Complaint</th>
+              <th scope="col">Priority</th>
+              <th scope="col">Updated At</th>
+              <th scope="col">Completed At</th>
+              <th scope="col">TAT</th>
+              <th scope="col">View Details</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% if page_obj %}
+              {% for complaint in page_obj %}
+                <tr
+                  {% if complaint.complaint.status == 'In Progress' %}
+                    class="status-progress"
+                  {% elif complaint.complaint.status == 'Resolved' %}
+                    class="status-resolved"
+                  {% elif complaint.complaint.status == 'Closed' %}
+                    class="status-closed"
+                  {% elif complaint.complaint.status == 'Cancelled' %}
+                    class="status-cancelled"
+                  {% endif %}
+                >
+                  <td>{{complaint.complaint.complaint_number}}</td>
+                  <td>{{complaint.complaint.department}}</td>
+                  <td>{{complaint.complaint.created_at}}</td>
+                  <td>{{complaint.complaint.status}}</td>
+                  {% if complaint.status_changed_to != 'Cancelled' %}
+                    {% if complaint.complaint.status != 'In Progress' and complaint.complaint.status != 'Resolved' and complaint.complaint.status != 'Closed'  %}
+                      <td>
+                        <form method="POST" action="{% url 'cms:cancel_complaint' complaint.id %}">
+                          {% csrf_token %}
+                          <input type="hidden" name="status" value="Cancelled">
+                          <button class="btn btn-danger" type="submit" aria-label="Cancel Complaint">Cancel</button>
+                        </form>
+                      </td>
+                    {% else %}
+                      <td>
+                        <p style="font-family:'Poppins', sans-serif;">Cancel window closed</p>
+                      </td>
+                    {% endif %}
+                  {% else %}
+                    <td><p style="font-family:'Poppins', sans-serif;">Cancel window closed</p></td>
+                  {% endif %}
+                  <td>{{complaint.complaint.priority}}</td>
+                  <td>{{complaint.timestamp}}</td>
+                  <td>{{complaint.complaint.completed_at}}</td>
+                  <td>{{ complaint.complaint.time_taken|duration_display }}</td>
+                  {% if request.user.role == 'User' %}
+                    <td><a href="{% url 'cms:staff_complaints_details' complaint.id %}" style="text-decoration: none;"><i class="fa-solid fa-eye"></i></a></td>
+                  {% elif request.user.role == 'Admin' %}
+                    <td><a href="{% url 'cms:incharge_complaints_details' complaint.id %}" style="text-decoration: none;"><i class="fa-solid fa-eye"></i></a></td>
+                  {% endif %}
+                </tr>
+              {% endfor %}
             {% else %}
-            <td>
-              <p style="font-family:'Poppins', sans-serif;">Cancel window closed</p>
-            </td>
+              <tr>
+                <td colspan="100%">No complaints have been raised!</td>
+              </tr>
             {% endif %}
-            {% else %}
-            <td><p style="font-family:'Poppins', sans-serif;">Cancel window closed</p></td>
-            {% endif %}
-            <td>{{complaint.complaint.priority}}</td>
-            <td>{{complaint.timestamp}}</td>
-            <td>{{complaint.complaint.completed_at}}</td>
-            <td>{{ complaint.complaint.time_taken|duration_display }}</td>
-            {% if request.user.role == 'User' %}
-            <td><a href="{% url 'cms:staff_complaints_details' complaint.id %}" style="text-decoration: none;"><i class="fa-solid fa-eye"></i></a></td>
-            {% elif request.user.role == 'Admin' %}
-            <td><a href="{% url 'cms:incharge_complaints_details' complaint.id %}" style="text-decoration: none;"><i class="fa-solid fa-eye"></i></a></td>
-            {% endif %}
-          </tr>
-          {% endfor %}
-          {% else %}
-          <tr>
-            <td colspan="100%">No complaints have been raised!</td>
-          </tr>
-          {% endif %}
-        </tbody>
-      </table>
+          </tbody>
+        </table>
+      </div>
     </div>
-  </div>  
-</div>
+  </div>
 {% endblock %}

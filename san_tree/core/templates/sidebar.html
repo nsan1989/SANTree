@@ -1,159 +1,159 @@
 {% load static %}
 {% block start %}
 <!--style-->
-<style>
+  <style>
 
-ul {
-  list-style-type: none;
-  padding-left: 0;
-}
+    ul {
+      list-style-type: none;
+      padding-left: 0;
+    }
 
-.sidebar .menu-label {
-  opacity: 0;
-  visibility: hidden;
-  width: 0;
-  overflow: hidden;
-  transition: opacity 0.2s ease, width 0.2s ease;
-}
+    .sidebar .menu-label {
+      opacity: 0;
+      visibility: hidden;
+      width: 0;
+      overflow: hidden;
+      transition: opacity 0.2s ease, width 0.2s ease;
+    }
 
-.sidebar.expanded .menu-label {
-  opacity: 1;
-  visibility: visible;
-  width: auto;
-  font-family: 'Poppins', sans-serif;
-}
+    .sidebar.expanded .menu-label {
+      opacity: 1;
+      visibility: visible;
+      width: auto;
+      font-family: 'Poppins', sans-serif;
+    }
 
-.demo-item,
-#menu-list {
-  height: 3rem;
-  display: flex;
-  align-items: center;
-  padding: 1rem;
-}
+    .demo-item,
+    #menu-list {
+      height: 3rem;
+      display: flex;
+      align-items: center;
+      padding: 1rem;
+    }
 
-.demo-item a {
-  text-decoration: none;
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
+    .demo-item a {
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
 
-#menu-list a {
-  text-decoration: none;
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
+    #menu-list a {
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
 
-.toggle-submenu {
-  text-decoration: none;
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  padding: 1rem;
-}
+    .toggle-submenu {
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1rem;
+    }
 
-.submenu {
-  display: none;
-  flex-direction: column;
-  width: 100%;
-  margin-left: 0;
-  padding-left: 1.5rem;
-}
+    .submenu {
+      display: none;
+      flex-direction: column;
+      width: 100%;
+      margin-left: 0;
+      padding-left: 1.5rem;
+    }
 
-.submenu li {
-  height: 2.5rem;
-  font-size: 0.8rem;
-  display: flex;
-  align-items: center;
-}
+    .submenu li {
+      height: 2.5rem;
+      font-size: 0.8rem;
+      display: flex;
+      align-items: center;
+    }
 
-.submenu.open {
-  display: flex;
-  justify-content: center;
-}
+    .submenu.open {
+      display: flex;
+      justify-content: center;
+    }
 
-.submenu-items {
-  text-decoration: none;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0px 8px;
-  gap: 0.5rem;
-}
+    .submenu-items {
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0px 8px;
+      gap: 0.5rem;
+    }
 
-.submenu-items i {
-  width: 1rem;
-}
+    .submenu-items i {
+      width: 1rem;
+    }
 
-.sidebar:not(.expanded) .menu-parent .toggle-submenu i:last-child {
-    display: none !important;
-}
+    .sidebar:not(.expanded) .menu-parent .toggle-submenu i:last-child {
+      display: none !important;
+    }
 
-.menu-parent.open .toggle-submenu i:last-child {
-  transform: rotate(180deg);
-  transition: 0.3s ease;
-}
+    .menu-parent.open .toggle-submenu i:last-child {
+      transform: rotate(180deg);
+      transition: 0.3s ease;
+    }
 
-</style>
+  </style>
 <!--------->
 <!-- sidebar.html -->
-<div id="sidebar-content" class="sidebar-content h-100">
-  <ul class="sidebar_menu">
-    <li class="demo-item">
-      <a href="#" style="width: 100%;color: #990000;">
-        <img class="img-fluid" src="{% static 'images/logo.png' %}" style="height: 2rem;width: 2rem;">
-        <p class="menu-label fw-bold m-0">SSMS</p>
-      </a>
-    </li>
+  <div id="sidebar-content" class="sidebar-content h-100">
+    <ul class="sidebar_menu">
+      <li class="demo-item">
+        <a href="#" style="width: 100%;color: #990000;">
+          <img class="img-fluid" src="{% static 'images/logo.png' %}" style="height: 2rem;width: 2rem;">
+          <p class="menu-label fw-bold m-0">SSMS</p>
+        </a>
+      </li>
 
-    {% for item in sidebar_menu %}
-    {% if item.children %}
-    <li class="menu-parent">
-      <a href="javascript:void(0);" class="toggle-submenu">
-        <i class="{{ item.icon }}"
-          style="display:flex;justify-content:center;align-items: center;color:#990000;height:2rem;width:2rem;"></i>
-        <p style="color:#990000;" class="menu-label m-0">{{ item.name }}</p>
-        <i class="{{ item.dropdown_icon }}"
-          style="display:flex;justify-content:center;align-items: center;color:#990000;height:2rem;width:2rem;"></i>
-      </a>
+      {% for item in sidebar_menu %}
+        {% if item.children %}
+          <li class="menu-parent">
+            <a href="javascript:void(0);" class="toggle-submenu">
+              <i class="{{ item.icon }}"
+                 style="display:flex;justify-content:center;align-items: center;color:#990000;height:2rem;width:2rem;"></i>
+              <p style="color:#990000;" class="menu-label m-0">{{ item.name }}</p>
+              <i class="{{ item.dropdown_icon }}"
+                 style="display:flex;justify-content:center;align-items: center;color:#990000;height:2rem;width:2rem;"></i>
+            </a>
 
-      <ul class="submenu">
-        {% for child in item.children %}
-        <li class="{% if request.resolver_match.url_name == child.url_name %}active{% endif %}">
-          <a class="submenu-items" href="{% url child.url_name %}" style="width:100%;">
-            <p style="color:#990000;" class="menu-label m-0">{{ child.name }}</p>
-            <i class="{{ child.icon }}"></i>
-          </a>
-        </li>
-        {% endfor %}
-      </ul>
-    </li>
-    {% else %}
-    <li id="menu-list" class="{% if request.resolver_match.url_name == item.view_name %}active{% endif %}">
-      <a href="{% url item.url_name %}" style="width: 100%;">
-        <i style="display: flex;justify-content: center;align-items: center;color: #990000;height: 2rem;width: 2rem;"
-          class="{{ item.icon }}"></i>
-        <p style="color: #990000;" class="menu-label m-0">{{ item.name }}</p>
-      </a>
-    </li>
-    {% endif %}
-    {% endfor %}
+            <ul class="submenu">
+              {% for child in item.children %}
+                <li class="{% if request.resolver_match.url_name == child.url_name %}active{% endif %}">
+                  <a class="submenu-items" href="{% url child.url_name %}" style="width:100%;">
+                    <p style="color:#990000;" class="menu-label m-0">{{ child.name }}</p>
+                    <i class="{{ child.icon }}"></i>
+                  </a>
+                </li>
+              {% endfor %}
+            </ul>
+          </li>
+        {% else %}
+          <li id="menu-list" class="{% if request.resolver_match.url_name == item.view_name %}active{% endif %}">
+            <a href="{% url item.url_name %}" style="width: 100%;">
+              <i style="display: flex;justify-content: center;align-items: center;color: #990000;height: 2rem;width: 2rem;"
+                 class="{{ item.icon }}"></i>
+              <p style="color: #990000;" class="menu-label m-0">{{ item.name }}</p>
+            </a>
+          </li>
+        {% endif %}
+      {% endfor %}
 
-  </ul>
-</div>
+    </ul>
+  </div>
 
-<script>
-  document.addEventListener("DOMContentLoaded", function () {
-    document.querySelectorAll(".menu-parent .toggle-submenu").forEach(link => {
-      link.addEventListener("click", function () {
-        const parent = this.closest(".menu-parent");
-        const submenu = this.parentElement.querySelector(".submenu");
-        submenu.classList.toggle("open");
-        parent.classList.toggle("open");
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      document.querySelectorAll(".menu-parent .toggle-submenu").forEach(link => {
+        link.addEventListener("click", function () {
+          const parent = this.closest(".menu-parent");
+          const submenu = this.parentElement.querySelector(".submenu");
+          submenu.classList.toggle("open");
+          parent.classList.toggle("open");
+        });
       });
     });
-  });
-</script>
+  </script>
 
 {% endblock %}

@@ -1,11 +1,13 @@
-from .models import *
 from django import forms
+
+from .models import *
+
 
 # Vehicle form.
 class VehicleForm(forms.ModelForm):
     class Meta:
         model = Vehicle
-        fields = '__all__'
+        fields = "__all__"
         widgets = {
             "maintenance_due_date": forms.DateInput(attrs={"type": "date"}),
         }
@@ -20,12 +22,13 @@ class VehicleForm(forms.ModelForm):
                 "Maintenance due date is required when vehicle is under repair."
             )
         return cleaned_data
-    
+
+
 # Driver form.
 class DriverForm(forms.ModelForm):
     class Meta:
         model = Driver
-        fields = '__all__'
+        fields = "__all__"
         widgets = {
             "shift_start": forms.TimeInput(attrs={"type": "time"}),
             "shift_end": forms.TimeInput(attrs={"type": "time"}),
@@ -41,42 +44,41 @@ class DriverForm(forms.ModelForm):
                 "Shift start time must be before shift end time."
             )
         return cleaned_data
-    
+
+
 # Booking form.
 class BookingForm(forms.ModelForm):
 
     pickup_time = forms.DateTimeField(
         required=False,
         widget=forms.DateTimeInput(
-            attrs={'type': 'datetime-local'},
-            format='%Y-%m-%dT%H:%M'
-        )
+            attrs={"type": "datetime-local"}, format="%Y-%m-%dT%H:%M"
+        ),
     )
 
     drop_time = forms.DateTimeField(
         required=False,
         widget=forms.DateTimeInput(
-            attrs={'type': 'datetime-local'},
-            format='%Y-%m-%dT%H:%M'
-        )
+            attrs={"type": "datetime-local"}, format="%Y-%m-%dT%H:%M"
+        ),
     )
 
     class Meta:
         model = Booking
         fields = [
-            'booking_type',
-            'priority',
-            'pickup_location',
-            'drop_location',
-            'pickup_time',
-            'drop_time',
-            'cargo'
+            "booking_type",
+            "priority",
+            "pickup_location",
+            "drop_location",
+            "pickup_time",
+            "drop_time",
+            "cargo",
         ]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['pickup_time'].input_formats = ['%Y-%m-%dT%H:%M']
-        self.fields['drop_time'].input_formats = ['%Y-%m-%dT%H:%M']
+        self.fields["pickup_time"].input_formats = ["%Y-%m-%dT%H:%M"]
+        self.fields["drop_time"].input_formats = ["%Y-%m-%dT%H:%M"]
 
     def clean(self):
         cleaned_data = super().clean()
@@ -90,17 +92,14 @@ class BookingForm(forms.ModelForm):
         if booking_type == BookingTypes.PICKUP and not pickup:
             raise forms.ValidationError("Pickup location is required.")
 
-        if booking_type in [
-            BookingTypes.DROP,
-            BookingTypes.DROP_AND_PICKUP
-        ] and not drop:
+        if (
+            booking_type in [BookingTypes.DROP, BookingTypes.DROP_AND_PICKUP]
+            and not drop
+        ):
             raise forms.ValidationError("Drop location is required.")
 
         # Optional but recommended
         if pickup_time and drop_time and drop_time < pickup_time:
-            raise forms.ValidationError(
-                "Drop time cannot be earlier than pickup time."
-            )
+            raise forms.ValidationError("Drop time cannot be earlier than pickup time.")
 
         return cleaned_data
-

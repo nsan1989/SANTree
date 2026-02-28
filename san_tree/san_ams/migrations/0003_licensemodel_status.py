@@ -6,13 +6,25 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('san_ams', '0002_licensemodel_assigned_to_licensemodel_department_and_more'),
+        ("san_ams", "0002_licensemodel_assigned_to_licensemodel_department_and_more"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='licensemodel',
-            name='status',
-            field=models.CharField(choices=[('active', 'Active'), ('assigned', 'Assigned'), ('available', 'Available'), ('renewal due', 'Renewal Due'), ('suspended', 'Suspended'), ('expired', 'Expired'), ('revoked', 'Revoked')], default='active', max_length=20),
+            model_name="licensemodel",
+            name="status",
+            field=models.CharField(
+                choices=[
+                    ("active", "Active"),
+                    ("assigned", "Assigned"),
+                    ("available", "Available"),
+                    ("renewal due", "Renewal Due"),
+                    ("suspended", "Suspended"),
+                    ("expired", "Expired"),
+                    ("revoked", "Revoked"),
+                ],
+                default="active",
+                max_length=20,
+            ),
         ),
     ]

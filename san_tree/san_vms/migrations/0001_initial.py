@@ -15,76 +15,246 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='Cargo',
+            name="Cargo",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('cargo_type', models.CharField(max_length=100)),
-                ('weight', models.FloatField()),
-                ('volume', models.FloatField()),
-                ('fragile', models.BooleanField(default=False)),
-                ('refrigeration_required', models.BooleanField(default=False)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("cargo_type", models.CharField(max_length=100)),
+                ("weight", models.FloatField()),
+                ("volume", models.FloatField()),
+                ("fragile", models.BooleanField(default=False)),
+                ("refrigeration_required", models.BooleanField(default=False)),
             ],
         ),
         migrations.CreateModel(
-            name='Vehicle',
+            name="Vehicle",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('vehicle_number', models.CharField(max_length=50, unique=True)),
-                ('vehicle_type', models.CharField(max_length=50)),
-                ('capacity_weight', models.FloatField(blank=True, null=True)),
-                ('capacity_volume', models.FloatField(blank=True, null=True)),
-                ('fuel_type', models.CharField(choices=[('DIESEL', 'Diesel'), ('PETROL', 'Petrol'), ('ELECTRIC', 'Electric')], max_length=20)),
-                ('status', models.CharField(choices=[('AVAILABLE', 'Available'), ('BOOKED', 'Booked'), ('IN_TRANSIT', 'In Transit'), ('UNDER_REPAIR', 'Under Repair'), ('INACTIVE', 'Inactive')], default='AVAILABLE', max_length=20)),
-                ('current_location', models.CharField(blank=True, max_length=255)),
-                ('maintenance_due_date', models.DateField(blank=True, null=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("vehicle_number", models.CharField(max_length=50, unique=True)),
+                ("vehicle_type", models.CharField(max_length=50)),
+                ("capacity_weight", models.FloatField(blank=True, null=True)),
+                ("capacity_volume", models.FloatField(blank=True, null=True)),
+                (
+                    "fuel_type",
+                    models.CharField(
+                        choices=[
+                            ("DIESEL", "Diesel"),
+                            ("PETROL", "Petrol"),
+                            ("ELECTRIC", "Electric"),
+                        ],
+                        max_length=20,
+                    ),
+                ),
+                (
+                    "status",
+                    models.CharField(
+                        choices=[
+                            ("AVAILABLE", "Available"),
+                            ("BOOKED", "Booked"),
+                            ("IN_TRANSIT", "In Transit"),
+                            ("UNDER_REPAIR", "Under Repair"),
+                            ("INACTIVE", "Inactive"),
+                        ],
+                        default="AVAILABLE",
+                        max_length=20,
+                    ),
+                ),
+                ("current_location", models.CharField(blank=True, max_length=255)),
+                ("maintenance_due_date", models.DateField(blank=True, null=True)),
             ],
         ),
         migrations.CreateModel(
-            name='Driver',
+            name="Driver",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('license_type', models.CharField(max_length=50)),
-                ('phone', models.CharField(max_length=15)),
-                ('status', models.CharField(choices=[('AVAILABLE', 'Available'), ('ON_DUTY', 'On Duty'), ('OFF_DUTY', 'Off Duty')], default='AVAILABLE', max_length=20)),
-                ('shift_start', models.TimeField()),
-                ('shift_end', models.TimeField()),
-                ('user', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, related_name='driver_profile', to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("license_type", models.CharField(max_length=50)),
+                ("phone", models.CharField(max_length=15)),
+                (
+                    "status",
+                    models.CharField(
+                        choices=[
+                            ("AVAILABLE", "Available"),
+                            ("ON_DUTY", "On Duty"),
+                            ("OFF_DUTY", "Off Duty"),
+                        ],
+                        default="AVAILABLE",
+                        max_length=20,
+                    ),
+                ),
+                ("shift_start", models.TimeField()),
+                ("shift_end", models.TimeField()),
+                (
+                    "user",
+                    models.OneToOneField(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="driver_profile",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='Booking',
+            name="Booking",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('booking_type', models.CharField(choices=[('DROP', 'Drop'), ('PICKUP', 'Pickup'), ('DROP_AND_PICKUP', 'Drop and Pickup')], max_length=20)),
-                ('pickup_location', models.CharField(max_length=255)),
-                ('drop_location', models.CharField(blank=True, max_length=255)),
-                ('pickup_time', models.DateTimeField(blank=True, null=True)),
-                ('drop_time', models.DateTimeField(blank=True, null=True)),
-                ('status', models.CharField(choices=[('WAITING', 'Waiting'), ('CONFIRMED', 'Confirmed'), ('IN_PROGRESS', 'In Progress'), ('COMPLETED', 'Completed'), ('CANCELLED', 'Cancelled')], default='WAITING', max_length=20)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('assigned_to', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='bookings_assigned', to=settings.AUTH_USER_MODEL)),
-                ('booked_by', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='bookings_user', to=settings.AUTH_USER_MODEL)),
-                ('cargo', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='san_vms.cargo')),
-                ('driver', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='bookings_driver', to='san_vms.driver')),
-                ('vehicle', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='bookings', to='san_vms.vehicle')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "booking_type",
+                    models.CharField(
+                        choices=[
+                            ("DROP", "Drop"),
+                            ("PICKUP", "Pickup"),
+                            ("DROP_AND_PICKUP", "Drop and Pickup"),
+                        ],
+                        max_length=20,
+                    ),
+                ),
+                ("pickup_location", models.CharField(max_length=255)),
+                ("drop_location", models.CharField(blank=True, max_length=255)),
+                ("pickup_time", models.DateTimeField(blank=True, null=True)),
+                ("drop_time", models.DateTimeField(blank=True, null=True)),
+                (
+                    "status",
+                    models.CharField(
+                        choices=[
+                            ("WAITING", "Waiting"),
+                            ("CONFIRMED", "Confirmed"),
+                            ("IN_PROGRESS", "In Progress"),
+                            ("COMPLETED", "Completed"),
+                            ("CANCELLED", "Cancelled"),
+                        ],
+                        default="WAITING",
+                        max_length=20,
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                (
+                    "assigned_to",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="bookings_assigned",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    "booked_by",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="bookings_user",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    "cargo",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="san_vms.cargo"
+                    ),
+                ),
+                (
+                    "driver",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="bookings_driver",
+                        to="san_vms.driver",
+                    ),
+                ),
+                (
+                    "vehicle",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="bookings",
+                        to="san_vms.vehicle",
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='DriverSchedule',
+            name="DriverSchedule",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('booking', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to='san_vms.booking')),
-                ('driver', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='san_vms.driver')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "booking",
+                    models.OneToOneField(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="san_vms.booking",
+                    ),
+                ),
+                (
+                    "driver",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="san_vms.driver"
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='VehicleMaintenance',
+            name="VehicleMaintenance",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('description', models.TextField()),
-                ('start_date', models.DateField()),
-                ('end_date', models.DateField(blank=True, null=True)),
-                ('vehicle', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='san_vms.vehicle')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("description", models.TextField()),
+                ("start_date", models.DateField()),
+                ("end_date", models.DateField(blank=True, null=True)),
+                (
+                    "vehicle",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="san_vms.vehicle",
+                    ),
+                ),
             ],
         ),
     ]

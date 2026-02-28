@@ -1,35 +1,104 @@
 from django.urls import path
+
 from .views import *
 
 app_name = "cms"
 
 urlpatterns = [
-    path('incharge/dashboard/', AdminComplaintDashboard, name='admin_dashboard'),
-    path('user-pie-chart/', user_status_pie_chart, name='user_status_pie_chart'),
-    path('complaint-pie-chart/', complaint_status_pie_chart, name='complaint_status_pie_chart'),
-    path('complaint_staff/dashboard/', UserComplaintDashboard, name='staff_dashboard'),
-    path('raised-pie-chart/', raise_complaint_pie_chart, name='raise_complaint_pie_chart'),
-    path('assigned-pie-chart/', assign_complaint_pie_chart, name='assign_complaint_pie_chart'),
-    path('raised_complaints/', ComplaintView, name='complaints'),
-    path('incharge/review_complaints/', ReviewComplaints, name='review_complaints'),
-    path('incharge/review_complaints/<int:id>/review_complaint_details', ReviewComplaintDetails, name='review_complaint_details'),
-    path('review_complaint_update_status/<int:id>/', ReviewComplaintUpdateView, name='review_complaint_update_status'),
-    path('overall_complaint/', ComplainHistory, name='overall_complaint'),
-    path('overall_complaint/<int:id>/complaint_details/', ComplaintDetails, name='overall_complaints_details'),
-    path('staff/raised_complaints/', AllComplaintsView, name='staff_complaints_history'),
-    path('staff/raised_complaints/<int:id>/complaint_details/', ComplaintDetails, name='staff_complaints_details'),
-    path('staff/assigned_tasks/', AssignedTasks, name='staff_assigned_tasks'),
-    path('staff/assigned_tasks/<int:id>/assigned_tasks_details/', AssignedTaskDetails, name='staff_assigned_tasks_details'),
-    path('incharge/raised_complaints/', AllComplaintsView, name='incharge_complaints_history'),
-    path('incharge/raised_complaints/<int:id>/complaint_details/', ComplaintDetails, name='incharge_complaints_details'),
-    path('incharge/assigned_complaint/', AssignedComplaint, name='assigned_complaint'),
-    path('incharge/assigned_complaint/<int:id>/assigned_complaint_details/', AssignedComplaintDetails, name='assigned_complaint_details'),
-    path('incharge/assigned_complaint/<int:complaint_id>/reassign_complaints/', ReassignedComplaintView, name='reassign_complaints'),
-    path('incharge/assigned_complaint/<int:complaint_id>/reassign_departments/', ReassignDepartmentView, name='reassign_departments'),
-    path('complaints_remarks/<int:complaint_id>/remark/', RemarksComplaint, name='complaints_remarks'),
-    path('staff_update_complaint_status/<int:id>/', StaffUpdateComplaintStatus, name='staff_update_complaint_status'),
-    path('admin_update_complaint_status/<int:id>/', AdminUpdateComplaintStatus, name='admin_update_complaint_status'),
-    path('cancel_complaint/<int:id>/', CancelComplaint, name='cancel_complaint'),
-    path('ajax/load-complaint-types/', load_complaint_types, name='ajax_load_complaint_types'),
-    path('export/excel/', TasksExport, name='export_tasks_excel'),
+    path("incharge/dashboard/", AdminComplaintDashboard, name="admin_dashboard"),
+    path("user-pie-chart/", user_status_pie_chart, name="user_status_pie_chart"),
+    path(
+        "complaint-pie-chart/",
+        complaint_status_pie_chart,
+        name="complaint_status_pie_chart",
+    ),
+    path("complaint_staff/dashboard/", UserComplaintDashboard, name="staff_dashboard"),
+    path(
+        "raised-pie-chart/", raise_complaint_pie_chart, name="raise_complaint_pie_chart"
+    ),
+    path(
+        "assigned-pie-chart/",
+        assign_complaint_pie_chart,
+        name="assign_complaint_pie_chart",
+    ),
+    path("raised_complaints/", ComplaintView, name="complaints"),
+    path("incharge/review_complaints/", ReviewComplaints, name="review_complaints"),
+    path(
+        "incharge/review_complaints/<int:id>/review_complaint_details",
+        ReviewComplaintDetails,
+        name="review_complaint_details",
+    ),
+    path(
+        "review_complaint_update_status/<int:id>/",
+        ReviewComplaintUpdateView,
+        name="review_complaint_update_status",
+    ),
+    path("overall_complaint/", ComplainHistory, name="overall_complaint"),
+    path(
+        "overall_complaint/<int:id>/complaint_details/",
+        ComplaintDetails,
+        name="overall_complaints_details",
+    ),
+    path(
+        "staff/raised_complaints/", AllComplaintsView, name="staff_complaints_history"
+    ),
+    path(
+        "staff/raised_complaints/<int:id>/complaint_details/",
+        ComplaintDetails,
+        name="staff_complaints_details",
+    ),
+    path("staff/assigned_tasks/", AssignedTasks, name="staff_assigned_tasks"),
+    path(
+        "staff/assigned_tasks/<int:id>/assigned_tasks_details/",
+        AssignedTaskDetails,
+        name="staff_assigned_tasks_details",
+    ),
+    path(
+        "incharge/raised_complaints/",
+        AllComplaintsView,
+        name="incharge_complaints_history",
+    ),
+    path(
+        "incharge/raised_complaints/<int:id>/complaint_details/",
+        ComplaintDetails,
+        name="incharge_complaints_details",
+    ),
+    path("incharge/assigned_complaint/", AssignedComplaint, name="assigned_complaint"),
+    path(
+        "incharge/assigned_complaint/<int:id>/assigned_complaint_details/",
+        AssignedComplaintDetails,
+        name="assigned_complaint_details",
+    ),
+    path(
+        "incharge/assigned_complaint/<int:complaint_id>/reassign_complaints/",
+        ReassignedComplaintView,
+        name="reassign_complaints",
+    ),
+    path(
+        "incharge/assigned_complaint/<int:complaint_id>/reassign_departments/",
+        ReassignDepartmentView,
+        name="reassign_departments",
+    ),
+    path(
+        "complaints_remarks/<int:complaint_id>/remark/",
+        RemarksComplaint,
+        name="complaints_remarks",
+    ),
+    path(
+        "staff_update_complaint_status/<int:id>/",
+        StaffUpdateComplaintStatus,
+        name="staff_update_complaint_status",
+    ),
+    path(
+        "admin_update_complaint_status/<int:id>/",
+        AdminUpdateComplaintStatus,
+        name="admin_update_complaint_status",
+    ),
+    path("cancel_complaint/<int:id>/", CancelComplaint, name="cancel_complaint"),
+    path(
+        "ajax/load-complaint-types/",
+        load_complaint_types,
+        name="ajax_load_complaint_types",
+    ),
+    path("export/excel/", TasksExport, name="export_tasks_excel"),
 ]

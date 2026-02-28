@@ -1,253 +1,253 @@
 {% extends 'index.html' %} {% load static %} {% block title %} Home {% endblock %} {% block start %}
-<style>
-  .card-title p {
-    font-size: 1rem;
-  }
-
-  .modal {
-    font-family: 'Poppins', sans-serif;
-  }
-
-  @media (max-width: 768px) {
-    .card-image img {
-      width: 32px;
-      height: 32px;
-    }
-
+  <style>
     .card-title p {
-      font-size: 0.8rem;
+      font-size: 1rem;
     }
-  }
-</style>
 
-<link rel="stylesheet" href="{% static 'styles/common.css' %}" />
+    .modal {
+      font-family: 'Poppins', sans-serif;
+    }
 
-<div class="container d-flex flex-column align-items-center pt-3">
+    @media (max-width: 768px) {
+      .card-image img {
+        width: 32px;
+        height: 32px;
+      }
+
+      .card-title p {
+        font-size: 0.8rem;
+      }
+    }
+  </style>
+
+  <link rel="stylesheet" href="{% static 'styles/common.css' %}" />
+
+  <div class="container d-flex flex-column align-items-center pt-3">
   <!--Tracking-->
-  <div class="row mb-4" style="font-family: 'Poppins', sans-serif;">
-    <div class="col-12 d-flex align-items-center justify-content-center">
-      <p class="mb-0 text-light">Track your complaint/task here</p>
-      &nbsp;
-      <button type="button" class="btn btn-sm btn-warning text-white" data-bs-toggle="modal"
-        data-bs-target="#trackingModal">
-        Track
-      </button>
+    <div class="row mb-4" style="font-family: 'Poppins', sans-serif;">
+      <div class="col-12 d-flex align-items-center justify-content-center">
+        <p class="mb-0 text-light">Track your complaint/task here</p>
+        &nbsp;
+        <button type="button" class="btn btn-sm btn-warning text-white" data-bs-toggle="modal"
+                data-bs-target="#trackingModal">
+          Track
+        </button>
+      </div>
     </div>
-  </div>
   <!------------>
 
-  <div class="row w-100 g-3 pb-3">
+    <div class="row w-100 g-3 pb-3">
     <!--Task-->
-    <div class="col-6 col-sm-6 col-md-4 col-lg-3">
-      <div class="shadow-sm d-flex align-items-center justify-content-center rounded text-white glass-card h-100">
-        {% if request.user.role == 'Admin' %}
-        <a href="{% url 'tms:tms_admin_dashboard' %}"
-          class="text-white text-decoration-none w-100 h-100 d-flex align-items-center justify-content-center">
-          <div class="d-flex flex-column align-items-center">
-            <div class="card-image mb-2">
-              <img class="img-fluid" src="../../static/images/task-icon.png" />
-            </div>
-            <div class="card-title">
-              <p class="fw-bold mb-0 text-center">Task Management System</p>
-            </div>
-          </div>
-        </a>
-        {% else %}
-        <a href="{% url 'tms:tms_staff_dashboard' %}"
-          class="text-white text-decoration-none w-100 h-100 d-flex align-items-center justify-content-center">
-          <div class="d-flex flex-column align-items-center">
-            <div class="card-image mb-2">
-              <img class="img-fluid" src="../../static/images/task-icon.png" />
-            </div>
-            <div class="card-title">
-              <p class="fw-bold mb-0 text-center">Task Management System</p>
-            </div>
-          </div>
-        </a>
-        {% endif %}
+      <div class="col-6 col-sm-6 col-md-4 col-lg-3">
+        <div class="shadow-sm d-flex align-items-center justify-content-center rounded text-white glass-card h-100">
+          {% if request.user.role == 'Admin' %}
+            <a href="{% url 'tms:tms_admin_dashboard' %}"
+               class="text-white text-decoration-none w-100 h-100 d-flex align-items-center justify-content-center">
+              <div class="d-flex flex-column align-items-center">
+                <div class="card-image mb-2">
+                  <img class="img-fluid" src="../../static/images/task-icon.png" />
+                </div>
+                <div class="card-title">
+                  <p class="fw-bold mb-0 text-center">Task Management System</p>
+                </div>
+              </div>
+            </a>
+          {% else %}
+            <a href="{% url 'tms:tms_staff_dashboard' %}"
+               class="text-white text-decoration-none w-100 h-100 d-flex align-items-center justify-content-center">
+              <div class="d-flex flex-column align-items-center">
+                <div class="card-image mb-2">
+                  <img class="img-fluid" src="../../static/images/task-icon.png" />
+                </div>
+                <div class="card-title">
+                  <p class="fw-bold mb-0 text-center">Task Management System</p>
+                </div>
+              </div>
+            </a>
+          {% endif %}
+        </div>
       </div>
-    </div>
     <!--Complaint-->
-    <div class="col-6 col-sm-6 col-md-4 col-lg-3">
-      <div class="shadow-sm d-flex align-items-center justify-content-center rounded text-white glass-card h-100">
-        {% if request.user.role == 'Admin' %}
-        <a href="{% url 'cms:admin_dashboard' %}"
-          class="text-white text-decoration-none w-100 h-100 d-flex align-items-center justify-content-center">
-          <div class="d-flex flex-column align-items-center">
-            <div class="card-image mb-2">
-              <img class="img-fluid" src="../../static/images/complaint-icon.png" />
-            </div>
-            <div class="card-title">
-              <p class="fw-bold mb-0 text-center">
-                Complaint Management System
-              </p>
-            </div>
-          </div>
-        </a>
-        {% else %}
-        <a href="{% url 'cms:staff_dashboard' %}"
-          class="text-white text-decoration-none w-100 h-100 d-flex align-items-center justify-content-center">
-          <div class="d-flex flex-column align-items-center">
-            <div class="card-image mb-2">
-              <img class="img-fluid" src="../../static/images/complaint-icon.png" />
-            </div>
-            <div class="card-title">
-              <p class="fw-bold mb-0 text-center">
-                Complaint Management System
-              </p>
-            </div>
-          </div>
-        </a>
-        {% endif %}
+      <div class="col-6 col-sm-6 col-md-4 col-lg-3">
+        <div class="shadow-sm d-flex align-items-center justify-content-center rounded text-white glass-card h-100">
+          {% if request.user.role == 'Admin' %}
+            <a href="{% url 'cms:admin_dashboard' %}"
+               class="text-white text-decoration-none w-100 h-100 d-flex align-items-center justify-content-center">
+              <div class="d-flex flex-column align-items-center">
+                <div class="card-image mb-2">
+                  <img class="img-fluid" src="../../static/images/complaint-icon.png" />
+                </div>
+                <div class="card-title">
+                  <p class="fw-bold mb-0 text-center">
+                    Complaint Management System
+                  </p>
+                </div>
+              </div>
+            </a>
+          {% else %}
+            <a href="{% url 'cms:staff_dashboard' %}"
+               class="text-white text-decoration-none w-100 h-100 d-flex align-items-center justify-content-center">
+              <div class="d-flex flex-column align-items-center">
+                <div class="card-image mb-2">
+                  <img class="img-fluid" src="../../static/images/complaint-icon.png" />
+                </div>
+                <div class="card-title">
+                  <p class="fw-bold mb-0 text-center">
+                    Complaint Management System
+                  </p>
+                </div>
+              </div>
+            </a>
+          {% endif %}
+        </div>
       </div>
-    </div>
     <!--Service-->
-    <div class="col-6 col-sm-6 col-md-4 col-lg-3">
-      <div class="shadow-sm d-flex align-items-center justify-content-center rounded text-white glass-card h-100">
-        {% if request.user.role == 'Admin' %}
-        <a href="{% url 'srm:admin_dashboard' %}"
-          class="text-white text-decoration-none w-100 h-100 d-flex align-items-center justify-content-center">
-          <div class="d-flex flex-column align-items-center">
-            <div class="card-image mb-2">
-              <img class="img-fluid" src="../../static/images/service-icon.png" />
-            </div>
-            <div class="card-title">
-              <p class="fw-bold mb-0 text-center">
-                Service Request Management
-              </p>
-            </div>
-          </div>
-        </a>
-        {% else %}
-        <a href="{% url 'srm:staff_dashboard' %}"
-          class="text-white text-decoration-none w-100 h-100 d-flex align-items-center justify-content-center">
-          <div class="d-flex flex-column align-items-center">
-            <div class="card-image mb-2">
-              <img class="img-fluid" src="../../static/images/service-icon.png" />
-            </div>
-            <div class="card-title">
-              <p class="fw-bold mb-0 text-center">
-                Service Request Management
-              </p>
-            </div>
-          </div>
-        </a>
-        {% endif %}
+      <div class="col-6 col-sm-6 col-md-4 col-lg-3">
+        <div class="shadow-sm d-flex align-items-center justify-content-center rounded text-white glass-card h-100">
+          {% if request.user.role == 'Admin' %}
+            <a href="{% url 'srm:admin_dashboard' %}"
+               class="text-white text-decoration-none w-100 h-100 d-flex align-items-center justify-content-center">
+              <div class="d-flex flex-column align-items-center">
+                <div class="card-image mb-2">
+                  <img class="img-fluid" src="../../static/images/service-icon.png" />
+                </div>
+                <div class="card-title">
+                  <p class="fw-bold mb-0 text-center">
+                    Service Request Management
+                  </p>
+                </div>
+              </div>
+            </a>
+          {% else %}
+            <a href="{% url 'srm:staff_dashboard' %}"
+               class="text-white text-decoration-none w-100 h-100 d-flex align-items-center justify-content-center">
+              <div class="d-flex flex-column align-items-center">
+                <div class="card-image mb-2">
+                  <img class="img-fluid" src="../../static/images/service-icon.png" />
+                </div>
+                <div class="card-title">
+                  <p class="fw-bold mb-0 text-center">
+                    Service Request Management
+                  </p>
+                </div>
+              </div>
+            </a>
+          {% endif %}
+        </div>
       </div>
-    </div>
     <!--asset-->
-    <div class="col-6 col-sm-6 col-md-4 col-lg-3">
-      <div class="shadow-sm d-flex align-items-center justify-content-center rounded text-white glass-card h-100">
-        {% if request.user.role == 'Admin' %}
-        <a href="" class="text-white text-decoration-none w-100 h-100 d-flex align-items-center justify-content-center"
-          title="coming soon!">
-          <div class="d-flex flex-column align-items-center">
-            <div class="card-image mb-2">
-              <img class="img-fluid" src="../../static/images/asset-icon.png" />
-            </div>
-            <div class="card-title">
-              <p class="fw-bold mb-0 text-center">
-                Asset Management System
-              </p>
-            </div>
-          </div>
-        </a>
-        {% else %}
-        <a href="" class="text-white text-decoration-none w-100 h-100 d-flex align-items-center justify-content-center"
-          title="coming soon!">
-          <div class="d-flex flex-column align-items-center">
-            <div class="card-image mb-2">
-              <img class="img-fluid" src="../../static/images/asset-icon.png" />
-            </div>
-            <div class="card-title">
-              <p class="fw-bold mb-0 text-center">
-                Asset Management System
-              </p>
-            </div>
-          </div>
-        </a>
-        {% endif %}
+      <div class="col-6 col-sm-6 col-md-4 col-lg-3">
+        <div class="shadow-sm d-flex align-items-center justify-content-center rounded text-white glass-card h-100">
+          {% if request.user.role == 'Admin' %}
+            <a href="" class="text-white text-decoration-none w-100 h-100 d-flex align-items-center justify-content-center"
+               title="coming soon!">
+              <div class="d-flex flex-column align-items-center">
+                <div class="card-image mb-2">
+                  <img class="img-fluid" src="../../static/images/asset-icon.png" />
+                </div>
+                <div class="card-title">
+                  <p class="fw-bold mb-0 text-center">
+                    Asset Management System
+                  </p>
+                </div>
+              </div>
+            </a>
+          {% else %}
+            <a href="" class="text-white text-decoration-none w-100 h-100 d-flex align-items-center justify-content-center"
+               title="coming soon!">
+              <div class="d-flex flex-column align-items-center">
+                <div class="card-image mb-2">
+                  <img class="img-fluid" src="../../static/images/asset-icon.png" />
+                </div>
+                <div class="card-title">
+                  <p class="fw-bold mb-0 text-center">
+                    Asset Management System
+                  </p>
+                </div>
+              </div>
+            </a>
+          {% endif %}
+        </div>
       </div>
-    </div>
     <!--transport-->
-    <div class="col-6 col-sm-6 col-md-4 col-lg-3">
-      <div class="shadow-sm d-flex align-items-center justify-content-center rounded text-white glass-card h-100">
-        {% if request.user.role == 'Admin' %}
-        <a href="{% url 'vms:vms_admin_dashboard' %}"
-          class="text-white text-decoration-none w-100 h-100 d-flex align-items-center justify-content-center"
-          title="coming soon!">
-          <div class="d-flex flex-column align-items-center">
-            <div class="card-image mb-2">
-              <img class="img-fluid" src="../../static/images/cab_icon.png" />
-            </div>
-            <div class="card-title">
-              <p class="fw-bold mb-0 text-center">
-                Transport Management System
-              </p>
-            </div>
-          </div>
-        </a>
-        {% else %}
-        <a href="{% url 'vms:vms_staff_dashboard' %}"
-          class="text-white text-decoration-none w-100 h-100 d-flex align-items-center justify-content-center"
-          title="coming soon!">
-          <div class="d-flex flex-column align-items-center">
-            <div class="card-image mb-2">
-              <img class="img-fluid" src="../../static/images/cab_icon.png" />
-            </div>
-            <div class="card-title">
-              <p class="fw-bold mb-0 text-center">
-                Transport Management System
-              </p>
-            </div>
-          </div>
-        </a>
-        {% endif %}
+      <div class="col-6 col-sm-6 col-md-4 col-lg-3">
+        <div class="shadow-sm d-flex align-items-center justify-content-center rounded text-white glass-card h-100">
+          {% if request.user.role == 'Admin' %}
+            <a href="{% url 'vms:vms_admin_dashboard' %}"
+               class="text-white text-decoration-none w-100 h-100 d-flex align-items-center justify-content-center"
+               title="coming soon!">
+              <div class="d-flex flex-column align-items-center">
+                <div class="card-image mb-2">
+                  <img class="img-fluid" src="../../static/images/cab_icon.png" />
+                </div>
+                <div class="card-title">
+                  <p class="fw-bold mb-0 text-center">
+                    Transport Management System
+                  </p>
+                </div>
+              </div>
+            </a>
+          {% else %}
+            <a href="{% url 'vms:vms_staff_dashboard' %}"
+               class="text-white text-decoration-none w-100 h-100 d-flex align-items-center justify-content-center"
+               title="coming soon!">
+              <div class="d-flex flex-column align-items-center">
+                <div class="card-image mb-2">
+                  <img class="img-fluid" src="../../static/images/cab_icon.png" />
+                </div>
+                <div class="card-title">
+                  <p class="fw-bold mb-0 text-center">
+                    Transport Management System
+                  </p>
+                </div>
+              </div>
+            </a>
+          {% endif %}
+        </div>
       </div>
     </div>
   </div>
-</div>
-</div>
+  </div>
 
 <!-- Modal -->
-<div class="modal fade" id="trackingModal" tabindex="-1">
-  <div class="modal-dialog">
-    <div class="modal-content bg-light text-primary">
-      <div class="modal-header">
-        <h5 class="modal-title">Track Complaint/Task here</h5>
-        <button type="button" class="btn-close btn-close-danger" data-bs-dismiss="modal"></button>
-      </div>
-      <div class="modal-body">
-        <form id="universal-track-form">
-          <input class="form-control mb-2" type="text" name="q" placeholder="#enter complaint/task number" required>
-          <button class="btn btn-primary" type="submit">Search</button>
-        </form>
-        <div id="universal-track-result" class="mt-3"></div>
+  <div class="modal fade" id="trackingModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content bg-light text-primary">
+        <div class="modal-header">
+          <h5 class="modal-title">Track Complaint/Task here</h5>
+          <button type="button" class="btn-close btn-close-danger" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <form id="universal-track-form">
+            <input class="form-control mb-2" type="text" name="q" placeholder="#enter complaint/task number" required>
+            <button class="btn btn-primary" type="submit">Search</button>
+          </form>
+          <div id="universal-track-result" class="mt-3"></div>
+        </div>
       </div>
     </div>
   </div>
-</div>
 
 <!-- ✅ Load your script first -->
-<script src="{% static 'js/push-notification.js' %}"></script>
+  <script src="{% static 'js/push-notification.js' %}"></script>
 
-<script>
-  const publicKey = "{{ vapid_key |escapejs }}".trim();
-  subscribeToPush(publicKey);
-</script>
+  <script>
+    const publicKey = "{{ vapid_key |escapejs }}".trim();
+    subscribeToPush(publicKey);
+  </script>
 
-<script>
-  document.getElementById('universal-track-form').addEventListener('submit', function (e) {
-    e.preventDefault();
-    const q = this.q.value.trim();
-    const resultDiv = document.getElementById('universal-track-result');
-    resultDiv.innerHTML = "Searching...";
+  <script>
+    document.getElementById('universal-track-form').addEventListener('submit', function (e) {
+      e.preventDefault();
+      const q = this.q.value.trim();
+      const resultDiv = document.getElementById('universal-track-result');
+      resultDiv.innerHTML = "Searching...";
 
-    fetch(`/track/?q=${encodeURIComponent(q)}`)
-      .then(res => res.json())
-      .then(data => {
-        if (data.found) {
-          resultDiv.innerHTML = `
+      fetch(`/track/?q=${encodeURIComponent(q)}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.found) {
+            resultDiv.innerHTML = `
             <div class="table-responsive">
               <table class="table">
                 <thead>
@@ -267,14 +267,14 @@
               </table>
             </div>
           `;
-        } else {
-          resultDiv.innerHTML = `<div class="text-warning">${data.error}</div>`;
-        }
-      })
-      .catch(() => {
-        resultDiv.innerHTML = `<div class="text-danger">An error occurred. Try again.</div>`;
-      });
-  });
-</script>
+          } else {
+            resultDiv.innerHTML = `<div class="text-warning">${data.error}</div>`;
+          }
+        })
+        .catch(() => {
+          resultDiv.innerHTML = `<div class="text-danger">An error occurred. Try again.</div>`;
+        });
+    });
+  </script>
 
 {% endblock %}

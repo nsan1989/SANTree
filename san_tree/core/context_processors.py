@@ -1,5 +1,6 @@
 from .menus import MENU_STRUCTURE
 
+
 def sidebar_menu(request):
     user = request.user
     if not user.is_authenticated:

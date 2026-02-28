@@ -5,78 +5,78 @@
 
 {% block start %}
 
-<style>
-    .card-body {
-        font-family: 'Poppins', sans-serif;
-        padding: 0.5rem;
-    }
+    <style>
+        .card-body {
+            font-family: 'Poppins', sans-serif;
+            padding: 0.5rem;
+        }
 
-    .content-header h5 {
-        color: #6b1d20;
-    }
-</style>
+        .content-header h5 {
+            color: #6b1d20;
+        }
+    </style>
 
-<div class="container-fluid">
-    <div class="mb-3">
-        <a href="javascript:history.back()" class="col-12 d-flex align-items-center justify-content-start text-warning"
-            style="text-decoration: none">
-            <i class="fa-solid fa-arrow-left"></i>
-            &nbsp;back
-        </a>
-    </div>
-    <div class="row justify-content-center">
-        <div class="col-12 col-sm-10 col-md-6 col-lg-5">
+    <div class="container-fluid">
+        <div class="mb-3">
+            <a href="javascript:history.back()" class="col-12 d-flex align-items-center justify-content-start text-warning"
+               style="text-decoration: none">
+                <i class="fa-solid fa-arrow-left"></i>
+                &nbsp;back
+            </a>
+        </div>
+        <div class="row justify-content-center">
+            <div class="col-12 col-sm-10 col-md-6 col-lg-5">
 
-            <div class="card shadow-sm border-0 rounded-2">
-                <div class="card-body">
+                <div class="card shadow-sm border-0 rounded-2">
+                    <div class="card-body">
 
                     <!-- Header -->
-                    <div class="content-header d-flex justify-content-between align-items-center mb-3">
-                        <h5 class="fw-bold mb-0">Profile</h5>
-                        <a href="" class="btn btn-sm btn-outline-primary d-flex align-items-center gap-1"
-                            title="Edit Profile">
-                            <i class="bi bi-pencil"></i>
-                            <span>Edit</span>
-                        </a>
-                    </div>
+                        <div class="content-header d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="fw-bold mb-0">Profile</h5>
+                            <a href="" class="btn btn-sm btn-outline-primary d-flex align-items-center gap-1"
+                               title="Edit Profile">
+                                <i class="bi bi-pencil"></i>
+                                <span>Edit</span>
+                            </a>
+                        </div>
 
-                    <hr>
+                        <hr>
 
                     <!-- Profile Info -->
-                    <div class="row mb-2">
-                        <div class="col-5 text-dark fw-semibold">Username</div>
-                        <div class="col-7">{{ user.username }}</div>
-                    </div>
+                        <div class="row mb-2">
+                            <div class="col-5 text-dark fw-semibold">Username</div>
+                            <div class="col-7">{{ user.username }}</div>
+                        </div>
 
-                    <div class="row mb-2">
-                        <div class="col-5 text-dark fw-semibold">Department</div>
-                        <div class="col-7">{{ user.department }}</div>
-                    </div>
+                        <div class="row mb-2">
+                            <div class="col-5 text-dark fw-semibold">Department</div>
+                            <div class="col-7">{{ user.department }}</div>
+                        </div>
 
-                    <div class="row mb-2">
-                        <div class="col-5 text-dark fw-semibold">Designation</div>
-                        <div class="col-7">{{ user.designation }}</div>
-                    </div>
+                        <div class="row mb-2">
+                            <div class="col-5 text-dark fw-semibold">Designation</div>
+                            <div class="col-7">{{ user.designation }}</div>
+                        </div>
 
-                    <div class="row mb-2">
-                        <div class="col-5 text-dark fw-semibold">Emp. ID</div>
-                        <div class="col-7">{{ user.employee_id }}</div>
-                    </div>
+                        <div class="row mb-2">
+                            <div class="col-5 text-dark fw-semibold">Emp. ID</div>
+                            <div class="col-7">{{ user.employee_id }}</div>
+                        </div>
 
-                    <div class="row mb-2">
-                        <div class="col-5 text-dark fw-semibold">Phone</div>
-                        <div class="col-7">{{ user.phone_number }}</div>
-                    </div>
+                        <div class="row mb-2">
+                            <div class="col-5 text-dark fw-semibold">Phone</div>
+                            <div class="col-7">{{ user.phone_number }}</div>
+                        </div>
 
-                    <div class="row">
-                        <div class="col-5 text-dark fw-semibold">Email</div>
-                        <div class="col-7">{{ user.email }}</div>
-                    </div>
+                        <div class="row">
+                            <div class="col-5 text-dark fw-semibold">Email</div>
+                            <div class="col-7">{{ user.email }}</div>
+                        </div>
 
+                    </div>
                 </div>
-            </div>
 
+            </div>
         </div>
     </div>
-</div>
 {% endblock %}

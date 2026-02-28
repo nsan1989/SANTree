@@ -2,178 +2,178 @@
 {% load crispy_forms_tags %}
 
 {% block title %}
-Add Asset
+    Add Asset
 {% endblock %}
 
 {% block start %}
 
-<style>
-    .header-title {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        color: wheat;
-    }
+    <style>
+        .header-title {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: wheat;
+        }
 
-    .form-wrapper {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        background-color: #fff;
-        padding: 1rem;
-    }
+        .form-wrapper {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: #fff;
+            padding: 1rem;
+        }
 
-    .form-title h4 {
-        text-transform: uppercase;
-        font-weight: bold;
-    }
+        .form-title h4 {
+            text-transform: uppercase;
+            font-weight: bold;
+        }
 
-    .col-12 {
-        display: flex;
-        flex-direction: column;
-    }
-</style>
+        .col-12 {
+            display: flex;
+            flex-direction: column;
+        }
+    </style>
 
-<div class="container-fluid">
-    <div class="d-flex justify-content-center align-items-center">
-        <span>
-            <div class="mb-3">
-                <a href="javascript:history.back()" class="d-flex align-items-center text-warning"
-                    style="text-decoration: none">
-                    <i class="fa-solid fa-arrow-left"></i>
-                    &nbsp;back
-                </a>
-            </div>
-        </span>
-    </div>
-    <div class="row mb-3">
-        <div class="col-12">
-            <div class="header-title">
-                <h3 class="mb-0">Add Assets</h3>
-                <p class="mb-0">Please enter the details to add an asset!</p>
+    <div class="container-fluid">
+        <div class="d-flex justify-content-center align-items-center">
+            <span>
+                <div class="mb-3">
+                    <a href="javascript:history.back()" class="d-flex align-items-center text-warning"
+                       style="text-decoration: none">
+                        <i class="fa-solid fa-arrow-left"></i>
+                        &nbsp;back
+                    </a>
+                </div>
+            </span>
+        </div>
+        <div class="row mb-3">
+            <div class="col-12">
+                <div class="header-title">
+                    <h3 class="mb-0">Add Assets</h3>
+                    <p class="mb-0">Please enter the details to add an asset!</p>
+                </div>
             </div>
         </div>
-    </div>
-    <div class="row d-flex justify-content-center">
-        <div class="col-12 col-md-6 col-lg-4">
-            <div class="form-wrapper rounded">
-                <div class="form-title mb-2">
-                    <h4>asset form</h4>
-                </div>
-                <div class="form-content">
-                    <form id="asset-form" class="asset-form" method="post" enctype="multipart/form-data">
-                        {% if form.errors %}
-                        <div class="alert alert-danger">
-                            <strong>Form Errors:</strong>
-                            {{ form.errors }}
-                        </div>
-                        {% endif %}
-                        {% csrf_token %}
-                        <div class="row w-100 mb-1">
-                            <div class="col-12 col-md-6">
-                                <label for="id-name" class="form-label requiredField mb-0">
-                                    Name
-                                    <span class="asteriskField">*</span>
-                                </label>
-                                <input type="text" id="id-name" name="name" class="form-control" required>
-                            </div>
-                            <div class="col-12 col-md-6">
-                                <label class="form-label">
-                                    Department
-                                </label>
-                                <input type="text" class="form-control" value="{{ request.user.department }}" disabled>
-                            </div>
-                        </div>
-                        <div class="row w-100 mb-1">
-                            <div class="col-12 col-md-6">
-                                <label for="id-category" class="form-lable requiredField">
-                                    Category
-                                    <span class="asteriskField">*</span>
-                                </label>
-                                <select name="category" class="form-select" required id="id-category">
-                                    <option value="" selected>select</option>
-                                    {% for cat in category %}
-                                    <option value="{{ cat.id }}">{{ cat.name }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                            <div class="col-12 col-md-6">
-                                <label for="id-manufacturer" class="form-label requiredField mb-0">
-                                    Manufacturer
-                                    <span class="asteriskField">*</span>
-                                </label>
-                                <input type="text" id="id-manufacturer" name="manufacturer" class="form-control"
-                                    required>
-                            </div>
-                        </div>
-                        <div class="row w-100 mb-1">
-                            <div class="col-12 col-md-6">
-                                <label for="id-model_number" class="form-label requiredField mb-0">
-                                    Model No.
-                                    <span class="asteriskField">*</span>
-                                </label>
-                                <input type="text" id="id-model_number" name="model_number" class="form-control"
-                                    required>
-                            </div>
-                            <div class="col-12 col-md-6">
-                                <label for="id-serial_number" class="form-label requiredField mb-0">
-                                    Serial No.
-                                    <span class="asteriskField">*</span>
-                                </label>
-                                <input type="text" id="id-serial_number" name="serial_number" class="form-control"
-                                    required>
-                            </div>
-                        </div>
-                        <div class="row w-100 mb-1">
-                            <div class="col-12 col-md-6">
-                                <label for="id-image" class="form-label mb-0">
-                                    Image
-                                </label>
-                                <input type="file" name="image" class="form-control">
-                            </div>
-                            <div class="col-12 col-md-6">
-                                <label for="id_cost" class="form-label requiredField">
-                                    Cost <span class="asteriskField">*</span>
-                                </label>
-                                <input type="number" name="cost" id="id_cost" class="form-control" step="0.01" min="0"
-                                    required>
-                            </div>
-                        </div>
-                        <div class="row w-100 mb-1">
-                            <div class="col-12 col-md-6">
-                                <label for="id_expiry_date" class="form-label requiredField">
-                                    Expiry Date <span class="asteriskField">*</span>
-                                </label>
-                                <input type="date" name="expiry_date" id="id_expiry_date" class="form-control" required>
-                            </div>
-                            <div class="col-12 col-md-6">
-                                <label for="id_purchase_date" class="form-label requiredField">
-                                    Purchase Date <span class="asteriskField">*</span>
-                                </label>
-                                <input type="date" name="purchase_date" id="id_purchase_date" class="form-control"
-                                    required>
-                            </div>
-                            <div class="col-12 col-md-6">
-                                <div class="d-grid mt-4">
-                                    <button type="submit" id="submitBtn" class="btn btn-primary btn-sm">Submit</button>
+        <div class="row d-flex justify-content-center">
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="form-wrapper rounded">
+                    <div class="form-title mb-2">
+                        <h4>asset form</h4>
+                    </div>
+                    <div class="form-content">
+                        <form id="asset-form" class="asset-form" method="post" enctype="multipart/form-data">
+                            {% if form.errors %}
+                                <div class="alert alert-danger">
+                                    <strong>Form Errors:</strong>
+                                    {{ form.errors }}
+                                </div>
+                            {% endif %}
+                            {% csrf_token %}
+                            <div class="row w-100 mb-1">
+                                <div class="col-12 col-md-6">
+                                    <label for="id-name" class="form-label requiredField mb-0">
+                                        Name
+                                        <span class="asteriskField">*</span>
+                                    </label>
+                                    <input type="text" id="id-name" name="name" class="form-control" required>
+                                </div>
+                                <div class="col-12 col-md-6">
+                                    <label class="form-label">
+                                        Department
+                                    </label>
+                                    <input type="text" class="form-control" value="{{ request.user.department }}" disabled>
                                 </div>
                             </div>
-                        </div>
-                    </form>
+                            <div class="row w-100 mb-1">
+                                <div class="col-12 col-md-6">
+                                    <label for="id-category" class="form-lable requiredField">
+                                        Category
+                                        <span class="asteriskField">*</span>
+                                    </label>
+                                    <select name="category" class="form-select" required id="id-category">
+                                        <option value="" selected>select</option>
+                                        {% for cat in category %}
+                                            <option value="{{ cat.id }}">{{ cat.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-12 col-md-6">
+                                    <label for="id-manufacturer" class="form-label requiredField mb-0">
+                                        Manufacturer
+                                        <span class="asteriskField">*</span>
+                                    </label>
+                                    <input type="text" id="id-manufacturer" name="manufacturer" class="form-control"
+                                           required>
+                                </div>
+                            </div>
+                            <div class="row w-100 mb-1">
+                                <div class="col-12 col-md-6">
+                                    <label for="id-model_number" class="form-label requiredField mb-0">
+                                        Model No.
+                                        <span class="asteriskField">*</span>
+                                    </label>
+                                    <input type="text" id="id-model_number" name="model_number" class="form-control"
+                                           required>
+                                </div>
+                                <div class="col-12 col-md-6">
+                                    <label for="id-serial_number" class="form-label requiredField mb-0">
+                                        Serial No.
+                                        <span class="asteriskField">*</span>
+                                    </label>
+                                    <input type="text" id="id-serial_number" name="serial_number" class="form-control"
+                                           required>
+                                </div>
+                            </div>
+                            <div class="row w-100 mb-1">
+                                <div class="col-12 col-md-6">
+                                    <label for="id-image" class="form-label mb-0">
+                                        Image
+                                    </label>
+                                    <input type="file" name="image" class="form-control">
+                                </div>
+                                <div class="col-12 col-md-6">
+                                    <label for="id_cost" class="form-label requiredField">
+                                        Cost <span class="asteriskField">*</span>
+                                    </label>
+                                    <input type="number" name="cost" id="id_cost" class="form-control" step="0.01" min="0"
+                                           required>
+                                </div>
+                            </div>
+                            <div class="row w-100 mb-1">
+                                <div class="col-12 col-md-6">
+                                    <label for="id_expiry_date" class="form-label requiredField">
+                                        Expiry Date <span class="asteriskField">*</span>
+                                    </label>
+                                    <input type="date" name="expiry_date" id="id_expiry_date" class="form-control" required>
+                                </div>
+                                <div class="col-12 col-md-6">
+                                    <label for="id_purchase_date" class="form-label requiredField">
+                                        Purchase Date <span class="asteriskField">*</span>
+                                    </label>
+                                    <input type="date" name="purchase_date" id="id_purchase_date" class="form-control"
+                                           required>
+                                </div>
+                                <div class="col-12 col-md-6">
+                                    <div class="d-grid mt-4">
+                                        <button type="submit" id="submitBtn" class="btn btn-primary btn-sm">Submit</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const form = document.getElementById("asset-form");
-        const submitBtn = document.getElementById("submitBtn");
-        form.addEventListener("submit", function (event) {
-            submitBtn.disabled = true;
-            submitBtn.innerText = "Submitting...";
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const form = document.getElementById("asset-form");
+            const submitBtn = document.getElementById("submitBtn");
+            form.addEventListener("submit", function (event) {
+                submitBtn.disabled = true;
+                submitBtn.innerText = "Submitting...";
+            });
         });
-    });
-</script>
+    </script>
 {% endblock %}

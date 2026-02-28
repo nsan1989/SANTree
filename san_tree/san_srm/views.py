@@ -1,35 +1,43 @@
-from django.shortcuts import render, redirect, get_object_or_404
-from django.db.models import Q
-from django.core.exceptions import PermissionDenied
-from .models import *
-from .forms import *
-from accounts.models import CustomUsers
-from django.http import JsonResponse
-from django.core.paginator import Paginator
-from django.contrib import messages
-from django.utils import timezone
 from datetime import timedelta
-import structlog
+
 import matplotlib
-matplotlib.use('Agg')
-import matplotlib.pyplot as plt
+import structlog
+from django.contrib import messages
+from django.core.exceptions import PermissionDenied
+from django.core.paginator import Paginator
+from django.db.models import Q
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404, redirect, render
+from django.utils import timezone
+
+from accounts.models import CustomUsers
+
+from .forms import *
+from .models import *
+
+matplotlib.use("Agg")
 import io
 from threading import Lock
+
+import matplotlib.pyplot as plt
+
 plot_lock = Lock()
-from django.http import HttpResponse
-from django.db.models import OuterRef, Subquery
 from datetime import datetime, time
+
 from django.db import transaction
+from django.db.models import OuterRef, Subquery
+from django.http import HttpResponse
 
 log = structlog.get_logger()
+
 
 # Tasks Pie Chart
 def ServicePieChart(request):
 
-    start_date = request.GET.get('start_date')
-    end_date = request.GET.get('end_date')
+    start_date = request.GET.get("start_date")
+    end_date = request.GET.get("end_date")
 
-    services = Service.objects.filter(created_by = request.user)
+    services = Service.objects.filter(created_by=request.user)
 
     if start_date and end_date:
         try:
@@ -39,41 +47,51 @@ def ServicePieChart(request):
         except ValueError:
             pass
 
-    open_serv = services.filter(status = 'Open').count()
-    prog_serv = services.filter(status = 'In Progress').count()
-    wait_serv = services.filter(status = 'Waiting').count()
-    pen_serv = services.filter(status = 'Pending').count()
-    hold_serv = services.filter(status = 'On Hold').count()
-    comp_serv = services.filter(status = 'Completed').count()
+    open_serv = services.filter(status="Open").count()
+    prog_serv = services.filter(status="In Progress").count()
+    wait_serv = services.filter(status="Waiting").count()
+    pen_serv = services.filter(status="Pending").count()
+    hold_serv = services.filter(status="On Hold").count()
+    comp_serv = services.filter(status="Completed").count()
     if open_serv + prog_serv + wait_serv + pen_serv + hold_serv + comp_serv == 0:
-        labels = ['No Data']
+        labels = ["No Data"]
         sizes = [1]
-        colors = ['#d3d3d3']
+        colors = ["#d3d3d3"]
     else:
         raw_data = [
-            ('Open', open_serv, '#cccccc'),
-            ('In Progress', prog_serv, '#ff6600'),
-            ('Waiting', wait_serv, "#ff9900"),
-            ('Pending', pen_serv, "#990000"),
-            ('On Hold', hold_serv, "#993300"),
-            ('Completed', comp_serv, '#003300')
-            ]
-    
-        filtered_data = [(label, size, color) for label, size, color in raw_data if size > 0]
+            ("Open", open_serv, "#cccccc"),
+            ("In Progress", prog_serv, "#ff6600"),
+            ("Waiting", wait_serv, "#ff9900"),
+            ("Pending", pen_serv, "#990000"),
+            ("On Hold", hold_serv, "#993300"),
+            ("Completed", comp_serv, "#003300"),
+        ]
+
+        filtered_data = [
+            (label, size, color) for label, size, color in raw_data if size > 0
+        ]
         labels, sizes, colors = zip(*filtered_data)
 
     buffer = io.BytesIO()
 
     with plot_lock:
         bg_color = (0, 0, 0, 0.4)
-        fig, ax = plt.subplots(figsize=(4, 2), facecolor=bg_color) 
-        ax.pie(sizes, labels=labels, autopct='%1.1f%%', colors=colors, startangle=90, textprops={'color': 'white'})
-        ax.axis('equal')
-        plt.savefig(buffer, format='png', facecolor=fig.get_facecolor())
+        fig, ax = plt.subplots(figsize=(4, 2), facecolor=bg_color)
+        ax.pie(
+            sizes,
+            labels=labels,
+            autopct="%1.1f%%",
+            colors=colors,
+            startangle=90,
+            textprops={"color": "white"},
+        )
+        ax.axis("equal")
+        plt.savefig(buffer, format="png", facecolor=fig.get_facecolor())
         plt.close(fig)
-    
+
     buffer.seek(0)
-    return HttpResponse(buffer.read(), content_type='image/png')
+    return HttpResponse(buffer.read(), content_type="image/png")
+
 
 # Admin Dashboard view.
 def AdminDashboard(request):
@@ -83,17 +101,19 @@ def AdminDashboard(request):
     except:
         raise PermissionDenied("User profile not found")
     dept_users = CustomUsers.objects.filter(
-        Q(department__name='GDA') | Q(department__name='General Duty Assistant')
-        ).exclude(role='Admin')
+        Q(department__name="GDA") | Q(department__name="General Duty Assistant")
+    ).exclude(role="Admin")
     user_count = dept_users.count()
-    vacant_users = dept_users.filter(status = 'vacant')
+    vacant_users = dept_users.filter(status="vacant")
     vacant = vacant_users.count()
-    engaged_users = dept_users.filter(status = 'engaged')
+    engaged_users = dept_users.filter(status="engaged")
     engage = engaged_users.count()
-    services = Service.objects.filter(assigned_to__shift_staffs__department__name= user.department)
+    services = Service.objects.filter(
+        assigned_to__shift_staffs__department__name=user.department
+    )
     total_serv = services.count()
-    start_date = request.GET.get('start_date')
-    end_date = request.GET.get('end_date')
+    start_date = request.GET.get("start_date")
+    end_date = request.GET.get("end_date")
 
     if start_date and end_date:
         try:
@@ -103,19 +123,20 @@ def AdminDashboard(request):
         except ValueError:
             pass
     context = {
-        'sevices': services.order_by('-created_at'),
-        'current_user': user,
-        'all_users': user_count,
-        'engage_user': engaged_users,
-        'engaged': engage,
-        'vacant_user': vacant_users,
-        'vacants': vacant,
-        'total_service': total_serv,
+        "sevices": services.order_by("-created_at"),
+        "current_user": user,
+        "all_users": user_count,
+        "engage_user": engaged_users,
+        "engaged": engage,
+        "vacant_user": vacant_users,
+        "vacants": vacant,
+        "total_service": total_serv,
     }
     view_name = request.resolver_match.view_name
-    if view_name == "srm:admin_dashboard" and user_role == 'Admin':
-        return render(request, 'srm_admin_dashboard.html', context)
+    if view_name == "srm:admin_dashboard" and user_role == "Admin":
+        return render(request, "srm_admin_dashboard.html", context)
     raise PermissionDenied("You are not authorized to view this page.")
+
 
 # Staff Dashboard View.
 def StaffDashboard(request):
@@ -126,26 +147,39 @@ def StaffDashboard(request):
         user_role = user.role
     except:
         raise PermissionDenied("User profile not found")
-    service_created = Service.objects.filter(created_by = user)
+    service_created = Service.objects.filter(created_by=user)
     created_services = service_created.count()
-    open_created_service = Service.objects.filter(created_by = user, status = 'Open').count()
-    progress_created_service = Service.objects.filter(created_by = user, status = 'In Progress').count()
-    completed_created_service = Service.objects.filter(created_by = user, status = 'Completed').count()
+    open_created_service = Service.objects.filter(
+        created_by=user, status="Open"
+    ).count()
+    progress_created_service = Service.objects.filter(
+        created_by=user, status="In Progress"
+    ).count()
+    completed_created_service = Service.objects.filter(
+        created_by=user, status="Completed"
+    ).count()
     user_services = Service.objects.filter(
         Q(assigned_to__shift_staffs=user) | Q(created_by=user),
-        Q(status__in=['Open', 'In Progress', 'On Hold', 'Completed'])
-    ).order_by('-created_at')[:10]
-    assign_service = Service.objects.filter(assigned_to__shift_staffs = user).all().count()
-    open_assign_service = Service.objects.filter(assigned_to__shift_staffs = user, status = 'Open').count()
-    progress_assign_service = Service.objects.filter(assigned_to__shift_staffs = user, status = 'In Progress').count()
-    completed_assign_service = Service.objects.filter(assigned_to__shift_staffs = user, status = 'Completed').count()
-    service_generated_by = GenerateService.objects.filter(generate_by__shift_staffs = user).count()
-    my_shift = ShiftSchedule.objects.filter(
-        shift_staffs = user, 
-        status="ongoing"
-        ).all()
-    start_date = request.GET.get('start_date')
-    end_date = request.GET.get('end_date')
+        Q(status__in=["Open", "In Progress", "On Hold", "Completed"]),
+    ).order_by("-created_at")[:10]
+    assign_service = (
+        Service.objects.filter(assigned_to__shift_staffs=user).all().count()
+    )
+    open_assign_service = Service.objects.filter(
+        assigned_to__shift_staffs=user, status="Open"
+    ).count()
+    progress_assign_service = Service.objects.filter(
+        assigned_to__shift_staffs=user, status="In Progress"
+    ).count()
+    completed_assign_service = Service.objects.filter(
+        assigned_to__shift_staffs=user, status="Completed"
+    ).count()
+    service_generated_by = GenerateService.objects.filter(
+        generate_by__shift_staffs=user
+    ).count()
+    my_shift = ShiftSchedule.objects.filter(shift_staffs=user, status="ongoing").all()
+    start_date = request.GET.get("start_date")
+    end_date = request.GET.get("end_date")
     if start_date and end_date:
         try:
             start = datetime.strptime(start_date, "%Y-%m-%d")
@@ -153,109 +187,124 @@ def StaffDashboard(request):
             service_created = service_created.filter(created_at__range=(start, end))
         except ValueError:
             pass
-    if request.method == 'POST':
+    if request.method == "POST":
         form = ServiceGenerateForm(request.POST, request.FILES, user=request.user)
         if form.is_valid():
             new_service = form.save(commit=False)
-            shift_schedule = ShiftSchedule.objects.filter(shift_staffs=request.user).first()
+            shift_schedule = ShiftSchedule.objects.filter(
+                shift_staffs=request.user
+            ).first()
 
             if shift_schedule:
                 new_service.generate_by = shift_schedule
                 new_service.save()
 
                 if request.headers.get("x-requested-with") == "XMLHttpRequest":
-                    return JsonResponse({
-                        "success": True,
-                        "id": new_service.id,
-                        "generate_number": new_service.generate_number,
-                        "service_type": str(new_service.service_type),
-                        "from_location": str(new_service.from_location),
-                        "to_location": str(new_service.to_location),
-                        "status": new_service.status,
-                        "generate_at": new_service.generate_at.strftime("%Y-%m-%d %H:%M"),
-                    })
+                    return JsonResponse(
+                        {
+                            "success": True,
+                            "id": new_service.id,
+                            "generate_number": new_service.generate_number,
+                            "service_type": str(new_service.service_type),
+                            "from_location": str(new_service.from_location),
+                            "to_location": str(new_service.to_location),
+                            "status": new_service.status,
+                            "generate_at": new_service.generate_at.strftime(
+                                "%Y-%m-%d %H:%M"
+                            ),
+                        }
+                    )
 
                 messages.success(request, "Service generated successfully!")
-                return redirect('srm:staff_dashboard')
+                return redirect("srm:staff_dashboard")
             else:
                 if request.headers.get("x-requested-with") == "XMLHttpRequest":
-                    return JsonResponse({"success": False, "error": "Shift schedule not found"}, status=400)
+                    return JsonResponse(
+                        {"success": False, "error": "Shift schedule not found"},
+                        status=400,
+                    )
                 messages.error(request, "Shift schedule not found")
-                return redirect('srm:staff_dashboard')
+                return redirect("srm:staff_dashboard")
         else:
             if request.headers.get("x-requested-with") == "XMLHttpRequest":
-                return JsonResponse({"success": False, "errors": form.errors}, status=400)
+                return JsonResponse(
+                    {"success": False, "errors": form.errors}, status=400
+                )
             messages.error(request, "Invalid form")
     else:
         form = ServiceGenerateForm(user=request.user)
     context = {
-        'services': service_created.order_by('-created_at'),
-        'current_user': user,
-        'total_created_service': created_services,
-        'open_created_serv': open_created_service,
-        'prog_created_serv': progress_created_service,
-        'comp_created_serv': completed_created_service,
-        'user_services': user_services,
-        'total_assign_service': assign_service,
-        'open_assign_service': open_assign_service,
-        'prog_assign_serv': progress_assign_service,
-        'comp_assign_serv': completed_assign_service,
-        'shifts': my_shift,
-        'generate': service_generated_by,
+        "services": service_created.order_by("-created_at"),
+        "current_user": user,
+        "total_created_service": created_services,
+        "open_created_serv": open_created_service,
+        "prog_created_serv": progress_created_service,
+        "comp_created_serv": completed_created_service,
+        "user_services": user_services,
+        "total_assign_service": assign_service,
+        "open_assign_service": open_assign_service,
+        "prog_assign_serv": progress_assign_service,
+        "comp_assign_serv": completed_assign_service,
+        "shifts": my_shift,
+        "generate": service_generated_by,
         "show_action_buttons": user.status == "engaged",
-        "form": form
+        "form": form,
     }
     view_name = request.resolver_match.view_name
-    if view_name == "srm:staff_dashboard" and user_role == 'User':
-        return render(request, 'srm_staff_dashboard.html', context)
+    if view_name == "srm:staff_dashboard" and user_role == "User":
+        return render(request, "srm_staff_dashboard.html", context)
     raise PermissionDenied("You are not authorized to view this page.")
+
 
 # Load Service Types.
 def load_service_types(request):
-    department_id = request.GET.get('department')
-    tasks_types = ServiceTypes.objects.filter(department_id=department_id).order_by('name')
-    return JsonResponse(list(tasks_types.values('id', 'name')), safe=False)
+    department_id = request.GET.get("department")
+    tasks_types = ServiceTypes.objects.filter(department_id=department_id).order_by(
+        "name"
+    )
+    return JsonResponse(list(tasks_types.values("id", "name")), safe=False)
+
 
 # Service Request View.
 def ServiceView(request):
 
     priorities = [
-        ('high', 'High'),
-        ('mid', 'Mid'),
-        ('low', 'Low'),
+        ("high", "High"),
+        ("mid", "Mid"),
+        ("low", "Low"),
     ]
 
     service_types = ServiceTypes.objects.all()
     blocks = Blocks.objects.all()
     locations = Location.objects.all()
 
-    if request.method == 'POST':
+    if request.method == "POST":
         form = ServiceForm(request.POST, user=request.user)
         if form.is_valid():
             new_service = form.save(commit=False)
             new_service.created_by = request.user
-            new_service.status = 'Open'
+            new_service.status = "Open"
             new_service.save()
 
             if new_service.pk is None:
                 raise ValueError("Service not saved properly; missing required fields!")
 
-            eligible_shift_schedules = ShiftSchedule.objects.select_related(
-                "shift_staffs",
-                "shift_block"
-            ).filter(
-                shift_block=new_service.service_block,
-                status="ongoing",
-                shift_staffs__status__iexact="vacant",
-                shift_staffs__role="User",
-            ).filter(
-                Q(shift_staffs__department__name="GDA") |
-                Q(shift_staffs__department__name="General Duty Assistant")
+            eligible_shift_schedules = (
+                ShiftSchedule.objects.select_related("shift_staffs", "shift_block")
+                .filter(
+                    shift_block=new_service.service_block,
+                    status="ongoing",
+                    shift_staffs__status__iexact="vacant",
+                    shift_staffs__role="User",
+                )
+                .filter(
+                    Q(shift_staffs__department__name="GDA")
+                    | Q(shift_staffs__department__name="General Duty Assistant")
+                )
             )
 
             engaged_shift_ids = Service.objects.filter(
-                status="Open",
-                assigned_to__isnull=False
+                status="Open", assigned_to__isnull=False
             ).values_list("assigned_to_id", flat=True)
 
             eligible_shift_schedules = eligible_shift_schedules.exclude(
@@ -265,62 +314,174 @@ def ServiceView(request):
             eligible_shift_schedules = list(eligible_shift_schedules)
 
             if not eligible_shift_schedules:
-                new_service.status = 'Waiting'
+                new_service.status = "Waiting"
                 new_service.save()
                 ServiceRequestQueue.objects.create(service_request=new_service)
             else:
                 shift_free_times = []
                 for s in eligible_shift_schedules:
-                    last_completed_service = Service.objects.filter(
-                        assigned_to=s,
-                        status='Completed'
-                    ).order_by('-created_at').first()
+                    last_completed_service = (
+                        Service.objects.filter(assigned_to=s, status="Completed")
+                        .order_by("-created_at")
+                        .first()
+                    )
 
                     if last_completed_service and last_completed_service.created_at:
-                        free_time = timezone.localtime(last_completed_service.completed_at)
+                        free_time = timezone.localtime(
+                            last_completed_service.completed_at
+                        )
                     else:
-                        free_time = timezone.make_aware(datetime.min, timezone.get_current_timezone())
+                        free_time = timezone.make_aware(
+                            datetime.min, timezone.get_current_timezone()
+                        )
                     shift_free_times.append((s, free_time))
                 selected_shift = sorted(shift_free_times, key=lambda x: x[1])[0][0]
 
                 new_service.assigned_to = selected_shift
-                new_service.status = 'Open'
+                new_service.status = "Open"
                 new_service.save()
-            
-            if request.user.role == 'Admin':
-                return redirect('srm:admin_dashboard')
+
+            if request.user.role == "Admin":
+                return redirect("srm:admin_dashboard")
             else:
-                return redirect('srm:staff_dashboard')
+                return redirect("srm:staff_dashboard")
     else:
         form = ServiceForm(user=request.user)
     context = {
-        'form': form, 
-        'service_types': service_types, 
-        'priorities': priorities,
-        'blocks': blocks,
-        'locations': locations
+        "form": form,
+        "service_types": service_types,
+        "priorities": priorities,
+        "blocks": blocks,
+        "locations": locations,
     }
-    return render(request, 'service_request.html', context)
+    return render(request, "service_request.html", context)
+
 
 # Free up the staff when exceeds timestamp.
 def free_up_staff():
     try:
-        prog_service = Service.objects.filter(status='In Progress')
+        prog_service = Service.objects.filter(status="In Progress")
         if prog_service.exists():
             for service in prog_service:
                 if service.started_at <= timezone.now() - timedelta(minutes=15):
                     shift = service.assigned_to
                     staff = shift.shift_staffs
-                    if staff and staff.status == 'engaged':
-                        staff.status = 'vacant'
+                    if staff and staff.status == "engaged":
+                        staff.status = "vacant"
                         staff.save()
-                        service.status = 'Pending'
+                        service.status = "Pending"
                         service.assigned_to = None
                         service.save()
                     assign_service_from_queue(staff)
-                        
+
     except Exception as e:
         log.error("Error freeing up staff", error=str(e))
+
+
+# Free up the staff when service is completed.
+def free_up_completed_staff(request, id):
+    user = request.user
+    if not hasattr(user, "role"):
+        raise PermissionDenied("User Profile not found.")
+
+    try:
+        service = Service.objects.select_related("assigned_to__shift_staffs").get(id=id)
+    except Service.DoesNotExist:
+        raise PermissionDenied("Service not found.")
+
+    if request.method == "POST":
+        obj = service  # or ano_service
+        assigned_staff = obj.assigned_to
+
+        if not assigned_staff:
+            raise PermissionDenied("No shift assigned.")
+
+        staff = assigned_staff.shift_staffs
+
+        if user.role != "User" or staff != user:
+            raise PermissionDenied("You are not authorized.")
+
+        new_status = request.POST.get("status")
+
+        with transaction.atomic():
+
+            if new_status == "In Progress":
+                obj.status = "In Progress"
+                staff.status = "engaged"
+
+                staff.save(update_fields=["status"])
+                obj.save()
+
+                return redirect("srm:staff_service")
+
+            elif new_status == "Completed":
+                obj.status = "Completed"
+                obj.handled_by = staff
+                staff.status = "vacant"
+
+                staff.save(update_fields=["status"])
+                obj.save()
+
+            elif new_status == "On Hold":
+                obj.status = "On Hold"
+                obj.handled_by = staff
+                staff.status = "engaged"
+
+                staff.save(update_fields=["status"])
+                obj.save()
+
+            else:
+                raise PermissionDenied("Invalid status.")
+
+        if new_status in ["Completed"]:
+            assign_service_from_queue(staff)
+
+        messages.success(request, "Service status updated successfully.")
+        return redirect("srm:staff_service")
+
+    view_name = request.resolver_match.view_name
+    if view_name == "srm:staff_update_service_status" and user.role == "User":
+        return redirect("srm:staff_service")
+    raise PermissionDenied("You are not authorized to perform this action.")
+
+
+# Free up the staff if service status is 'On Hold' and exceeds timestamp.
+def free_up_onhold_staff():
+    try:
+        onhold_service = Service.objects.filter(status="On Hold")
+        if onhold_service.exists():
+            for service in onhold_service:
+                if service.created_at <= timezone.now() - timedelta(minutes=35):
+                    continue
+
+                shift = service.assigned_to
+                if not shift:
+                    log.warning(
+                        "On-hold service has no assigned shift", service_id=service.id
+                    )
+                    continue
+
+                staffs = shift.shift_staffs.all()
+
+                freed_any = False
+
+                for staff in staffs:
+                    if staff.status == "engaged":
+                        staff.status = "vacant"
+                        staff.save()
+                        freed_any = True
+
+                service.status = "Pending"
+                service.assigned_to = None
+                service.save()
+
+                if freed_any:
+                    for staff in staffs:
+                        assign_service_from_queue(staff)
+
+    except Exception as e:
+        log.error("Error freeing up staff", error=str(e))
+
 
 # Put on hold if the service exceeds creation date
 def hold_service():
@@ -333,97 +494,27 @@ def hold_service():
         end_of_yesterday = timezone.make_aware(
             datetime.combine(yesterday, datetime.max.time())
         )
-        
+
         services = Service.objects.filter(
-            created_at__lte=end_of_yesterday,
-            status__in=['Open', 'In Progress']
+            created_at__lte=end_of_yesterday, status__in=["Open", "On Hold"]
         )
 
         for serv in services:
             staff = getattr(serv.assigned_to, "shift_staffs", None)
 
             # Free staff if assigned
-            if staff and staff.status == 'engaged':
-                staff.status = 'vacant'
+            if staff and staff.status == "engaged":
+                staff.status = "vacant"
                 staff.save()
 
-            # Put service on hold
-            serv.status = 'On Hold'
+            # Put service on pending.
+            serv.status = "Pending"
             serv.assigned_to = None
             serv.save()
-
-            assign_service_from_queue(staff)
 
     except Exception as e:
         log.error("Error freeing up staff", error=str(e))
 
-# Free up the staff when service is completed.
-def free_up_completed_staff(request, id):
-    user = request.user
-    if not hasattr(user, 'role'):
-        raise PermissionDenied("User Profile not found.")
-    
-    try:
-        service = Service.objects.select_related(
-            "assigned_to__shift_staffs"
-        ).get(id=id)
-    except Service.DoesNotExist:
-        raise PermissionDenied("Service not found.")
-
-    if request.method == 'POST':
-        obj = service # or ano_service
-        assigned_staff = obj.assigned_to
-
-        if not assigned_staff:
-            raise PermissionDenied("No shift assigned.")
-
-        staff = assigned_staff.shift_staffs
-        
-        if user.role != 'User' or staff != user:
-            raise PermissionDenied("You are not authorized.")
-        
-        new_status = request.POST.get('status')
-        
-        with transaction.atomic():
-
-            if new_status=="In Progress":
-                obj.status = "In Progress"
-                staff.status = "engaged"
-
-                staff.save(update_fields=["status"])
-                obj.save()
-
-                return redirect('srm:staff_service')
-            
-            elif new_status=="Completed":
-                obj.status = "Completed"
-                obj.handled_by = staff
-                staff.status = "vacant"
-
-                staff.save(update_fields=["status"])
-                obj.save()
-
-            elif new_status=="On Hold":
-                obj.status="On Hold"
-                obj.handled_by =staff
-                staff.status="vacant"
-
-                staff.save(update_fields=["status"])
-                obj.save()
-
-            else:
-                raise PermissionDenied("Invalid status.")
-
-        if new_status in ['Completed', 'On Hold']:
-            assign_service_from_queue(staff)
-
-        messages.success(request, "Service status updated successfully.")
-        return redirect('srm:staff_service')                
-            
-    view_name = request.resolver_match.view_name
-    if view_name == "srm:staff_update_service_status" and user.role == 'User':
-        return redirect('srm:staff_service')
-    raise PermissionDenied("You are not authorized to perform this action.")
 
 # Assigned Service to the vacant staff from the queue.
 def assign_service_from_queue(vacant_staff):
@@ -431,20 +522,17 @@ def assign_service_from_queue(vacant_staff):
     try:
         if not vacant_staff:
             return
-        
+
         ShiftSchedule.update_shift_statuses()
 
         if Service.objects.filter(
-            assigned_to__shift_staffs=vacant_staff,
-            status="Open"
+            assigned_to__shift_staffs=vacant_staff, status="Open"
         ).exists():
             return
-        
-        queue_services = (
-            ServiceRequestQueue.objects
-            .select_related("service_request")
-            .order_by("created_at")
-        )
+
+        queue_services = ServiceRequestQueue.objects.select_related(
+            "service_request"
+        ).order_by("created_at")
 
         now = timezone.now()
 
@@ -453,8 +541,7 @@ def assign_service_from_queue(vacant_staff):
             service_obj = queue_service.service_request
 
             eligible_shift = (
-                ShiftSchedule.objects
-                .active_now()
+                ShiftSchedule.objects.active_now()
                 .filter(
                     shift_block_id=service_obj.service_block_id,
                     shift_staffs_id=vacant_staff.id,
@@ -475,9 +562,10 @@ def assign_service_from_queue(vacant_staff):
 
             queue_service.delete()
             return
-        
+
     except Exception as e:
         log.error("Error assigning service from queue", error=str(e))
+
 
 # All Generated Service
 def AllGeneratedService(request):
@@ -486,14 +574,15 @@ def AllGeneratedService(request):
         user_role = user.role
     except:
         raise PermissionDenied("User profile not found")
-    generate_serv = GenerateService.objects.filter(generate_by__shift_staffs = user).order_by('generate_at')
-    context = {
-        'generate': generate_serv
-    }
+    generate_serv = GenerateService.objects.filter(
+        generate_by__shift_staffs=user
+    ).order_by("generate_at")
+    context = {"generate": generate_serv}
     view_name = request.resolver_match.view_name
-    if view_name == "srm:all_generate_service" and user_role == 'User':
-        return render(request, 'all_generate_service.html', context)
+    if view_name == "srm:all_generate_service" and user_role == "User":
+        return render(request, "all_generate_service.html", context)
     raise PermissionDenied("You are not authorized to view this page.")
+
 
 # All Service View.
 def RequestServiceView(request):
@@ -502,208 +591,172 @@ def RequestServiceView(request):
         user_role = user.role
     except:
         raise PermissionDenied("User profile not found")
-    request_service = Service.objects.filter(created_by = user).order_by('-created_at')
-    if user.role == 'Admin':
-        assign_service = Service.objects.filter(assigned_to__shift_staffs__department__name = user.department).order_by('-created_at')
+    request_service = Service.objects.filter(created_by=user).order_by("-created_at")
+    if user.role == "Admin":
+        assign_service = Service.objects.filter(
+            Q(assigned_to__shift_staffs__department__name=user.department)
+            | Q(handled_by__department__name=user.department)
+        ).order_by("-created_at")
     else:
-        assign_service = Service.objects.filter(assigned_to__shift_staffs = user).order_by('-created_at')
-    latest_remark_subquery = ServiceRemarks.objects.filter(service=OuterRef('pk')).order_by('-created_at')
+        assign_service = Service.objects.filter(
+            Q(assigned_to__shift_staffs=user) | Q(handled_by=user)
+        ).order_by("-created_at")
+    latest_remark_subquery = ServiceRemarks.objects.filter(
+        service=OuterRef("pk")
+    ).order_by("-created_at")
     request_service = request_service.annotate(
-        latest_remark_text=Subquery(latest_remark_subquery.values('remarks')[:1])
+        latest_remark_text=Subquery(latest_remark_subquery.values("remarks")[:1])
     )
     assign_service = assign_service.annotate(
-        latest_remark_text=Subquery(latest_remark_subquery.values('remarks')[:1])
+        latest_remark_text=Subquery(latest_remark_subquery.values("remarks")[:1])
     )
-    selected_option = request.GET.get('status')
-    if selected_option == 'request':
+    selected_option = request.GET.get("status")
+    if selected_option == "request":
         services = services.filter(status=selected_option)
     else:
-        if user.department.name in ['GDA', 'General Duty Assistant']:
+        if user.department.name in ["GDA", "General Duty Assistant"]:
             services = assign_service
         else:
             services = request_service
-    selected_option = request.GET.get('status')
+    selected_option = request.GET.get("status")
     if selected_option:
         services = services.filter(status=selected_option)
     paginator = Paginator(services, 10)
-    page_number = request.GET.get('page')
+    page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
-    service_status = Service._meta.get_field('status').choices
+    service_status = Service._meta.get_field("status").choices
     context = {
-        'page_obj': page_obj,
-        'selected_option': selected_option,
-        'status': service_status,
+        "page_obj": page_obj,
+        "selected_option": selected_option,
+        "status": service_status,
     }
     view_name = request.resolver_match.view_name
-    if view_name == "srm:admin_service" and user_role == 'Admin':
-        return render(request, 'srm_admin_service.html', context)
-    if view_name == "srm:staff_service" and user_role == 'User':
-        return render(request, 'srm_staff_service.html', context)
+    if view_name == "srm:admin_service" and user_role == "Admin":
+        return render(request, "srm_admin_service.html", context)
+    if view_name == "srm:staff_service" and user_role == "User":
+        return render(request, "srm_staff_service.html", context)
     raise PermissionDenied("You are not authorized to view this page.")
+
 
 # Shift Schedule View.
 def ShiftSchedules(request):
-    ShiftSchedule.update_shift_statuses() 
+    ShiftSchedule.update_shift_statuses()
     user = request.user
     try:
         user_role = user.role
     except:
         raise PermissionDenied("User profile not found")
     now = timezone.now()
-    if user_role == 'User':
+    if user_role == "User":
         schedules = ShiftSchedule.objects.filter(
-            Q(shift_staffs__department__name__in=['GDA', 'General Duty Assistant']),
+            Q(shift_staffs__department__name__in=["GDA", "General Duty Assistant"]),
             start_time__lte=now,
             end_time__gte=now,
-            status="ongoing"
+            status="ongoing",
         ).order_by("-id")
     else:
         schedules = ShiftSchedule.objects.filter(
-            Q(shift_staffs__department__name__in=['GDA', 'General Duty Assistant']) &
-            (
-                Q(
-                    start_time__lte=now,
-                    end_time__gte=now,
-                    status="ongoing"
-                )
-                |
-                Q(
-                    start_time__gt=now,
-                    status="scheduled"
-                )
+            Q(shift_staffs__department__name__in=["GDA", "General Duty Assistant"])
+            & (
+                Q(start_time__lte=now, end_time__gte=now, status="ongoing")
+                | Q(start_time__gt=now, status="scheduled")
             )
         ).order_by("-id")
-    page_number = request.GET.get('page')
-    paginator = Paginator(schedules, 10) 
+    page_number = request.GET.get("page")
+    paginator = Paginator(schedules, 10)
     page_obj = paginator.get_page(page_number)
     context = {
-        'page_obj': page_obj,
+        "page_obj": page_obj,
     }
     view_name = request.resolver_match.view_name
-    if view_name == "srm:schedule" and user_role == 'Admin':
-        return render(request, 'shift_schedule.html', context)
-    if view_name == "srm:schedule" and user_role == 'User':
-        return render(request, 'shift_schedule.html', context)
+    if view_name == "srm:schedule" and user_role == "Admin":
+        return render(request, "shift_schedule.html", context)
+    if view_name == "srm:schedule" and user_role == "User":
+        return render(request, "shift_schedule.html", context)
     raise PermissionDenied("You are not authorized to view this page.")
+
 
 # Shift Schedule Form View.
 def ShiftScheduleView(request):
     shift_choices = [
-        ('morning', 'Morning'),
-        ('evening', 'Evening'),
-        ('day', 'Day'),
-        ('night', 'Night'),
+        ("morning", "Morning"),
+        ("evening", "Evening"),
+        ("day", "Day"),
+        ("night", "Night"),
     ]
     shift_blocks = Blocks.objects.all()
     shift_staffs = CustomUsers.objects.filter(
-        (Q(department__name='GDA') | Q(department__name='General Duty Assistant')) & Q(role='User')
+        (Q(department__name="GDA") | Q(department__name="General Duty Assistant"))
+        & Q(role="User")
     )
-    if request.method == 'POST':
+    if request.method == "POST":
         form = ShiftScheduleForm(request.POST, user=request.user)
         if form.is_valid():
             new_schedule = form.save(commit=False)
             new_schedule.created_by = request.user
             new_schedule.save()
             messages.success(request, "Shift schedule created successfully.")
-            return redirect('srm:schedule')
+            return redirect("srm:schedule")
     else:
         form = ShiftScheduleForm(user=request.user)
     context = {
-        'form': form,
-        'choices': shift_choices,
-        'blocks': shift_blocks,
-        'staffs': shift_staffs,
+        "form": form,
+        "choices": shift_choices,
+        "blocks": shift_blocks,
+        "staffs": shift_staffs,
     }
-    return render(request, 'schedule.html', context)
+    return render(request, "schedule.html", context)
 
-# Free up the staff if service status is 'On Hold' and exceeds timestamp.
-def free_up_onhold_staff():
-    try:
-        onhold_service = Service.objects.filter(status='On Hold')
-        if onhold_service.exists():
-            for service in onhold_service:
-                if service.created_at <= timezone.now() - timedelta(minutes=25):
-                    continue
-
-                shift = service.assigned_to
-                if not shift:
-                    log.warning(
-                        "On-hold service has no assigned shift",
-                        service_id=service.id
-                    )
-                    continue
-
-                staffs = shift.shift_staffs.all()
-
-                freed_any = False
-
-                for staff in staffs:
-                    if staff.status == 'engaged':
-                        staff.status = 'vacant'
-                        staff.save()
-                        freed_any = True
-                            
-                service.status = 'Pending'
-                service.assigned_to = None
-                service.save()
-
-                if freed_any:
-                    for staff in staffs:
-                        assign_service_from_queue(staff)
-
-    except Exception as e:
-        log.error("Error freeing up staff", error=str(e))
 
 # Service Remark View.
 def ServiceRemark(request, id):
     service = get_object_or_404(Service, id=id)
-    if request.method == 'POST':
+    if request.method == "POST":
         form = ServiceRemarkForm(request.POST, request.FILES)
         if form.is_valid():
             remark = form.save(commit=False)
             remark.service = service
-            remark.remarks = form.cleaned_data.get('remarks')
+            remark.remarks = form.cleaned_data.get("remarks")
             remark.created_by = request.user
             remark.save()
 
-            if request.user.role == 'User':
-                return redirect('srm:staff_service')
+            if request.user.role == "User":
+                return redirect("srm:staff_service")
             else:
-                return redirect('srm:all_services')
+                return redirect("srm:all_services")
 
     else:
         form = ServiceRemarkForm()
     context = {
-        'form': form,
-        'service': service,
+        "form": form,
+        "service": service,
     }
-    return render(request, 'srm_remarks.html', context)
+    return render(request, "srm_remarks.html", context)
+
 
 # Updating user status.
 def UpdateUserStatus(request):
     user = request.user
     if request.method == "POST":
         status = request.POST.get("status")
-        user.status = status 
+        user.status = status
         user.save()
         return JsonResponse({"success": True, "status": user.status})
     return JsonResponse({"success": False})
 
+
 # Shift Edit Form View.
 def ShiftEditView(request, id):
     edit_schedule = get_object_or_404(ShiftSchedule, id=id)
-    if request.method == 'POST':
+    if request.method == "POST":
         form = ShiftEditForm(request.POST, instance=edit_schedule, user=request.user)
         if form.is_valid():
             edit_schedule = form.save(commit=False)
             edit_schedule.created_by = request.user
             edit_schedule.save()
             messages.success(request, "Shift schedule edited successfully.")
-            return redirect('srm:schedule')
+            return redirect("srm:schedule")
     else:
-        form = ShiftEditForm(instance=edit_schedule ,user=request.user)
-    context = {
-        'form': form,
-        'edit_schedule': edit_schedule
-    }
-    return render(request, 'shift_edit.html', context)
+        form = ShiftEditForm(instance=edit_schedule, user=request.user)
+    context = {"form": form, "edit_schedule": edit_schedule}
+    return render(request, "shift_edit.html", context)

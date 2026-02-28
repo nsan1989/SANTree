@@ -6,13 +6,22 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('san_srm', '0003_shiftschedule_status'),
+        ("san_srm", "0003_shiftschedule_status"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='shiftschedule',
-            name='status',
-            field=models.CharField(choices=[('scheduled', 'Scheduled'), ('ongoing', 'Ongoing'), ('completed', 'Completed'), ('cancelled', 'Cancelled')], default='scheduled', max_length=20),
+            model_name="shiftschedule",
+            name="status",
+            field=models.CharField(
+                choices=[
+                    ("scheduled", "Scheduled"),
+                    ("ongoing", "Ongoing"),
+                    ("completed", "Completed"),
+                    ("cancelled", "Cancelled"),
+                ],
+                default="scheduled",
+                max_length=20,
+            ),
         ),
     ]

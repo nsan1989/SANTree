@@ -1,276 +1,276 @@
 {% extends 'index.html' %}
 
 {% block title %}
-Staff Dashboard
+    Staff Dashboard
 {% endblock %}
 
 {% block start %}
 
-<style>
-    .header-title h3,
-    .column-title h5 {
-        color: wheat;
-    }
+    <style>
+        .header-title h3,
+        .column-title h5 {
+            color: wheat;
+        }
 
-    .header-link a {
-        text-decoration: none;
-        color: rgb(36, 74, 240);
-        cursor: pointer;
-    }
+        .header-link a {
+            text-decoration: none;
+            color: rgb(36, 74, 240);
+            cursor: pointer;
+        }
 
-    .header-link a:hover {
-        color: rgb(238, 149, 32);
-    }
+        .header-link a:hover {
+            color: rgb(238, 149, 32);
+        }
 
-    .card-wrapper {
-        width: 100%;
-    }
+        .card-wrapper {
+            width: 100%;
+        }
 
-    .count-card {
-        width: 100%;
-        min-height: 6rem;
-        background-color: rgba(0, 0, 0, 0.4);
-        color: white;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-    }
+        .count-card {
+            width: 100%;
+            min-height: 6rem;
+            background-color: rgba(0, 0, 0, 0.4);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
 
-    .count-card:hover {
-        background-color: #6b1d20;
-        color: white;
-    }
+        .count-card:hover {
+            background-color: #6b1d20;
+            color: white;
+        }
 
-    .count-title h5 {
-        text-align: center;
-        font-size: 1rem;
-    }
+        .count-title h5 {
+            text-align: center;
+            font-size: 1rem;
+        }
 
-    .count-link a {
-        text-decoration: none;
-        color: orange;
-    }
-</style>
+        .count-link a {
+            text-decoration: none;
+            color: orange;
+        }
+    </style>
 
-<div class="container-fluid">
-    {% if activities %}
-    <div class="row mb-3">
-        <div class="col-12">
-            <div class="header-title">
-                <h3>Dashboard</h3>
+    <div class="container-fluid">
+        {% if activities %}
+            <div class="row mb-3">
+                <div class="col-12">
+                    <div class="header-title">
+                        <h3>Dashboard</h3>
+                    </div>
+                </div>
             </div>
-        </div>
+            <div class="row mb-3">
+                <div class="col-12 col-md-2">
+                    <div class="card-wrapper">
+                        <div class="count-card">
+                            <div class="count-title">
+                                <h5>Total Assets</h5>
+                            </div>
+                            <div class="count-value">
+                                <p class="m-0">{{asset|default:0}}</p>
+                            </div>
+                            <div class="count-link">
+                                <a href="{% url 'ams:staff_assets' %}">view</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-md-2">
+                    <div class="card-wrapper">
+                        <div class="count-card">
+                            <div class="count-title">
+                                <h5>Total Components</h5>
+                            </div>
+                            <div class="count-value">
+                                <p class="m-0">{{component|default:0}}</p>
+                            </div>
+                            <div class="count-link">
+                                <a href="">view</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-md-2">
+                    <div class="card-wrapper">
+                        <div class="count-card">
+                            <div class="count-title">
+                                <h5>Total Accessories</h5>
+                            </div>
+                            <div class="count-value">
+                                <p class="m-0">{{accessory|default:0}}</p>
+                            </div>
+                            <div class="count-link">
+                                <a href="">view</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-md-2">
+                    <div class="card-wrapper">
+                        <div class="count-card">
+                            <div class="count-title">
+                                <h5>Total Consumables</h5>
+                            </div>
+                            <div class="count-value">
+                                <p class="m-0">{{consumable|default:0}}</p>
+                            </div>
+                            <div class="count-link">
+                                <a href="">view</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12 col-md-8">
+                    <div class="column-title mb-2">
+                        <h5>Recent Activity</h5>
+                    </div>
+                    <div class="column-content table-responsive">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr class="table-danger">
+                                    <th scope="col">Date</th>
+                                    <th scope="col">Activity</th>
+                                    <th scope="col">Requested By</th>
+                                    <th scope="col">Asset</th>
+                                    <th scope="col">Target</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if activities %}
+                                    {% for activity in activities %}
+                                        <tr class="table-info">
+                                            <td>{{activity.created_at}}</td>
+                                            <td>{{activity.status}}</td>
+                                            <td>{{activity.created_by}}</td>
+                                            <td>{{activity.name}}</td>
+                                            <td>{{activity.requested_to}}</td>
+                                        </tr>
+                                    {% endfor %}
+                                {% else %}
+                                    <tr>
+                                        <td colspan="100%">{{activity_message}}</td>
+                                    </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="col-12 col-md-4">
+                    <div class="column-title mb-2">
+                        <h5>Asset By Status</h5>
+                    </div>
+                    <div class="column-content">
+                        <div class="chart-content d-flex justify-content-center">
+                            <img
+                                class="img-fluid w-100"
+                                src="{% url 'ams:asset_chart' %}" alt="asset Pie Chart"
+                            />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <div class="row mb-3">
+                <div class="col-12 col-md-6">
+                    <div class="header-title">
+                        <h3>Dashboard</h3>
+                    </div>
+                </div>
+                <div class="col-12 col-md-6">
+                    <div class="header-title">
+                        <h3>Request Asset</h3>
+                        <div class="d-flex header-link">
+                            <p class="mb-0 text-warning">click here to request an asset</p>&nbsp;
+                            <a
+                                data-url="{% url 'ams:asset_requests' %}"
+                                class="open-modal"
+                            >
+                                Request Asset
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    <div class="column-title mb-2">
+                        <h5>Recent Activity</h5>
+                    </div>
+                    <div class="column-content table-responsive">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr class="table-danger">
+                                    <th scope="col">Date</th>
+                                    <th scope="col">Activity</th>
+                                    <th scope="col">Requested To</th>
+                                    <th scope="col">Asset</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if activities %}
+                                    {% for activity in activities %}
+                                        <tr class="table-info">
+                                            <td>{{activity.created_at}}</td>
+                                            <td>{{activity.status}}</td>
+                                            <td>{{activity.requested_to}}</td>
+                                            <td>{{activity.name}}</td>
+                                        </tr>
+                                    {% endfor %}
+                                {% else %}
+                                    <tr>
+                                        <td colspan="100%">{{activity_message}}</td>
+                                    </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
     </div>
-    <div class="row mb-3">
-        <div class="col-12 col-md-2">
-            <div class="card-wrapper">
-                <div class="count-card">
-                    <div class="count-title">
-                        <h5>Total Assets</h5>
-                    </div>
-                    <div class="count-value">
-                        <p class="m-0">{{asset|default:0}}</p>
-                    </div>
-                    <div class="count-link">
-                        <a href="{% url 'ams:staff_assets' %}">view</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-12 col-md-2">
-            <div class="card-wrapper">
-                <div class="count-card">
-                    <div class="count-title">
-                        <h5>Total Components</h5>
-                    </div>
-                    <div class="count-value">
-                        <p class="m-0">{{component|default:0}}</p>
-                    </div>
-                    <div class="count-link">
-                        <a href="">view</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-12 col-md-2">
-            <div class="card-wrapper">
-                <div class="count-card">
-                    <div class="count-title">
-                        <h5>Total Accessories</h5>
-                    </div>
-                    <div class="count-value">
-                        <p class="m-0">{{accessory|default:0}}</p>
-                    </div>
-                    <div class="count-link">
-                        <a href="">view</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-12 col-md-2">
-            <div class="card-wrapper">
-                <div class="count-card">
-                    <div class="count-title">
-                        <h5>Total Consumables</h5>
-                    </div>
-                    <div class="count-value">
-                        <p class="m-0">{{consumable|default:0}}</p>
-                    </div>
-                    <div class="count-link">
-                        <a href="">view</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-12 col-md-8">
-            <div class="column-title mb-2">
-                <h5>Recent Activity</h5>
-            </div>
-            <div class="column-content table-responsive">
-                <table class="table table-bordered">
-                    <thead>
-                        <tr class="table-danger">
-                            <th scope="col">Date</th>
-                            <th scope="col">Activity</th>
-                            <th scope="col">Requested By</th>
-                            <th scope="col">Asset</th>
-                            <th scope="col">Target</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% if activities %}
-                            {% for activity in activities %}
-                            <tr class="table-info">
-                                <td>{{activity.created_at}}</td>
-                                <td>{{activity.status}}</td>
-                                <td>{{activity.created_by}}</td>
-                                <td>{{activity.name}}</td>
-                                <td>{{activity.requested_to}}</td>
-                            </tr>
-                            {% endfor %}
-                        {% else %}
-                        <tr>
-                            <td colspan="100%">{{activity_message}}</td>
-                        </tr>
-                        {% endif %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        <div class="col-12 col-md-4">
-            <div class="column-title mb-2">
-                <h5>Asset By Status</h5>
-            </div>
-            <div class="column-content">
-                <div class="chart-content d-flex justify-content-center">
-                    <img
-                    class="img-fluid w-100"
-                    src="{% url 'ams:asset_chart' %}" alt="asset Pie Chart"
-                    />
-                </div>
-            </div>
-        </div>
-    </div>
-    {% else %}
-    <div class="row mb-3">
-        <div class="col-12 col-md-6">
-            <div class="header-title">
-                <h3>Dashboard</h3>
-            </div>
-        </div>
-        <div class="col-12 col-md-6">
-            <div class="header-title">
-                <h3>Request Asset</h3>
-                <div class="d-flex header-link">
-                    <p class="mb-0 text-warning">click here to request an asset</p>&nbsp;
-                    <a 
-                    data-url="{% url 'ams:asset_requests' %}" 
-                    class="open-modal" 
-                    >
-                        Request Asset
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-12">
-            <div class="column-title mb-2">
-                <h5>Recent Activity</h5>
-            </div>
-            <div class="column-content table-responsive">
-                <table class="table table-bordered">
-                    <thead>
-                        <tr class="table-danger">
-                            <th scope="col">Date</th>
-                            <th scope="col">Activity</th>
-                            <th scope="col">Requested To</th>
-                            <th scope="col">Asset</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% if activities %}
-                            {% for activity in activities %}
-                            <tr class="table-info">
-                                <td>{{activity.created_at}}</td>
-                                <td>{{activity.status}}</td>
-                                <td>{{activity.requested_to}}</td>
-                                <td>{{activity.name}}</td>
-                            </tr>
-                            {% endfor %}
-                        {% else %}
-                        <tr>
-                            <td colspan="100%">{{activity_message}}</td>
-                        </tr>
-                        {% endif %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-    {% endif %}
-</div>
 
 <!--Dynamic Modal-->
-<div class="modal fade dynamic-modal" tabindex="-1">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body" id="modalContent">
+    <div class="modal fade dynamic-modal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="modalContent">
         <!--Model Content Goes Here!-->
-      </div>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
-</div>
 
 <!--Script-->
-<script>
-    document.addEventListener("DOMContentLoaded", function() {
-        const modal = new bootstrap.Modal(document.querySelector('.dynamic-modal'));
-        const modalBody = document.getElementById('modalContent');
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const modal = new bootstrap.Modal(document.querySelector('.dynamic-modal'));
+            const modalBody = document.getElementById('modalContent');
 
-        document.querySelectorAll(".open-modal").forEach(link => {
-            link.addEventListener("click", function(event) {
-                event.preventDefault();
-                const url = this.getAttribute("data-url");
-                modalBody.innerHTML = `<div class="text-center p-3">Loading...</div>`;
+            document.querySelectorAll(".open-modal").forEach(link => {
+                link.addEventListener("click", function(event) {
+                    event.preventDefault();
+                    const url = this.getAttribute("data-url");
+                    modalBody.innerHTML = `<div class="text-center p-3">Loading...</div>`;
 
-                fetch(url)
-                    .then(response => response.text())
-                    .then(html => {
-                        modalBody.innerHTML = html;
-                        modal.show();
-                    })
-                    .catch(error => {
-                        modalBody.innerHTML = `<div class="text-danger p-3">An error occurred while loading content.</div>`;
-                    });
+                    fetch(url)
+                        .then(response => response.text())
+                        .then(html => {
+                            modalBody.innerHTML = html;
+                            modal.show();
+                        })
+                        .catch(error => {
+                            modalBody.innerHTML = `<div class="text-danger p-3">An error occurred while loading content.</div>`;
+                        });
+                });
             });
         });
-    });
-</script>
+    </script>
 {% endblock %}

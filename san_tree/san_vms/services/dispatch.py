@@ -1,4 +1,4 @@
-from san_vms.models import Booking, Vehicle, BookingStatus
+from san_vms.models import Booking, BookingStatus, Vehicle
 
 
 def HandleCriticalBooking(critical_booking):
@@ -8,7 +8,7 @@ def HandleCriticalBooking(critical_booking):
         .filter(
             status=BookingStatus.CONFIRMED,
             priority="NORMAL",
-            vehicle=critical_booking.vehicle_id
+            vehicle=critical_booking.vehicle_id,
         )
         .select_related("vehicle", "driver")
         .exclude(id=critical_booking.id)
@@ -26,7 +26,7 @@ def HandleCriticalBooking(critical_booking):
 
         assign_vehicle(critical_booking, vehicle, driver)
         return True
-    
+
     return False
 
 

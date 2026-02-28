@@ -6,13 +6,22 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('san_srm', '0002_alter_service_uhid'),
+        ("san_srm", "0002_alter_service_uhid"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='shiftschedule',
-            name='status',
-            field=models.CharField(choices=[('morning', 'Morning'), ('evening', 'Evening'), ('day', 'Day'), ('night', 'Night')], default='scheduled', max_length=20),
+            model_name="shiftschedule",
+            name="status",
+            field=models.CharField(
+                choices=[
+                    ("morning", "Morning"),
+                    ("evening", "Evening"),
+                    ("day", "Day"),
+                    ("night", "Night"),
+                ],
+                default="scheduled",
+                max_length=20,
+            ),
         ),
     ]

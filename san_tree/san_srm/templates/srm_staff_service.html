@@ -3,28 +3,28 @@
 {% load static %}
 
 {% block title %}
-Service
+  Service
 {% endblock %}
 
 {% block start %}
 
-<style>
+  <style>
     .all-tasks-title h1 {
-        font-family: 'Poppins', sans-serif;
-        color: wheat;
+      font-family: 'Poppins', sans-serif;
+      color: wheat;
     }
 
     .all-tasks-title p {
-        font-family: 'Poppins', sans-serif;
-        color: wheat;
+      font-family: 'Poppins', sans-serif;
+      color: wheat;
     }
     th {
-        font-family: 'Poppins', sans-serif;
-        font-size: 0.9rem;
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.9rem;
     }
     td {
-        font-family: 'Poppins', sans-serif;
-        font-size: 0.85rem;
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.85rem;
     }
     .status-open > td { background-color: #0ba50b; color: #fff;}
     .status-progress > td   { background-color: #e7c60b; color: black; }
@@ -32,21 +32,21 @@ Service
     .status-waiting > td  { background-color: #ff9900; color: #000; }
     .status-completed > td { background-color: #003300; color: #fff; }
     .status-onhold  > td  { background-color: #d2d2d2; color: #000; }
-</style>
+  </style>
 
-<div class="container-fluid">
+  <div class="container-fluid">
     {% if request.user.department.name != 'GDA' and request.user.department.name != 'General Duty Assistant' %}
-    <div class="row mb-3">
+      <div class="row mb-3">
         <div class="col-12 d-flex flex-column">
-            <div class="all-tasks-title">
-                <h1 class="fw-bold mb-0">All Service</h1>
-                <p>All the service requested is listed below!</p>
-            </div>
+          <div class="all-tasks-title">
+            <h1 class="fw-bold mb-0">All Service</h1>
+            <p>All the service requested is listed below!</p>
+          </div>
         </div>
-    </div>
-    <div class="row mb-3">
+      </div>
+      <div class="row mb-3">
         <div class="col-12 col-md-8">
-            <nav>
+          <nav>
             <ul class="pagination">
               {% if page_obj.has_previous %}
                 <li class="page-item">
@@ -62,7 +62,7 @@ Service
                   </li>
                 {% endif %}
               {% endfor %}
-        
+
               {% if page_obj.has_next %}
                 <li class="page-item">
                   <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
@@ -73,89 +73,89 @@ Service
         </div>
         <div class="col-12 col-md-4">
           <div class="col-12 col-md-4 d-flex align-items-center">
-          <h6 class="mb-0 text-warning">filters</h6>
-          &nbsp;&nbsp;
-          <select class="form-select form-select-sm"
-        style="width: 150px;"
-        onchange="window.location='?status=' + this.value">
-            <option value="">-- select --</option>
-            {% for value, label in status %}
+            <h6 class="mb-0 text-warning">filters</h6>
+            &nbsp;&nbsp;
+            <select class="form-select form-select-sm"
+                    style="width: 150px;"
+                    onchange="window.location='?status=' + this.value">
+              <option value="">-- select --</option>
+              {% for value, label in status %}
                 <option value="{{ value }}" {% if selected_option == value %}selected{% endif %}>{{ label }}</option>
-            {% endfor %}
-        </select>
+              {% endfor %}
+            </select>
+          </div>
         </div>
-        </div>
-    </div>
-    <div class="row">
+      </div>
+      <div class="row">
         <div class="col-12 table-responsive">
-            <table class="table">
-                <thead class="table-danger">
-                    <tr>
-                        <th scope="col">Service No.</th>
-                        <th scope="col">Service Type</th>
-                        <th scope="col">Assigned To</th>
-                        <th scope="col">From</th>
-                        <th scope="col">To</th>
-                        <th scope="col">UHID</th>
-                        <th scope="col">Description</th>
-                        <th scope="col">Status</th>
-                        <th scope="col">Start Time</th>
-                        <th scope="col">Complted AT</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% if page_obj %}
-                        {% for service in page_obj %}
-                            <tr
-                            {% if service.status == "Open" %}
-                              class="status-open"
-                            {% elif service.status == "In Progress" %}
-                              class="status-progress"
-                            {% elif service.status == "Pending" %}
-                              class="status-pending"
-                            {% elif service.status == "Waiting" %}
-                              class="status-waiting"
-                            {% elif service.status == "Completed" %}
-                              class="status-completed"
-                            {% elif service.status == "On Hold" %}
-                              class="status-onhold"
-                            {% endif %}
-                            >
-                                <td>{{service.service_number}}</td>
-                                <td>{{service.service_type}}</td>
-                                <td>{{service.assigned_to}}</td>
-                                <td>{{service.from_location}}</td>
-                                <td>{{service.to_location}}</td>
-                                <td>{{service.UHID}}</td>
-                                <td>{{service.description}}</td>
-                                <td>{{service.status}}</td>
-                                <td>{{service.start_time|duration_display}}</td>
-                                <td>{{service.time_taken|duration_display}}</td>
-                            </tr>
-                        {% endfor %}
-                    {% else %}
-                    <tr>
-                        <td colspan="100%">
-                            No service have been requested yet!
-                        </td>
-                    </tr>
+          <table class="table">
+            <thead class="table-danger">
+              <tr>
+                <th scope="col">Service No.</th>
+                <th scope="col">Service Type</th>
+                <th scope="col">Assigned To</th>
+                <th scope="col">From</th>
+                <th scope="col">To</th>
+                <th scope="col">UHID</th>
+                <th scope="col">Description</th>
+                <th scope="col">Status</th>
+                <th scope="col">Start Time</th>
+                <th scope="col">Complted AT</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% if page_obj %}
+                {% for service in page_obj %}
+                  <tr
+                    {% if service.status == "Open" %}
+                      class="status-open"
+                    {% elif service.status == "In Progress" %}
+                      class="status-progress"
+                    {% elif service.status == "Pending" %}
+                      class="status-pending"
+                    {% elif service.status == "Waiting" %}
+                      class="status-waiting"
+                    {% elif service.status == "Completed" %}
+                      class="status-completed"
+                    {% elif service.status == "On Hold" %}
+                      class="status-onhold"
                     {% endif %}
-                </tbody>
-            </table>
+                  >
+                    <td>{{service.service_number}}</td>
+                    <td>{{service.service_type}}</td>
+                    <td>{{service.assigned_to}}</td>
+                    <td>{{service.from_location}}</td>
+                    <td>{{service.to_location}}</td>
+                    <td>{{service.UHID}}</td>
+                    <td>{{service.description}}</td>
+                    <td>{{service.status}}</td>
+                    <td>{{service.start_time|duration_display}}</td>
+                    <td>{{service.time_taken|duration_display}}</td>
+                  </tr>
+                {% endfor %}
+              {% else %}
+                <tr>
+                  <td colspan="100%">
+                    No service have been requested yet!
+                  </td>
+                </tr>
+              {% endif %}
+            </tbody>
+          </table>
         </div>
-    </div>
+      </div>
     {% else %}
-    <div class="row mb-3">
+      <div class="row mb-3">
         <div class="col-12 d-flex flex-column">
-            <div class="all-tasks-title">
-                <h1 class="fw-bold mb-0">All Service</h1>
-                <p>All the service requested to you!</p>
-            </div>
+          <div class="all-tasks-title">
+            <h1 class="fw-bold mb-0">All Service</h1>
+            <p>All the service requested to you!</p>
+          </div>
         </div>
-    </div>
-    <div class="row mb-3">
+      </div>
+      <div class="row mb-3">
         <div class="col-12 col-md-8">
-            <nav>
+          <nav>
             <ul class="pagination">
               {% if page_obj.has_previous %}
                 <li class="page-item">
@@ -163,15 +163,17 @@ Service
                 </li>
               {% endif %}
               {% for num in page_obj.paginator.page_range %}
-                {% if page_obj.number == num %}
-                  <li class="page-item active"><span class="page-link">{{ num }}</span></li>
-                {% else %}
-                  <li class="page-item">
-                    <a class="page-link" href="?page={{ num }}">{{ num }}</a>
-                  </li>
+                {% if num >= page_obj.number|add:'-2' and num <= page_obj.number|add:'2' %}
+                  {% if page_obj.number == num %}
+                    <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                  {% else %}
+                    <li class="page-item">
+                      <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                    </li>
+                  {% endif %}
                 {% endif %}
               {% endfor %}
-        
+
               {% if page_obj.has_next %}
                 <li class="page-item">
                   <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
@@ -184,160 +186,160 @@ Service
           <h6 class="mb-0 text-warning">filters</h6>
           &nbsp;&nbsp;
           <select class="form-select form-select-sm"
-        style="width: 150px;"
-        onchange="window.location='?status=' + this.value">
+                  style="width: 150px;"
+                  onchange="window.location='?status=' + this.value">
             <option value="">-- select --</option>
             {% for value, label in status %}
-                <option value="{{ value }}" {% if selected_option == value %}selected{% endif %}>{{ label }}</option>
+              <option value="{{ value }}" {% if selected_option == value %}selected{% endif %}>{{ label }}</option>
             {% endfor %}
-        </select>
+          </select>
         </div>
-    </div>
-    <div class="row">
+      </div>
+      <div class="row">
         <div class="col-12 table-responsive">
-            <table class="table">
-                <thead class="table-danger">
-                    <tr>
-                        <th scope="col">Service No.</th>
-                        <th scope="col">Service Type</th>
-                        <th scope="col">Requested By</th>
-                        <th scope="col">From</th>
-                        <th scope="col">To</th>
-                        <th scope="col">UHID</th>
-                        <th scope="col">Description</th>
-                        <th scope="col">Status</th>
-                        <th scope="col">Start Time</th>
-                        <th scope="col">Completed At</th>
-                        <th scope="col">Remark</th>
-                        <th scope="col">Update Status</th>
-                    </tr>
-                </thead>
-                <tbody class="table-info">
-                    {% if page_obj %}
-                        {% for service in page_obj %}
-                            <tr
-                            {% if service.status == "Pending" %}
-                              class="status-pending"
-                            {% elif service.status == "Waiting" %}
-                              class="status-waiting"
-                              {% elif service.status == "In Progress" %}
-                              class="status-progress"
-                            {% elif service.status == "Completed" %}
-                              class="status-completed"
-                            {% elif service.status == "On Hold" %}
-                              class="status-onhold"
-                            {% endif %}
-                            >
-                                <td>{{service.service_number}}</td>
-                                <td>{{service.service_type}}</td>
-                                <td>{{service.created_by|default:"-"}}</td>
-                                <td>{{service.from_location}}</td>
-                                <td>{{service.to_location}}</td>
-                                <td>{{service.UHID}}</td>
-                                <td>{{service.description}}</td>
-                                <td>{{service.status}}</td>
-                                <td>{{service.start_time|duration_display}}</td>
-                                <td>{{service.time_taken|duration_display}}</td>
-                                <td>{{ service.latest_remark_text|default:"-" }}</td>
-                                {% if service.status != 'Completed' and service.status != 'Pending' and service.status == 'Open' %}
-                                <td>
-                                  <form method="POST" action="{% url 'srm:staff_update_service_status' service.id %}">
-                                    {% csrf_token %}
-                                    <select name="status" class="statusSelect" data-service-id="{{ service.id }}" required>
-                                      <option value="">select</option>
-                                      <option value="In Progress" {% if service.status == 'In Progress' %} selected {% endif %}>In Progress</option>
-                                    </select>
-                                    <button class="btn btn-sm btn-primary mt-2" type="submit">Update</button>
-                                  </form>
-                                </td>
-                                {% elif service.status != 'Completed' and service.status != 'Pending' and service.status == 'In Progress' %}
-                                <td>
-                                  <form method="POST" action="{% url 'srm:staff_update_service_status' service.id %}">
-                                    {% csrf_token %}
-                                    <select name="status" class="statusSelect" data-service-id="{{ service.id }}" required>
-                                      <option value="">select</option>
-                                      <option value="Completed" {% if service.status == 'Completed' %} selected {% endif %}>Completed</option>
-                                      <option value="On Hold" {% if service.status == 'On Hold' %} selected {% endif %}>On Hold</option>
-                                    </select>
-                                    <button class="btn btn-sm btn-primary mt-2" type="submit">Update</button>
-                                  </form>
-                                </td>
-                                {% else %}
-                                <td>
-                                  <span class="text-light">No action needed</span>
-                                </td>
-                                {% endif %}
-                            </tr>
-                        {% endfor %}
-                    {% else %}
-                    <tr>
-                        <td colspan="100%">
-                            No service have been requested yet!
-                        </td>
-                    </tr>
+          <table class="table">
+            <thead class="table-danger">
+              <tr>
+                <th scope="col">Service No.</th>
+                <th scope="col">Service Type</th>
+                <th scope="col">Requested By</th>
+                <th scope="col">From</th>
+                <th scope="col">To</th>
+                <th scope="col">UHID</th>
+                <th scope="col">Description</th>
+                <th scope="col">Status</th>
+                <th scope="col">Start Time</th>
+                <th scope="col">Completed At</th>
+                <th scope="col">Remark</th>
+                <th scope="col">Update Status</th>
+              </tr>
+            </thead>
+            <tbody class="table-info">
+              {% if page_obj %}
+                {% for service in page_obj %}
+                  <tr
+                    {% if service.status == "Pending" %}
+                      class="status-pending"
+                    {% elif service.status == "Waiting" %}
+                      class="status-waiting"
+                    {% elif service.status == "In Progress" %}
+                      class="status-progress"
+                    {% elif service.status == "Completed" %}
+                      class="status-completed"
+                    {% elif service.status == "On Hold" %}
+                      class="status-onhold"
                     {% endif %}
-                </tbody>
-            </table>
+                  >
+                    <td>{{service.service_number}}</td>
+                    <td>{{service.service_type}}</td>
+                    <td>{{service.created_by|default:"-"}}</td>
+                    <td>{{service.from_location}}</td>
+                    <td>{{service.to_location}}</td>
+                    <td>{{service.UHID}}</td>
+                    <td>{{service.description}}</td>
+                    <td>{{service.status}}</td>
+                    <td>{{service.start_time|duration_display}}</td>
+                    <td>{{service.time_taken|duration_display}}</td>
+                    <td>{{ service.latest_remark_text|default:"-" }}</td>
+                    {% if service.status != 'Completed' and service.status != 'Pending' and service.status == 'Open' %}
+                      <td>
+                        <form method="POST" action="{% url 'srm:staff_update_service_status' service.id %}">
+                          {% csrf_token %}
+                          <select name="status" class="statusSelect" data-service-id="{{ service.id }}" required>
+                            <option value="">select</option>
+                            <option value="In Progress" {% if service.status == 'In Progress' %} selected {% endif %}>In Progress</option>
+                          </select>
+                          <button class="btn btn-sm btn-primary mt-2" type="submit">Update</button>
+                        </form>
+                      </td>
+                    {% elif service.status != 'Completed' and service.status != 'Pending' and service.status == 'In Progress' %}
+                      <td>
+                        <form method="POST" action="{% url 'srm:staff_update_service_status' service.id %}">
+                          {% csrf_token %}
+                          <select name="status" class="statusSelect" data-service-id="{{ service.id }}" required>
+                            <option value="">select</option>
+                            <option value="Completed" {% if service.status == 'Completed' %} selected {% endif %}>Completed</option>
+                            <option value="On Hold" {% if service.status == 'On Hold' %} selected {% endif %}>On Hold</option>
+                          </select>
+                          <button class="btn btn-sm btn-primary mt-2" type="submit">Update</button>
+                        </form>
+                      </td>
+                    {% else %}
+                      <td>
+                        <span class="text-light">No action needed</span>
+                      </td>
+                    {% endif %}
+                  </tr>
+                {% endfor %}
+              {% else %}
+                <tr>
+                  <td colspan="100%">
+                    No service have been requested yet!
+                  </td>
+                </tr>
+              {% endif %}
+            </tbody>
+          </table>
         </div>
-    </div>
-    {% endif %} 
-</div>
+      </div>
+    {% endif %}
+  </div>
 
 <!-- Modal -->
-<div id="onHoldModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5);">
-  <div style="background:white; padding:20px; margin:50px auto; width:500px; border-radius:8px; position:relative;">
-    <button id="closeModal" style="position:absolute; top:10px; right:10px;">&times;</button>
-    <div id="modalContent"></div>
+  <div id="onHoldModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5);">
+    <div style="background:white; padding:20px; margin:50px auto; width:500px; border-radius:8px; position:relative;">
+      <button id="closeModal" style="position:absolute; top:10px; right:10px;">&times;</button>
+      <div id="modalContent"></div>
+    </div>
   </div>
-</div>
 
-<script>
-const modal = document.getElementById('onHoldModal');
-const closeModal = document.getElementById('closeModal');
-const modalContent = document.getElementById('modalContent');
+  <script>
+    const modal = document.getElementById('onHoldModal');
+    const closeModal = document.getElementById('closeModal');
+    const modalContent = document.getElementById('modalContent');
 
-document.querySelectorAll('.statusSelect').forEach(select => {
-  select.addEventListener('change', function() {
-    if (this.value === 'On Hold') {
-      const serviceId = this.dataset.serviceId;
-      modal.style.display = 'block';
+    document.querySelectorAll('.statusSelect').forEach(select => {
+      select.addEventListener('change', function() {
+        if (this.value === 'On Hold') {
+          const serviceId = this.dataset.serviceId;
+          modal.style.display = 'block';
 
-      fetch(`/srm/service_remark/${serviceId}/remark/`) 
-        .then(response => response.text())
-        .then(html => {
-          modalContent.innerHTML = html;
-        })
-        .catch(err => {
-          modalContent.innerHTML = "<p>Error loading form.</p>";
-          console.error(err);
-        });
-    }
-  });
-});
+          fetch(`/srm/service_remark/${serviceId}/remark/`)
+            .then(response => response.text())
+            .then(html => {
+              modalContent.innerHTML = html;
+            })
+            .catch(err => {
+              modalContent.innerHTML = "<p>Error loading form.</p>";
+              console.error(err);
+            });
+        }
+      });
+    });
 
-closeModal.addEventListener('click', () => {
-  modal.style.display = 'none';
-  modalContent.innerHTML = '';
-});
+    closeModal.addEventListener('click', () => {
+      modal.style.display = 'none';
+      modalContent.innerHTML = '';
+    });
 
-window.addEventListener('click', (e) => {
-  if (e.target == modal) {
-    modal.style.display = 'none';
-    modalContent.innerHTML = '';
-  }
-});
+    window.addEventListener('click', (e) => {
+      if (e.target == modal) {
+        modal.style.display = 'none';
+        modalContent.innerHTML = '';
+      }
+    });
 
 // When a radio button changes, reload the page with the selected option as a GET parameter
-document.querySelectorAll('input[name="serviceType"]').forEach(radio => {
-  radio.addEventListener('change', function() {
-    const selected = this.value;
-    const url = new URL(window.location.href);
-    url.searchParams.set('serviceType', selected);
-    url.searchParams.delete('page');  // Reset pagination when switching
-    window.location.href = url.toString();
-  });
-});
+    document.querySelectorAll('input[name="serviceType"]').forEach(radio => {
+      radio.addEventListener('change', function() {
+        const selected = this.value;
+        const url = new URL(window.location.href);
+        url.searchParams.set('serviceType', selected);
+        url.searchParams.delete('page');  // Reset pagination when switching
+        window.location.href = url.toString();
+      });
+    });
 
-</script>
+  </script>
 
 {% endblock %}

@@ -6,18 +6,29 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('san_ams', '0003_licensemodel_status'),
+        ("san_ams", "0003_licensemodel_status"),
     ]
 
     operations = [
         migrations.RenameField(
-            model_name='assetmodel',
-            old_name='resquestable',
-            new_name='requestable',
+            model_name="assetmodel",
+            old_name="resquestable",
+            new_name="requestable",
         ),
         migrations.AlterField(
-            model_name='licensemodel',
-            name='status',
-            field=models.CharField(choices=[('active', 'Active'), ('assigned', 'Assigned'), ('available', 'Available'), ('renewal due', 'Renewal Due'), ('expired', 'Expired'), ('revoked', 'Revoked')], default='active', max_length=20),
+            model_name="licensemodel",
+            name="status",
+            field=models.CharField(
+                choices=[
+                    ("active", "Active"),
+                    ("assigned", "Assigned"),
+                    ("available", "Available"),
+                    ("renewal due", "Renewal Due"),
+                    ("expired", "Expired"),
+                    ("revoked", "Revoked"),
+                ],
+                default="active",
+                max_length=20,
+            ),
         ),
     ]

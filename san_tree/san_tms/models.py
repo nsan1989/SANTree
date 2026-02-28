@@ -1,67 +1,93 @@
-from django.db import models
-from accounts.models import CustomUsers, Departments, Location
-from PIL import Image
-from io import BytesIO
-from django.core.files.base import ContentFile
 import os
 from datetime import timedelta
-from dateutil.relativedelta import relativedelta 
+from io import BytesIO
+
+from dateutil.relativedelta import relativedelta
+from django.core.files.base import ContentFile
+from django.db import models
 from django.utils.timezone import now
+from PIL import Image
+
+from accounts.models import CustomUsers, Departments, Location
+
 
 # Tasks Types.
 class TasksTypes(models.Model):
     name = models.CharField(max_length=255)
-    department = models.ForeignKey(Departments, on_delete=models.CASCADE, related_name='tasks_types')
+    department = models.ForeignKey(
+        Departments, on_delete=models.CASCADE, related_name="tasks_types"
+    )
 
     def __str__(self):
-        return f'{self.name} {self.department}'
-    
+        return f"{self.name} {self.department}"
+
     class Meta:
-        verbose_name_plural = 'Tasks Types'
+        verbose_name_plural = "Tasks Types"
+
 
 # Tasks Frequency.
 TASKS_FREQUENCY = (
-    ('Daily', 'Daily'),
-    ('Weekly', 'Weekly'),
-    ('Monthly', 'Monthly'),
+    ("Daily", "Daily"),
+    ("Weekly", "Weekly"),
+    ("Monthly", "Monthly"),
 )
 
 # Status Choices.
 STATUS_CHOICES = (
-    ('Waiting', 'Waiting'),
-    ('In Progress', 'In Progress'),
-    ('Postponed', 'Postponed'),
-    ('Overdue', 'Overdue'),
-    ('Completed', 'Completed'),
-    ('Cancelled', 'Cancelled'),
+    ("Waiting", "Waiting"),
+    ("In Progress", "In Progress"),
+    ("Postponed", "Postponed"),
+    ("Overdue", "Overdue"),
+    ("Completed", "Completed"),
+    ("Cancelled", "Cancelled"),
 )
 
+
 def task_image_path(instance, filename):
-    filename = os.path.basename(filename)  
-    return f'task_images/{filename}'
+    filename = os.path.basename(filename)
+    return f"task_images/{filename}"
+
 
 # Tasks Model.
 class Tasks(models.Model):
     tasks_number = models.CharField(max_length=20, unique=True, blank=True)
-    tasks_types = models.ForeignKey(TasksTypes, on_delete=models.SET_NULL, null=True, blank=True)
-    task_frequency = models.CharField(max_length=20, choices=TASKS_FREQUENCY, default='Daily')
-    location = models.ForeignKey(Location, related_name='tasks_locations', on_delete=models.SET_NULL, null=True, blank=True)
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Waiting')
+    tasks_types = models.ForeignKey(
+        TasksTypes, on_delete=models.SET_NULL, null=True, blank=True
+    )
+    task_frequency = models.CharField(
+        max_length=20, choices=TASKS_FREQUENCY, default="Daily"
+    )
+    location = models.ForeignKey(
+        Location,
+        related_name="tasks_locations",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+    )
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="Waiting")
     department = models.ForeignKey(Departments, on_delete=models.CASCADE)
-    created_by = models.ForeignKey(CustomUsers, related_name='tms_created_tasks', on_delete=models.CASCADE)
-    assigned_to = models.ForeignKey(CustomUsers, related_name='tms_assigned_tasks', on_delete=models.SET_NULL, null=True, blank=True)
+    created_by = models.ForeignKey(
+        CustomUsers, related_name="tms_created_tasks", on_delete=models.CASCADE
+    )
+    assigned_to = models.ForeignKey(
+        CustomUsers,
+        related_name="tms_assigned_tasks",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     next_date = models.DateTimeField(null=True, blank=True)
     attachment = models.ImageField(upload_to=task_image_path, null=True, blank=True)
-    
+
     def __str__(self):
         return str(self.tasks_types)
 
-#    @property
-#    def time_taken(self):
-#        if self.completed_at and self.created_at:
-#            return self.completed_at - self.created_at
-#        return None
+    #    @property
+    #    def time_taken(self):
+    #        if self.completed_at and self.created_at:
+    #            return self.completed_at - self.created_at
+    #        return None
 
     # auto assign completed time
     def save(self, *args, **kwargs):
@@ -88,7 +114,7 @@ class Tasks(models.Model):
                     img = img.convert("RGB")
 
                 output = BytesIO()
-                img.save(output, format='JPEG', quality=70)
+                img.save(output, format="JPEG", quality=70)
                 output.seek(0)
 
                 # Keep original file name
@@ -119,23 +145,33 @@ class Tasks(models.Model):
             Tasks.objects.filter(pk=self.pk).update(tasks_number=self.tasks_number)
 
     class Meta:
-        verbose_name_plural = 'Tasks'
-    
+        verbose_name_plural = "Tasks"
+
+
 def task_remark_image_path(instance, filename):
-    filename = os.path.basename(filename)  
-    return f'task_remark_images/{filename}'
+    filename = os.path.basename(filename)
+    return f"task_remark_images/{filename}"
+
 
 # Tasks Remarks.
 class TasksRemarks(models.Model):
     tasks = models.ForeignKey(Tasks, on_delete=models.CASCADE)
     remarks = models.TextField()
-    created_by = models.ForeignKey(CustomUsers, on_delete=models.CASCADE, null=True, blank=True, related_name='tms_created_remark')
+    created_by = models.ForeignKey(
+        CustomUsers,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="tms_created_remark",
+    )
     created_at = models.DateTimeField(auto_now=True)
-    attachment = models.ImageField(upload_to=task_remark_image_path, null=True, blank=True)
+    attachment = models.ImageField(
+        upload_to=task_remark_image_path, null=True, blank=True
+    )
 
     def __str__(self):
-        return f'{self.tasks} {self.remarks}'
-    
+        return f"{self.tasks} {self.remarks}"
+
     # Compress image before saving
     def save(self, *args, **kwargs):
         is_new = self.pk is None
@@ -157,7 +193,7 @@ class TasksRemarks(models.Model):
                     img = img.convert("RGB")
 
                 output = BytesIO()
-                img.save(output, format='JPEG', quality=70)
+                img.save(output, format="JPEG", quality=70)
                 output.seek(0)
 
                 # Keep original file name
@@ -170,4 +206,4 @@ class TasksRemarks(models.Model):
         super().save(*args, **kwargs)
 
     class Meta:
-        verbose_name_plural = 'Tasks Remarks'
+        verbose_name_plural = "Tasks Remarks"
