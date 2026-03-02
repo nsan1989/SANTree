@@ -298,21 +298,34 @@
     const closeModal = document.getElementById('closeModal');
     const modalContent = document.getElementById('modalContent');
 
+    let selectedServiceId = null;
+    let selectedStatus = null;
+
     document.querySelectorAll('.statusSelect').forEach(select => {
       select.addEventListener('change', function() {
         if (this.value === 'On Hold') {
-          const serviceId = this.dataset.serviceId;
+          selectedServiceId = this.dataset.serviceId;
+          selectedStatus = this.value;
+
           modal.style.display = 'block';
 
-          fetch(`/srm/service_remark/${serviceId}/remark/`)
+          fetch(`/srm/service_remark/${selectedServiceId}/remark/`)
             .then(response => response.text())
             .then(html => {
               modalContent.innerHTML = html;
+              const statusInput =
+                modalContent.querySelector('#remarkStatus');
+
+              if (statusInput) {
+                statusInput.value = selectedStatus;
+              }
             })
             .catch(err => {
               modalContent.innerHTML = "<p>Error loading form.</p>";
               console.error(err);
             });
+
+          this.value = "";
         }
       });
     });

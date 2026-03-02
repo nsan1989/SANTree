@@ -8,7 +8,9 @@
             <div class="card-body p-4">
               <h4 class="card-title text-center mb-4">Remark</h4>
               <form id="remarkForm" method="post" enctype="multipart/form-data" action="{% url 'srm:service_remarks' service.id %}">
-                {% csrf_token %} {{ form|crispy }}
+                {% csrf_token %}
+                <input type="hidden" name="status" id="remarkStatus">
+                {{ form|crispy }}
 
                 <div class="d-grid mt-4">
                   <button

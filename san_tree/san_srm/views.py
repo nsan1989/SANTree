@@ -496,7 +496,8 @@ def hold_service():
         )
 
         services = Service.objects.filter(
-            created_at__lte=end_of_yesterday, status__in=["Open", "On Hold"]
+            created_at__lte=end_of_yesterday,
+            status__in=["Open", "On Hold", "In Progress"],
         )
 
         for serv in services:
@@ -716,9 +717,14 @@ def ServiceRemark(request, id):
         if form.is_valid():
             remark = form.save(commit=False)
             remark.service = service
-            remark.remarks = form.cleaned_data.get("remarks")
             remark.created_by = request.user
             remark.save()
+
+            status = request.POST.get("status")
+
+            if status == "On Hold":
+                service.status = status
+                service.save()
 
             if request.user.role == "User":
                 return redirect("srm:staff_service")
