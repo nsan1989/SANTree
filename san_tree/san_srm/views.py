@@ -370,6 +370,7 @@ def free_up_staff():
                         staff.status = "vacant"
                         staff.save()
                         service.status = "Pending"
+                        service.handled_by = staff
                         service.assigned_to = None
                         service.save()
                     assign_service_from_queue(staff)
@@ -472,6 +473,7 @@ def free_up_onhold_staff():
                         freed_any = True
 
                 service.status = "Pending"
+                service.handled_by = staff
                 service.assigned_to = None
                 service.save()
 
@@ -510,6 +512,7 @@ def hold_service():
 
             # Put service on pending.
             serv.status = "Pending"
+            serv.handled_by = staff
             serv.assigned_to = None
             serv.save()
 
