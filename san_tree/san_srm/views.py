@@ -360,20 +360,28 @@ def ServiceView(request):
 # Free up the staff when exceeds timestamp.
 def free_up_staff():
     try:
-        prog_service = Service.objects.filter(status="In Progress")
-        if prog_service.exists():
-            for service in prog_service:
-                if service.started_at <= timezone.now() - timedelta(minutes=3):
-                    shift = service.assigned_to
-                    staff = shift.shift_staffs
-                    if staff and staff.status == "engaged":
-                        staff.status = "vacant"
-                        staff.save()
-                        service.status = "Pending"
-                        service.handled_by = staff
-                        service.assigned_to = None
-                        service.save()
-                    assign_service_from_queue(staff)
+        now = timezone.now()
+        expired_services = Service.objects.filter(
+            status__in=["In Progress", "On Hold"],
+            deadline__isnull=False,
+            deadline__lt=now,
+        ).select_related("assigned_to__shift_staffs")
+
+        for service in expired_services:
+
+            shift = service.assigned_to
+            staff = shift.shift_staffs if shift else None
+
+            service.status = "Pending"
+            service.handled_by = staff
+            service.assigned_to = None
+            service.save()
+
+            if staff and staff.status == "engaged":
+                staff.status = "vacant"
+                staff.save(update_fields=["status"])
+
+                assign_service_from_queue(staff)
 
     except Exception as e:
         log.error("Error freeing up staff", error=str(e))
@@ -425,9 +433,6 @@ def free_up_completed_staff(request, id):
 
             elif new_status == "On Hold":
                 obj.status = "On Hold"
-                staff.status = "engaged"
-
-                staff.save(update_fields=["status"])
                 obj.save()
 
             else:
@@ -443,28 +448,6 @@ def free_up_completed_staff(request, id):
     if view_name == "srm:staff_update_service_status" and user.role == "User":
         return redirect("srm:staff_service")
     raise PermissionDenied("You are not authorized to perform this action.")
-
-
-# Free up the staff if service status is 'On Hold' and exceeds timestamp.
-def free_up_onhold_staff():
-    try:
-        onhold_service = Service.objects.filter(status="On Hold")
-        if onhold_service.exists():
-            for service in onhold_service:
-                if service.hold_at <= timezone.now() - timedelta(minutes=6):
-                    shift = service.assigned_to
-                    staff = shift.shift_staffs
-                    if staff and staff.status == "engaged":
-                        staff.status = "vacant"
-                        staff.save(update_fields=["status"])
-                        service.status = "Pending"
-                        service.handled_by = staff
-                        service.assigned_to = None
-                        service.save()
-                    assign_service_from_queue(staff)
-
-    except Exception as e:
-        log.error("Error freeing up staff", error=str(e))
 
 
 # Put on hold if the service exceeds creation date

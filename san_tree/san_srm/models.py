@@ -6,6 +6,7 @@ from django.core.files.base import ContentFile
 from django.db import models
 from django.utils import timezone
 from PIL import Image
+from datetime import timedelta
 
 from accounts.models import CustomUsers, Departments, Location
 
@@ -169,8 +170,9 @@ class Service(models.Model):
     )
     created_at = models.DateTimeField(auto_now_add=True)
     started_at = models.DateTimeField(null=True, blank=True)
-    hold_at = models.DateTimeField(null=True, blank=True)
+    deadline = models.DateTimeField(null=True, blank=True)
     completed_at = models.DateTimeField(null=True, blank=True)
+    hold_used = models.DateTimeField(default=False)
 
     def __str__(self):
         return str(self.service_type)
@@ -188,21 +190,22 @@ class Service(models.Model):
         return None
 
     @property
-    def hold_time(self):
-        if self.started_at and self.hold_at:
-            return self.hold_at - self.started_at
-        return None
+    def is_overdue(self):
+        if self.deadline and self.status in ["In Progress", "On Hold"]:
+            return timezone.now() > self.deadline
+        return False
 
     @property
-    def hold_complete(self):
-        if self.hold_at and self.completed_at:
-            return self.completed_at - self.hold_at
+    def remaining_time(self):
+        if self.deadline and self.status in ["In Progress", "On Hold"]:
+            remaining = self.deadline - timezone.now()
+            return remaining if remaining.total_seconds() > 0 else None
         return None
 
     def save(self, *args, **kwargs):
         is_new = self.pk is None
+        now = timezone.now()
 
-        old_status = None
         if not is_new:
             before = Service.objects.get(pk=self.pk)
             old_status = before.status
@@ -210,15 +213,18 @@ class Service(models.Model):
 
             # Started
             if new_status == "In Progress" and not self.started_at:
-                self.started_at = timezone.now()
+                self.started_at = now
+                self.deadline = now + timedelta(minutes=15)
 
-            # On Hold
-            if new_status == "On Hold":
-                self.hold_at = timezone.now()
+            elif new_status == "On Hold":
+                if self.hold_used:
+                    raise ValueError("Extension already used once.")
 
-            # Completed
-            if new_status == "Completed" and not self.completed_at:
-                self.completed_at = timezone.now()
+                if old_status != "In Progress":
+                    raise ValueError("Service must be In Progress before Hold.")
+
+                self.deadline = now + timedelta(minutes=20)
+                self.hold_used = True
 
         super().save(*args, **kwargs)
 
