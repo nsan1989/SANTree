@@ -77,9 +77,12 @@ class ServiceResources(resources.ModelResource):
             "UHID",
             "status",
             "assigned_to",
+            "handled_by",
             "description",
             "created_by",
             "created_at",
+            "started_at",
+            "hold_at",
             "completed_at",
         )
 
@@ -96,9 +99,12 @@ class ServiceAdmin(ImportExportModelAdmin):
         "UHID",
         "status",
         "get_assigned_staff",
+        "handled_by",
         "description",
         "created_by",
         "created_at",
+        "started_at",
+        "hold_at",
         "completed_at",
     )
     list_filter = ("service_block", "status")

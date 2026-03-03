@@ -363,7 +363,7 @@ def free_up_staff():
         prog_service = Service.objects.filter(status="In Progress")
         if prog_service.exists():
             for service in prog_service:
-                if service.started_at <= timezone.now() - timedelta(minutes=15):
+                if service.started_at <= timezone.now() - timedelta(minutes=3):
                     shift = service.assigned_to
                     staff = shift.shift_staffs
                     if staff and staff.status == "engaged":
@@ -425,7 +425,6 @@ def free_up_completed_staff(request, id):
 
             elif new_status == "On Hold":
                 obj.status = "On Hold"
-                obj.handled_by = staff
                 staff.status = "engaged"
 
                 staff.save(update_fields=["status"])
@@ -452,34 +451,17 @@ def free_up_onhold_staff():
         onhold_service = Service.objects.filter(status="On Hold")
         if onhold_service.exists():
             for service in onhold_service:
-                if service.created_at <= timezone.now() - timedelta(minutes=35):
-                    continue
-
-                shift = service.assigned_to
-                if not shift:
-                    log.warning(
-                        "On-hold service has no assigned shift", service_id=service.id
-                    )
-                    continue
-
-                staffs = shift.shift_staffs.all()
-
-                freed_any = False
-
-                for staff in staffs:
-                    if staff.status == "engaged":
+                if service.hold_at <= timezone.now() - timedelta(minutes=6):
+                    shift = service.assigned_to
+                    staff = shift.shift_staffs
+                    if staff and staff.status == "engaged":
                         staff.status = "vacant"
-                        staff.save()
-                        freed_any = True
-
-                service.status = "Pending"
-                service.handled_by = staff
-                service.assigned_to = None
-                service.save()
-
-                if freed_any:
-                    for staff in staffs:
-                        assign_service_from_queue(staff)
+                        staff.save(update_fields=["status"])
+                        service.status = "Pending"
+                        service.handled_by = staff
+                        service.assigned_to = None
+                        service.save()
+                    assign_service_from_queue(staff)
 
     except Exception as e:
         log.error("Error freeing up staff", error=str(e))
@@ -559,7 +541,7 @@ def assign_service_from_queue(vacant_staff):
             # assign
             service_obj.assigned_to = eligible_shift
             service_obj.status = "Open"
-            service_obj.save(update_fields=["assigned_to", "status"])
+            service_obj.save()
 
             vacant_staff.status = "engaged"
             vacant_staff.save(update_fields=["status"])

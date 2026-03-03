@@ -150,7 +150,6 @@ class Service(models.Model):
         default="enter description here", max_length=100, null=True, blank=True
     )
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="Open")
-    started_at = models.DateTimeField(null=True, blank=True)
     assigned_to = models.ForeignKey(
         ShiftSchedule,
         related_name="srm_service_staff",
@@ -169,10 +168,18 @@ class Service(models.Model):
         CustomUsers, related_name="srm_created_service", on_delete=models.CASCADE
     )
     created_at = models.DateTimeField(auto_now_add=True)
+    started_at = models.DateTimeField(null=True, blank=True)
+    hold_at = models.DateTimeField(null=True, blank=True)
     completed_at = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
         return str(self.service_type)
+
+    @property
+    def start_time(self):
+        if self.started_at and self.created_at:
+            return self.started_at - self.created_at
+        return None
 
     @property
     def time_taken(self):
@@ -181,9 +188,15 @@ class Service(models.Model):
         return None
 
     @property
-    def start_time(self):
-        if self.started_at and self.created_at:
-            return self.started_at - self.created_at
+    def hold_time(self):
+        if self.started_at and self.hold_at:
+            return self.hold_at - self.started_at
+        return None
+
+    @property
+    def hold_complete(self):
+        if self.hold_at and self.completed_at:
+            return self.completed_at - self.hold_at
         return None
 
     def save(self, *args, **kwargs):
@@ -193,17 +206,19 @@ class Service(models.Model):
         if not is_new:
             before = Service.objects.get(pk=self.pk)
             old_status = before.status
-
-        if not is_new:
             new_status = self.status
 
-            if old_status == "Open" and new_status == "In Progress":
-                if not self.started_at:
-                    self.started_at = timezone.now()
+            # Started
+            if new_status == "In Progress" and not self.started_at:
+                self.started_at = timezone.now()
 
-            if old_status == "In Progress" and new_status == "Completed":
-                if not self.completed_at:
-                    self.completed_at = timezone.now()
+            # On Hold
+            if new_status == "On Hold":
+                self.hold_at = timezone.now()
+
+            # Completed
+            if new_status == "Completed" and not self.completed_at:
+                self.completed_at = timezone.now()
 
         super().save(*args, **kwargs)
 
