@@ -25,7 +25,7 @@
             <h1 class="header-title mb-0">Dashboard</h1>
             <p class="mb-0 text-light">Welcome! You can view your recent activity here.</p>
         </div>
-        {% if request.user.department == 'transport' %}
+        {% if request.user.department.name|lower != "transport" %}
             <div class="cab-request d-flex align-items-center mb-3">
                 <p class="mb-0 text-light">Booked a cab</p>&nbsp;<a class="btn btn-warning" href="{% url 'vms:vms_cab_request' %}">Book Now</a>
             </div>

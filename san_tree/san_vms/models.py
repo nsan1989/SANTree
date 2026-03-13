@@ -17,6 +17,7 @@ class VehicleStatus(models.TextChoices):
 class BookingStatus(models.TextChoices):
     WAITING = "WAITING", "Waiting"
     CONFIRMED = "CONFIRMED", "Confirmed"
+    ACKNOWLEDGE = "ACKNOWLEDGE", "Acknowledge"
     IN_PROGRESS = "IN_PROGRESS", "In Progress"
     COMPLETED = "COMPLETED", "Completed"
     CANCELLED = "CANCELLED", "Cancelled"

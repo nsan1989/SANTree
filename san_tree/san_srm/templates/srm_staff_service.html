@@ -100,7 +100,6 @@
                 <th scope="col">Description</th>
                 <th scope="col">Status</th>
                 <th scope="col">Start Time</th>
-                <th scope="col">Hold Time</th>
                 <th scope="col">Complted AT</th>
               </tr>
             </thead>
@@ -130,16 +129,15 @@
                     <td>{{service.UHID}}</td>
                     <td>{{service.description}}</td>
                     <td>{{service.status}}</td>
-                    <td>{{service.start_time|duration_display}}</td>
-                    {% if service.hold_time %}
-                    <td>{{service.hold_time|duration_display}}</td>
+                    {% if service.start_time %}
+                      <td>{{service.start_time|duration_display}}</td>
                     {% else %}
-                    <td>--NA--</td>
+                      <td>--NA--</td>
                     {% endif %}
                     {% if service.time_taken %}
-                    <td>{{service.time_taken|duration_display}}</td>
+                      <td>{{service.time_taken|duration_display}}</td>
                     {% else %}
-                    <td>{{service.hold_complete|duration_display}}</td>
+                      <td>--NA--</td>
                     {% endif %}
                   </tr>
                 {% endfor %}
@@ -219,7 +217,6 @@
                 <th scope="col">Description</th>
                 <th scope="col">Status</th>
                 <th scope="col">Start Time</th>
-                <th scope="col">Hold At</th>
                 <th scope="col">Completed At</th>
                 <th scope="col">Remark</th>
                 <th scope="col">Update Status</th>
@@ -249,16 +246,15 @@
                     <td>{{service.UHID}}</td>
                     <td>{{service.description}}</td>
                     <td>{{service.status}}</td>
-                    <td>{{service.start_time|duration_display}}</td>
-                    {% if service.hold_time %}
-                    <td>{{service.hold_time|duration_display}}</td>
+                    {% if service.start_time %}
+                      <td>{{service.start_time|duration_display}}</td>
                     {% else %}
-                    <td>--NA--</td>
+                      <td>--NA--</td>
                     {% endif %}
                     {% if service.time_taken %}
-                    <td>{{service.time_taken|duration_display}}</td>
+                      <td>{{service.time_taken|duration_display}}</td>
                     {% else %}
-                    <td>{{service.hold_complete|duration_display}}</td>
+                      <td>--NA--</td>
                     {% endif %}
                     <td>{{ service.latest_remark_text|default:"-" }}</td>
                     {% if service.status != 'Completed' and service.status != 'Pending' and service.status == 'Open' %}
@@ -284,7 +280,7 @@
                           <button class="btn btn-sm btn-primary mt-2" type="submit">Update</button>
                         </form>
                       </td>
-                      {% elif service.status != 'Completed' and service.status != 'Pending' and service.status == 'On Hold' %}
+                    {% elif service.status != 'Completed' and service.status != 'Pending' and service.status == 'On Hold' %}
                       <td>
                         <form method="POST" action="{% url 'srm:staff_update_service_status' service.id %}">
                           {% csrf_token %}

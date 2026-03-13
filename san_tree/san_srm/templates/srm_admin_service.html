@@ -86,6 +86,7 @@
                             <th scope="col">Description</th>
                             <th scope="col">Status</th>
                             <th scope="col">Started At</th>
+                            <th scope="col">Hold Time</th>
                             <th scope="col">Completed At</th>
                         </tr>
                     </thead>
@@ -114,8 +115,21 @@
                                     <td>{{ service.UHID }}</td>
                                     <td>{{ service.description }}</td>
                                     <td>{{ service.status }}</td>
-                                    <td>{{ service.started_at }}</td>
-                                    <td>{{ service.completed_at }}</td>
+                                    {% if service.start_time %}
+                                        <td>{{service.start_time|duration_display}}</td>
+                                    {% else %}
+                                        <td>--NA--</td>
+                                    {% endif %}
+                                    {% if service.remaining_time %}
+                                        <td>{{service.remaining_time|duration_display}}</td>
+                                    {% else %}
+                                        <td>--NA--</td>
+                                    {% endif %}
+                                    {% if service.time_taken %}
+                                        <td>{{service.time_taken|duration_display}}</td>
+                                    {% else %}
+                                        <td>--NA--</td>
+                                    {% endif %}
                                     <tr>
                             {% endfor %}
                         {% else %}

@@ -103,6 +103,9 @@ def AdminDashboard(request):
     dept_users = CustomUsers.objects.filter(
         Q(department__name="GDA") | Q(department__name="General Duty Assistant")
     ).exclude(role="Admin")
+    #   dept_users = CustomUsers.objects.filter(
+    #        department_id = user.department_id
+    #   ).exclude(role="Admin")
     user_count = dept_users.count()
     vacant_users = dept_users.filter(status="vacant")
     vacant = vacant_users.count()
@@ -140,8 +143,8 @@ def AdminDashboard(request):
 
 # Staff Dashboard View.
 def StaffDashboard(request):
-    today = timezone.localdate()
-    tomorrow = today + timedelta(days=1)
+    #    today = timezone.localdate()
+    #    tomorrow = today + timedelta(days=1)
     user = request.user
     try:
         user_role = user.role
@@ -372,22 +375,37 @@ def free_up_staff():
             shift = service.assigned_to
             staff = shift.shift_staffs if shift else None
 
-            service.status = "Pending"
-            service.handled_by = staff
-            service.assigned_to = None
-            service.save()
+            #           staff = service.assigned_to.shift_staffs if service.assigned_to else None
+            #           with transaction.atomic():
+            #               Service.objects.filter(pk=service.pk).update(
+            #                   status="Pending",
+            #                   handled_by_id=staff.id if staff else None,
+            #                   assigned_to=None,
+            #               )
+            #               if staff:
+            #                   staff.status = "vacant"
+            #                   staff.save(update_fields=["status"])
+            #               if staff:
+            #                   assigned_service_from_queue(staff)
 
-            if staff and staff.status == "engaged":
-                staff.status = "vacant"
-                staff.save(update_fields=["status"])
+            with transaction.atomic():
+                service.status = "Pending"
+                service.handled_by = staff
+                service.assigned_to = None
+                service.save()
 
+                if staff:
+                    staff.status = "vacant"
+                    staff.save(update_fields=["status"])
+
+            if staff:
                 assign_service_from_queue(staff)
 
     except Exception as e:
         log.error("Error freeing up staff", error=str(e))
 
 
-# Free up the staff when service is completed.
+# Service status update.
 def free_up_completed_staff(request, id):
     user = request.user
     if not hasattr(user, "role"):
@@ -433,6 +451,9 @@ def free_up_completed_staff(request, id):
 
             elif new_status == "On Hold":
                 obj.status = "On Hold"
+                staff.status = "engaged"
+
+                staff.save(update_fields=["status"])
                 obj.save()
 
             else:
@@ -563,8 +584,7 @@ def RequestServiceView(request):
     request_service = Service.objects.filter(created_by=user).order_by("-created_at")
     if user.role == "Admin":
         assign_service = Service.objects.filter(
-            Q(assigned_to__shift_staffs__department__name=user.department)
-            | Q(handled_by__department__name=user.department)
+            Q(service_type__department=user.department)
         ).order_by("-created_at")
     else:
         assign_service = Service.objects.filter(

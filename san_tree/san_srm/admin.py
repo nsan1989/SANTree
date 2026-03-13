@@ -59,14 +59,15 @@ class ShiftScheduleAdmin(ImportExportModelAdmin):
 
 # service resources
 class ServiceResources(resources.ModelResource):
-    assigned_to = fields.Field(
-        column_name="assigned_to",
-        attribute="assigned_to",
-        widget=widgets.ManyToManyWidget(ShiftSchedule, field="id"),
-    )
+    assigned_to = fields.Field(column_name="assigned_to")
+
+    def dehydrate_assigned_to(self, obj):
+        if obj.assigned_to and obj.assigned_to.shift_staffs:
+            return obj.assigned_to.shift_staffs.username
+        return "-"
 
     class Meta:
-        models = Service
+        model = Service
         fields = (
             "id",
             "service_number",
@@ -82,7 +83,6 @@ class ServiceResources(resources.ModelResource):
             "created_by",
             "created_at",
             "started_at",
-            "hold_at",
             "completed_at",
         )
 
@@ -104,7 +104,6 @@ class ServiceAdmin(ImportExportModelAdmin):
         "created_by",
         "created_at",
         "started_at",
-        "hold_at",
         "completed_at",
     )
     list_filter = ("service_block", "status")

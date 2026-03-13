@@ -112,10 +112,12 @@ def AdminUpdateBookingStatusView(request, booking_id):
         if driver_id:
             new_driver = Driver.objects.get(id=driver_id)
             booking.driver = new_driver
+            booking.assigned_to = new_driver.user
             new_driver.user.status = "engaged"
             new_driver.user.save()
         else:
             booking.driver = None
+            booking.assigned_to = None
 
         if booking.priority == "CRITICAL" and booking.vehicle:
             HandleCriticalBooking(booking)
@@ -154,12 +156,22 @@ def StaffDashboardView(request):
         raise PermissionDenied("User profile not found")
     context = {}
     try:
-        all_bookings = Booking.objects.filter(booked_by=current_user)
+        if (
+            current_user.department
+            and "transport" in current_user.department.name.lower()
+        ):
+            all_bookings = Booking.objects.filter(assigned_to=current_user).order_by(
+                "-created_at"
+            )
+        else:
+            all_bookings = Booking.objects.filter(created_by=current_user).order_by(
+                "-created_at"
+            )
+        context["bookings"] = all_bookings
     except Exception as e:
         context["error"] = str(e)
     view_name = request.resolver_match.view_name
     if view_name == "vms:vms_staff_dashboard" and current_user_role == "User":
-        context["bookings"] = all_bookings
         return render(request, "vms_staff_dashboard.html", context)
     raise PermissionDenied(
         "You are not authorized to view this page. Please contact administrator!"
@@ -217,9 +229,19 @@ def AllTripsView(request):
         raise PermissionDenied("User profile not found")
     context = {}
     try:
-        all_requests = Booking.objects.filter(
-            booked_by=current_user, status=BookingStatus.COMPLETED
-        ).order_by("-created_at")
+        if (
+            current_user.department
+            and "transport" in current_user.department.name.lower()
+        ):
+            all_requests = Booking.objects.filter(
+                assigned_to=current_user,
+                status__in=["ACKNOWLEDGE", "COMPLETED", "IN_PROGRESS", "CANCELLED"],
+            ).order_by("-created_at")
+        else:
+            all_requests = Booking.objects.filter(
+                booked_by=current_user,
+                status__in=["COMPLETED", "IN_PROGRESS", "CANCELLED"],
+            ).order_by("-created_at")
         page_number = request.GET.get("page")
         paginator = Paginator(all_requests, 10)
         page_obj = paginator.get_page(page_number)
@@ -243,9 +265,17 @@ def UpcomingTripsView(request):
         raise PermissionDenied("User profile not found")
     context = {}
     try:
-        upcoming = Booking.objects.filter(
-            booked_by=current_user, status=BookingStatus.CONFIRMED
-        ).order_by("-created_at")
+        if (
+            current_user.department
+            and "transport" in current_user.department.name.lower()
+        ):
+            upcoming = Booking.objects.filter(
+                status__in=["CONFIRMED", "ACKNOWLEDGE"]
+            ).order_by("-created_at")
+        else:
+            upcoming = Booking.objects.filter(
+                booked_by=current_user, status__in=["CONFIRMED", "ACKNOWLEDGE"]
+            ).order_by("-created_at")
         page_number = request.GET.get("page")
         paginator = Paginator(upcoming, 10)
         page_obj = paginator.get_page(page_number)

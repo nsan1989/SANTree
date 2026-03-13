@@ -17,6 +17,11 @@ urlpatterns = [
     ),
     path("staff/dashboard/", StaffDashboardView, name="vms_staff_dashboard"),
     path("staff/cab_request/", CabRequestView, name="vms_cab_request"),
-    path("staff/all_trips/", AllTripsView, name="vms_all_trips"),
     path("staff/upcoming_trips/", UpcomingTripsView, name="vms_upcoming_trips"),
+    path(
+        "staff/upcoming_trips/update_booking_status/<int:booking_id>/",
+        StaffUpdateBookingStatusView,
+        name="staff_update_booking_status",
+    ),
+    path("staff/all_trips/", AllTripsView, name="vms_all_trips"),
 ]

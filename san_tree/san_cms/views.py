@@ -9,10 +9,14 @@ from openpyxl import Workbook
 
 from accounts.models import CustomUsers, Departments
 
-from .forms import (ComplaintForm, ReassignedDepartmentForm, ReassignedForm,
-                    RemarksForm)
-from .models import (Complaint, ComplaintHistory, ComplaintRemarks,
-                     ComplaintType, ReassignedComplaint)
+from .forms import ComplaintForm, ReassignedDepartmentForm, ReassignedForm, RemarksForm
+from .models import (
+    Complaint,
+    ComplaintHistory,
+    ComplaintRemarks,
+    ComplaintType,
+    ReassignedComplaint,
+)
 
 matplotlib.use("Agg")
 import io

@@ -119,6 +119,10 @@ STATUS_CHOICES = (
 )
 
 
+# Service Priority.
+SERVICE_PRIORITY = (("Critical", "Critical"), ("Medium", "Medium"), ("Low", "Low"))
+
+
 # Request Service Model.
 class Service(models.Model):
     service_number = models.CharField(max_length=20, unique=True, null=True, blank=True)
@@ -172,7 +176,7 @@ class Service(models.Model):
     started_at = models.DateTimeField(null=True, blank=True)
     deadline = models.DateTimeField(null=True, blank=True)
     completed_at = models.DateTimeField(null=True, blank=True)
-    hold_used = models.DateTimeField(default=False)
+    hold_used = models.BooleanField(default=False)
 
     def __str__(self):
         return str(self.service_type)
@@ -225,6 +229,10 @@ class Service(models.Model):
 
                 self.deadline = now + timedelta(minutes=20)
                 self.hold_used = True
+
+            elif new_status == "Completed" and not self.completed_at:
+                self.completed_at = now
+                self.deadline = None
 
         super().save(*args, **kwargs)
 

@@ -3,8 +3,13 @@ from django.db.models import Count, Q
 
 from accounts.models import CustomUsers, Departments
 
-from .models import (Complaint, ComplaintRemarks, ComplaintType,
-                     ReassignDepartment, ReassignedComplaint)
+from .models import (
+    Complaint,
+    ComplaintRemarks,
+    ComplaintType,
+    ReassignDepartment,
+    ReassignedComplaint,
+)
 
 
 # Complaint Form.
