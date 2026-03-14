@@ -89,6 +89,7 @@ class ShiftSchedule(models.Model):
     start_time = models.DateTimeField()
     end_time = models.DateTimeField()
     status = models.CharField(max_length=20, choices=SHIFT_STATUS, default="scheduled")
+    is_active = models.BooleanField(default=False)
 
     objects = ShiftManager()
 
@@ -119,15 +120,15 @@ STATUS_CHOICES = (
 )
 
 
-# Service Priority.
-SERVICE_PRIORITY = (("Critical", "Critical"), ("Medium", "Medium"), ("Low", "Low"))
-
-
 # Request Service Model.
 class Service(models.Model):
+    SERVICE_PRIORITY = [("Critical", "Critical"), ("High", "High"), ("Low", "Low")]
     service_number = models.CharField(max_length=20, unique=True, null=True, blank=True)
     service_type = models.ForeignKey(
         ServiceTypes, on_delete=models.SET_NULL, null=True, blank=True
+    )
+    request_type = models.CharField(
+        max_length=20, choices=SERVICE_PRIORITY, default="Low"
     )
     service_block = models.ForeignKey(
         Blocks,

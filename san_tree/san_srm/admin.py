@@ -42,6 +42,8 @@ class ShiftScheduleResources(resources.ModelResource):
             "shift_staffs",
             "start_time",
             "end_time",
+            "status",
+            "is_active",
         )
 
 
@@ -54,6 +56,8 @@ class ShiftScheduleAdmin(ImportExportModelAdmin):
         "shift_staffs",
         "start_time",
         "end_time",
+        "status",
+        "is_active",
     )
 
 

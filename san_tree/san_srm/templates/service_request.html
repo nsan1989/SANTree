@@ -43,16 +43,41 @@
           </div>
 
         <!-- Service Block -->
-          <div class="mb-3">
-            <label for="id_service_block" class="form-label requiredField">
-              Service Block <span class="asteriskField">*</span>
-            </label>
-            <select name="service_block" class="form-select" required id="id_service_block">
-              <option value="" selected>select</option>
-              {% for block in blocks %}
-                <option value="{{ block.id }}">{{ block.name }}</option>
-              {% endfor %}
-            </select>
+          <div class="row d-flex">
+            <div class="col-12 col-md-6 mb-3">
+              <label for="id_service_block" class="form-label requiredField">
+                Service Block <span class="asteriskField">*</span>
+              </label>
+              <select name="service_block" class="form-select" required id="id_service_block">
+                <option value="" selected>select</option>
+                {% for block in blocks %}
+                  <option value="{{ block.id }}">{{ block.name }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-12 col-md-6 mb-3">
+              <label for="id_request_type" class="form-label requiredField">
+                Priority <span class="asteriskField">*</span>
+              </label>
+              <div>
+                {% for value, label in request_type %}
+                  <div class="form-check form-check-inline">
+                    <input 
+                      class="form-check-input"
+                      type="radio"
+                      name="request_type"
+                      id="priority_{{ value }}"
+                      value="{{ value }}"
+                      {% if value == "Low" %}checked{% endif %}
+                    >
+
+                    <label class="form-check-label" for="priority_{{ value }}">
+                      {{ label }}
+                    </label>
+                  </div>
+                {% endfor %}
+              </div>
+            </div>
           </div>
 
           <div class="row d-flex">

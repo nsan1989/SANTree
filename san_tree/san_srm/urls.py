@@ -38,4 +38,5 @@ urlpatterns = [
     path("service_pie_chart/", ServicePieChart, name="service_pie_chart"),
     path("service_remark/<int:id>/remark/", ServiceRemark, name="service_remarks"),
     path("update_status/", UpdateUserStatus, name="update_status"),
+    path("schedule-toggle/<int:pk>/", ToggleSchedule, name="toggle_schedule"),
 ]

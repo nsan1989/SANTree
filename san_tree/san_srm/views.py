@@ -27,6 +27,7 @@ from datetime import datetime, time
 from django.db import transaction
 from django.db.models import OuterRef, Subquery
 from django.http import HttpResponse
+import json
 
 log = structlog.get_logger()
 
@@ -297,6 +298,7 @@ def ServiceView(request):
                 .filter(
                     shift_block=new_service.service_block,
                     status="ongoing",
+                    is_active=True,
                     shift_staffs__status__iexact="vacant",
                     shift_staffs__role="User",
                 )
@@ -356,6 +358,7 @@ def ServiceView(request):
         "priorities": priorities,
         "blocks": blocks,
         "locations": locations,
+        "request_type": Service.SERVICE_PRIORITY,
     }
     return render(request, "service_request.html", context)
 
@@ -374,19 +377,6 @@ def free_up_staff():
 
             shift = service.assigned_to
             staff = shift.shift_staffs if shift else None
-
-            #           staff = service.assigned_to.shift_staffs if service.assigned_to else None
-            #           with transaction.atomic():
-            #               Service.objects.filter(pk=service.pk).update(
-            #                   status="Pending",
-            #                   handled_by_id=staff.id if staff else None,
-            #                   assigned_to=None,
-            #               )
-            #               if staff:
-            #                   staff.status = "vacant"
-            #                   staff.save(update_fields=["status"])
-            #               if staff:
-            #                   assigned_service_from_queue(staff)
 
             with transaction.atomic():
                 service.status = "Pending"
@@ -535,6 +525,7 @@ def assign_service_from_queue(vacant_staff):
                 .filter(
                     shift_block_id=service_obj.service_block_id,
                     shift_staffs_id=vacant_staff.id,
+                    is_active=True,
                 )
                 .first()
             )
@@ -754,3 +745,25 @@ def ShiftEditView(request, id):
         form = ShiftEditForm(instance=edit_schedule, user=request.user)
     context = {"form": form, "edit_schedule": edit_schedule}
     return render(request, "shift_edit.html", context)
+
+
+def ToggleSchedule(request, pk):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        schedule = ShiftSchedule.objects.get(id=pk)
+        schedule.is_active = data["is_active"]
+        schedule.save()
+        return JsonResponse({"status": "success"})
+
+        #           staff = service.assigned_to.shift_staffs if service.assigned_to else None
+        #           with transaction.atomic():
+        #               Service.objects.filter(pk=service.pk).update(
+        #                   status="Pending",
+        #                   handled_by_id=staff.id if staff else None,
+        #                   assigned_to=None,
+        #               )
+        #               if staff:
+        #                   staff.status = "vacant"
+        #                   staff.save(update_fields=["status"])
+        #               if staff:
+        #                   assigned_service_from_queue(staff)

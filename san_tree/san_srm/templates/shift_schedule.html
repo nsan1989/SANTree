@@ -122,7 +122,7 @@
               <th scope="col">Timing</th>
               <th scope="col">Status</th>
               {% if request.user.department.name == 'GDA' and request.user.role == 'Admin' or request.user.department.name == 'General Duty Assistant' and request.user.role == 'Admin' %}
-                <th scope="col">Edit</th>
+              <th scope="col">Edit</th>
               {% endif %}
             </tr>
           </thead>
@@ -137,6 +137,14 @@
                   <td>{{schedule.shift_staffs.status}}</td>
                   {% if request.user.department.name == 'GDA' and request.user.role == 'Admin' or request.user.department.name == 'General Duty Assistant' and request.user.role == 'Admin' %}
                     <td>
+                      <!-- Toggle Switch -->
+                      <div class="form-check form-switch m-0">
+                          <input class="form-check-input schedule-toggle"
+                                type="checkbox"
+                                data-id="{{ schedule.id }}"
+                                data-url="{% url 'srm:toggle_schedule' schedule.id %}"
+                                {% if schedule.is_active %}checked{% endif %}>
+                      </div>
                       <a class="edit-link shift-edit-modal" href="{% url 'srm:edit_schedule' schedule.id %}"
                          data-bs-toggle="modal" data-bs-target="#editSchedule">
                         <i class="fa-solid fa-pencil"></i>
@@ -217,5 +225,28 @@
         });
       });
     });
+  </script>
+
+  <script>
+  document.querySelectorAll('.schedule-toggle').forEach(toggle => {
+      toggle.addEventListener('change', function () {
+
+          const url = this.dataset.url;
+          const status = this.checked;
+
+          fetch(url, {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json',
+                  'X-CSRFToken': '{{ csrf_token }}'
+              },
+              body: JSON.stringify({
+                  is_active: status
+              })
+          })
+          .then(res => res.json())
+          .catch(error => {});
+      });
+  });
   </script>
 {% endblock %}

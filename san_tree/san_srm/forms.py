@@ -11,6 +11,7 @@ class ServiceForm(forms.ModelForm):
         model = Service
         fields = [
             "service_type",
+            "request_type",
             "service_block",
             "from_location",
             "to_location",
@@ -24,6 +25,8 @@ class ServiceForm(forms.ModelForm):
         super(ServiceForm, self).__init__(*args, **kwargs)
 
         self.fields["service_type"].required = True
+
+        self.fields["request_type"].required = True
 
         self.fields["service_block"].required = True
 
