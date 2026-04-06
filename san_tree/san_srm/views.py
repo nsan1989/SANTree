@@ -18,6 +18,7 @@ from .models import *
 matplotlib.use("Agg")
 import io
 from threading import Lock
+import random
 
 import matplotlib.pyplot as plt
 
@@ -273,8 +274,8 @@ def load_service_types(request):
 def ServiceView(request):
 
     priorities = [
+        ("critical", "Critical"),
         ("high", "High"),
-        ("mid", "Mid"),
         ("low", "Low"),
     ]
 
@@ -323,24 +324,27 @@ def ServiceView(request):
                 new_service.save()
                 ServiceRequestQueue.objects.create(service_request=new_service)
             else:
-                shift_free_times = []
-                for s in eligible_shift_schedules:
-                    last_completed_service = (
-                        Service.objects.filter(assigned_to=s, status="Completed")
-                        .order_by("-created_at")
-                        .first()
-                    )
+                if new_service.request_type.lower() == "critical":
+                    selected_shift = random.choice(eligible_shift_schedules)
+                else:
+                    shift_free_times = []
+                    for s in eligible_shift_schedules:
+                        last_completed_service = (
+                            Service.objects.filter(assigned_to=s, status="Completed")
+                            .order_by("-created_at")
+                            .first()
+                        )
 
-                    if last_completed_service and last_completed_service.created_at:
-                        free_time = timezone.localtime(
-                            last_completed_service.completed_at
-                        )
-                    else:
-                        free_time = timezone.make_aware(
-                            datetime.min, timezone.get_current_timezone()
-                        )
-                    shift_free_times.append((s, free_time))
-                selected_shift = sorted(shift_free_times, key=lambda x: x[1])[0][0]
+                        if last_completed_service and last_completed_service.created_at:
+                            free_time = timezone.localtime(
+                                last_completed_service.completed_at
+                            )
+                        else:
+                            free_time = timezone.make_aware(
+                                datetime.min, timezone.get_current_timezone()
+                            )
+                        shift_free_times.append((s, free_time))
+                    selected_shift = sorted(shift_free_times, key=lambda x: x[1])[0][0]
 
                 new_service.assigned_to = selected_shift
                 new_service.status = "Open"
@@ -367,29 +371,44 @@ def ServiceView(request):
 def free_up_staff():
     try:
         now = timezone.now()
-        expired_services = Service.objects.filter(
-            status__in=["In Progress", "On Hold"],
-            deadline__isnull=False,
-            deadline__lt=now,
-        ).select_related("assigned_to__shift_staffs")
+        processed_staffs = set()
+        with transaction.atomic():
+            expired_services = (
+                Service.objects.select_for_update()
+                .filter(
+                    status__in=["In Progress", "On Hold"],
+                    deadline__isnull=False,
+                    deadline__lt=now,
+                )
+                .select_related("assigned_to__shift_staffs")
+            )
 
-        for service in expired_services:
+            for service in expired_services:
 
-            shift = service.assigned_to
-            staff = shift.shift_staffs if shift else None
-
-            with transaction.atomic():
-                service.status = "Pending"
-                service.handled_by = staff
-                service.assigned_to = None
-                service.save()
+                shift = service.assigned_to
+                staff = getattr(shift, "shift_staffs", None) if shift else None
 
                 if staff:
-                    staff.status = "vacant"
-                    staff.save(update_fields=["status"])
+                    staff = (
+                        CustomUsers.objects.select_for_update()
+                        .filter(id=staff.id)
+                        .first()
+                    )
 
-            if staff:
-                assign_service_from_queue(staff)
+                    service.status = "Pending"
+                    service.handled_by = staff
+                    service.assigned_to = None
+                    service.save(update_fields=["status", "handled_by", "assigned_to"])
+
+                    if staff:
+                        staff.status = "vacant"
+                        staff.save(update_fields=["status"])
+                        processed_staffs.add(staff)
+                    else:
+                        log.warning(f"Staff missing for service {service.id}")
+
+        for staff in processed_staffs:
+            assign_service_from_queue(staff)
 
     except Exception as e:
         log.error("Error freeing up staff", error=str(e))
@@ -538,7 +557,7 @@ def assign_service_from_queue(vacant_staff):
             service_obj.status = "Open"
             service_obj.save()
 
-            vacant_staff.status = "engaged"
+            vacant_staff.status = "vacant"
             vacant_staff.save(update_fields=["status"])
 
             queue_service.delete()
@@ -633,6 +652,7 @@ def ShiftSchedules(request):
             start_time__lte=now,
             end_time__gte=now,
             status="ongoing",
+            is_active=True,
         ).order_by("-id")
     else:
         schedules = ShiftSchedule.objects.filter(

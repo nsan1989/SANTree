@@ -352,7 +352,7 @@ def ComplaintView(request):
 
             if user.role == "User":
                 assigned_user = CustomUsers.objects.filter(
-                    department=user.department, role="Admin"
+                    department=user.department, role="Admin", is_active=True
                 ).first()
                 if assigned_user:
                     new_complaint.assigned_to = assigned_user
@@ -361,7 +361,9 @@ def ComplaintView(request):
                 new_complaint.save()
 
             if user.role == "Admin":
-                admins = CustomUsers.objects.filter(department=department, role="Admin")
+                admins = CustomUsers.objects.filter(
+                    department=department, role="Admin", is_active=True
+                )
                 if admins.exists():
                     assigned_user = random.choice(list(admins))
 
@@ -460,7 +462,7 @@ def ReviewComplaintUpdateView(request, id):
         user_role = user.role
     except:
         raise PermissionDenied("User profile not found.")
-    complaint = get_object_or_404(ComplaintHistory, id=id)
+    complaint = get_object_or_404(ComplaintHistory, complaint_id=id)
 
     if request.method == "POST":
         new_status = request.POST.get("status")
@@ -565,7 +567,7 @@ def StaffUpdateComplaintStatus(request, id):
         user_role = user.role
     except:
         raise PermissionDenied("User Profile not found.")
-    complaint = get_object_or_404(ComplaintHistory, id=id)
+    complaint = get_object_or_404(ComplaintHistory, complaint_id=id)
 
     if complaint.complaint.assigned_to != request.user:
         return redirect("cms:staff_assigned_tasks")
@@ -598,7 +600,7 @@ def AdminUpdateComplaintStatus(request, id):
     except:
         raise PermissionDenied("User profile not found.")
 
-    complaint = get_object_or_404(ComplaintHistory, id=id)
+    complaint = get_object_or_404(ComplaintHistory, complaint_id=id)
 
     if (
         complaint.complaint.assigned_to != user
@@ -675,7 +677,7 @@ def ComplaintDetails(request, id):
         user_role = user.role
     except:
         raise PermissionDenied("User profile not found.")
-    complaint = get_object_or_404(ComplaintHistory, id=id)
+    complaint = get_object_or_404(ComplaintHistory, complaint_id=id)
     remark = ComplaintRemarks.objects.filter(id=id)
 
     context = {"complaint": complaint, "remarks": remark}

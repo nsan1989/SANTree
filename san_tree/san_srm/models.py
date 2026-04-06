@@ -89,7 +89,7 @@ class ShiftSchedule(models.Model):
     start_time = models.DateTimeField()
     end_time = models.DateTimeField()
     status = models.CharField(max_length=20, choices=SHIFT_STATUS, default="scheduled")
-    is_active = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
 
     objects = ShiftManager()
 

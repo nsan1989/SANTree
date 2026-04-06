@@ -16,6 +16,7 @@ class DepartmentResource(resources.ModelResource):
 class DepartmentsAdmin(ImportExportModelAdmin):
     resource_class = DepartmentResource
     list_display = ("name",)
+    search_fields = ("name",)
 
 
 # Users resource class

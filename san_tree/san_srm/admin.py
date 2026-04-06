@@ -14,7 +14,7 @@ class ServiceTypesResources(resources.ModelResource):
 
 @admin.register(ServiceTypes)
 class ServiceTypesAdmin(ImportExportModelAdmin):
-    resource_class: ServiceTypesResources
+    resource_class = ServiceTypesResources
     list_display = ("name", "department")
 
 
@@ -111,6 +111,7 @@ class ServiceAdmin(ImportExportModelAdmin):
         "completed_at",
     )
     list_filter = ("service_block", "status")
+    search_fields = ("service_number",)
 
     def get_assigned_staff(self, obj):
         if obj.assigned_to is None:

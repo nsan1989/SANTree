@@ -44,6 +44,11 @@ class ComplaintAdmin(ImportExportModelAdmin):
         "attachment",
     )
     list_filter = ("status",)
+    search_fields = (
+        "complaint_number",
+        "assigned_to__username",
+        "created_by__username",
+    )
 
 
 # complaint type resources.
