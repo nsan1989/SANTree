@@ -24,4 +24,14 @@ urlpatterns = [
         name="staff_update_booking_status",
     ),
     path("staff/all_trips/", AllTripsView, name="vms_all_trips"),
+    path("admin/all_vehicles/", VehiclesView, name="vms_all_vehicles"),
+    path("admin/all_staffs/", StaffView, name="vms_all_staffs"),
+    path("admin/add_schedule/", ScheduleForm, name="add_schedule"),
+    path(
+        "incharge/dashboard/schedules/edit_schedule/<int:id>/",
+        ShiftEditView,
+        name="edit_schedule",
+    ),
+    path("admin/driver_schedule/", DriverScheduleView, name="driver_schedule"),
+    path("schedule-toggle/<int:pk>/", ToggleSchedule, name="toggle_schedule"),
 ]

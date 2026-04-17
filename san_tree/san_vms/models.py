@@ -1,5 +1,6 @@
 from django.db import models
 from django.db.models import Q
+from django.utils import timezone
 
 from accounts.models import CustomUsers
 
@@ -85,8 +86,7 @@ class Driver(models.Model):
     user = models.OneToOneField(
         CustomUsers, on_delete=models.CASCADE, related_name="driver_profile"
     )
-    license_type = models.CharField(max_length=50)
-    phone = models.CharField(max_length=15)
+    license_number = models.CharField(max_length=50)
 
     def __str__(self):
         return self.user.username
@@ -96,7 +96,6 @@ class Driver(models.Model):
 class Cargo(models.Model):
     cargo_type = models.CharField(max_length=100)
     weight = models.FloatField()
-    volume = models.FloatField()
     fragile = models.BooleanField(default=False)
     refrigeration_required = models.BooleanField(default=False)
 
@@ -168,15 +167,58 @@ class Booking(models.Model):
         ]
 
 
+# Shift Manager
+class ShiftManager(models.Manager):
+    def active_now(self):
+        now = timezone.now()
+        return self.filter(status="ongoing", start_time__lte=now, end_time__gte=now)
+
+
 # Driver schedule.
 class DriverSchedule(models.Model):
-    driver = models.ForeignKey(Driver, on_delete=models.CASCADE)
-    booking = models.OneToOneField(Booking, on_delete=models.CASCADE)
-    shift_start = models.TimeField(null=True, blank=True)
-    shift_end = models.TimeField(null=True, blank=True)
+    SHIFT_CHOICES = [
+        ("morning", "Morning"),
+        ("evening", "Evening"),
+        ("day", "Day"),
+        ("night", "Night"),
+    ]
+    SHIFT_STATUS = [
+        ("scheduled", "Scheduled"),
+        ("ongoing", "Ongoing"),
+        ("completed", "Completed"),
+        ("cancelled", "Cancelled"),
+    ]
+    shift_staffs = models.ForeignKey(
+        Driver,
+        related_name="shift_staff",
+        on_delete=models.CASCADE,
+        limit_choices_to=(models.Q(user__department__name__iexact="Transport"))
+        & models.Q(user__role="User"),
+    )
+    shift_type = models.CharField(
+        max_length=20, choices=SHIFT_CHOICES, default="Morning"
+    )
+    start_time = models.DateTimeField(null=True, blank=True)
+    end_time = models.DateTimeField(null=True, blank=True)
+    status = models.CharField(max_length=20, choices=SHIFT_STATUS, default="scheduled")
+    is_active = models.BooleanField(default=True)
+
+    objects = ShiftManager()
+
+    @classmethod
+    def update_shift_statuses(cls):
+        now = timezone.now()
+
+        cls.objects.filter(start_time__gt=now).update(status="scheduled")
+
+        cls.objects.filter(start_time__lte=now, end_time__gte=now).update(
+            status="ongoing"
+        )
+
+        cls.objects.filter(end_time__lt=now).update(status="completed")
 
     def __str__(self):
-        return self.driver.user.username
+        return self.shift_staffs.user.username
 
 
 # Vehicle maintenance.

@@ -148,14 +148,19 @@
                                         <td>{{ trip.driver.user.username|default:"-" }}</td>
                                         <td>{{ trip.driver.user.phone_number|default:"-" }}</td>
                                         {% if trip.status == 'CONFIRMED' %}
-                                        <td>
+                                        <td
+                                            style="
+                                                display: flex;
+                                                align-items: center;
+                                            "
+                                        >
                                             <form method="POST" action="{% url 'vms:staff_update_booking_status' trip.id %}">
                                                 {% csrf_token %}
                                                 <select name="status" class="statusSelect" data-service-id="{{ trip.id }}" required>
                                                     <option value="">select</option>
                                                     <option value="ACKNOWLEDGE" {% if service.status == 'ACKNOWLEDGE' %} selected {% endif %}>Acknowledge</option>
                                                 </select>
-                                                <button class="btn btn-sm btn-primary mt-2" type="submit">Update</button>
+                                                <button class="btn btn-sm btn-primary" type="submit">Update</button>
                                             </form>
                                         </td>
                                         {% else %}

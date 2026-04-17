@@ -1,0 +1,96 @@
+{% load crispy_forms_tags %}
+{% block start %}
+<!--styles-->
+  <style>
+    .card-title,
+    #remarksForm {
+      font-family: 'Poppins', sans-serif;
+    }
+  </style>
+<!---------->
+
+  <div class="container">
+    {% if messages %}
+      {% for message in messages %}
+        <div class="schedule-alert alert-{{ message.tags }}">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+    <div class="row d-flex justify-content-center py-3">
+      <div class="col-12 col-md-4 w-100">
+        <div class="card shadow-lg border-0 rounded-4">
+          <div class="card-body p-4">
+            <form id="submitForm" method="post" enctype="multipart/form-data" action="{% url 'srm:shift_schedule' %}">
+              {% csrf_token %}
+
+              <div class="row">
+
+              <!-- Shift Choices -->
+                <div class="col-12 col-md-6 mb-3">
+                  <label class="form-label requiredField d-block mb-2">
+                    Shift <span class="asteriskField">*</span>
+                  </label>
+                  <div class="d-flex flex-wrap gap-3">
+                    {% for c in choices %}
+                      <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="shift_type" id="shift_{{ c.0 }}" value="{{ c.0 }}">
+                        <label class="form-check-label" for="shift_{{ c.0 }}">
+                          {{ c.1 }}
+                        </label>
+                      </div>
+                    {% endfor %}
+
+                  </div>
+                </div>
+
+              <!--Shift Staffs-->
+                <div class="col-12 mb-3">
+                  <label for="id_shift_staffs" class="form-label requiredField">
+                    Shift Staffs <span class="asteriskField">*</span>
+                  </label>
+                  <select name="shift_staffs" class="form-select" required id="id_shift_staffs">
+                    <option value="" selected>select</option>
+                    {% for staff in staffs %}
+                      <option value="{{ staff.id }}">{{ staff.user.username }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+
+              <!--Start and end time-->
+                <div class="col-12 col-md-6 mb-3">
+                  <label for="id_start_time" class="form-label requiredField">
+                    Start Time <span class="asteriskField">*</span>
+                  </label>
+                  <input type="datetime-local" name="start_time" class="form-control" required id="id_start_time">
+                </div>
+                <div class="col-12 col-md-6 mb-3">
+                  <label for="id_end_time" class="form-label requiredField">
+                    End Time <span class="asteriskField">*</span>
+                  </label>
+                  <input type="datetime-local" name="end_time" class="form-control" required id="id_end_time">
+                </div>
+
+              </div>
+
+              <div class="d-grid mt-4">
+                <button id="submitBtn" type="submit" class="btn btn-lg" style="border: 1px solid #800000; color: #800000">
+                  Submit
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      const form = document.getElementById("submitForm");
+      const submitBtn = document.getElementById("submitBtn");
+      form.addEventListener("submit", function(event) {
+        submitBtn.disabled = true;
+        submitBtn.innerText = "Submitting...";
+      });
+    });
+  </script>
+{% endblock %}

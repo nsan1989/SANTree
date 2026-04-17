@@ -53,14 +53,14 @@
                         <table class="table table-bordered">
                             <thead class="table-danger">
                                 <tr>
-                                    <th>Booking ID</th>
-                                    <th>Type</th>
-                                    <th>Pickup</th>
-                                    <th>Drop</th>
-                                    <th>Cargo</th>
-                                    <th>Vehicle</th>
-                                    <th>Driver</th>
-                                    <th>Status</th>
+                                    <th scope="col">Booking ID</th>
+                                    <th scope="col">Type</th>
+                                    <th scope="col">Pickup</th>
+                                    <th scope="col">Drop</th>
+                                    <th scope="col">Cargo</th>
+                                    <th scope="col">Vehicle</th>
+                                    <th scope="col">Driver</th>
+                                    <th scope="col">Status</th>
                                 </tr>
                             </thead>
                             <tbody class="table-info">
@@ -122,7 +122,9 @@
             <div class="content-body">
                 <div class="row">
                     <div class="col-12 table-responsive">
-                        <table class="table table-bordered">
+                        <table 
+                            class="table table-bordered"
+                        >
                             <thead class="table-danger">
                                 <tr>
                                     <th>Booking ID</th>
@@ -131,7 +133,7 @@
                                     <th>Drop</th>
                                     <th>Cargo</th>
                                     <th>Vehicle</th>
-                                    <th>Driver</th>
+                                    <th>Passenger</th>
                                     <th>Status</th>
                                 </tr>
                             </thead>
@@ -145,31 +147,39 @@
                                             <td>{{ request.drop_location }}</td>
                                             <td>{{ request.cargo }}</td>
                                             <td>{{ request.vehicle }}</td>
-                                            <td>{{ request.driver }}</td>
-                                            {% if request.status == 'ACKNOWLEDGE' %}
-                                            <td>
-                                                <form method="POST" action="{% url 'vms:staff_update_booking_status' request.id %}">
-                                                    {% csrf_token %}
-                                                    <select name="status" class="statusSelect" data-service-id="{{ request.id }}" required>
-                                                        <option value="">select</option>
-                                                        <option value="IN_PROGRESS" {% if request.status == 'IN_PROGRESS' %} selected {% endif %}>In Progress</option>
-                                                    </select>
-                                                    <button class="btn btn-sm btn-primary mt-2" type="submit">Update</button>
-                                                </form>
+                                            <td>{{ request.booked_by }}</td>
+                                            <td
+                                                style="
+                                                    display: flex;
+                                                    align-items: center;
+                                                "
+                                            >
+                                                {% if request.status == 'ACKNOWLEDGE' %}
+                                                    <form method="POST" action="{% url 'vms:staff_update_booking_status' request.id %}"
+                                                        style="display: flex; flex-direction: column; gap: 5px;">
+                                                        {% csrf_token %}
+                                                        <select name="status" class="statusSelect" required>
+                                                            <option value="">select</option>
+                                                            <option value="IN_PROGRESS">In Progress</option>
+                                                        </select>
+                                                        <button class="btn btn-sm btn-primary" type="submit">Update</button>
+                                                    </form>
+
+                                                {% elif request.status == 'IN_PROGRESS' %}
+                                                    <form method="POST" action="{% url 'vms:staff_update_booking_status' request.id %}"
+                                                        style="display: flex; flex-direction: column; gap: 5px;">
+                                                        {% csrf_token %}
+                                                        <select name="status" class="statusSelect" required>
+                                                            <option value="">select</option>
+                                                            <option value="COMPLETED">Completed</option>
+                                                        </select>
+                                                        <button class="btn btn-sm btn-primary" type="submit">Update</button>
+                                                    </form>
+
+                                                {% else %}
+                                                    <span class="badge bg-success">{{ request.status }}</span>
+                                                {% endif %}
                                             </td>
-                                            {% endif %}
-                                            {% if request.status == 'IN_PROGRESS' %}
-                                            <td>
-                                                <form method="POST" action="{% url 'vms:staff_update_booking_status' request.id %}">
-                                                    {% csrf_token %}
-                                                    <select name="status" class="statusSelect" data-service-id="{{ request.id }}" required>
-                                                        <option value="">select</option>
-                                                        <option value="COMPLETED" {% if request.status == 'COMPLETED' %} selected {% endif %}>Completed</option>
-                                                    </select>
-                                                    <button class="btn btn-sm btn-primary mt-2" type="submit">Update</button>
-                                                </form>
-                                            </td>
-                                            {% endif %}
                                         </tr>
                                     {% endfor %}
                                 {% else %}

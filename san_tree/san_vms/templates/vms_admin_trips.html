@@ -5,16 +5,37 @@
 {% endblock %}
 
 {% block start %}
+<style>
+    .content-header h3 {
+        color: wheat;
+        font-family: 'poppins', sans-serif;
+        font-weight: bold;
+    }
+
+    .content-header p {
+        color: wheat;
+        font-family: 'poppins', sans-serif;
+    }
+
+    thead {
+        font-family: 'poppins', sans-serif;
+        font-weight: bold;
+    }
+
+    tbody {
+        font-family: 'poppins', sans-serif;
+    }
+</style>
+
     <div class="container-fluid">
         <div class="content-header mb-3">
             <h3 class="mb-0">All Trips</h3>
             <p class="mb-0">View all completed trips in the system.</p>
         </div>
         <div class="content-body">
-            <div class="row">
-                <div class="col-12">
+                <div class="table-responsive">
                     <table class="table table-bordered">
-                        <thead>
+                        <thead class="table-danger">
                             <tr>
                                 <th>Type</th>
                                 <th>Pick Up</th>
@@ -27,7 +48,7 @@
                                 <th>Status</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody class="table-info">
                             {% if all_trips %}
                                 {% for trip in all_trips %}
                                     <tr>
@@ -50,7 +71,6 @@
                         </tbody>
                     </table>
                 </div>
-            </div>
         </div>
     </div>
 {% endblock %}

@@ -271,6 +271,24 @@ MENU_STRUCTURE = {
                 "view_name": "AdminTripsView",
                 "icon": "fa-solid fa-car",
             },
+            {
+                "name": "Staff",
+                "url_name": "vms:vms_all_staffs",
+                "view_name": "StaffView",
+                "icon": "fa-solid fa-users",
+            },
+            {
+                "name": "Vehicles",
+                "url_name": "vms:vms_all_vehicles",
+                "view_name": "VehiclesView",
+                "icon": "fa-solid fa-car",
+            },
+            {
+                "name": "Schedule",
+                "url_name": "vms:driver_schedule",
+                "view_name": "DriverScheduleView",
+                "icon": "fa-solid fa-calendar",
+            },
         ],
         "user": [
             {

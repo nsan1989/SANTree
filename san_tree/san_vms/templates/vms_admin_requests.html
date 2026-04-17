@@ -5,6 +5,28 @@
 {% endblock %}
 
 {% block start %}
+<style>
+    .content-header h3 {
+        color: wheat;
+        font-family: 'poppins', sans-serif;
+        font-weight: bold;
+    }
+
+    .content-header p {
+        color: wheat;
+        font-family: 'poppins', sans-serif;
+    }
+
+    thead {
+        font-family: 'poppins', sans-serif;
+        font-weight: bold;
+    }
+
+    tbody {
+        font-family: 'poppins', sans-serif;
+    }
+</style>
+
     <div class="container-fluid">
         <div class="content-header mb-3">
             <h3 class="mb-0">All Cab Requests</h3>
@@ -36,10 +58,9 @@
         </nav>
     <!--Paginator-->
         <div class="content-body">
-            <div class="row">
-                <div class="col-12 table-responsive">
+                <div class="table-responsive">
                     <table class="table table-bordered">
-                        <thead>
+                        <thead class="table-danger">
                             <tr>
                                 <th>Type</th>
                                 <th>Pick Up Location</th>
@@ -51,7 +72,7 @@
                                 <th>Update Status</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody class="table-info">
                             {% if page_obj %}
                                 {% for request in page_obj %}
                                     <tr>
@@ -149,7 +170,6 @@
                         </tbody>
                     </table>
                 </div>
-            </div>
         </div>
     </div>
 {% endblock %}

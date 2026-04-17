@@ -8,7 +8,7 @@ from .models import *
 # service types resources
 class ServiceTypesResources(resources.ModelResource):
     class Meta:
-        models = ServiceTypes
+        model = ServiceTypes
         fields = ("id", "name", "department")
 
 
@@ -21,7 +21,7 @@ class ServiceTypesAdmin(ImportExportModelAdmin):
 # blocks resources
 class BlockResources(resources.ModelResource):
     class Meta:
-        models = Blocks
+        model = Blocks
         fields = ("id", "name")
 
 
@@ -34,7 +34,7 @@ class BlockAdmin(ImportExportModelAdmin):
 # shift schedule resources
 class ShiftScheduleResources(resources.ModelResource):
     class Meta:
-        models = ShiftSchedule
+        model = ShiftSchedule
         fields = (
             "id",
             "shift_type",
@@ -124,7 +124,7 @@ class ServiceAdmin(ImportExportModelAdmin):
 # service queue resources
 class ServiceQueueResources(resources.ModelResource):
     class Meta:
-        models = ServiceRequestQueue
+        model = ServiceRequestQueue
         fields = ("id", "service_request", "created_at")
 
 
@@ -137,7 +137,7 @@ class ServiceQueueAdmin(ImportExportModelAdmin):
 # generate service resources
 class GenerateServiceResources(resources.ModelResource):
     class Meta:
-        models = GenerateService
+        model = GenerateService
         fields = (
             "id",
             "generate_number",
@@ -171,7 +171,7 @@ class GenerateServiceAdmin(ImportExportModelAdmin):
 # service remark resources.
 class ServiceRemarkResources(resources.ModelResource):
     class Meta:
-        models = ServiceRemarks
+        model = ServiceRemarks
         fields = ("id", "service", "remarks", "created_by", "created_at", "attachment")
 
 

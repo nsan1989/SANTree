@@ -2,6 +2,9 @@ from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator
 from django.db import transaction
 from django.shortcuts import get_object_or_404, redirect, render
+from django.contrib import messages
+import json
+from django.http import JsonResponse
 
 from .forms import *
 from .models import *
@@ -73,7 +76,7 @@ def AdminTripsView(request):
         raise PermissionDenied("User profile not found")
     context = {}
     try:
-        all_trips = Booking.objects.filter(status=BookingStatus.COMPLETED).order_by(
+        all_trips = Booking.objects.exclude(status=BookingStatus.WAITING).order_by(
             "-created_at"
         )
     except Exception as e:
@@ -297,3 +300,130 @@ def StaffUpdateBookingStatusView(request, booking_id):
         booking.status = request.POST.get("status")
         booking.save()
     return redirect("vms:vms_staff_dashboard")
+
+
+# All Vehicles View.
+def VehiclesView(request):
+    current_user = request.user
+    try:
+        current_user_role = current_user.role
+    except:
+        raise PermissionDenied("User profile not found")
+    context = {}
+    try:
+        vehicles = Vehicle.objects.all()
+        page_number = request.GET.get("page")
+        paginator = Paginator(vehicles, 10)
+        page_obj = paginator.get_page(page_number)
+        context["page_obj"] = page_obj
+    except Exception as e:
+        context["error"] = str(e)
+    view_name = request.resolver_match.view_name
+    if view_name == "vms:vms_all_vehicles" and current_user_role == "Admin":
+        return render(request, "vms_vehicles.html", context)
+    raise PermissionDenied(
+        "You are not authorized to view this page. Please contact administrator!"
+    )
+
+
+# All Staff View.
+def StaffView(request):
+    current_user = request.user
+    try:
+        current_user_role = current_user.role
+    except:
+        raise PermissionDenied("User profile not found")
+    context = {}
+    try:
+        staff = Driver.objects.all()
+        page_number = request.GET.get("page")
+        paginator = Paginator(staff, 10)
+        page_obj = paginator.get_page(page_number)
+        context["page_obj"] = page_obj
+    except Exception as e:
+        context["error"] = str(e)
+    view_name = request.resolver_match.view_name
+    if view_name == "vms:vms_all_staffs" and current_user_role == "Admin":
+        return render(request, "vms_staff.html", context)
+    raise PermissionDenied(
+        "You are not authorized to view this page. Please contact administrator!"
+    )
+
+
+# Driver Schedule View.
+def DriverScheduleView(request):
+    current_user = request.user
+    try:
+        current_user_role = current_user.role
+    except:
+        raise PermissionDenied("User profile not found")
+    context = {}
+    try:
+        schedule = DriverSchedule.objects.all()
+        page_number = request.GET.get("page")
+        paginator = Paginator(schedule, 10)
+        page_obj = paginator.get_page(page_number)
+        context["page_obj"] = page_obj
+    except Exception as e:
+        context["error"] = str(e)
+    view_name = request.resolver_match.view_name
+    if view_name == "vms:driver_schedule" and current_user_role == "Admin":
+        return render(request, "vms_schedule.html", context)
+    raise PermissionDenied(
+        "You are not authorized to view this page. Please contact administrator!"
+    )
+
+
+# Driver Schedule Form View.
+def ScheduleForm(request):
+    shift_choices = [
+        ("morning", "Morning"),
+        ("evening", "Evening"),
+        ("day", "Day"),
+        ("night", "Night"),
+    ]
+    shift_staffs = Driver.objects.filter(
+        (Q(user__department__name="Transport")) & Q(user__role="User")
+    )
+    if request.method == "POST":
+        form = DriverScheduleForm(request.POST, user=request.user)
+        if form.is_valid():
+            new_schedule = form.save(commit=False)
+            new_schedule.created_by = request.user
+            new_schedule.save()
+            messages.success(request, "Shift schedule created successfully.")
+            return redirect("srm:schedule")
+    else:
+        form = DriverScheduleForm(user=request.user)
+    context = {
+        "form": form,
+        "choices": shift_choices,
+        "staffs": shift_staffs,
+    }
+    return render(request, "vms_schedule_form.html", context)
+
+
+# Shift Edit Form View.
+def ShiftEditView(request, id):
+    edit_schedule = get_object_or_404(DriverSchedule, id=id)
+    if request.method == "POST":
+        form = ShiftEditForm(request.POST, instance=edit_schedule, user=request.user)
+        if form.is_valid():
+            edit_schedule = form.save(commit=False)
+            edit_schedule.created_by = request.user
+            edit_schedule.save()
+            messages.success(request, "Shift schedule edited successfully.")
+            return redirect("srm:schedule")
+    else:
+        form = ShiftEditForm(instance=edit_schedule, user=request.user)
+    context = {"form": form, "edit_schedule": edit_schedule}
+    return render(request, "shift_edit.html", context)
+
+
+def ToggleSchedule(request, pk):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        schedule = DriverSchedule.objects.get(id=pk)
+        schedule.is_active = data["is_active"]
+        schedule.save()
+        return JsonResponse({"status": "success"})
