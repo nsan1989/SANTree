@@ -71,16 +71,22 @@
                     </tr>
                 </thead>
                 <tbody class="table-info">
-                    {% for vehicle in page_obj %}
-                    <tr>
-                        <td>{{vehicle.vehicle_number}}</td>
-                        <td>{{vehicle.vehicle_type}}</td>
-                        <td>{{vehicle.capacity_volume}}</td>
-                        <td>{{vehicle.capacity_weight}}</td>
-                        <td>{{vehicle.status}}</td>
-                        <td>{{vehicle.maintenance_due_date}}</td>
-                    </tr>
-                    {% endfor %}
+                    {% if page_obj %}
+                        {% for vehicle in page_obj %}
+                        <tr>
+                            <td>{{vehicle.vehicle_number}}</td>
+                            <td>{{vehicle.vehicle_type}}</td>
+                            <td>{{vehicle.capacity_volume}}</td>
+                            <td>{{vehicle.capacity_weight}}</td>
+                            <td>{{vehicle.status}}</td>
+                            <td>{{vehicle.maintenance_due_date}}</td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="100%">No Data.</td>
+                        </tr>
+                    {% endif %}
                 </tbody>
             </table>
         </div>

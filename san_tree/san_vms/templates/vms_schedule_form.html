@@ -1,5 +1,6 @@
 {% load crispy_forms_tags %}
 {% block start %}
+
 <!--styles-->
   <style>
     .card-title,
@@ -19,7 +20,7 @@
       <div class="col-12 col-md-4 w-100">
         <div class="card shadow-lg border-0 rounded-4">
           <div class="card-body p-4">
-            <form id="submitForm" method="post" enctype="multipart/form-data" action="{% url 'srm:shift_schedule' %}">
+            <form id="submitForm" method="post" enctype="multipart/form-data" action="{% url 'vms:add_schedule' %}">
               {% csrf_token %}
 
               <div class="row">

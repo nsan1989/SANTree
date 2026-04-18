@@ -26,6 +26,10 @@ app.conf.beat_schedule = {
         "task": "san_srm.tasks.task_hold_service",
         "schedule": crontab(minute="*/1", hour="9-17"),
     },
+    "recurring-bookings-processor": {
+        "task": "san_vms.tasks.recurring_bookings_task",
+        "schedule": crontab(minute=0),
+    },
 }
 
 

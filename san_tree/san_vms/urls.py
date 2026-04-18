@@ -25,6 +25,7 @@ urlpatterns = [
     ),
     path("staff/all_trips/", AllTripsView, name="vms_all_trips"),
     path("admin/all_vehicles/", VehiclesView, name="vms_all_vehicles"),
+    path("admin/add_staff/", AddStaffView, name="vms_add_staff"),
     path("admin/all_staffs/", StaffView, name="vms_all_staffs"),
     path("admin/add_schedule/", ScheduleForm, name="add_schedule"),
     path(

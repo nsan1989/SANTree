@@ -69,14 +69,20 @@
                     </tr>
                 </thead>
                 <tbody class="table-info">
-                    {% for staff in page_obj %}
-                    <tr>
-                        <td>{{staff.user.username}}</td>
-                        <td>{{staff.license_number}}</td>
-                        <td>{{staff.user.phone_number}}</td>
-                        <td>{{staff.user.status}}</td>
-                    </tr>
-                    {% endfor %}
+                    {% if page_obj %}
+                        {% for staff in page_obj %}
+                        <tr>
+                            <td>{{staff.user.username}}</td>
+                            <td>{{staff.license_number}}</td>
+                            <td>{{staff.user.phone_number}}</td>
+                            <td>{{staff.user.status}}</td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="100%">No Data</td>
+                        </tr>
+                    {% endif %}
                 </tbody>
             </table>
         </div>

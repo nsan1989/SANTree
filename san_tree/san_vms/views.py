@@ -5,6 +5,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib import messages
 import json
 from django.http import JsonResponse
+from datetime import timedelta
 
 from .forms import *
 from .models import *
@@ -193,8 +194,6 @@ def CabRequestView(request):
     if current_user_role != "User":
         raise PermissionDenied("Unauthorized access")
 
-    cargos = Cargo.objects.all()
-
     if request.method == "POST":
         form = BookingForm(request.POST)
         if form.is_valid():
@@ -218,7 +217,7 @@ def CabRequestView(request):
     else:
         form = BookingForm()
 
-    context = {"form": form, "cargos": cargos}
+    context = {"form": form}
 
     return render(request, "vms_booking_request.html", context)
 
@@ -326,6 +325,30 @@ def VehiclesView(request):
     )
 
 
+# Add Staff View.
+def AddStaffView(request):
+    current_user = request.user
+    try:
+        current_user_role = current_user.role
+    except:
+        raise PermissionDenied("User profile not found")
+    context = {}
+    try:
+        if request.method == "POST":
+            form = DriverForm(request.POST, user=request.user)
+            if form.is_valid():
+                new_driver = form.save(commit=False)
+                new_driver.save()
+    except Exception as e:
+        context["error"] = str(e)
+    view_name = request.resolver_match.view_name
+    if view_name == "vms:vms_add_staff" and current_user_role == "Admin":
+        return render(request, "vms_add_staff.html", context)
+    raise PermissionDenied(
+        "You are not authorized to view this page. Please contact administrator!"
+    )
+
+
 # All Staff View.
 def StaffView(request):
     current_user = request.user
@@ -350,8 +373,38 @@ def StaffView(request):
     )
 
 
+# Driver Schedule Form View.
+def ScheduleForm(request):
+    shift_choices = [
+        ("morning", "Morning"),
+        ("evening", "Evening"),
+        ("day", "Day"),
+        ("night", "Night"),
+    ]
+    shift_staffs = Driver.objects.filter(
+        (Q(user__department__name__iexact="Transport")) & Q(user__role="User")
+    )
+    if request.method == "POST":
+        form = DriverScheduleForm(request.POST, user=request.user)
+        if form.is_valid():
+            new_schedule = form.save(commit=False)
+            new_schedule.created_by = request.user
+            new_schedule.save()
+            messages.success(request, "Shift schedule created successfully.")
+            return redirect("vms:driver_schedule")
+    else:
+        form = DriverScheduleForm(user=request.user)
+    context = {
+        "form": form,
+        "choices": shift_choices,
+        "staffs": shift_staffs,
+    }
+    return render(request, "vms_schedule_form.html", context)
+
+
 # Driver Schedule View.
 def DriverScheduleView(request):
+    DriverSchedule.update_shift_statuses()
     current_user = request.user
     try:
         current_user_role = current_user.role
@@ -372,35 +425,6 @@ def DriverScheduleView(request):
     raise PermissionDenied(
         "You are not authorized to view this page. Please contact administrator!"
     )
-
-
-# Driver Schedule Form View.
-def ScheduleForm(request):
-    shift_choices = [
-        ("morning", "Morning"),
-        ("evening", "Evening"),
-        ("day", "Day"),
-        ("night", "Night"),
-    ]
-    shift_staffs = Driver.objects.filter(
-        (Q(user__department__name="Transport")) & Q(user__role="User")
-    )
-    if request.method == "POST":
-        form = DriverScheduleForm(request.POST, user=request.user)
-        if form.is_valid():
-            new_schedule = form.save(commit=False)
-            new_schedule.created_by = request.user
-            new_schedule.save()
-            messages.success(request, "Shift schedule created successfully.")
-            return redirect("srm:schedule")
-    else:
-        form = DriverScheduleForm(user=request.user)
-    context = {
-        "form": form,
-        "choices": shift_choices,
-        "staffs": shift_staffs,
-    }
-    return render(request, "vms_schedule_form.html", context)
 
 
 # Shift Edit Form View.
@@ -427,3 +451,37 @@ def ToggleSchedule(request, pk):
         schedule.is_active = data["is_active"]
         schedule.save()
         return JsonResponse({"status": "success"})
+
+
+def recurring_bookings():
+    today = timezone.now().date()
+
+    bookings = Booking.objects.filter(
+        is_recurring=True,
+        pickup_time__date=today,
+        status__in=["WAITING", "CONFIRMED", "COMPLETED"],
+    )
+
+    for booking in bookings:
+        if booking.recurrence_pattern == "DAILY":
+            delta = timedelta(days=1)
+
+        elif booking.recurrence_pattern == "WEEKLY":
+            delta = timedelta(days=7)
+
+        elif booking.recurrence_pattern == "MONTHLY":
+            delta = timedelta(months=1)
+
+        else:
+            continue
+
+        if booking.pickup_time:
+            booking.pickup_time += delta
+        if booking.drop_time:
+            booking.drop_time += delta
+
+        booking.status = "WAITING"
+        booking.vehicle = None
+        booking.driver = None
+
+        booking.save()

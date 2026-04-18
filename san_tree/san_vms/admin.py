@@ -61,32 +61,6 @@ class DriverAdmin(ImportExportModelAdmin):
     )
 
 
-# Cargo Resources.
-class CargoResources(resources.ModelResource):
-    class Meta:
-        model = Cargo
-        fields = (
-            "id",
-            "cargo_type",
-            "weight",
-            "fragile",
-            "refrigeration_required",
-        )
-
-
-# Cargo Admin.
-@admin.register(Cargo)
-class CargoAdmin(ImportExportModelAdmin):
-    resource_class = CargoResources
-    list_display = (
-        "id",
-        "cargo_type",
-        "weight",
-        "fragile",
-        "refrigeration_required",
-    )
-
-
 # Booking Resources.
 class BookingResources(resources.ModelResource):
     class Meta:
@@ -100,7 +74,8 @@ class BookingResources(resources.ModelResource):
             "drop_location",
             "pickup_time",
             "drop_time",
-            "cargo",
+            "passengers",
+            "description",
             "vehicle",
             "driver",
             "booked_by",
@@ -125,7 +100,8 @@ class BookingAdmin(ImportExportModelAdmin):
         "drop_location",
         "pickup_time",
         "drop_time",
-        "cargo",
+        "passengers",
+        "description",
         "vehicle",
         "driver",
         "booked_by",

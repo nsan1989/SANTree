@@ -92,15 +92,11 @@ class Driver(models.Model):
         return self.user.username
 
 
-# Cargo model.
-class Cargo(models.Model):
-    cargo_type = models.CharField(max_length=100)
-    weight = models.FloatField()
-    fragile = models.BooleanField(default=False)
-    refrigeration_required = models.BooleanField(default=False)
-
-    def __str__(self):
-        return self.cargo_type
+# Recurrence pattern.
+class PatternChoices(models.TextChoices):
+    DAILY = "DAILY", "Daily"
+    WEEKLY = "WEEKLY", "Weekly"
+    MONTHLY = "MONTHLY", "Monthly"
 
 
 # Booking model.
@@ -116,7 +112,8 @@ class Booking(models.Model):
     drop_location = models.CharField(max_length=255, blank=True)
     pickup_time = models.DateTimeField(null=True, blank=True)
     drop_time = models.DateTimeField(null=True, blank=True)
-    cargo = models.ForeignKey(Cargo, on_delete=models.CASCADE, null=True, blank=True)
+    passengers = models.IntegerField(null=True, blank=True, default=0)
+    description = models.TextField(null=True, blank=True)
     vehicle = models.ForeignKey(
         Vehicle,
         on_delete=models.SET_NULL,
@@ -147,7 +144,7 @@ class Booking(models.Model):
     )
     is_recurring = models.BooleanField(default=False)
     recurrence_pattern = models.CharField(
-        max_length=50, blank=True, help_text="Example: DAILY, WEEKLY_MON, WEEKLY_FRI"
+        max_length=20, choices=PatternChoices.choices, default=PatternChoices.DAILY
     )
     status = models.CharField(
         max_length=20, choices=BookingStatus.choices, default=BookingStatus.WAITING
@@ -192,8 +189,10 @@ class DriverSchedule(models.Model):
         Driver,
         related_name="shift_staff",
         on_delete=models.CASCADE,
-        limit_choices_to=(models.Q(user__department__name__iexact="Transport"))
-        & models.Q(user__role="User"),
+        limit_choices_to=models.Q(
+            user__department__name__iexact="Transport",
+            user__role="User",
+        ),
     )
     shift_type = models.CharField(
         max_length=20, choices=SHIFT_CHOICES, default="Morning"

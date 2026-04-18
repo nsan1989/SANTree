@@ -29,20 +29,9 @@ class DriverForm(forms.ModelForm):
     class Meta:
         model = Driver
         fields = "__all__"
-        widgets = {
-            "shift_start": forms.TimeInput(attrs={"type": "time"}),
-            "shift_end": forms.TimeInput(attrs={"type": "time"}),
-        }
 
     def clean(self):
         cleaned_data = super().clean()
-        shift_start = cleaned_data.get("shift_start")
-        shift_end = cleaned_data.get("shift_end")
-
-        if shift_start and shift_end and shift_start >= shift_end:
-            raise forms.ValidationError(
-                "Shift start time must be before shift end time."
-            )
         return cleaned_data
 
 
@@ -72,7 +61,10 @@ class BookingForm(forms.ModelForm):
             "drop_location",
             "pickup_time",
             "drop_time",
-            "cargo",
+            "passengers",
+            "description",
+            "is_recurring",
+            "recurrence_pattern",
         ]
 
     def __init__(self, *args, **kwargs):
@@ -98,7 +90,6 @@ class BookingForm(forms.ModelForm):
         ):
             raise forms.ValidationError("Drop location is required.")
 
-        # Optional but recommended
         if pickup_time and drop_time and drop_time < pickup_time:
             raise forms.ValidationError("Drop time cannot be earlier than pickup time.")
 

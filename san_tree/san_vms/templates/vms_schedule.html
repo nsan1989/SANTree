@@ -16,6 +16,24 @@
         color: wheat;
         font-family: 'poppins', sans-serif;
     } 
+
+    thead {
+        font-family: 'poppins', sans-serif;
+        font-weight: bold;
+    }
+
+    tbody {
+      font-family: 'poppins', sans-serif;
+    }
+
+    .schedule-link {
+      font-family: 'poppins', sans-serif;
+      color: wheat;
+    }
+
+    .schedule-link a {
+      text-decoration: none;
+    }
 </style>
 
 <div class="container-fluid">
@@ -24,7 +42,7 @@
         <p>List is today's schedule.</p>
     </div>
     {% if request.user.department.name == 'Transport' and request.user.role == 'Admin' %}
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 mb-3">
           <div class="schedule-link">
             Set Schedules
             <a class="text-warning shift-add-modal" href="{% url 'vms:add_schedule' %}" data-bs-toggle="modal"
@@ -35,12 +53,32 @@
     <div class="page-content">
         <div class="table-responsive">
             <table class="table table-bordered">
-                <thead>
+                <thead class="table-danger">
                     <tr>
                         <th scope="col">Driver</th>
+                        <th scope="col">Shift Type</th>
                         <th scope="col">Status</th>
+                        <th scope="col">Start Time</th>
+                        <th scope="col">End Time</th>
                     </tr>
                 </thead>
+                <tbody class="table-info">
+                  {% if page_obj %}
+                    {% for schedule in page_obj %}
+                    <tr>
+                      <td>{{schedule.shift_staffs.user.username}}</td>
+                      <td>{{schedule.shift_type}}</td>
+                      <td>{{schedule.status}}</td>
+                      <td>{{schedule.start_time}}</td>
+                      <td>{{schedule.end_time}}</td>
+                    </tr>
+                    {% endfor %}
+                  {% else %}
+                    <tr>
+                      <td colspan="100%">No Data</td>
+                    </tr>
+                  {% endif %}
+                </tbody>
             </table>
         </div>
     </div>

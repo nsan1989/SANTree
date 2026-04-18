@@ -47,15 +47,14 @@
           <div class="row mb-3">
             <div class="col-6" id="div_id_pickup_location">
               <label for="id_pickup_location" class="form-label required">
-                Pickup
+                Source
                 <span class="asteriskField">*</span>
               </label>
               <input type="text" name="pickup_location" id="id_pickup_location" required class="text form-control">
             </div>
             <div class="col-6" id="div_id_drop_location">
-              <label for="id_drop_location" class="form-label required">
-                Drop
-                <span class="asteriskField">*</span>
+              <label for="id_drop_location" class="form-label">
+                Destination
               </label>
               <input type="text" name="drop_location" id="id_drop_location" required class="text form-control">
             </div>
@@ -76,15 +75,43 @@
             </div>
           </div>
           <div class="row mb-3">
-            <div class="col-12" id="div_id_cargo">
-              <label for="id_cargo" class="form-label">
-                Cargo
+            <div class="col-6" id="div_id_passengers">
+              <label for="id_passengers" class="form-label">
+                No. of Passengers
               </label>
-              <select name="cargo" id="id_cargo" class="select form-select">
+              <input type="text" name="passengers" id="id_passengers" class="form-control">
+            </div>
+            <div class="col-6" id="div_id_description">
+              <label for="id_description" class="form-label">
+                Description
+              </label>
+              <input type="text" name="description" id="id_description" class="form-control">
+            </div>
+          </div>
+          <div class="row mb-3">
+            <div class="col-6" id="div_id_is_recurring">
+              <div class="form-check">
+                <input 
+                  class="form-check-input" 
+                  type="checkbox" 
+                  name="is_recurring"
+                  value="true"
+                  id="id_is_recurring"
+                >
+                <label class="form-check-label" for="id_is_recurring">
+                  Recurring
+                </label>
+              </div>
+            </div>
+            <div class="col-6" id="div_id_recurrence_pattern">
+              <label for="id_recurrence_pattern" class="form-label">
+                Pattern
+              </label>
+              <select name="recurrence_pattern" id="id_recurrence_pattern" class="select form-select">
                 <option value="">Select</option>
-                {% for cargo in cargos %}
-                  <option value="{{ cargo.id }}">{{ cargo.cargo_type }}</option>
-                {% endfor %}
+                <option value="DAILY">DAILY</option>
+                <option value="WEEKLY">WEEKLY</option>
+                <option value="MONTHLY">MONTHLY</option>
               </select>
             </div>
           </div>
