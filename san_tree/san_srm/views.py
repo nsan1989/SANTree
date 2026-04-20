@@ -9,6 +9,7 @@ from django.db.models import Q
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
+from django.urls import reverse
 
 from accounts.models import CustomUsers
 
@@ -350,10 +351,7 @@ def ServiceView(request):
                 new_service.status = "Open"
                 new_service.save()
 
-            if request.user.role == "Admin":
-                return redirect("srm:admin_dashboard")
-            else:
-                return redirect("srm:staff_dashboard")
+            return redirect("srm:success")
     else:
         form = ServiceForm(user=request.user)
     context = {
@@ -787,3 +785,13 @@ def ToggleSchedule(request, pk):
         #                   staff.save(update_fields=["status"])
         #               if staff:
         #                   assigned_service_from_queue(staff)
+
+
+# Success view.
+def SuccessView(request):
+    if request.user.role == "Admin":
+        redirect_url = reverse("srm:admin_dashboard")
+    else:
+        redirect_url = reverse("srm:staff_dashboard")
+
+    return render(request, "service_success.html", {"redirect_url": redirect_url})

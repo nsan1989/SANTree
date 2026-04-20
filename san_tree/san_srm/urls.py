@@ -23,6 +23,7 @@ urlpatterns = [
     path("staff/dashboard/", StaffDashboard, name="staff_dashboard"),
     path("staff/dashboard/request_service/", ServiceView, name="request_service"),
     #    path('staff/dashboard/generate_service/', GenerateServiceView, name='generate_service'),
+    path("staff/dashboard/request_service/success", SuccessView, name="success"),
     path(
         "staff/dashboard/all_generate_service/",
         AllGeneratedService,

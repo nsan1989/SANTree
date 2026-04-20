@@ -6,6 +6,7 @@ from django.db.models import Q
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from openpyxl import Workbook
+from django.urls import reverse
 
 from accounts.models import CustomUsers, Departments
 
@@ -377,10 +378,7 @@ def ComplaintView(request):
                 changed_by=new_complaint.created_by,
             )
 
-            if user.role == "User":
-                return redirect("cms:staff_complaints_history")
-            elif user.role == "Admin":
-                return redirect("cms:incharge_complaints_history")
+            return redirect("cms:success_complaint")
     else:
         form = ComplaintForm(user=request.user)
 
@@ -889,3 +887,13 @@ def TasksExport(request):
         )
     wb.save(response)
     return response
+
+
+# Success view.
+def ComplaintSuccessView(request):
+    if request.user.role == "Admin":
+        redirect_url = reverse("cms:incharge_complaints_history")
+    else:
+        redirect_url = reverse("cms:staff_complaints_history")
+
+    return render(request, "complaint_success.html", {"redirect_url": redirect_url})

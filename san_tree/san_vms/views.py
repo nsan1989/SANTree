@@ -412,7 +412,7 @@ def DriverScheduleView(request):
         raise PermissionDenied("User profile not found")
     context = {}
     try:
-        schedule = DriverSchedule.objects.all()
+        schedule = DriverSchedule.objects.filter(shift_type="ongoing")
         page_number = request.GET.get("page")
         paginator = Paginator(schedule, 10)
         page_obj = paginator.get_page(page_number)
@@ -453,6 +453,7 @@ def ToggleSchedule(request, pk):
         return JsonResponse({"status": "success"})
 
 
+# Recurrence booking view.
 def recurring_bookings():
     today = timezone.now().date()
 

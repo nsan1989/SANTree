@@ -13,13 +13,19 @@
     }
   </style>
 
+  {% if form.errors %}
+  <div class="alert alert-danger">
+    {{ form.errors }}
+  </div>
+{% endif %}
+
   <div class="container-fluid">
     <div class="row d-flex justify-content-center align-items-center" style="min-height: 80vh;">
       <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4">
         <form id="cabForm" class="cab_form bg-light p-2 rounded" method="post" enctype="multipart/form-data">
           {% csrf_token %}
           <div class="row mb-3">
-            <div class="col-6" id="div_id_booking_type">
+            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6" id="div_id_booking_type">
               <label for="id_booking_type" class="form-label required">
                 Type
                 <span class="asteriskField">*</span>
@@ -31,7 +37,7 @@
                 <option value="DROP_AND_PICKUP">Drop and Pickup</option>
               </select>
             </div>
-            <div class="col-6" id="div_id_priority">
+            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6" id="div_id_priority">
               <label for="id_priority" class="form-label required">
                 Priority
                 <span class="asteriskField">*</span>
@@ -45,29 +51,29 @@
             </div>
           </div>
           <div class="row mb-3">
-            <div class="col-6" id="div_id_pickup_location">
+            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6" id="div_id_pickup_location">
               <label for="id_pickup_location" class="form-label required">
                 Source
                 <span class="asteriskField">*</span>
               </label>
               <input type="text" name="pickup_location" id="id_pickup_location" required class="text form-control">
             </div>
-            <div class="col-6" id="div_id_drop_location">
+            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6" id="div_id_drop_location">
               <label for="id_drop_location" class="form-label">
                 Destination
               </label>
-              <input type="text" name="drop_location" id="id_drop_location" required class="text form-control">
+              <input type="text" name="drop_location" id="id_drop_location" class="text form-control">
             </div>
           </div>
           <div class="row mb-3">
-            <div class="col-6" id="div_id_pickup_time">
-              <label for="id_pickup_time" class="form-label required">
+            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6" id="div_id_pickup_time">
+              <label for="id_pickup_time" class="form-label">
                 Pickup Time
                 <span class="asteriskField">*</span>
               </label>
               <input type="datetime-local" name="pickup_time" id="id_pickup_time" required class="datetime form-control">
             </div>
-            <div class="col-6" id="div_id_drop_time">
+            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6" id="div_id_drop_time">
               <label for="id_drop_time" class="form-label">
                 Drop Time
               </label>
@@ -75,21 +81,7 @@
             </div>
           </div>
           <div class="row mb-3">
-            <div class="col-6" id="div_id_passengers">
-              <label for="id_passengers" class="form-label">
-                No. of Passengers
-              </label>
-              <input type="text" name="passengers" id="id_passengers" class="form-control">
-            </div>
-            <div class="col-6" id="div_id_description">
-              <label for="id_description" class="form-label">
-                Description
-              </label>
-              <input type="text" name="description" id="id_description" class="form-control">
-            </div>
-          </div>
-          <div class="row mb-3">
-            <div class="col-6" id="div_id_is_recurring">
+            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6" id="div_id_is_recurring">
               <div class="form-check">
                 <input 
                   class="form-check-input" 
@@ -103,7 +95,7 @@
                 </label>
               </div>
             </div>
-            <div class="col-6" id="div_id_recurrence_pattern">
+            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6" id="div_id_recurrence_pattern">
               <label for="id_recurrence_pattern" class="form-label">
                 Pattern
               </label>
@@ -113,6 +105,20 @@
                 <option value="WEEKLY">WEEKLY</option>
                 <option value="MONTHLY">MONTHLY</option>
               </select>
+            </div>
+          </div>
+          <div class="row mb-3">
+            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6" id="div_id_passengers">
+              <label for="id_passengers" class="form-label">
+                No. of Passengers
+              </label>
+              <input type="text" name="passengers" id="id_passengers" class="form-control">
+            </div>
+            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6" id="div_id_description">
+              <label for="id_description" class="form-label">
+                Description
+              </label>
+              <textarea id="id_description" name="description" rows="4" style="width: 100%;"></textarea>
             </div>
           </div>
           <button type="submit" id="submitBtn" class="btn btn-primary">Book Cab</button>

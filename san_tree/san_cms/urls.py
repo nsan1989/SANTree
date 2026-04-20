@@ -22,6 +22,7 @@ urlpatterns = [
         name="assign_complaint_pie_chart",
     ),
     path("raised_complaints/", ComplaintView, name="complaints"),
+    path("raised_complaints/success/", ComplaintSuccessView, name="success_complaint"),
     path("incharge/review_complaints/", ReviewComplaints, name="review_complaints"),
     path(
         "incharge/review_complaints/<int:id>/review_complaint_details",

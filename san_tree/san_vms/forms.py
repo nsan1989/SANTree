@@ -39,7 +39,7 @@ class DriverForm(forms.ModelForm):
 class BookingForm(forms.ModelForm):
 
     pickup_time = forms.DateTimeField(
-        required=False,
+        required=True,
         widget=forms.DateTimeInput(
             attrs={"type": "datetime-local"}, format="%Y-%m-%dT%H:%M"
         ),

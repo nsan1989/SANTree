@@ -1,6 +1,7 @@
 from django.db import models
 from django.db.models import Q
 from django.utils import timezone
+from django.core.exceptions import ValidationError
 
 from accounts.models import CustomUsers
 
@@ -91,6 +92,20 @@ class Driver(models.Model):
     def __str__(self):
         return self.user.username
 
+    def save(self, *args, **kwargs):
+        if Driver.objects.filter(
+            user__username__iexact=self.user.username,
+            license_number__iexact=self.license_number,
+        ):
+            raise ValidationError(
+                f"A Driver with the name '{self.user.username}' and '{self.license_number}' already exists."
+            )
+        self().save(*args, **kwargs)
+
+    class Meta:
+        ordering = ["user__username"]
+        verbose_name_plural = "Users"
+
 
 # Recurrence pattern.
 class PatternChoices(models.TextChoices):
@@ -144,7 +159,11 @@ class Booking(models.Model):
     )
     is_recurring = models.BooleanField(default=False)
     recurrence_pattern = models.CharField(
-        max_length=20, choices=PatternChoices.choices, default=PatternChoices.DAILY
+        max_length=20,
+        choices=PatternChoices.choices,
+        default=PatternChoices.DAILY,
+        blank=True,
+        null=True,
     )
     status = models.CharField(
         max_length=20, choices=BookingStatus.choices, default=BookingStatus.WAITING
