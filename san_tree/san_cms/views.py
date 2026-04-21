@@ -370,7 +370,7 @@ def ComplaintView(request):
 
                     new_complaint.assigned_to = assigned_user
                     new_complaint.status = "Open"
-                    new_complaint.save()
+                new_complaint.save()
 
             ComplaintHistory.objects.create(
                 complaint=new_complaint,

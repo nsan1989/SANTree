@@ -18,6 +18,9 @@
         .cab-request a {
             text-decoration: none;
         }
+        .booking-body.active {
+            display: block !important;
+        }
     </style>
 
     <div class="container-fluid">
@@ -35,7 +38,7 @@
                 <h3>Recent Activity</h3>
             </div>
             <div class="row">
-                <div class="col-12 table-responsive">
+                <div class="col-12 d-none d-lg-flex table-responsive">
                     <table class="table table-bordered">
                         <thead class="table-danger">
                             <tr>
@@ -65,7 +68,89 @@
                         </tbody>
                     </table>
                 </div>
+                <div class="col-12 d-md-flex">
+                    {% if bookings %}
+                        {% for booking in bookings %}
+                            <div class="booking-wrapper">
+                                <div
+                                    class="booking-header"
+                                    style="
+                                           display: flex;
+                                           justify-content: space-between;
+                                           cursor: pointer;
+                                           background-color: #7ae1f5;
+                                           padding: 0.5rem;
+                                           border-radius: 0.2rem;
+                                           color: #000;
+                                           font-family: 'Poppins', sans-serif;
+                                          "
+                                    onClick="toggleTask(this)"
+                                >
+                                    <div class="booking-number">
+                                        {{booking.id}}
+                                    </div>
+                                    <div class="booking-status">
+                                        {{booking.status}}
+                                    </div>
+                                    <div class="booking-detail">
+                                        <i class="fa-solid fa-plus"></i>
+                                    </div>
+                                </div>
+                                <div
+                                    class="booking-body"
+                                    style="
+                                           display: none;
+                                           align-items: center;
+                                           background-color: #fff;
+                                           padding: 0.5rem;
+                                           font-family: 'Poppins', sans-serif;
+                                          "
+                                >
+                                    <div>
+                                        <i class="fa-solid fa-location-arrow"></i>
+                                        <p>{{ booking.pickup_location }}</p>
+                                    </div>
+                                    <div>
+                                        <i class="fa-solid fa-location-arrow"></i>
+                                        <p>{{ booking.drop_location }}</p>
+                                    </div>
+                                    <div>
+                                        <i class="fa-solid fa-clock"></i>
+                                        <p>{{ booking.pickup_time }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div
+                            class="booking-header"
+                            style="
+                                   background-color: #7ae1f5;
+                                   padding: 0.5rem;
+                                   border-radius: 0.2rem;
+                                  "
+                        >
+                            <p class="mb-0">No Bookings!</p>
+                        </div>
+                    {% endif %}
+                </div>
             </div>
         </div>
     </div>
+
+    <script>
+        function toggleTask(element) {
+            const body = element.nextElementSibling;
+            body.classList.toggle("active");
+
+            const icon = element.querySelector("i");
+            if (body.classList.contains("active")) {
+                icon.classList.remove("fa-plus");
+                icon.classList.add("fa-minus");
+            } else {
+                icon.classList.remove("fa-minus");
+                icon.classList.add("fa-plus");
+            }
+        }
+    </script>
 {% endblock %}

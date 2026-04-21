@@ -2,34 +2,34 @@
 {% load static %}
 
 {% block title %}
-  Success
+    Success
 {% endblock %}
 
 {% block start %}
 
-<style>
-    .success-wrapper {
-        height: 100vh;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-    }
-    .success-text {
-        text-align: center;
-    }
-</style>
+    <style>
+        .success-wrapper {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        .success-text {
+            text-align: center;
+        }
+    </style>
 
-<div class="container-fluid">
-    <div class="success-wrapper">
-        <div class="success-text">
-            <h2>✅ Service submitted successfully!</h2>
-            <p>Redirecting to dashboard in <span id="countdown">5</span> seconds...</p>
+    <div class="container-fluid">
+        <div class="success-wrapper">
+            <div class="success-text">
+                <h2>✅ Complaint submitted successfully!</h2>
+                <p>Redirecting to dashboard in <span id="countdown">5</span> seconds...</p>
+            </div>
         </div>
     </div>
-</div>
 
-<script>
+    <script>
         let seconds = 5;
         const countdownEl = document.getElementById("countdown");
         const redirectUrl = "{{ redirect_url }}";

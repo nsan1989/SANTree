@@ -18,37 +18,37 @@
     </style>
 
     {% if request.user.department.name|lower != "transport" %}
-    <div class="container-fluid">
-        <div class="content-header mb-3">
-            <h3 class="mb-0 fw-bold">Upcoming Trips</h3>
-            <p class="mb-0 text-light">list of upcoming trips</p>
-        </div>
+        <div class="container-fluid">
+            <div class="content-header mb-3">
+                <h3 class="mb-0 fw-bold">Upcoming Trips</h3>
+                <p class="mb-0 text-light">list of upcoming trips</p>
+            </div>
     <!--Paginator-->
-        <nav class="mb-3">
-            <ul class="pagination">
-                {% if page_obj.has_previous %}
-                    <li class="page-item">
-                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a>
-                    </li>
-                {% endif %}
-                {% for num in page_obj.paginator.page_range %}
-                    {% if page_obj.number == num %}
-                        <li class="page-item active"><span class="page-link">{{ num }}</span></li>
-                    {% else %}
+            <nav class="mb-3">
+                <ul class="pagination">
+                    {% if page_obj.has_previous %}
                         <li class="page-item">
-                            <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a>
                         </li>
                     {% endif %}
-                {% endfor %}
-                {% if page_obj.has_next %}
-                    <li class="page-item">
-                        <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
-                    </li>
-                {% endif %}
-            </ul>
-        </nav>
+                    {% for num in page_obj.paginator.page_range %}
+                        {% if page_obj.number == num %}
+                            <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                        {% else %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                    {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
     <!--Paginator-->
-        <div class="content-body">
+            <div class="content-body">
                 <div class="table-responsive">
                     <table class="table table-bordered">
                         <thead class="table-danger">
@@ -85,40 +85,40 @@
                         </tbody>
                     </table>
                 </div>
+            </div>
         </div>
-    </div>
     {% else %}
-    <div class="container-fluid">
-        <div class="content-header mb-3">
-            <h3 class="mb-0 fw-bold">Upcoming Trips</h3>
-            <p class="mb-0 text-light">list of upcoming trips</p>
-        </div>
+        <div class="container-fluid">
+            <div class="content-header mb-3">
+                <h3 class="mb-0 fw-bold">Upcoming Trips</h3>
+                <p class="mb-0 text-light">list of upcoming trips</p>
+            </div>
     <!--Paginator-->
-        <nav class="mb-3">
-            <ul class="pagination">
-                {% if page_obj.has_previous %}
-                    <li class="page-item">
-                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a>
-                    </li>
-                {% endif %}
-                {% for num in page_obj.paginator.page_range %}
-                    {% if page_obj.number == num %}
-                        <li class="page-item active"><span class="page-link">{{ num }}</span></li>
-                    {% else %}
+            <nav class="mb-3">
+                <ul class="pagination">
+                    {% if page_obj.has_previous %}
                         <li class="page-item">
-                            <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a>
                         </li>
                     {% endif %}
-                {% endfor %}
-                {% if page_obj.has_next %}
-                    <li class="page-item">
-                        <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
-                    </li>
-                {% endif %}
-            </ul>
-        </nav>
+                    {% for num in page_obj.paginator.page_range %}
+                        {% if page_obj.number == num %}
+                            <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                        {% else %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                    {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
     <!--Paginator-->
-        <div class="content-body">
+            <div class="content-body">
                 <div class="table-responsive">
                     <table class="table table-bordered">
                         <thead class="table-danger">
@@ -145,23 +145,23 @@
                                         <td>{{ trip.driver.user.username|default:"-" }}</td>
                                         <td>{{ trip.driver.user.phone_number|default:"-" }}</td>
                                         {% if trip.status == 'CONFIRMED' %}
-                                        <td
-                                            style="
-                                                display: flex;
-                                                align-items: center;
-                                            "
-                                        >
-                                            <form method="POST" action="{% url 'vms:staff_update_booking_status' trip.id %}">
-                                                {% csrf_token %}
-                                                <select name="status" class="statusSelect" data-service-id="{{ trip.id }}" required>
-                                                    <option value="">select</option>
-                                                    <option value="ACKNOWLEDGE" {% if service.status == 'ACKNOWLEDGE' %} selected {% endif %}>Acknowledge</option>
-                                                </select>
-                                                <button class="btn btn-sm btn-primary" type="submit">Update</button>
-                                            </form>
-                                        </td>
+                                            <td
+                                                style="
+                                                       display: flex;
+                                                       align-items: center;
+                                                      "
+                                            >
+                                                <form method="POST" action="{% url 'vms:staff_update_booking_status' trip.id %}">
+                                                    {% csrf_token %}
+                                                    <select name="status" class="statusSelect" data-service-id="{{ trip.id }}" required>
+                                                        <option value="">select</option>
+                                                        <option value="ACKNOWLEDGE" {% if service.status == 'ACKNOWLEDGE' %} selected {% endif %}>Acknowledge</option>
+                                                    </select>
+                                                    <button class="btn btn-sm btn-primary" type="submit">Update</button>
+                                                </form>
+                                            </td>
                                         {% else %}
-                                        <td>{{ trip.status }}</td>
+                                            <td>{{ trip.status }}</td>
                                         {% endif %}
                                     </tr>
                                 {% endfor %}
@@ -173,7 +173,7 @@
                         </tbody>
                     </table>
                 </div>
+            </div>
         </div>
-    </div>
     {% endif %}
 {% endblock %}

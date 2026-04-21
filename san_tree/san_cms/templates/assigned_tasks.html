@@ -34,6 +34,23 @@
     .status-progress > td { background-color: #ff6600; color: white; }
     .status-closed > td { background-color: #666666; color: white; }
     .status-cancelled > td { background-color: #cc0000; color: white; }
+
+    .task-body.active {
+      display: block !important;
+    }
+
+    .task-body div {
+      display: flex;
+    }
+
+    .task-body div i {
+      width: 2rem;
+      height: 2rem;
+    }
+
+    .task-body div p {
+      margin-bottom: 0;
+    }
   </style>
 
   <div class="container-fluid">
@@ -49,9 +66,9 @@
         {% endfor %}
       {% endif %}
       <div class="col-12">
-        <div class="row mb-3">
+        <div class="row">
         <!-- Pagination Section -->
-          <div class="col-12 col-md-6 mb-3 mb-md-0">
+          <div class="col-12 col-md-6 mb-md-0">
             <nav>
               <ul class="pagination flex-wrap justify-content-md-start">
                 {% if page_obj.has_previous %}
@@ -85,7 +102,7 @@
           </div>
 
         <!-- Export Section -->
-          <div class="col-12 col-md-6">
+          <div class="col-12 col-md-6 mb-3">
             <div class="export-button d-flex justify-content-md-end">
               <form method="get" action="{% url 'cms:export_tasks_excel' %}" class="export-form d-flex flex-wrap gap-2"
                     style="font-size: 0.875rem;">
@@ -106,9 +123,8 @@
             </div>
           </div>
         </div>
-
       </div>
-      <div class="col-12 table-responsive">
+      <div class="col-12 d-none d-lg-flex table-responsive">
         <table class="table table-bordered">
           <thead class="table-primary">
             <tr>
@@ -171,11 +187,140 @@
               {% endfor %}
             {% else %}
               <tr>
-                <td colspan="10">No tasks is assigned!</td>
+                <td colspan="10">No complaints!</td>
               </tr>
             {% endif %}
           </tbody>
         </table>
+      </div>
+      <div class="col-12 d-md-none">
+        <div class="task-title mb-3">
+          <h5 class="fw-bold">Complaint List</h5>
+        </div>
+        {% if page_obj %}
+          {% for task in page_obj %}
+            <div
+              class="task-wrapper"
+              style="
+                     border: 1px soild #fff;
+                     border-radius: 0.2rem;
+                    "
+            >
+              <div
+                class="task-header"
+                style="
+                       display: flex;
+                       justify-content: space-between;
+                       cursor: pointer;
+                       background-color: #7ae1f5;
+                       padding: 0.5rem;
+                       border-radius: 0.2rem;
+                       color: #000;
+                       font-family: 'Poppins', sans-serif;
+                      "
+                onClick="toggleTask(this)"
+              >
+                <div class="task-no">
+                  {{task.complaint.complaint_number}}
+                </div>
+                <div class="task-status">
+                  {{task.complaint.status}}
+                </div>
+                <div class="task-priority">
+                  {{task.complaint.priority}}
+                </div>
+                <div class="task-details">
+                  <i class="fa-solid fa-plus"></i>
+                </div>
+              </div>
+              <div
+                class="task-body"
+                style="
+                       display: none;
+                       align-items: center;
+                       background-color: #fff;
+                       padding: 0.5rem;
+                       font-family: 'Poppins', sans-serif;
+                      "
+              >
+                <div>
+                  <i class="fa-regular fa-user"></i>
+                  <p>{{task.complaint.created_by.department}}</p>
+                </div>
+                <div>
+                  <i class="fa-regular fa-clipboard"></i>
+                  <p>{{task.complaint.complaint_type}}</p>
+                </div>
+                <div>
+                  <i class="fa-solid fa-location-dot"></i>
+                  <p>{{task.complaint.location}}</p>
+                </div>
+                <div>
+                  <i class="fa-regular fa-flag"></i>
+                  <p>{{task.complaint.priority}}</p>
+                </div>
+                <div>
+                  <i class="fa-regular fa-calendar"></i>
+                  <p>{{task.complaint.created_at}}</p>
+                </div>
+                <div class="d-flex align-items-center">
+                  <i class="fa-solid fa-magnifying-glass-chart"></i>
+                  {% if task.complaint.status != 'Cancelled' and task.complaint.status != 'Resolved' and task.complaint.status != 'Halt' %}
+                    <form method="POST" action="{% url 'cms:staff_update_complaint_status' task.complaint.id %}">
+                      {% csrf_token %}
+                      <select name="status" required>
+                        <option value="">select</option>
+                        <option value="Review" {% if complaints.status == 'Review' %} selected {% endif %}>Review</option>
+                      </select>
+                      <button class="btn btn-sm btn-primary" type="submit">Update</button>
+                    </form>
+                  {% else %}
+                    <p>--</p>
+                  {% endif %}
+                </div>
+                <div class="d-flex align-items-center">
+                  {% if task.complaint.status == 'Resolved' %}
+                    <p class="text-center">--</p>
+                  {% else %}
+                    <a
+                      class="open-modal d-flex"
+                      data-url="{% url 'cms:complaints_remarks' task.complaint.id %}"
+                      style="text-decoration: none;"
+                    >
+                      <i class="fa-solid fa-pen"></i>
+                      <p>Add Remark</p>
+                    </a>
+                  {% endif %}
+                </div>
+                <div>
+                  <a
+                    class="d-flex align-items-center"
+                    href="{% url 'cms:staff_assigned_tasks_details' task.complaint.id %}"
+                    style="text-decoration: none;"
+                  >
+                    <i class="fa-solid fa-eye"></i>
+                    <p>See Details</p>
+                  </a>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        {% else %}
+          <div
+            class="task-wrapper"
+            style="
+                   display: flex;
+                   align-items: center;
+                   justify-content: space-between;
+                   border: 1px soild #fff;
+                   background-color: #fff;
+                   border-radius: 0.2rem;
+                   padding: 0.5rem;
+                  "
+          >
+            <p class="mb-0">No Complaints!</p>
+          </div>
+        {% endif %}
       </div>
     </div>
   </div>
@@ -251,5 +396,21 @@
         });
       });
     });
+  </script>
+
+  <script>
+    function toggleTask(element) {
+      const body = element.nextElementSibling;
+      body.classList.toggle("active");
+
+      const icon = element.querySelector("i");
+      if (body.classList.contains("active")) {
+        icon.classList.remove("fa-plus");
+        icon.classList.add("fa-minus");
+      } else {
+        icon.classList.remove("fa-minus");
+        icon.classList.add("fa-plus");
+      }
+    }
   </script>
 {% endblock %}

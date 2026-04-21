@@ -5,27 +5,27 @@
 {% endblock %}
 
 {% block start %}
-<style>
-    .content-header h3 {
-        color: wheat;
-        font-family: 'poppins', sans-serif;
-        font-weight: bold;
-    }
+    <style>
+        .content-header h3 {
+            color: wheat;
+            font-family: 'poppins', sans-serif;
+            font-weight: bold;
+        }
 
-    .content-header p {
-        color: wheat;
-        font-family: 'poppins', sans-serif;
-    }
+        .content-header p {
+            color: wheat;
+            font-family: 'poppins', sans-serif;
+        }
 
-    thead {
-        font-family: 'poppins', sans-serif;
-        font-weight: bold;
-    }
+        thead {
+            font-family: 'poppins', sans-serif;
+            font-weight: bold;
+        }
 
-    tbody {
-        font-family: 'poppins', sans-serif;
-    }
-</style>
+        tbody {
+            font-family: 'poppins', sans-serif;
+        }
+    </style>
 
     <div class="container-fluid">
         <div class="content-header mb-3">
@@ -58,118 +58,118 @@
         </nav>
     <!--Paginator-->
         <div class="content-body">
-                <div class="table-responsive">
-                    <table class="table table-bordered">
-                        <thead class="table-danger">
-                            <tr>
-                                <th>Type</th>
-                                <th>Pick Up Location</th>
-                                <th>Drop Location</th>
-                                <th>Pick Up Time</th>
-                                <th>Cargo</th>
-                                <th>Booked By</th>
-                                <th>Status</th>
-                                <th>Update Status</th>
-                            </tr>
-                        </thead>
-                        <tbody class="table-info">
-                            {% if page_obj %}
-                                {% for request in page_obj %}
-                                    <tr>
-                                        <td>{{ request.booking_type }}</td>
-                                        <td>{{ request.pickup_location }}</td>
-                                        <td>{{ request.drop_location }}</td>
-                                        <td>{{ request.pickup_time }}</td>
-                                        <td>{{ request.cargo }}</td>
-                                        <td>{{ request.booked_by }}</td>
-                                        <td>{{ request.status }}</td>
-                                        {% if request.status != 'CONFIRMED' and request.status != 'CANCELLED' %}
-                                            <td>
-                                                <button class="btn btn-primary btn-sm" data-bs-toggle="modal"
-                                                        data-bs-target="#updateModal{{ request.id }}">
-                                                    Update
-                                                </button>
-                                            </td>
-                                        {% else %}
-                                            <td>NA</td>
-                                        {% endif %}
-                                    </tr>
-                                    <div class="modal fade" id="updateModal{{ request.id }}" tabindex="-1">
-                                        <div class="modal-dialog">
-                                            <div class="modal-content">
+            <div class="table-responsive">
+                <table class="table table-bordered">
+                    <thead class="table-danger">
+                        <tr>
+                            <th>Type</th>
+                            <th>Pick Up Location</th>
+                            <th>Drop Location</th>
+                            <th>Pick Up Time</th>
+                            <th>Cargo</th>
+                            <th>Booked By</th>
+                            <th>Status</th>
+                            <th>Update Status</th>
+                        </tr>
+                    </thead>
+                    <tbody class="table-info">
+                        {% if page_obj %}
+                            {% for request in page_obj %}
+                                <tr>
+                                    <td>{{ request.booking_type }}</td>
+                                    <td>{{ request.pickup_location }}</td>
+                                    <td>{{ request.drop_location }}</td>
+                                    <td>{{ request.pickup_time }}</td>
+                                    <td>{{ request.cargo }}</td>
+                                    <td>{{ request.booked_by }}</td>
+                                    <td>{{ request.status }}</td>
+                                    {% if request.status != 'CONFIRMED' and request.status != 'CANCELLED' %}
+                                        <td>
+                                            <button class="btn btn-primary btn-sm" data-bs-toggle="modal"
+                                                    data-bs-target="#updateModal{{ request.id }}">
+                                                Update
+                                            </button>
+                                        </td>
+                                    {% else %}
+                                        <td>NA</td>
+                                    {% endif %}
+                                </tr>
+                                <div class="modal fade" id="updateModal{{ request.id }}" tabindex="-1">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
 
-                                                <div class="modal-header">
-                                                    <h5 class="modal-title">Update Booking #{{ request.id }}</h5>
-                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                                </div>
+                                            <div class="modal-header">
+                                                <h5 class="modal-title">Update Booking #{{ request.id }}</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                            </div>
 
-                                                <form action="{% url 'vms:update_booking_status' request.id %}" method="post">
-                                                    {% csrf_token %}
+                                            <form action="{% url 'vms:update_booking_status' request.id %}" method="post">
+                                                {% csrf_token %}
 
-                                                    <div class="modal-body">
+                                                <div class="modal-body">
 
                                     <!-- Status -->
-                                                        <div class="mb-3">
-                                                            <label class="form-label">Status</label>
-                                                            <select name="status" class="form-select">
-                                                                <option value="CONFIRMED">Confirmed</option>
-                                                                <option value="CANCELLED">Cancelled</option>
-                                                            </select>
-                                                        </div>
+                                                    <div class="mb-3">
+                                                        <label class="form-label">Status</label>
+                                                        <select name="status" class="form-select">
+                                                            <option value="CONFIRMED">Confirmed</option>
+                                                            <option value="CANCELLED">Cancelled</option>
+                                                        </select>
+                                                    </div>
 
                                     <!-- Assign Vehicle -->
-                                                        <div class="mb-3">
-                                                            <label class="form-label">Assign Vehicle</label>
-                                                            <select name="vehicle" class="form-select">
-                                                                <option value="">Select Vehicle</option>
-                                                                {% for vehicle in vehicles %}
-                                                                    <option value="{{ vehicle.id }}"
-                                                                            {% if request.vehicle and request.vehicle.id == vehicle.id %}selected{% endif %}>
-                                                                        {{ vehicle.vehicle_number }}
-                                                                    </option>
-                                                                {% endfor %}
-                                                            </select>
-                                                        </div>
+                                                    <div class="mb-3">
+                                                        <label class="form-label">Assign Vehicle</label>
+                                                        <select name="vehicle" class="form-select">
+                                                            <option value="">Select Vehicle</option>
+                                                            {% for vehicle in vehicles %}
+                                                                <option value="{{ vehicle.id }}"
+                                                                        {% if request.vehicle and request.vehicle.id == vehicle.id %}selected{% endif %}>
+                                                                    {{ vehicle.vehicle_number }}
+                                                                </option>
+                                                            {% endfor %}
+                                                        </select>
+                                                    </div>
 
                                     <!-- Assign Driver -->
-                                                        <div class="mb-3">
-                                                            <label class="form-label">Assign Driver</label>
-                                                            <select name="driver" class="form-select">
-                                                                <option value="">Select Driver</option>
-                                                                {% for driver in drivers %}
-                                                                    <option value="{{ driver.id }}"
-                                                                            {% if request.driver and request.driver.id == driver.id %}selected{% endif %}>
-                                                                        {{ driver.user.username }}
-                                                                    </option>
-                                                                {% endfor %}
-                                                            </select>
-                                                        </div>
-
+                                                    <div class="mb-3">
+                                                        <label class="form-label">Assign Driver</label>
+                                                        <select name="driver" class="form-select">
+                                                            <option value="">Select Driver</option>
+                                                            {% for driver in drivers %}
+                                                                <option value="{{ driver.id }}"
+                                                                        {% if request.driver and request.driver.id == driver.id %}selected{% endif %}>
+                                                                    {{ driver.user.username }}
+                                                                </option>
+                                                            {% endfor %}
+                                                        </select>
                                                     </div>
 
-                                                    <div class="modal-footer">
-                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                                                            Close
-                                                        </button>
-                                                        <button type="submit" class="btn btn-primary">
-                                                            Update
-                                                        </button>
-                                                    </div>
+                                                </div>
 
-                                                </form>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                                        Close
+                                                    </button>
+                                                    <button type="submit" class="btn btn-primary">
+                                                        Update
+                                                    </button>
+                                                </div>
 
-                                            </div>
+                                            </form>
+
                                         </div>
                                     </div>
-                                {% endfor %}
-                            {% else %}
-                                <tr>
-                                    <td colspan="100%" class="text-center">No requests available</td>
-                                </tr>
-                            {% endif %}
-                        </tbody>
-                    </table>
-                </div>
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="100%" class="text-center">No requests available</td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 {% endblock %}

@@ -28,6 +28,22 @@
     td a {
       cursor: pointer;
     }
+    .task-wrapper.active .task-body {
+      display: block !important;
+    }
+
+    .task-body div {
+      display: flex;
+    }
+
+    .task-body div i {
+      width: 2rem;
+      height: 2rem;
+    }
+
+    .task-body div p {
+      margin-bottom: 0;
+    }
   </style>
 
   <link rel="stylesheet" href="{% static 'styles/assigned_complaint.css' %}" />
@@ -41,7 +57,7 @@
       </div>
     </div>
     <div class="row mb-2">
-      <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 mb-2">
+      <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4">
         <nav>
           <ul class="pagination">
             {% if page_obj.has_previous %}
@@ -99,7 +115,7 @@
         <div class="alert alert-{{ message.tags }}">{{ message }}</div>
       {% endfor %}
     {% endif %}
-    <div class="col-12 table-responsive">
+    <div class="col-12 d-none d-lg-flex table-responsive">
       <table class="table table-bordered">
         <thead class="table-danger">
           <tr style="font-family: 'Open Sans', sans-serif;">
@@ -184,6 +200,171 @@
         </tbody>
       </table>
     </div>
+    <div class="col-12 d-md-none">
+      <div class="task-title mb-3">
+        <h5 class="fw-bold">Complaint List</h5>
+      </div>
+      {% if page_obj %}
+        {% for complaints in page_obj %}
+          <div
+            class="task-wrapper"
+            style="
+                   border: 1px soild #fff;
+                   border-radius: 0.2rem;
+                  "
+          >
+            <div
+              class="task-header"
+              style="
+                     display: flex;
+                     justify-content: space-between;
+                     cursor: pointer;
+                     background-color: #7ae1f5;
+                     padding: 0.5rem;
+                     border-radius: 0.2rem;
+                     color: #000;
+                     font-family: 'Poppins', sans-serif;
+                    "
+              onClick="toggleTask(this)"
+            >
+              <div class="complaint-number">
+                {{complaints.complaint.complaint_number}}
+              </div>
+              <div class="complaint-status">
+                {{complaints.complaint.status}}
+              </div>
+              <div class="complaint-priority">
+                {{complaints.complaint.priority}}
+              </div>
+              <div class="task-details">
+                <i class="fa-solid fa-plus"></i>
+              </div>
+            </div>
+            <div
+              class="task-body"
+              style="
+                     display: none;
+                     align-items: center;
+                     background-color: #fff;
+                     padding: 0.5rem;
+                     font-family: 'Poppins', sans-serif;
+                    "
+            >
+              <div>
+                <i class="fa-regular fa-calendar"></i>
+                <p>{{complaints.complaint.created_at}}</p>
+              </div>
+              <div>
+                <i class="fa-regular fa-calendar"></i>
+                {% if complaints.status_change_to != 'In Progress' or complaints.status_change_to != 'Resolved' %}
+                  <p>{{complaints.timestamp}}</p>
+                {% else %}
+                  <p>Not yet updated!</p>
+                {% endif %}
+              </div>
+              <div>
+                <i class="fa-regular fa-flag"></i>
+                <p>{{complaints.complaint.priority}}</p>
+              </div>
+              <div>
+                <i class="fa-regular fa-clock"></i>
+                <p>{{ complaints.complaint.time_taken|duration_display }}</p>
+              </div>
+              <div>
+                <i class="fa-solid fa-magnifying-glass-chart"></i>
+                {% if complaints.complaint.assigned_to == request.user or complaints.complaint.status == 'Review' %}
+                  {% if complaints.complaint.status != 'Cancelled' and complaints.complaint.status != 'Resolved' %}
+                    <p>
+                      <form method="POST" action="{% url 'cms:admin_update_complaint_status' complaints.complaint.id %}">
+                        {% csrf_token %}
+                        <select name="status" required>
+                          <option value="">select</option>
+                          <option value="In Progress" {% if complaints.status == 'In Progress' %} selected {% endif %}>In Progress</option>
+                          <option value="Resolved" {% if complaints.status == 'Resolved' %} selected {% endif %}>Resolved</option>
+                        </select>
+                        <button class="btn btn-sm btn-primary mt-2" type="submit">Update</button>
+                      </form>
+                    </p>
+                  {% else %}
+                    <p>--</p>
+                  {% endif %}
+                {% else %}
+                  <p>--</p>
+                {% endif %}
+              </div>
+              <div>
+                {% if complaints.complaint.assigned_to == request.user %}
+                  {% if complaints.complaint.status == 'Resolved' %}
+                    <p class="text-center">--</p>
+                  {% else %}
+                    <a
+                      class="open-modal"
+                      data-url="{% url 'cms:reassign_complaints' complaints.id %}"
+                      style="
+                             text-decoration: none;
+                            "
+                    >
+                      <i class="fa-solid fa-handshake-simple"></i>
+                      Assigned to Staff
+                    </a>
+                  {% endif %}
+                {% endif %}
+              </div>
+              <div>
+                {% if complaints.complaint.assigned_to == request.user %}
+                  {% if complaints.complaint.status == 'Resolved' %}
+                    <p class="text-center">--</p>
+                  {% else %}
+                    <a
+                      class="open-modal"
+                      data-url="{% url 'cms:reassign_departments' complaints.id %}"
+                      style="
+                             text-decoration: none;
+                            "
+                    >
+                      <i class="fa-solid fa-building"></i>
+                      Handover to Department
+                    </a>
+                  {% endif %}
+                {% endif %}
+              </div>
+              <div>
+                {% if complaints.complaint.status == 'Resolved' %}
+                  <p class="text-center">--</p>
+                {% else %}
+                  <a class="open-modal" data-url="{% url 'cms:complaints_remarks' complaints.id %}" style="text-decoration: none;">
+                    <i class="fa-solid fa-pen"></i>
+                    Add Remark
+                  </a>
+                {% endif %}
+              </div>
+              <div>
+                <a href="{% url 'cms:assigned_complaint_details' complaints.complaint.id %}"
+                   style="text-decoration: none;">
+                  <i class="fa-solid fa-eye"></i>
+                  Details
+                </a>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      {% else %}
+        <div
+          class="task-wrapper"
+          style="
+                 display: flex;
+                 align-items: center;
+                 justify-content: space-between;
+                 border: 1px soild #fff;
+                 background-color: #fff;
+                 border-radius: 0.2rem;
+                 padding: 0.5rem;
+                "
+        >
+          <p>No Data</p>
+        </div>
+      {% endif %}
+    </div>
   </div>
 <!--Modal Block-->
   <div class="modal fade" id="dynamicModal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
@@ -256,5 +437,21 @@
         });
       });
     });
+  </script>
+
+  <script>
+    function toggleTask(element) {
+      const wrapper = element.parentElement;
+      wrapper.classList.toggle("active");
+
+      const icon = element.querySelector("i");
+      if (wrapper.classList.contains("active")) {
+        icon.classList.remove("fa-plus");
+        icon.classList.add("fa-minus");
+      } else {
+        icon.classList.remove("fa-minus");
+        icon.classList.add("fa-plus");
+      }
+    }
   </script>
 {% endblock %}

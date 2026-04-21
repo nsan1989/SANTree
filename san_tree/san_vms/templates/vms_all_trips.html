@@ -48,42 +48,42 @@
             </nav>
             <!--Paginator-->
             <div class="content-body">
-                    <div class="table-responsive">
-                        <table class="table table-bordered">
-                            <thead class="table-danger">
-                                <tr>
-                                    <th scope="col">Booking ID</th>
-                                    <th scope="col">Type</th>
-                                    <th scope="col">Pickup</th>
-                                    <th scope="col">Drop</th>
-                                    <th scope="col">Cargo</th>
-                                    <th scope="col">Vehicle</th>
-                                    <th scope="col">Driver</th>
-                                    <th scope="col">Status</th>
-                                </tr>
-                            </thead>
-                            <tbody class="table-info">
-                                {% if page_obj %}
-                                    {% for request in page_obj %}
-                                        <tr>
-                                            <td>{{ request.id }}</td>
-                                            <td>{{ request.booking_type }}</td>
-                                            <td>{{ request.pickup_location }}</td>
-                                            <td>{{ request.drop_location }}</td>
-                                            <td>{{ request.cargo }}</td>
-                                            <td>{{ request.vehicle }}</td>
-                                            <td>{{ request.driver }}</td>
-                                            <td>{{ request.status }}</td>
-                                        </tr>
-                                    {% endfor %}
-                                {% else %}
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead class="table-danger">
+                            <tr>
+                                <th scope="col">Booking ID</th>
+                                <th scope="col">Type</th>
+                                <th scope="col">Pickup</th>
+                                <th scope="col">Drop</th>
+                                <th scope="col">Cargo</th>
+                                <th scope="col">Vehicle</th>
+                                <th scope="col">Driver</th>
+                                <th scope="col">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody class="table-info">
+                            {% if page_obj %}
+                                {% for request in page_obj %}
                                     <tr>
-                                        <td colspan="100%">No requests available</td>
+                                        <td>{{ request.id }}</td>
+                                        <td>{{ request.booking_type }}</td>
+                                        <td>{{ request.pickup_location }}</td>
+                                        <td>{{ request.drop_location }}</td>
+                                        <td>{{ request.cargo }}</td>
+                                        <td>{{ request.vehicle }}</td>
+                                        <td>{{ request.driver }}</td>
+                                        <td>{{ request.status }}</td>
                                     </tr>
-                                {% endif %}
-                            </tbody>
-                        </table>
-                    </div>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="100%">No requests available</td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     {% else %}
@@ -118,75 +118,75 @@
             </nav>
             <!--Paginator-->
             <div class="content-body">
-                    <div class="table-responsive">
-                        <table 
-                            class="table table-bordered"
-                        >
-                            <thead class="table-danger">
-                                <tr>
-                                    <th>Booking ID</th>
-                                    <th>Type</th>
-                                    <th>Pickup</th>
-                                    <th>Drop</th>
-                                    <th>Cargo</th>
-                                    <th>Vehicle</th>
-                                    <th>Passenger</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody class="table-info">
-                                {% if page_obj %}
-                                    {% for request in page_obj %}
-                                        <tr>
-                                            <td>{{ request.id }}</td>
-                                            <td>{{ request.booking_type }}</td>
-                                            <td>{{ request.pickup_location }}</td>
-                                            <td>{{ request.drop_location }}</td>
-                                            <td>{{ request.cargo }}</td>
-                                            <td>{{ request.vehicle }}</td>
-                                            <td>{{ request.booked_by }}</td>
-                                            <td
-                                                style="
-                                                    display: flex;
-                                                    align-items: center;
-                                                "
-                                            >
-                                                {% if request.status == 'ACKNOWLEDGE' %}
-                                                    <form method="POST" action="{% url 'vms:staff_update_booking_status' request.id %}"
-                                                        style="display: flex; flex-direction: column; gap: 5px;">
-                                                        {% csrf_token %}
-                                                        <select name="status" class="statusSelect" required>
-                                                            <option value="">select</option>
-                                                            <option value="IN_PROGRESS">In Progress</option>
-                                                        </select>
-                                                        <button class="btn btn-sm btn-primary" type="submit">Update</button>
-                                                    </form>
-
-                                                {% elif request.status == 'IN_PROGRESS' %}
-                                                    <form method="POST" action="{% url 'vms:staff_update_booking_status' request.id %}"
-                                                        style="display: flex; flex-direction: column; gap: 5px;">
-                                                        {% csrf_token %}
-                                                        <select name="status" class="statusSelect" required>
-                                                            <option value="">select</option>
-                                                            <option value="COMPLETED">Completed</option>
-                                                        </select>
-                                                        <button class="btn btn-sm btn-primary" type="submit">Update</button>
-                                                    </form>
-
-                                                {% else %}
-                                                    <span class="badge bg-success">{{ request.status }}</span>
-                                                {% endif %}
-                                            </td>
-                                        </tr>
-                                    {% endfor %}
-                                {% else %}
+                <div class="table-responsive">
+                    <table
+                        class="table table-bordered"
+                    >
+                        <thead class="table-danger">
+                            <tr>
+                                <th>Booking ID</th>
+                                <th>Type</th>
+                                <th>Pickup</th>
+                                <th>Drop</th>
+                                <th>Cargo</th>
+                                <th>Vehicle</th>
+                                <th>Passenger</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody class="table-info">
+                            {% if page_obj %}
+                                {% for request in page_obj %}
                                     <tr>
-                                        <td colspan="100%">No requests available</td>
+                                        <td>{{ request.id }}</td>
+                                        <td>{{ request.booking_type }}</td>
+                                        <td>{{ request.pickup_location }}</td>
+                                        <td>{{ request.drop_location }}</td>
+                                        <td>{{ request.cargo }}</td>
+                                        <td>{{ request.vehicle }}</td>
+                                        <td>{{ request.booked_by }}</td>
+                                        <td
+                                            style="
+                                                   display: flex;
+                                                   align-items: center;
+                                                  "
+                                        >
+                                            {% if request.status == 'ACKNOWLEDGE' %}
+                                                <form method="POST" action="{% url 'vms:staff_update_booking_status' request.id %}"
+                                                      style="display: flex; flex-direction: column; gap: 5px;">
+                                                    {% csrf_token %}
+                                                    <select name="status" class="statusSelect" required>
+                                                        <option value="">select</option>
+                                                        <option value="IN_PROGRESS">In Progress</option>
+                                                    </select>
+                                                    <button class="btn btn-sm btn-primary" type="submit">Update</button>
+                                                </form>
+
+                                            {% elif request.status == 'IN_PROGRESS' %}
+                                                <form method="POST" action="{% url 'vms:staff_update_booking_status' request.id %}"
+                                                      style="display: flex; flex-direction: column; gap: 5px;">
+                                                    {% csrf_token %}
+                                                    <select name="status" class="statusSelect" required>
+                                                        <option value="">select</option>
+                                                        <option value="COMPLETED">Completed</option>
+                                                    </select>
+                                                    <button class="btn btn-sm btn-primary" type="submit">Update</button>
+                                                </form>
+
+                                            {% else %}
+                                                <span class="badge bg-success">{{ request.status }}</span>
+                                            {% endif %}
+                                        </td>
                                     </tr>
-                                {% endif %}
-                            </tbody>
-                        </table>
-                    </div>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="100%">No requests available</td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     {% endif %}

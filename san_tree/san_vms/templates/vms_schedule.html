@@ -1,25 +1,25 @@
 {% extends 'index.html' %}
 
 {% block title %}
-    All Staff
+  All Staff
 {% endblock %}
 
 {% block start %}
-<style>
-   .page-header h3 {
-        color: wheat;
-        font-family: 'poppins', sans-serif;
-        font-weight: bold;
+  <style>
+    .page-header h3 {
+      color: wheat;
+      font-family: 'poppins', sans-serif;
+      font-weight: bold;
     }
 
     .page-header p {
-        color: wheat;
-        font-family: 'poppins', sans-serif;
-    } 
+      color: wheat;
+      font-family: 'poppins', sans-serif;
+    }
 
     thead {
-        font-family: 'poppins', sans-serif;
-        font-weight: bold;
+      font-family: 'poppins', sans-serif;
+      font-weight: bold;
     }
 
     tbody {
@@ -34,55 +34,55 @@
     .schedule-link a {
       text-decoration: none;
     }
-</style>
+  </style>
 
-<div class="container-fluid">
+  <div class="container-fluid">
     <div class="page-header mb-3">
-        <h3 class="mb-0">Schedule</h3>
-        <p>List is today's schedule.</p>
+      <h3 class="mb-0">Schedule</h3>
+      <p>List is today's schedule.</p>
     </div>
     {% if request.user.department.name == 'Transport' and request.user.role == 'Admin' %}
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 mb-3">
-          <div class="schedule-link">
-            Set Schedules
-            <a class="text-warning shift-add-modal" href="{% url 'vms:add_schedule' %}" data-bs-toggle="modal"
-               data-bs-target="#scheduleModal">click here</a>
-          </div>
+      <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 mb-3">
+        <div class="schedule-link">
+          Set Schedules
+          <a class="text-warning shift-add-modal" href="{% url 'vms:add_schedule' %}" data-bs-toggle="modal"
+             data-bs-target="#scheduleModal">click here</a>
         </div>
-      {% endif %}
+      </div>
+    {% endif %}
     <div class="page-content">
-        <div class="table-responsive">
-            <table class="table table-bordered">
-                <thead class="table-danger">
-                    <tr>
-                        <th scope="col">Driver</th>
-                        <th scope="col">Shift Type</th>
-                        <th scope="col">Status</th>
-                        <th scope="col">Start Time</th>
-                        <th scope="col">End Time</th>
-                    </tr>
-                </thead>
-                <tbody class="table-info">
-                  {% if page_obj %}
-                    {% for schedule in page_obj %}
-                    <tr>
-                      <td>{{schedule.shift_staffs.user.username}}</td>
-                      <td>{{schedule.shift_type}}</td>
-                      <td>{{schedule.status}}</td>
-                      <td>{{schedule.start_time}}</td>
-                      <td>{{schedule.end_time}}</td>
-                    </tr>
-                    {% endfor %}
-                  {% else %}
-                    <tr>
-                      <td colspan="100%">No Data</td>
-                    </tr>
-                  {% endif %}
-                </tbody>
-            </table>
-        </div>
+      <div class="table-responsive">
+        <table class="table table-bordered">
+          <thead class="table-danger">
+            <tr>
+              <th scope="col">Driver</th>
+              <th scope="col">Shift Type</th>
+              <th scope="col">Status</th>
+              <th scope="col">Start Time</th>
+              <th scope="col">End Time</th>
+            </tr>
+          </thead>
+          <tbody class="table-info">
+            {% if page_obj %}
+              {% for schedule in page_obj %}
+                <tr>
+                  <td>{{schedule.shift_staffs.user.username}}</td>
+                  <td>{{schedule.shift_type}}</td>
+                  <td>{{schedule.status}}</td>
+                  <td>{{schedule.start_time}}</td>
+                  <td>{{schedule.end_time}}</td>
+                </tr>
+              {% endfor %}
+            {% else %}
+              <tr>
+                <td colspan="100%">No Data</td>
+              </tr>
+            {% endif %}
+          </tbody>
+        </table>
+      </div>
     </div>
-</div>
+  </div>
 
 <!-- Modal structure -->
   <div class="modal fade" id="scheduleModal" tabindex="-1" aria-hidden="true">
@@ -148,25 +148,25 @@
   </script>
 
   <script>
-  document.querySelectorAll('.schedule-toggle').forEach(toggle => {
+    document.querySelectorAll('.schedule-toggle').forEach(toggle => {
       toggle.addEventListener('change', function () {
 
-          const url = this.dataset.url;
-          const status = this.checked;
+        const url = this.dataset.url;
+        const status = this.checked;
 
-          fetch(url, {
-              method: 'POST',
-              headers: {
-                  'Content-Type': 'application/json',
-                  'X-CSRFToken': '{{ csrf_token }}'
-              },
-              body: JSON.stringify({
-                  is_active: status
-              })
+        fetch(url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token }}'
+          },
+          body: JSON.stringify({
+            is_active: status
           })
+        })
           .then(res => res.json())
           .catch(error => {});
       });
-  });
+    });
   </script>
 {% endblock %}
