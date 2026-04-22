@@ -112,6 +112,7 @@ class AddAssetForm(forms.ModelForm):
             "purchase_date",
             "cost",
             "expiry_date",
+            "handler",
         ]
 
 

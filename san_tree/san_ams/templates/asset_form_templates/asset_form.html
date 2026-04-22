@@ -72,11 +72,11 @@
                             {% csrf_token %}
                             <div class="row w-100 mb-1">
                                 <div class="col-12 col-md-6">
-                                    <label for="id-name" class="form-label requiredField mb-0">
+                                    <label for="id_name" class="form-label requiredField mb-0">
                                         Name
                                         <span class="asteriskField">*</span>
                                     </label>
-                                    <input type="text" id="id-name" name="name" class="form-control" required>
+                                    <input type="text" id="id_name" name="name" class="form-control" required>
                                 </div>
                                 <div class="col-12 col-md-6">
                                     <label class="form-label">
@@ -87,11 +87,11 @@
                             </div>
                             <div class="row w-100 mb-1">
                                 <div class="col-12 col-md-6">
-                                    <label for="id-category" class="form-lable requiredField">
+                                    <label for="id_category" class="form-lable requiredField">
                                         Category
                                         <span class="asteriskField">*</span>
                                     </label>
-                                    <select name="category" class="form-select" required id="id-category">
+                                    <select name="category" class="form-select" required id="id_category">
                                         <option value="" selected>select</option>
                                         {% for cat in category %}
                                             <option value="{{ cat.id }}">{{ cat.name }}</option>
@@ -99,38 +99,38 @@
                                     </select>
                                 </div>
                                 <div class="col-12 col-md-6">
-                                    <label for="id-manufacturer" class="form-label requiredField mb-0">
+                                    <label for="id_manufacturer" class="form-label requiredField mb-0">
                                         Manufacturer
                                         <span class="asteriskField">*</span>
                                     </label>
-                                    <input type="text" id="id-manufacturer" name="manufacturer" class="form-control"
+                                    <input type="text" id="id_manufacturer" name="manufacturer" class="form-control"
                                            required>
                                 </div>
                             </div>
                             <div class="row w-100 mb-1">
                                 <div class="col-12 col-md-6">
-                                    <label for="id-model_number" class="form-label requiredField mb-0">
+                                    <label for="id_model_number" class="form-label requiredField mb-0">
                                         Model No.
                                         <span class="asteriskField">*</span>
                                     </label>
-                                    <input type="text" id="id-model_number" name="model_number" class="form-control"
+                                    <input type="text" id="id_model_number" name="model_number" class="form-control"
                                            required>
                                 </div>
                                 <div class="col-12 col-md-6">
-                                    <label for="id-serial_number" class="form-label requiredField mb-0">
+                                    <label for="id_serial_number" class="form-label requiredField mb-0">
                                         Serial No.
                                         <span class="asteriskField">*</span>
                                     </label>
-                                    <input type="text" id="id-serial_number" name="serial_number" class="form-control"
+                                    <input type="text" id="id_serial_number" name="serial_number" class="form-control"
                                            required>
                                 </div>
                             </div>
                             <div class="row w-100 mb-1">
                                 <div class="col-12 col-md-6">
-                                    <label for="id-image" class="form-label mb-0">
+                                    <label for="id_image" class="form-label mb-0">
                                         Image
                                     </label>
-                                    <input type="file" name="image" class="form-control">
+                                    <input type="file" id="id_image" name="image" class="form-control">
                                 </div>
                                 <div class="col-12 col-md-6">
                                     <label for="id_cost" class="form-label requiredField">
@@ -153,6 +153,19 @@
                                     </label>
                                     <input type="date" name="purchase_date" id="id_purchase_date" class="form-control"
                                            required>
+                                </div>
+                            </div>
+                            <div class="row w-100 mb-1">
+                                <div class="col-12 col-md-6">
+                                    <label for="id_handler" class="form-label requiredField">
+                                        Handler <span class="asteriskField">*</span>
+                                    </label>
+                                    <select name="hadler" class="form-select" required id="id_handler">
+                                        <option value="" selected>select</option>
+                                        {% for user in dept_user %}
+                                            <option value="{{ user.id }}">{{ user.username }}</option>
+                                        {% endfor %}
+                                    </select>
                                 </div>
                                 <div class="col-12 col-md-6">
                                     <div class="d-grid mt-4">

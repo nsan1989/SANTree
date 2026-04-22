@@ -160,7 +160,7 @@ MENU_STRUCTURE = {
                 "name": "Requests",
                 "url_name": "ams:admin_asset_requests",
                 "view_name": "AssetRequestsView",
-                "icon": "fa-solid fa-users",
+                "icon": "fa-solid fa-hand",
             },
             {
                 "name": "Settings",
@@ -176,8 +176,14 @@ MENU_STRUCTURE = {
                         "icon": "fa-solid fa-plus",
                     },
                     {
-                        "name": "Accessory Category",
+                        "name": "Assets Category",
                         "url_name": "ams:add_asset_category",
+                        "view_name": "AddAssetCategoryView",
+                        "icon": "fa-solid fa-plus",
+                    },
+                    {
+                        "name": "Accessory Category",
+                        "url_name": "ams:add_accessory_category",
                         "view_name": "AddAccessoryCategoryView",
                         "icon": "fa-solid fa-plus",
                     },

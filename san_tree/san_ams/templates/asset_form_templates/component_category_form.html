@@ -1,0 +1,89 @@
+{% extends 'index.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}
+    Add Component Category
+{% endblock %}
+
+{% block start %}
+
+    <style>
+        .header-title {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: wheat;
+        }
+
+        .form-wrapper {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: #fff;
+            padding: 1rem;
+        }
+
+        .form-title h4 {
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+    </style>
+
+    <div class="container-fluid">
+        <div class="d-flex justify-content-center align-items-center">
+            <span>
+                <div class="mb-3">
+                    <a href="javascript:history.back()" class="d-flex align-items-center text-warning"
+                       style="text-decoration: none">
+                        <i class="fa-solid fa-arrow-left"></i>
+                        &nbsp;back
+                    </a>
+                </div>
+            </span>
+        </div>
+        <div class="row mb-3">
+            <div class="col-12">
+                <div class="header-title">
+                    <h3 class="mb-0">Add Component Category</h3>
+                    <p class="mb-0">Please enter the details to add an component category!</p>
+                </div>
+            </div>
+        </div>
+        <div class="row d-flex justify-content-center">
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="form-wrapper rounded">
+                    <div class="form-title mb-2">
+                        <h4>component category form</h4>
+                    </div>
+                    <div class="form-content">
+                        <form id="component-category-form" class="component-category-form" method="post" enctype="multipart/form-data">
+                            {% if form.errors %}
+                                <div class="alert alert-danger">
+                                    <strong>Form Errors:</strong>
+                                    {{ form.errors }}
+                                </div>
+                            {% endif %}
+                            {% csrf_token %}
+                            <div class="row w-100 mb-1" id="form-content-items">
+                                <div class="col-12 col-md-6">
+                                    <label for="id_name" class="form-label requiredField mb-0">
+                                        Name
+                                        <span class="asteriskField">*</span>
+                                    </label>
+                                    <input type="text" id="id_name" name="name" class="form-control" required>
+                                </div>
+                                <div class="col-12 col-md-6">
+                                    <div class="d-grid mt-4">
+                                        <button type="submit" id="submitBtn" class="btn btn-primary btn-sm">Submit</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

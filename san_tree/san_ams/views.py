@@ -199,6 +199,9 @@ def AddAccessoryCategoryView(request):
 
 # Add Accessory View.
 def AddAccessoryView(request):
+
+    category = AssetCategoryModel.objects.all()
+
     if request.method == "POST":
         form = AddAccessoryForm(request.POST)
         if form.is_valid():
@@ -214,7 +217,9 @@ def AddAccessoryView(request):
     else:
         form = AddAccessoryCategoryForm()
 
-    return render(request, "asset_form_templates/accessory_form.html", {"form": form})
+    context = {"form": form, "category": category}
+
+    return render(request, "asset_form_templates/accessory_form.html", context)
 
 
 # Add Consumable Category Form.
@@ -289,6 +294,9 @@ def AddComponentCategoryView(request):
 
 # Add Component Form
 def AddComponentView(request):
+
+    category = AssetCategoryModel.objects.all()
+
     if request.method == "POST":
         form = AddComponentForm(request.POST)
         if form.is_valid():
@@ -304,9 +312,12 @@ def AddComponentView(request):
     else:
         form = AddComponentForm()
 
-    return render(
-        request, "asset_form_templates/component_category_form.html", {"form": form}
-    )
+    context = {
+        "form": form,
+        "category": category,
+    }
+
+    return render(request, "asset_form_templates/component_form.html", context)
 
 
 # Add Asset Category Form
@@ -333,7 +344,11 @@ def AddAssetCategoryView(request):
 
 # Add Asset Form
 def AddAssetView(request):
+    user = request.user
     category = AssetCategoryModel.objects.all()
+    dept_users = CustomUsers.objects.filter(
+        department__name=user.department.name, role="User"
+    )
 
     if request.method == "POST":
         form = AddAssetForm(request.POST, request.FILES)
@@ -363,6 +378,7 @@ def AddAssetView(request):
     context = {
         "form": form,
         "category": category,
+        "dept_user": dept_users,
     }
 
     return render(request, "asset_form_templates/asset_form.html", context)

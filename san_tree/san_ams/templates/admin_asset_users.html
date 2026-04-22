@@ -1,0 +1,72 @@
+{% extends 'index.html' %}
+
+{% block title %}
+    Asset Users
+{% endblock %}
+
+{% block start %}
+
+    <style>
+        .header-title h3,
+        .header-title p {
+            color: wheat;
+            margin-bottom: 0;
+        }
+    </style>
+
+    <div class="container-fluid">
+        <div class="row mb-3">
+            <div class="col-12 col-md-6">
+                <div class="header-title">
+                    <h3>Asset Users</h3>
+                    <p>Following is the list of all asset users.</p>
+                </div>
+            </div>
+            <div class="col-6 col-md-6">
+                <div class="asset-filters d-flex align-items-center">
+                    <label for="statusFilter" class="form-label mb-0 me-3">Filter by Status:</label>
+                    <select id="statusFilter" class="form-select form-select-sm w-auto">
+                        <option value="">--select--</option>
+                        {% for status in statuses %}
+                            <option value="{{ status }}">{{ status|title }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <table class="table table-bordered">
+                    <thead class="table-danger">
+                        <tr>
+                            <th>User</th>
+                            <th>Asset</th>
+                            <th>Image</th>
+                            <th>Status</th>
+                            <th>Handler</th>
+                            <th>Location</th>
+                        </tr>
+                    </thead>
+                    <tbody class="table-info">
+                        {% if asset_users %}
+                            {% for user in asset_users %}
+                                <tr>
+                                    <td>{{asset.assigned_to.name}}</td>
+                                    <td>{{asset.name}}</td>
+                                    <td>{{asset.image}}</td>
+                                    <td>{{asset.status}}</td>
+                                    <td>{{asset.handler.name}}</td>
+                                    <td>{{asset.location}}</td>
+                                </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="100%">No asset users.</td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}
