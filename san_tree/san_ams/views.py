@@ -248,6 +248,7 @@ def AddConsumableCategoryView(request):
 
 # Add Consumable Form
 def AddConsumableView(request):
+    category = AssetCategoryModel.objects.all()
     if request.method == "POST":
         form = AddConsumableForm(request.POST)
         if form.is_valid():
@@ -265,7 +266,12 @@ def AddConsumableView(request):
     else:
         form = AddConsumableForm()
 
-    return render(request, "asset_form_templates/consumable_form.html", {"form": form})
+    context = {
+        "form": form,
+        "category": category,
+    }
+
+    return render(request, "asset_form_templates/consumable_form.html", context)
 
 
 # Add Component Category Form

@@ -1,0 +1,155 @@
+{% extends 'index.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}
+    Add Consumable
+{% endblock %}
+
+{% block start %}
+
+    <style>
+        .header-title {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: wheat;
+        }
+
+        .form-wrapper {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: #fff;
+            padding: 1rem;
+        }
+
+        .form-title h4 {
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+
+        .col-12 {
+            display: flex;
+            flex-direction: column;
+        }
+    </style>
+
+    <div class="container-fluid">
+        <div class="d-flex justify-content-center align-items-center">
+            <span>
+                <div class="mb-3">
+                    <a href="javascript:history.back()" class="d-flex align-items-center text-warning"
+                       style="text-decoration: none">
+                        <i class="fa-solid fa-arrow-left"></i>
+                        &nbsp;back
+                    </a>
+                </div>
+            </span>
+        </div>
+        <div class="row mb-3">
+            <div class="col-12">
+                <div class="header-title">
+                    <h3 class="mb-0">Add Consumable</h3>
+                    <p class="mb-0">Please enter the details to add an consumable!</p>
+                </div>
+            </div>
+        </div>
+        <div class="row d-flex justify-content-center">
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="form-wrapper rounded">
+                    <div class="form-title mb-2">
+                        <h4>consumable form</h4>
+                    </div>
+                    <div class="form-content">
+                        <form id="consumable-form" class="consumbale-form" method="post" enctype="multipart/form-data">
+                            {% if form.errors %}
+                                <div class="alert alert-danger">
+                                    <strong>Form Errors:</strong>
+                                    {{ form.errors }}
+                                </div>
+                            {% endif %}
+                            {% csrf_token %}
+                            <div class="row w-100 mb-1">
+                                <div class="col-12 col-md-6">
+                                    <label for="id_name" class="form-label requiredField mb-0">
+                                        Name
+                                        <span class="asteriskField">*</span>
+                                    </label>
+                                    <input type="text" id="id_name" name="name" class="form-control" required>
+                                </div>
+                                <div class="col-12 col-md-6">
+                                    <label for="id_category" class="form-label requiredField mb-0">
+                                        Category
+                                    </label>
+                                    <select name="category" class="form-select" required id="id_category">
+                                        <option value="" selected>select</option>
+                                        {% for cat in category %}
+                                            <option value="{{ cat.id }}">{{ cat.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row w-100 mb-1">
+                                <div class="col-12 col-md-6">
+                                    <label for="id_serial_number" class="form-label requiredField mb-0">
+                                        Serial Number
+                                        <span class="asteriskField">*</span>
+                                    </label>
+                                    <input type="text" id="id_serial_number" name="serial_number" class="form-control" required>
+                                </div>
+                                <div class="col-12 col-md-6">
+                                    <label for="id_manufacturer" class="form-label requiredField mb-0">
+                                        Manufacturer
+                                        <span class="asteriskField">*</span>
+                                    </label>
+                                    <input type="text" id="id_manufacturer" name="manufacturer" class="form-control" required>
+                                </div>
+                            </div>
+                            <div class="row w-100 mb-1">
+                                <div class="col-12 col-md-6">
+                                    <label for="id_cost" class="form-label requiredField mb-0">
+                                        Cost
+                                        <span class="asteriskField">*</span>
+                                    </label>
+                                    <input type="text" id="id_cost" name="cost" class="form-control" required>
+                                </div>
+                                <div class="col-12 col-md-6">
+                                    <label for="id_purchase_date" class="form-label requiredField mb-0">
+                                        Purchase Date
+                                        <span class="asteriskField">*</span>
+                                    </label>
+                                    <input type="text" id="id_purchase_date" name="purchase_date" class="form-control" required>
+                                </div>
+                            </div>
+                            <div class="row w-100 mb-1">
+                                <div class="col-12 col-md-6">
+                                    <label for="id_image" class="form-label requiredField mb-0">
+                                        Image
+                                        <span class="asteriskField">*</span>
+                                    </label>
+                                    <input type="file" id="id_image" name="image" class="form-control" required>
+                                </div>
+                                <div class="col-12 col-md-6">
+                                    <label for="id_quantity" class="form-label requiredField mb-0">
+                                        Quantity
+                                        <span class="asteriskField">*</span>
+                                    </label>
+                                    <input type="text" id="id_quantity" name="quantity" class="form-control" required>
+                                </div>
+                            </div>
+                            <div class="row w-100 mb-1">
+                                <div class="col-12 col-md-6">
+                                    <div class="d-grid mt-4">
+                                        <button type="submit" id="submitBtn" class="btn btn-primary btn-sm">Submit</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
