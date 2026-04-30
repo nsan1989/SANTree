@@ -2,7 +2,7 @@ from django import forms
 
 from accounts.models import CustomUsers
 
-from .models import Departments, Tasks, TasksRemarks, TasksTypes
+from .models import Departments, TaskHandover, Tasks, TasksRemarks, TasksTypes
 
 
 # Tasks Form.
@@ -13,6 +13,7 @@ class TasksForm(forms.ModelForm):
             "department",
             "tasks_types",
             "task_frequency",
+            "start_date",
             "location",
             "assigned_to",
             "attachment",
@@ -20,7 +21,11 @@ class TasksForm(forms.ModelForm):
         labels = {
             "tasks_types": "Tasks",
             "task_frequency": "Frequency",
+            "start_date": "Start Date",
             "assigned_to": "Assigned To",
+        }
+        widgets = {
+            "start_date": forms.DateInput(attrs={"type": "date"}),
         }
 
     def __init__(self, *args, user=None, **kwargs):
@@ -73,3 +78,27 @@ class RemarkForm(forms.ModelForm):
                 )
             else:
                 self.fields["tasks"].queryset = Tasks.objects.none()
+
+
+class TaskHandoverForm(forms.ModelForm):
+    class Meta:
+        model = TaskHandover
+        fields = ["to_user", "reason"]
+        widgets = {
+            "reason": forms.Textarea(
+                attrs={"rows": 3, "placeholder": "Handover reason"}
+            ),
+        }
+
+    def __init__(self, *args, task=None, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields["to_user"].queryset = CustomUsers.objects.none()
+
+        if task and task.department_id:
+            queryset = CustomUsers.objects.filter(
+                department_id=task.department_id, role="User", is_active=True
+            )
+            if task.assigned_to_id:
+                queryset = queryset.exclude(id=task.assigned_to_id)
+            self.fields["to_user"].queryset = queryset

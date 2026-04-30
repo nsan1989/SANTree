@@ -1,10 +1,11 @@
 import os
-from datetime import timedelta
+from datetime import datetime, time, timedelta
 from io import BytesIO
 
 from dateutil.relativedelta import relativedelta
 from django.core.files.base import ContentFile
 from django.db import models
+from django.utils import timezone
 from django.utils.timezone import now
 from PIL import Image
 
@@ -35,6 +36,7 @@ TASKS_FREQUENCY = (
 # Status Choices.
 STATUS_CHOICES = (
     ("Waiting", "Waiting"),
+    ("Acknowledged", "Acknowledged"),
     ("In Progress", "In Progress"),
     ("Postponed", "Postponed"),
     ("Overdue", "Overdue"),
@@ -76,7 +78,8 @@ class Tasks(models.Model):
         null=True,
         blank=True,
     )
-    created_at = models.DateTimeField(auto_now_add=True)
+    start_date = models.DateField(default=timezone.localdate)
+    created_at = models.DateField(auto_now_add=True)
     next_date = models.DateTimeField(null=True, blank=True)
     attachment = models.ImageField(upload_to=task_image_path, null=True, blank=True)
 
@@ -93,8 +96,11 @@ class Tasks(models.Model):
     def save(self, *args, **kwargs):
         is_new = self.pk is None
         old_frequency = None
+        old_start_date = None
         if not is_new:
-            old_frequency = Tasks.objects.get(pk=self.pk).task_frequency
+            old_task = Tasks.objects.get(pk=self.pk)
+            old_frequency = old_task.task_frequency
+            old_start_date = old_task.start_date
 
         image_changed = False
 
@@ -127,8 +133,17 @@ class Tasks(models.Model):
         super().save(*args, **kwargs)
 
         # Auto-set next_date based on frequency ONLY for new or if frequency changed
-        if (is_new or old_frequency != self.task_frequency) or not self.next_date:
-            base_date = self.created_at or now()
+        if (
+            is_new
+            or old_frequency != self.task_frequency
+            or old_start_date != self.start_date
+            or not self.next_date
+        ):
+            base_date = datetime.combine(self.start_date, time.min)
+            if timezone.is_naive(base_date):
+                base_date = timezone.make_aware(
+                    base_date, timezone.get_current_timezone()
+                )
 
             if self.task_frequency == "Daily":
                 self.next_date = base_date + timedelta(days=1)
@@ -207,3 +222,57 @@ class TasksRemarks(models.Model):
 
     class Meta:
         verbose_name_plural = "Tasks Remarks"
+
+
+# Tasks Handover.
+class TaskHandover(models.Model):
+    tasks = models.ForeignKey(
+        Tasks, on_delete=models.CASCADE, related_name="handover_history"
+    )
+    from_user = models.ForeignKey(
+        CustomUsers,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="tms_handover_from",
+    )
+    to_user = models.ForeignKey(
+        CustomUsers,
+        on_delete=models.CASCADE,
+        related_name="tms_handover_to",
+    )
+    reason = models.TextField()
+    created_by = models.ForeignKey(
+        CustomUsers,
+        on_delete=models.CASCADE,
+        related_name="tms_handover_created_by",
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.tasks} | {self.from_user} -> {self.to_user}"
+
+    class Meta:
+        verbose_name_plural = "Task Handovers"
+
+
+class TaskChecklistItem(models.Model):
+    tasks = models.ForeignKey(
+        Tasks, on_delete=models.CASCADE, related_name="checklist_items"
+    )
+    item_text = models.CharField(max_length=255)
+    is_completed = models.BooleanField(default=False)
+    completed_by = models.ForeignKey(
+        CustomUsers,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="tms_completed_checklist_items",
+    )
+    completed_at = models.DateTimeField(null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.tasks} | {self.item_text}"
+
+    class Meta:
+        verbose_name_plural = "Task Checklist Items"

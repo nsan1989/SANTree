@@ -8,12 +8,22 @@
     }
 
     #calendar {
-      max-width: 800px;
-    /* adjust size */
-      margin: auto;
+      width: 100%;
       font-size: 12px;
       background: #f3f3f3;
-    /* smaller text */
+      margin: 0 auto;
+    }
+    .fc .fc-view-harness,
+    .fc .fc-scroller {
+      height: auto !important;
+      overflow: visible !important;
+    }
+    .fc .fc-toolbar {
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    .fc .fc-toolbar-title {
+      font-size: 1rem;
     }
 
     .btn {
@@ -34,17 +44,38 @@
             </h5>
           </div>
         </div>
+        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 d-md-none flex-column">
+          <div class="task-create-wrapper gap-2 mb-3 d-flex flex-column">
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createModal"><i
+              class="fa-solid fa-plus"></i>&nbsp;create</button>
+            <p class="mb-0 text-primary">click here to create a new task.</p>
+          </div>
+          <div class="calendar-filters gap-2 mb-3 d-flex flex-column">
+            <div class="dropdown">
+              <button id="calendarFilterBtn" class="btn btn-warning dropdown-toggle" type="button"
+                      data-bs-toggle="dropdown" aria-expanded="false">
+                select
+              </button>
+              <ul class="dropdown-menu" id="calendarFilterOptions">
+                <li><a class="dropdown-item" data-view="dayGridMonth" href="#">Month</a></li>
+                <li><a class="dropdown-item" data-view="timeGridWeek" href="#">Week</a></li>
+                <li><a class="dropdown-item" data-view="timeGridDay" href="#">Day</a></li>
+              </ul>
+            </div>
+            <p class="mb-0 text-warning">click to change calendar view.</p>
+          </div>
+        </div>
         <div class="bottom-content">
           <div class="calender-wrapper">
             <div id="calendar"></div>
           </div>
         </div>
       </div>
-      <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 d-flex flex-column">
+      <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 d-none d-md-flex flex-column">
         <div class="task-create-wrapper d-flex align-items-center gap-4 mb-3">
           <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createModal"><i
             class="fa-solid fa-plus"></i>&nbsp;create</button>
-          <p class="mb-0 text-light">click here to create a new task.</p>
+          <p class="mb-0 text-primary">click here to create a new task.</p>
         </div>
         <div class="calendar-filters d-flex align-items-center gap-4 mb-3">
           <div class="dropdown">
@@ -58,7 +89,7 @@
               <li><a class="dropdown-item" data-view="timeGridDay" href="#">Day</a></li>
             </ul>
           </div>
-          <p class="mb-0 text-light">click to change calendar view.</p>
+          <p class="mb-0 text-primary">click to change calendar view.</p>
         </div>
       </div>
     </div>
@@ -92,6 +123,14 @@
                 {{ form.task_frequency }}
               </div>
               <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 d-flex flex-column mb-2">
+                <label for="id_start_date" class="form-label requiredField">
+                  Start Date <span class="asteriskField">*</span>
+                </label>
+                {{ form.start_date }}
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 d-flex flex-column mb-2">
                 <label for="id_location" class="form-label">
                   Location
                 </label>
@@ -112,6 +151,21 @@
                 {{ form.attachment }}
               </div>
             </div>
+            <div class="row">
+              <div class="col-12 d-flex flex-column mb-2">
+                <label for="id_checklist_items" class="form-label requiredField">
+                  Checklist Items <span class="asteriskField">*</span>
+                </label>
+                <textarea
+                  id="id_checklist_items"
+                  name="checklist_items"
+                  class="form-control"
+                  rows="4"
+                  placeholder="Enter one checklist item per line"
+                  required
+                ></textarea>
+              </div>
+            </div>
             <div class="d-grid mt-4">
               <button type="submit" class="btn btn-primary btn-lg">Submit</button>
             </div>
@@ -130,6 +184,11 @@
 
       const calendar = new FullCalendar.Calendar(calendarEl, {
         initialView: 'dayGridMonth',
+        height: 'auto',
+        contentHeight: 'auto',
+        expandRows: true,
+        handleWindowResize: true,
+        dayMaxEventRows: true,
         headerToolbar: {
           left: 'prev,next today',
           center: 'title',

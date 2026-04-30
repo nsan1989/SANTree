@@ -65,6 +65,38 @@
             </div>
         </div>
         <div class="row">
+            <div class="col-12 table-responsive">
+                <table class="table table-bordered">
+                    <thead class="table-danger">
+                        <tr>
+                            <th scope="col">From</th>
+                            <th scope="col">To</th>
+                            <th scope="col">Reason</th>
+                            <th scope="col">Created By</th>
+                            <th scope="col">Created At</th>
+                        </tr>
+                    </thead>
+                    <tbody class="table-primary">
+                        {% if handover_history %}
+                            {% for handover in handover_history %}
+                                <tr>
+                                    <td>{{ handover.from_user }}</td>
+                                    <td>{{ handover.to_user }}</td>
+                                    <td>{{ handover.reason }}</td>
+                                    <td>{{ handover.created_by }}</td>
+                                    <td>{{ handover.created_at }}</td>
+                                </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="5">No handover history!</td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="row">
             <div class="col-12">
                 <div class="remark-title">
                     <h5>Remarks</h5>

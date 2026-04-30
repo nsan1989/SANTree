@@ -25,6 +25,13 @@
     .status-progress > td { background-color: #ff6600; color: #fff; }
     .status-waiting > td { background-color: #808080; color: #fff; }
     .status-cancelled > td { background-color: #cc0000; color: #fff; }
+
+    .task-body {
+      display: none;
+    }
+    .task-body.active {
+      display: table-row;
+    }
   </style>
 
   <div class="container-fluid">
@@ -65,7 +72,8 @@
         </nav>
       </div>
     </div>
-    <div class="row">
+    <!--Desktop View-->
+    <div class="row d-none d-md-flex">
       <div class="col-12 table-responsive">
         <table class="table table-bordered">
           <thead class="table-danger">
@@ -114,6 +122,63 @@
             {% else %}
               <tr>
                 <td colspan="9">No data available!</td>
+              </tr>
+            {% endif %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <!--Mobile View-->
+    <div class="row d-md-none">
+      <div class="col-12">
+        <table class="table table-bordered">
+          <thead class="table-danger">
+            <tr>
+              <th>Task No.</th>
+              <th>Status</th>
+              <th>Details</th>
+            </tr>
+          </thead>
+          <tbody class="table-info">
+            {% if page_obj %}
+              {% for task in page_obj %}
+                <tr
+                  class="task-summary-row"
+                  onClick="toggleTask(this)"
+                >
+                  <td>{{task.tasks_number}}</td>
+                  <td>{{task.status}}</td>
+                  <td><i class="fa-solid fa-plus"></i></td>
+                </tr>
+                <tr class="task-body">
+                  <td colspan="3">
+                    <div class="task-detail-content">
+                      <div class="task-detail-item"><strong>Task:</strong> {{ task.tasks_types.name }}</div>
+                      <div class="task-detail-item"><strong>Frequency:</strong> {{ task.task_frequency }}</div>
+                      <div class="task-detail-item"><strong>Status:</strong> {{ task.status }}</div>
+                      <div class="task-detail-item"><strong>Assigned To:</strong> {{ task.assigned_to }}</div>
+                      <div class="task-detail-item"><strong>Created At:</strong> {{ task.created_at }}</div>
+                      <div class="task-detail-item">
+                        <a class="open-modal d-flex align-items-center" data-url="{% url 'tms:tasks_remarks' task.id %}">
+                          <i class="fa-solid fa-pen text-primary"></i>
+                          &nbsp;
+                          <p>Edit</p>
+                        </a>
+                      </div>
+                      <div class="task-detail-item">
+                        <a class="d-flex align-items-center" href="{% url 'tms:admin_tasks_details' task.id %}">
+                          <i class="fa-solid fa-eye text-primary"></i>
+                          &nbsp;
+                          <p>View</p>
+                        </a>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+              {% endfor %}
+            {% else %}
+              <tr>
+                <td colspan="100%">No Tasks!</td>
               </tr>
             {% endif %}
           </tbody>
@@ -193,5 +258,27 @@
         });
       });
     });
+  </script>
+
+  <script>
+    function toggleTask(element) {
+      const body = element.nextElementSibling;
+      if (!body) {
+        return;
+      }
+      body.classList.toggle("active");
+
+      const icon = element.querySelector("i");
+      if (!icon) {
+        return;
+      }
+      if (body.classList.contains("active")) {
+        icon.classList.remove("fa-plus");
+        icon.classList.add("fa-minus");
+      } else {
+        icon.classList.remove("fa-minus");
+        icon.classList.add("fa-plus");
+      }
+    }
   </script>
 {% endblock %}

@@ -19,6 +19,11 @@ urlpatterns = [
         UpdateStatus,
         name="admin_update_task_status",
     ),
+    path(
+        "tasks_admin/all_tasks/all_tasks_details/handover/<int:id>/",
+        TaskHandoverUpdate,
+        name="admin_task_handover",
+    ),
     path("tasks_staff/my_tasks/", MyTasks, name="my_tasks"),
     path(
         "tasks_staff/my_tasks/tasks_details/<int:id>/",
@@ -29,6 +34,16 @@ urlpatterns = [
         "tasks_staff/my_tasks/tasks_details/update_status/<int:id>/",
         UpdateStatus,
         name="staff_update_task_status",
+    ),
+    path(
+        "tasks_staff/my_tasks/handover/<int:id>/",
+        TaskHandoverUpdate,
+        name="staff_task_handover",
+    ),
+    path(
+        "tasks_staff/my_tasks/checklist/<int:id>/",
+        UpdateChecklist,
+        name="staff_task_checklist_update",
     ),
     path("ajax/load-tasks-types/", load_tasks_types, name="ajax_load_tasks_types"),
     path("ajax/load-staff/", load_tasks_staffs, name="ajax_load_staff"),

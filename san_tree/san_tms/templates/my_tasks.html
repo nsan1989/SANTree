@@ -25,6 +25,44 @@
     .status-progress > td { background-color: #ff6600; color: #000; }
     .status-waiting > td { background-color: #808080; color: #fff; }
     .status-rejected > td { background-color: #cc0000; color: #fff; }
+    .task-body {
+      display: none;
+    }
+    .task-body.active {
+      display: table-row;
+    }
+    .mobile-task-table {
+      table-layout: fixed;
+      width: 100%;
+    }
+    .mobile-task-table th,
+    .mobile-task-table td {
+      word-wrap: break-word;
+      white-space: normal;
+      vertical-align: top;
+    }
+    .mobile-task-table .task-summary-row td:nth-child(1) {
+      width: 35%;
+    }
+    .mobile-task-table .task-summary-row td:nth-child(2) {
+      width: 40%;
+    }
+    .mobile-task-table .task-summary-row td:nth-child(3) {
+      width: 25%;
+      text-align: center;
+    }
+    .task-detail-content {
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.85rem;
+      background-color: #eef6ff;
+      padding: 0.75rem;
+    }
+    .task-detail-item {
+      margin-bottom: 0.45rem;
+    }
+    .task-detail-item:last-child {
+      margin-bottom: 0;
+    }
   </style>
 
   <div class="container-fluid">
@@ -65,7 +103,8 @@
         </nav>
       </div>
     </div>
-    <div class="row">
+    <!--Desktop view-->
+    <div class="row d-none d-md-flex">
       <div class="col-12 task-table">
         <div class="table-responsive">
           <table class="table table-bordered">
@@ -73,6 +112,7 @@
               <tr>
                 <th scope="col">Tasks No.</th>
                 <th scope="col">Tasks</th>
+                <th scope="col">Start Date</th>
                 <th scope="col">Frequency</th>
                 <th scope="col">Location</th>
                 <th scope="col">Status</th>
@@ -80,6 +120,7 @@
                   <th scope="col">Update Status</th>
                 {% endif %}
                 <th scope="col">Remark</th>
+                <th scope="col">Handover</th>
                 <th scope="col">Details</th>
               </tr>
             </thead>
@@ -98,23 +139,53 @@
                 >
                   <td>{{ task.tasks_number}}</td>
                   <td>{{ task.tasks_types.name }}</td>
+                  <td>{{ task.start_date }}</td>
                   <td>{{ task.task_frequency }}</td>
-                  {% if task.location %}
-                    <td>{{ task.location }}</td>
-                  {% else %}
-                    <td>NA</td>
-                  {% endif %}
-                  <td>{{ task.status }}</td>
-                  {% if task.status != 'Completed' and task.status != 'Postponed' %}
+                  <td>{{ task.location|default:"NA" }}</td>
+                  <td>
+                    {{ task.status }}
+                    {% if task.start_date > today %}
+                      <span class="badge bg-warning text-dark ms-1">Upcoming</span>
+                    {% endif %}
+                  </td>
+                  {% if task.status != 'Completed' and task.status != 'Cancelled' %}
                     <td>
+
                       <form method="POST" action="{% url 'tms:staff_update_task_status' task.id %}">
                         {% csrf_token %}
-                        <select class="mb-2" name="status" required>
+                        <div class="form-check d-flex align-items-center">
+                      <input class="form-check-input me-2 task-complete-check"
+                             type="checkbox"
+                             name="completed_checkbox"
+                             value="on"
+                             id="btncheck-{{ task.id }}">
+                      <label class="form-check-label" for="btncheck-{{ task.id }}">
+                        Checklist
+                      </label>
+                    </div>
+                        <select class="mb-2 status-select" name="status" data-reason-target="remarks-desktop-{{ task.id }}" required>
                           <option value="">select</option>
-                          <option value="In Progress" {% if tasks.status == 'In Progress' %} selected {% endif %}>In Progress</option>
-                          <option value="Postponed" {% if tasks.status == 'Postponed' %} selected {% endif %}>Postponed</option>
-                          <option value="Completed" {% if tasks.status == 'Completed' %} selected {% endif %}>Completed</option>
+                          {% if task.status == 'Waiting' %}
+                            <option value="Acknowledged">Acknowledged</option>
+                            <option value="Cancelled">Cancelled</option>
+                          {% elif task.status == 'Acknowledged' %}
+                            <option value="In Progress">In Progress</option>
+                            <option value="Postponed">Postponed</option>
+                          {% elif task.status == 'In Progress' %}
+                            <option value="Completed">Completed</option>
+                            <option value="Postponed">Postponed</option>
+                          {% elif task.status == 'Postponed' %}
+                            <option value="In Progress">In Progress</option>
+                            <option value="Cancelled">Cancelled</option>
+                          {% endif %}
                         </select>
+                        <input
+                          type="text"
+                          id="remarks-desktop-{{ task.id }}"
+                          name="remarks"
+                          class="form-control form-control-sm mb-2 d-none"
+                          placeholder="Enter remark"
+                        >
                         <button class="btn btn-sm btn-primary" type="submit">Update</button>
                       </form>
                     </td>
@@ -126,13 +197,18 @@
                   {% else %}
                     <td>--</td>
                   {% endif %}
+                  <td class="text-center">
+                    <a class="open-modal" data-url="{% url 'tms:staff_task_handover' task.id %}" title="Handover">
+                      <i class="fa-solid fa-right-left"></i>
+                    </a>
+                  </td>
                   <td>
                     <a href="{% url 'tms:staff_tasks_details' task.id %}"><i class="fa-solid fa-eye"></i></a>
                   </td>
                 </tr>
               {% endfor %} {% else %}
                 <tr>
-                  <td colspan="9">
+                  <td colspan="100%">
                     No tasks have been assigned yet!
                   </td>
                 </tr>
@@ -140,6 +216,102 @@
             </tbody>
           </table>
         </div>
+      </div>
+    </div>
+    <!--Mobile view-->
+    <div class="row d-md-none">
+      <div class="col-12 table-responsive">
+        <table class="table table-bordered">
+          <thead class="table-danger">
+            <tr>
+              <th scope="col">Task No.</th>
+              <th scope="col">Status</th>
+              <th scope="col">Details</th>
+            </tr>
+          </thead>
+          <tbody class="table-info">
+            {% if page_obj %}
+              {% for task in page_obj %}
+                <tr
+                  class="task-summary-row"
+                  onClick="toggleTask(this)"
+                >
+                  <td>{{task.tasks_number}}</td>
+                  <td>{{task.status}}</td>
+                  <td><i class="fa-solid fa-plus"></i></td>
+                </tr>
+                <tr class="task-body">
+                  <td colspan="3">
+                    <div class="task-detail-content">
+                      <div class="task-detail-item"><strong>Task:</strong> {{ task.tasks_types.name }}</div>
+                      <div class="task-detail-item"><strong>Frequency:</strong> {{ task.task_frequency }}</div>
+                      <div class="task-detail-item"><strong>Location:</strong> {% if task.location %}{{ task.location }}{% else %}NA{% endif %}</div>
+                      <div class="task-detail-item">
+                        <strong>Update Status:</strong>
+                        {% if task.status != 'Completed' and task.status != 'Cancelled' %}
+                          <form method="POST" action="{% url 'tms:staff_update_task_status' task.id %}" class="d-inline">
+                            {% csrf_token %}
+                            <select class="mb-2 status-select" name="status" data-reason-target="remarks-mobile-{{ task.id }}" required>
+                              <option value="">select</option>
+                              {% if task.status == 'Waiting' %}
+                                <option value="Acknowledged">Acknowledged</option>
+                                <option value="Cancelled">Cancelled</option>
+                              {% elif task.status == 'Acknowledged' %}
+                                <option value="In Progress">In Progress</option>
+                                <option value="Postponed">Postponed</option>
+                              {% elif task.status == 'In Progress' %}
+                                <option value="Completed">Completed</option>
+                                <option value="Postponed">Postponed</option>
+                              {% elif task.status == 'Postponed' %}
+                                <option value="In Progress">In Progress</option>
+                                <option value="Cancelled">Cancelled</option>
+                              {% endif %}
+                            </select>
+                            <input
+                              type="text"
+                              id="remarks-mobile-{{ task.id }}"
+                              name="remarks"
+                              class="form-control form-control-sm mb-2 d-none"
+                              placeholder="Enter remark"
+                            >
+                            <button class="btn btn-sm btn-primary" type="submit">Update</button>
+                          </form>
+                        {% else %}
+                          <span>--</span>
+                        {% endif %}
+                      </div>
+                      <div class="task-detail-item">
+                        <strong>Remark:</strong>
+                        {% if task.status != 'Postponed' and task.status != 'Completed' and task.start_date <= today %}
+                          <a class="open-modal" data-url="{% url 'tms:tasks_remarks' task.id %}" style="text-decoration: none;">
+                            <i class="fa-solid fa-pen"></i>
+                          </a>
+                        {% else %}
+                          <span>--</span>
+                        {% endif %}
+                      </div>
+                      <div class="task-detail-item">
+                        <strong>Handover:</strong>
+                        <a class="open-modal" data-url="{% url 'tms:staff_task_handover' task.id %}" style="text-decoration: none;">
+                          <i class="fa-solid fa-right-left"></i>
+                        </a>
+                      </div>
+                      <div class="task-detail-item">
+                        <a href="{% url 'tms:staff_tasks_details' task.id %}" style="text-decoration: none;">
+                          <i class="fa-solid fa-eye"></i> View Details
+                        </a>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+              {% endfor %}
+            {% else %}
+              <tr>
+                <td colspan="100%">No task has been assigned!</td>
+              </tr>
+            {% endif %}
+          </tbody>
+        </table>
       </div>
     </div>
   </div>
@@ -213,6 +385,72 @@
               modal.show();
             });
         });
+      });
+
+      function togglePostponeReason(selectEl) {
+        const reasonId = selectEl.getAttribute('data-reason-target');
+        if (!reasonId) {
+          return;
+        }
+        const reasonInput = document.getElementById(reasonId);
+        if (!reasonInput) {
+          return;
+        }
+        if (selectEl.value === 'Postponed') {
+          reasonInput.classList.remove('d-none');
+          reasonInput.required = true;
+        } else {
+          reasonInput.classList.add('d-none');
+          reasonInput.required = false;
+          reasonInput.value = '';
+        }
+      }
+
+      document.querySelectorAll('.status-select').forEach(function (selectEl) {
+        togglePostponeReason(selectEl);
+        selectEl.addEventListener('change', function () {
+          togglePostponeReason(selectEl);
+        });
+      });
+    });
+  </script>
+
+  <script>
+    function toggleTask(element) {
+      const body = element.nextElementSibling;
+      if (!body) {
+        return;
+      }
+      body.classList.toggle("active");
+
+      const icon = element.querySelector("i");
+      if (!icon) {
+        return;
+      }
+      if (body.classList.contains("active")) {
+        icon.classList.remove("fa-plus");
+        icon.classList.add("fa-minus");
+      } else {
+        icon.classList.remove("fa-minus");
+        icon.classList.add("fa-plus");
+      }
+    }
+  </script>
+
+  <script>
+    document.querySelectorAll('form[action*="staff_update_task_status"]').forEach(form => {
+      form.addEventListener("submit", function (e) {
+
+        const select = form.querySelector(".status-select");
+        if (!select) return;
+
+        const taskId = select.getAttribute("data-reason-target")?.split("-").pop();
+        const checkbox = document.getElementById(`btncheck-${taskId}`);
+
+        if (select.value === "Completed" && (!checkbox || !checkbox.checked)) {
+          e.preventDefault();
+          alert("Please check the 'Completed' checkbox before updating status.");
+        }
       });
     });
   </script>

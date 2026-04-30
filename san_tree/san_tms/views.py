@@ -10,8 +10,8 @@ from django.utils import timezone
 
 from accounts.models import CustomUsers
 
-from .forms import RemarkForm, TasksForm
-from .models import Tasks, TasksRemarks, TasksTypes
+from .forms import RemarkForm, TaskHandoverForm, TasksForm
+from .models import TaskChecklistItem, TaskHandover, Tasks, TasksRemarks, TasksTypes
 
 matplotlib.use("Agg")
 import io
@@ -40,13 +40,13 @@ def TasksPieChart(request):
     start_date = request.GET.get("start_date")
     end_date = request.GET.get("end_date")
 
-    tasks = Tasks.objects.filter(assigned_to=user)
+    tasks = Tasks.objects.filter(assigned_to=user, start_date__lte=timezone.localdate())
 
     if start_date and end_date:
         try:
             start = datetime.strptime(start_date, "%Y-%m-%d")
             end = datetime.strptime(end_date, "%Y-%m-%d") + timedelta(days=1)
-            tasks = tasks.filter(created_at__range=[start, end])
+            tasks = tasks.filter(start_date__range=[start.date(), end.date()])
         except ValueError:
             pass
 
@@ -110,6 +110,7 @@ def TaskDashboard(request):
         if form.is_valid():
             new_task = form.save(commit=False)
             new_task.created_by = request.user
+            checklist_items_input = request.POST.get("checklist_items", "")
             department = form.cleaned_data.get("department")
             task_type = form.cleaned_data.get("tasks_types")
             assigned_user = form.cleaned_data.get("assigned_to")
@@ -122,7 +123,6 @@ def TaskDashboard(request):
             if assigned_user:
                 if assigned_user.status.strip().lower() == "vacant":
                     new_task.assigned_to = assigned_user
-                    assigned_user.status = "engaged"
                     assigned_user.save()
                 else:
                     form.add_error(
@@ -140,7 +140,26 @@ def TaskDashboard(request):
                     },
                 )
 
+            checklist_lines = [
+                item.strip()
+                for item in checklist_items_input.splitlines()
+                if item.strip()
+            ]
+            if not checklist_lines:
+                messages.warning(request, "Please add at least one checklist item.")
+                return render(
+                    request,
+                    "tasks_dashboard.html",
+                    {
+                        "form": form,
+                        "current_user": user,
+                        "calendar_events": json.dumps(events, cls=DjangoJSONEncoder),
+                    },
+                )
+
             new_task.save()
+            for item_text in checklist_lines:
+                TaskChecklistItem.objects.create(tasks=new_task, item_text=item_text)
             return redirect("tms:tasks")
     else:
         form = TasksForm(user=request.user)
@@ -156,8 +175,9 @@ def TaskDashboard(request):
         events.append(
             {
                 "title": f"{tasks.tasks_types} ({tasks.task_frequency})",
-                "start": tasks.created_at.strftime("%Y-%m-%d"),
+                "start": tasks.start_date.strftime("%Y-%m-%d"),
                 "url": reverse("tms:admin_tasks_details", args=[tasks.id]),
+                "color": "#6c757d",
             }
         )
         if tasks.next_date:
@@ -166,6 +186,7 @@ def TaskDashboard(request):
                     "title": f"{tasks.tasks_types} - Next ({tasks.task_frequency})",
                     "start": tasks.next_date.strftime("%Y-%m-%d"),
                     "url": reverse("tms:admin_tasks_details", args=[tasks.id]),
+                    "color": "#f39c12",
                 }
             )
     total_tasks = incharge_tasks.count()
@@ -202,7 +223,9 @@ def StaffDashboard(request):
         user_role = user.role
     except AttributeError:
         raise PermissionDenied("User profile not found.")
-    staff_tasks = Tasks.objects.filter(assigned_to=user)
+    staff_tasks = Tasks.objects.filter(
+        assigned_to=user, start_date__lte=timezone.localdate()
+    )
     events = []
     for tasks in staff_tasks:
         # Determine event color based on status
@@ -217,9 +240,9 @@ def StaffDashboard(request):
         events.append(
             {
                 "title": str(tasks.tasks_types),
-                "start": tasks.created_at.strftime("%Y-%m-%d"),
+                "start": tasks.start_date.strftime("%Y-%m-%d"),
                 "url": reverse("tms:staff_tasks_details", args=[tasks.id]),
-                "color": color,
+                "color": "#6c757d",
             }
         )
         if tasks.next_date:
@@ -231,7 +254,9 @@ def StaffDashboard(request):
                     "color": color,
                 }
             )
-    upcoming_tasks = Tasks.objects.filter(next_date__gt=now()).order_by("next_date")[:5]
+    upcoming_tasks = Tasks.objects.filter(
+        assigned_to=user, start_date__gt=timezone.localdate()
+    ).order_by("start_date")[:5]
     context = {
         "current_user": user,
         "date": date.today(),
@@ -274,7 +299,7 @@ def AllTasks(request):
     page_number = request.GET.get("page")
     paginator = Paginator(new_tasks, 10)
     page_obj = paginator.get_page(page_number)
-    context = {"page_obj": page_obj}
+    context = {"page_obj": page_obj, "today": timezone.localdate()}
     view_name = request.resolver_match.view_name
     if view_name == "tms:tasks" and user_role == "Admin":
         return render(request, "all_tasks.html", context)
@@ -288,7 +313,7 @@ def MyTasks(request):
         user_role = user.role
     except:
         raise PermissionDenied("User profile not found")
-    my_tasks = Tasks.objects.filter(assigned_to=user).order_by("created_at")
+    my_tasks = Tasks.objects.filter(assigned_to=user).order_by("start_date")
 
     page_number = request.GET.get("page")
     paginator = Paginator(my_tasks, 10)
@@ -310,9 +335,15 @@ def TasksDetails(request, id):
     except:
         PermissionDenied("User profile not found.")
     task_remark = TasksRemarks.objects.filter(tasks_id=id).order_by("-created_at")
+    handover_history = TaskHandover.objects.filter(tasks_id=id).order_by("-created_at")
+    handover_form = TaskHandoverForm(task=tasks)
+    checklist_items = TaskChecklistItem.objects.filter(tasks=tasks).order_by("id")
     context = {
         "tasks": tasks,
         "remark": task_remark,
+        "handover_history": handover_history,
+        "handover_form": handover_form,
+        "checklist_items": checklist_items,
     }
     view_name = request.resolver_match.view_name
     if view_name == "tms:staff_tasks_details" and user_role == "User":
@@ -329,14 +360,115 @@ def AllTasksDetails(request, id):
     except:
         PermissionDenied("User profile not found.")
     task_remark = TasksRemarks.objects.filter(tasks_id=id).order_by("-created_at")
+    handover_history = TaskHandover.objects.filter(tasks_id=id).order_by("-created_at")
+    checklist_items = TaskChecklistItem.objects.filter(tasks=tasks).order_by("id")
     context = {
         "tasks": tasks,
         "remark": task_remark,
+        "handover_history": handover_history,
+        "checklist_items": checklist_items,
     }
     view_name = request.resolver_match.view_name
     if view_name == "tms:admin_tasks_details" and user_role == "Admin":
         return render(request, "all_tasks_details.html", context)
     raise PermissionDenied("You are not authorized to view this page.")
+
+
+# Task Handover.
+def TaskHandoverUpdate(request, id):
+    user = request.user
+    try:
+        user_role = user.role
+    except AttributeError:
+        raise PermissionDenied("User profile not found.")
+
+    if user_role != "User":
+        raise PermissionDenied("You are not authorized to handover tasks.")
+
+    tasks = get_object_or_404(Tasks, id=id)
+    if tasks.assigned_to != user:
+        raise PermissionDenied("You can only handover tasks assigned to you.")
+
+    if request.method == "POST":
+        form = TaskHandoverForm(request.POST, task=tasks)
+        if form.is_valid():
+            new_user = form.cleaned_data["to_user"]
+            reason = form.cleaned_data["reason"]
+            old_user = tasks.assigned_to
+
+            tasks.assigned_to = new_user
+            tasks.save(update_fields=["assigned_to"])
+
+            if old_user:
+                has_active_tasks = (
+                    Tasks.objects.filter(assigned_to=old_user)
+                    .exclude(status__in=["Completed", "Cancelled"])
+                    .exists()
+                )
+                old_user.status = "Engaged" if has_active_tasks else "Vacant"
+                old_user.save(update_fields=["status"])
+
+            new_user.status = "Engaged"
+            new_user.save(update_fields=["status"])
+
+            TaskHandover.objects.create(
+                tasks=tasks,
+                from_user=old_user,
+                to_user=new_user,
+                reason=reason,
+                created_by=user,
+            )
+
+            messages.success(request, "Task handed over successfully.")
+        else:
+            messages.warning(request, "Handover failed. Please check the details.")
+    else:
+        form = TaskHandoverForm()
+
+    context = {"form": form, "task": tasks}
+    return render(request, "task_handover.html", context)
+
+
+def UpdateChecklist(request, id):
+    user = request.user
+    try:
+        user_role = user.role
+    except AttributeError:
+        raise PermissionDenied("User profile not found.")
+
+    if user_role != "User":
+        raise PermissionDenied("You are not authorized to update checklist.")
+
+    tasks = get_object_or_404(Tasks, id=id, assigned_to=user)
+    checklist_items = TaskChecklistItem.objects.filter(tasks=tasks)
+
+    if request.method == "POST":
+        selected_ids = set(
+            int(item_id)
+            for item_id in request.POST.getlist("completed_items")
+            if item_id.isdigit()
+        )
+        now_ts = timezone.now()
+        for item in checklist_items:
+            should_complete = item.id in selected_ids
+            if should_complete and not item.is_completed:
+                item.is_completed = True
+                item.completed_by = user
+                item.completed_at = now_ts
+                item.save(
+                    update_fields=["is_completed", "completed_by", "completed_at"]
+                )
+            elif not should_complete and item.is_completed:
+                item.is_completed = False
+                item.completed_by = None
+                item.completed_at = None
+                item.save(
+                    update_fields=["is_completed", "completed_by", "completed_at"]
+                )
+
+        messages.success(request, "Checklist updated successfully.")
+
+    return redirect("tms:staff_tasks_details", id=id)
 
 
 # Update Tasks Status.
@@ -349,14 +481,12 @@ def UpdateStatus(request, id):
 
     tasks = get_object_or_404(Tasks, id=id)
 
-    if tasks.status == "Completed":
-        messages.warning(
-            request, f"Cannot update status. Complaint is already {tasks.status}."
-        )
-        return redirect("tms:my_tasks")
-
     if request.method == "POST":
         new_status = request.POST.get("status")
+        checkbox = bool(request.POST.get("completed_checkbox"))
+        remarks = request.POST.get("remarks", "").strip()
+
+        print("Checkbox:", request.POST.get("completed_checkbox"))
 
         if tasks.status == "Completed":
             messages.warning(
@@ -364,22 +494,102 @@ def UpdateStatus(request, id):
             )
             return redirect("tms:my_tasks")
 
-        tasks.status = new_status
+        allowed_transitions = {
+            "Waiting": {"Acknowledged", "Cancelled"},
+            "Acknowledged": {"In Progress", "Postponed"},
+            "In Progress": {"Completed", "Postponed"},
+            "Postponed": {"In Progress", "Cancelled"},
+        }
+
+        valid_next_status = allowed_transitions.get(tasks.status, set())
+        if new_status not in valid_next_status:
+            messages.warning(
+                request,
+                f"Invalid status transition from {tasks.status} to {new_status}.",
+            )
+            if user.role == "User":
+                return redirect("tms:my_tasks")
+            return redirect("tms:tasks")
+
+        if new_status == "In Progress":
+            user.status = "Engaged"
+            user.save(update_fields=["status"])
+
+        if new_status == "Postponed" and not remarks:
+            messages.warning(request, "Postponed status requires a reason.")
+            if user.role == "User":
+                return redirect("tms:my_tasks")
+            return redirect("tms:tasks")
+
+        if new_status == "Postponed":
+            TasksRemarks.objects.create(
+                tasks=tasks,
+                remarks=remarks,
+                created_by=request.user,
+            )
+            user.status = "Vacant"
 
         if new_status == "Completed":
+            if not checkbox:
+                messages.warning(
+                    request, "Please confirm completion by checking the checkbox."
+                )
+                return redirect("tms:my_tasks")
+
+            checklist_items = TaskChecklistItem.objects.filter(tasks=tasks)
+
+            if (
+                checklist_items.exists()
+                and checklist_items.filter(is_completed=False).exists()
+            ):
+                messages.warning(request, "Complete all checklist items first.")
+                return redirect("tms:my_tasks")
+
+            tasks.status = "Completed"
             tasks.completed_at = timezone.now()
-            tasks.assigned_to.status = "Vacant"
-            tasks.assigned_to.save()
-            tasks.save()
-        else:
-            tasks.completed_at = None
+
+            current_assignee = tasks.assigned_to
+
+            # For recurring tasks, auto-create the next cycle and keep assignment.
+            if tasks.task_frequency in {"Daily", "Weekly", "Monthly"}:
+                next_start_date = timezone.localdate()
+
+                if tasks.next_date:
+                    next_start_date = timezone.localtime(tasks.next_date).date()
+
+                Tasks.objects.create(
+                    tasks_types=tasks.tasks_types,
+                    task_frequency=tasks.task_frequency,
+                    location=tasks.location,
+                    status="Waiting",
+                    department=tasks.department,
+                    created_by=tasks.created_by,
+                    assigned_to=current_assignee,
+                    start_date=next_start_date,
+                    attachment=tasks.attachment,
+                )
+
+            if current_assignee:
+                current_assignee.status = "Vacant"
+                current_assignee.save(update_fields=["status"])
+
+            tasks.save(update_fields=["status", "completed_at"])
+
+            messages.success(request, "Task completed successfully.")
+            return redirect("tms:my_tasks")
+
+        tasks.status = new_status
+        tasks.completed_at = None
 
         if new_status == "Waiting":
             tasks.waiting_time = timezone.now()
-            tasks.save()
 
-        tasks.save()
-        messages.success(request, "Status updated successfully.")
+        tasks.save(
+            update_fields=[
+                "status",
+            ]
+        )
+
         if user.role == "User":
             return redirect("tms:my_tasks")
         else:

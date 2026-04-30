@@ -8,12 +8,22 @@
     }
 
     #calendar {
-      max-width: 800px;
-    /* adjust size */
-      margin: auto;
+      width: 100%;
       font-size: 12px;
       background: #f3f3f3;
-    /* smaller text */
+      margin: 0 auto;
+    }
+    .fc .fc-view-harness,
+    .fc .fc-scroller {
+      height: auto !important;
+      overflow: visible !important;
+    }
+    .fc .fc-toolbar {
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    .fc .fc-toolbar-title {
+      font-size: 1rem;
     }
 
     .fc-scrollgrid-sync-inner a {
@@ -23,7 +33,6 @@
     .btn {
       width: 8rem;
     }
-
     th, td {
       font-family: 'Poppins', sans-serif;
     }
@@ -48,14 +57,7 @@
             </h5>
           </div>
         </div>
-        <div class="bottom-content">
-          <div class="calender-wrapper">
-            <div class="p-2 rounded" id="calendar"></div>
-          </div>
-        </div>
-      </div>
-      <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4">
-        <div class="calendar-filters d-flex align-items-center gap-4 mb-3">
+        <div class="calendar-filters d-md-none d-flex flex-column gap-2 mb-3">
           <div class="dropdown">
             <button id="calendarFilterBtn" class="btn btn-warning dropdown-toggle" type="button" data-bs-toggle="dropdown"
                     aria-expanded="false">
@@ -69,36 +71,26 @@
           </div>
           <p class="mb-0 text-warning">change calendar view.</p>
         </div>
-        <div class="upcoming-task-wrapper mb-3 d-flex flex-column">
-          <div class="upcoming-title">
-            <h3>Upcoming Task</h3>
+        <div class="bottom-content mb-3">
+          <div class="calender-wrapper">
+            <div class="p-2 rounded" id="calendar"></div>
           </div>
-          <div class="upcoming-tasks">
-            <table class="table">
-              <thead>
-                <tr class="table-danger">
-                  <th scope="col">Task Number</th>
-                  <th scope="col">Task</th>
-                  <th scope="col">DATE</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% if upcoming %}
-                  {% for task in upcoming %}
-                    <tr class="table-info">
-                      <td>{{task.tasks_number}}</td>
-                      <td>{{task.tasks_types.name}}</td>
-                      <td>{{task.next_date}}</td>
-                    </tr>
-                  {% endfor %}
-                {% else %}
-                  <tr>
-                    <td colspan="100%">no upcoming task!</td>
-                  </tr>
-                {% endif %}
-              </tbody>
-            </table>
+        </div>
+      </div>
+      <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4">
+        <div class="calendar-filters d-none d-md-flex align-items-center gap-4 mb-3">
+          <div class="dropdown">
+            <button id="calendarFilterBtn" class="btn btn-warning dropdown-toggle" type="button" data-bs-toggle="dropdown"
+                    aria-expanded="false">
+              select
+            </button>
+            <ul class="dropdown-menu" id="calendarFilterOptions">
+              <li><a class="dropdown-item" data-view="dayGridMonth" href="#">Month</a></li>
+              <li><a class="dropdown-item" data-view="timeGridWeek" href="#">Week</a></li>
+              <li><a class="dropdown-item" data-view="timeGridDay" href="#">Day</a></li>
+            </ul>
           </div>
+          <p class="mb-0 text-warning">change calendar view.</p>
         </div>
       </div>
     </div>
@@ -113,6 +105,11 @@
 
       const calendar = new FullCalendar.Calendar(calendarEl, {
         initialView: 'dayGridMonth',
+        height: 'auto',
+        contentHeight: 'auto',
+        expandRows: true,
+        handleWindowResize: true,
+        dayMaxEventRows: true,
         headerToolbar: {
           left: 'prev,next today',
           center: 'title',
