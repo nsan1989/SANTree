@@ -11,13 +11,6 @@
 <!---------->
 
   <div class="container">
-    {% if messages %}
-      {% for add_location_message in messages %}
-        <div class="location-alert alert-{{ message.tags }}">
-          {{ add_location_message }}
-        </div>
-      {% endfor %}
-    {% endif %}
 
     {% if form.errors %}
       <div class="location-error-alert alert-danger">

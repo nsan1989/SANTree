@@ -26,6 +26,29 @@ class TasksTypes(models.Model):
         verbose_name_plural = "Tasks Types"
 
 
+# Tasks Type Checklist.
+class TaskChecklist(models.Model):
+    task_type = models.ForeignKey(
+        TasksTypes, on_delete=models.CASCADE, related_name="checklist_task"
+    )
+    name = models.CharField(max_length=255)
+    is_completed = models.BooleanField(default=False)
+    completed_by = models.ForeignKey(
+        CustomUsers,
+        on_delete=models.CASCADE,
+        related_name="checklist_by",
+        null=True,
+        blank=True,
+    )
+    completed_date = models.DateField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.name} {self.task_type.name}"
+
+    class Meta:
+        verbose_name_plural = "Task Checklist"
+
+
 # Tasks Frequency.
 TASKS_FREQUENCY = (
     ("Daily", "Daily"),
@@ -254,25 +277,3 @@ class TaskHandover(models.Model):
 
     class Meta:
         verbose_name_plural = "Task Handovers"
-
-
-class TaskChecklistItem(models.Model):
-    tasks = models.ForeignKey(
-        Tasks, on_delete=models.CASCADE, related_name="checklist_items"
-    )
-    item_text = models.CharField(max_length=255)
-    is_completed = models.BooleanField(default=False)
-    completed_by = models.ForeignKey(
-        CustomUsers,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name="tms_completed_checklist_items",
-    )
-    completed_at = models.DateTimeField(null=True, blank=True)
-
-    def __str__(self):
-        return f"{self.tasks} | {self.item_text}"
-
-    class Meta:
-        verbose_name_plural = "Task Checklist Items"

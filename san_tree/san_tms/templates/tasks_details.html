@@ -121,26 +121,6 @@
                 </div>
             </div>
         </div>
-        <div class="row mb-3">
-            <div class="col-12">
-                <div class="remark-title">
-                    <h5>Task Checklist (Mandatory)</h5>
-                </div>
-            </div>
-            <div class="col-12">
-                <div class="bg-light p-3">
-                    {% if checklist_items %}
-                        {% for item in checklist_items %}
-                            <div class="form-check mb-2 p-0">
-                                {{ item.item_text }}
-                            </div>
-                        {% endfor %}
-                    {% else %}
-                        <p class="mb-0">No checklist items found.</p>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
         <div class="row d-none d-md-flex">
             <div class="col-12">
                 <div class="remark-title">

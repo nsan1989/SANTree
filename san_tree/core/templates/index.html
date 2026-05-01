@@ -28,6 +28,19 @@
   <body>
   <!--style-->
     <style>
+      .alert {
+        position: absolute;
+        margin-top: 0.5rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        width: 50%;
+        background-color: #6b1d20;
+        color: #fff;
+        z-index: 999;
+      }
+
       .layout {
         display: flex;
         width: 100%;
@@ -96,6 +109,30 @@
     */
     </style>
   <!----------->
+    <div
+      style="display: flex; justify-content: center;"
+    >
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert">
+          <span class="mb-2">{{message}}</span>
+          <button 
+            class="close-btn" 
+            onclick="this.parentElement.style.display='none';"
+            style="
+              width: 2rem;
+              height: 2rem;
+              border: none;
+              border-radius: 0.2rem;
+            "
+          >
+            OK
+          </button>
+        </div>
+      {% endfor %}
+    {% endif %}
+    </div>
+
     <div class="layout d-flex">
       {% if request.user.is_authenticated and request.user.role != 'Super Admin' and request.resolver_match.url_name != 'main_dashboard' and request.resolver_match.url_name != 'profile' %}
         <div id="sidebar" class="sidebar">

@@ -50,13 +50,13 @@
               class="fa-solid fa-plus"></i>&nbsp;create</button>
             <p class="mb-0 text-primary">click here to create a new task.</p>
           </div>
-          <div class="calendar-filters gap-2 mb-3 d-flex flex-column">
+          <div class="calendar-filters d-md-none d-flex flex-column gap-2 mb-3">
             <div class="dropdown">
-              <button id="calendarFilterBtn" class="btn btn-warning dropdown-toggle" type="button"
+              <button class="btn btn-warning dropdown-toggle calendarFilterBtn" type="button"
                       data-bs-toggle="dropdown" aria-expanded="false">
                 select
               </button>
-              <ul class="dropdown-menu" id="calendarFilterOptions">
+              <ul class="dropdown-menu calendarFilterOptions">
                 <li><a class="dropdown-item" data-view="dayGridMonth" href="#">Month</a></li>
                 <li><a class="dropdown-item" data-view="timeGridWeek" href="#">Week</a></li>
                 <li><a class="dropdown-item" data-view="timeGridDay" href="#">Day</a></li>
@@ -77,13 +77,13 @@
             class="fa-solid fa-plus"></i>&nbsp;create</button>
           <p class="mb-0 text-primary">click here to create a new task.</p>
         </div>
-        <div class="calendar-filters d-flex align-items-center gap-4 mb-3">
+        <div class="calendar-filters d-none d-md-flex flex-column gap-2 mb-3">
           <div class="dropdown">
-            <button id="calendarFilterBtn" class="btn btn-warning dropdown-toggle" type="button"
+            <button class="btn btn-warning dropdown-toggle calendarFilterBtn" type="button"
                     data-bs-toggle="dropdown" aria-expanded="false">
               select
             </button>
-            <ul class="dropdown-menu" id="calendarFilterOptions">
+            <ul class="dropdown-menu calendarFilterOptions">
               <li><a class="dropdown-item" data-view="dayGridMonth" href="#">Month</a></li>
               <li><a class="dropdown-item" data-view="timeGridWeek" href="#">Week</a></li>
               <li><a class="dropdown-item" data-view="timeGridDay" href="#">Day</a></li>
@@ -151,21 +151,6 @@
                 {{ form.attachment }}
               </div>
             </div>
-            <div class="row">
-              <div class="col-12 d-flex flex-column mb-2">
-                <label for="id_checklist_items" class="form-label requiredField">
-                  Checklist Items <span class="asteriskField">*</span>
-                </label>
-                <textarea
-                  id="id_checklist_items"
-                  name="checklist_items"
-                  class="form-control"
-                  rows="4"
-                  placeholder="Enter one checklist item per line"
-                  required
-                ></textarea>
-              </div>
-            </div>
             <div class="d-grid mt-4">
               <button type="submit" class="btn btn-primary btn-lg">Submit</button>
             </div>
@@ -203,18 +188,21 @@
       calendar.render();
 
     // Filtering dropdown logic
-      const filterMenu = document.getElementById("calendarFilterOptions");
-      const filterButton = document.getElementById("calendarFilterBtn");
+      const filterMenus = document.querySelectorAll(".calendarFilterOptions");
+      const filterButtons = document.querySelectorAll(".calendarFilterBtn");
 
-      if (filterMenu && filterButton) {
-        filterMenu.addEventListener("click", function (e) {
+      filterMenus.forEach((menu, index) => {
+        menu.addEventListener("click", function (e) {
           if (e.target.matches(".dropdown-item")) {
             const view = e.target.getAttribute("data-view");
             calendar.changeView(view);
-            filterButton.innerText = e.target.innerText;
+
+            if (filterButtons[index]) {
+              filterButtons[index].innerText = e.target.innerText;
+            }
           }
         });
-      }
+      });
     });
   </script>
 

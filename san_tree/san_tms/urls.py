@@ -40,11 +40,6 @@ urlpatterns = [
         TaskHandoverUpdate,
         name="staff_task_handover",
     ),
-    path(
-        "tasks_staff/my_tasks/checklist/<int:id>/",
-        UpdateChecklist,
-        name="staff_task_checklist_update",
-    ),
     path("ajax/load-tasks-types/", load_tasks_types, name="ajax_load_tasks_types"),
     path("ajax/load-staff/", load_tasks_staffs, name="ajax_load_staff"),
     path("tasks_remarks/<int:task_id>/remark/", TaskRemark, name="tasks_remarks"),

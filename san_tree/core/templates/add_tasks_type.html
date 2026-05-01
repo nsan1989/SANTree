@@ -11,13 +11,6 @@
 <!---------->
 
   <div class="container">
-    {% if messages %}
-      {% for add_tasks_message in messages %}
-        <div class="task-type-alert alert-{{ message.tags }}">
-          {{ add_tasks_message }}
-        </div>
-      {% endfor %}
-    {% endif %}
 
     {% if form.errors %}
       <div class="task-error-alert alert-danger">

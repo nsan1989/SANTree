@@ -11,13 +11,6 @@
 <!---------->
 
   <div class="container">
-    {% if messages %}
-      {% for add_service_message in messages %}
-        <div class="service-alert alert-{{ message.tags }}">
-          {{ add_service_message }}
-        </div>
-      {% endfor %}
-    {% endif %}
 
     {% if form.errors %}
       <div class="service-error-alert alert-danger">

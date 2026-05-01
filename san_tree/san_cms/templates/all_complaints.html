@@ -68,11 +68,6 @@
         </div>
       </div>
     </div>
-    {% if messages %}
-      {% for message in messages %}
-        <div class="all-complaints-alert alert-{{ message.tags }}">{{ message }}</div>
-      {% endfor %}
-    {% endif %}
     <nav class="mb-3">
       <ul class="pagination">
         {% if page_obj.has_previous %}

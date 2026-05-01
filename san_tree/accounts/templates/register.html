@@ -41,13 +41,6 @@
           <small>Please fill in the details below.</small>
         </div>
         <div class="register-form w-100 my-4 py-2">
-          {% if messages %}
-            {% for register_message in messages %}
-              <div class="register-alert alert-{{ message.tags }} text-center">
-                {{ register_message }}
-              </div>
-            {% endfor %}
-          {% endif %}
           <form method="post">
             {% csrf_token %}
           <!-- Username -->

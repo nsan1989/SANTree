@@ -42,11 +42,6 @@
           <small>Please enter your credentials.</small>
         </div>
         <div class="login-form w-100">
-          {% if messages %} {% for login_message in messages %}
-            <div class="login-alert alert-{{ message.tags }} text-center">
-              {{ login_message }}
-            </div>
-          {% endfor %} {% endif %}
           <form method="post">
             {% csrf_token %} {{form | crispy}}
             <div class="login-link d-grid gap-2 mt-3">
