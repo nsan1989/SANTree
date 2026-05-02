@@ -1,4 +1,5 @@
 from django import forms
+from django.db.models import Count, Q
 
 from .models import *
 
@@ -144,10 +145,46 @@ class AssignedAssetForm(forms.ModelForm):
 
 # Asset Request Form
 class AssetRequestForm(forms.ModelForm):
+    department = forms.ModelChoiceField(
+        queryset=Departments.objects.all(), empty_label="Select department"
+    )
+
     asset = forms.ModelChoiceField(
         queryset=AssetModel.objects.all(), empty_label="Select an asset"
     )
 
     class Meta:
         model = AssetRequest
-        fields = ["asset"]
+        fields = ["department", "asset"]
+
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop("user", None)
+        super().__init__(*args, **kwargs)
+
+        if user and user.department:
+            self.fields["department"].queryset = Departments.objects.exclude(
+                id=user.department.id
+            )
+
+
+# Asset Handler Form.
+class AssetHandlerForm(forms.ModelForm):
+    class Meta:
+        model = AssetModel
+        fields = [
+            "handler",
+        ]
+
+    def __init__(self, *args, **kwargs):
+        self.request = kwargs.pop("request", None)
+        super().__init__(*args, **kwargs)
+
+        if self.request:
+            user_department = getattr(self.request.user, "department", None)
+
+            if user_department:
+                self.fields["handler"].queryset = CustomUsers.objects.filter(
+                    Q(department=user_department)
+                ).exclude(id=self.request.user.id)
+            else:
+                self.fields["handler"].queryset = CustomUsers.objects.none()

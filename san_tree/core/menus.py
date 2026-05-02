@@ -54,6 +54,27 @@ MENU_STRUCTURE = {
                 "view_name": "AllTasks",
                 "icon": "fa-solid fa-person-circle-exclamation",
             },
+            {
+                "name": "Settings",
+                "url_name": None,
+                "view_name": None,
+                "icon": "fa-solid fa-gear",
+                "dropdown_icon": "fa-solid fa-angle-down",
+                "children": [
+                    {
+                        "name": "Task Types",
+                        "url_name": "tms:task_types",
+                        "view_name": "AddTaskTypes",
+                        "icon": "fa-solid fa-plus",
+                    },
+                    {
+                        "name": "Task Checklist",
+                        "url_name": "tms:task_checklist",
+                        "view_name": "AddTaskChecklist",
+                        "icon": "fa-solid fa-plus",
+                    },
+                ],
+            },
         ],
         "user": [
             {

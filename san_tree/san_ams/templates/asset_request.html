@@ -1,6 +1,6 @@
 {% load crispy_forms_tags %}
 
-<form id="assignForm" class="assigned_form"  method="post" enctype="multipart/form-data">
+<form id="assignForm" class="assigned_form"  method="post" action="{% url 'ams:asset_requests' %}" enctype="multipart/form-data">
   {% csrf_token %}
   {{ form|crispy }}
   <button type="submit" id="submitBtn" class="btn btn-primary">Request</button>
@@ -11,8 +11,35 @@
     const form = document.getElementById("assignForm");
     const submitBtn = document.getElementById("submitBtn");
     form.addEventListener("submit", function(event) {
+      event.preventDefault();
       submitBtn.disabled = true;
       submitBtn.innerText = "Submitting...";
     });
   });
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const deptSelect = document.getElementById("id_department");
+    const assetSelect = document.getElementById("id_asset");
+
+    deptSelect.addEventListener("change", function () {
+        const departmentId = this.value;
+
+        assetSelect.innerHTML = '<option value="">Loading...</option>';
+
+        fetch(`/ajax/load-assets/?department_id=${departmentId}`)
+            .then(response => response.json())
+            .then(data => {
+                assetSelect.innerHTML = '<option value="">Select an asset</option>';
+
+                data.forEach(asset => {
+                    let option = document.createElement("option");
+                    option.value = asset.id;
+                    option.textContent = asset.text;
+                    assetSelect.appendChild(option);
+                });
+            });
+    });
+});
 </script>

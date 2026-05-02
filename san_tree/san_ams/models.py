@@ -72,7 +72,7 @@ class AccessoryCategoryModel(models.Model):
 
     class Meta:
         ordering = ["name"]
-        verbose_name_plural = "AccessoryCategories"
+        verbose_name_plural = "Accessory Categories"
 
 
 # accessory image path.
@@ -115,7 +115,7 @@ class ConsumableCategoryModel(models.Model):
 
     class Meta:
         ordering = ["name"]
-        verbose_name_plural = "ConsumableCategories"
+        verbose_name_plural = "Consumable Categories"
 
 
 # consumable image path.
@@ -158,7 +158,7 @@ class ComponentCategoryModel(models.Model):
 
     class Meta:
         ordering = ["name"]
-        verbose_name_plural = "ComponentCategories"
+        verbose_name_plural = "Component Categories"
 
 
 # component image path.
@@ -202,7 +202,7 @@ class AssetCategoryModel(models.Model):
 
     class Meta:
         ordering = ["name"]
-        verbose_name_plural = "AssetCategories"
+        verbose_name_plural = "Asset Categories"
 
 
 # asset image path.

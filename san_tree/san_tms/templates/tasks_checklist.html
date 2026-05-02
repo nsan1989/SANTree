@@ -1,0 +1,25 @@
+{% block start %}
+    <div class="container">
+        <div class="title">
+            <h3>task checklist</h3>
+        </div>
+        <div class="content">
+            <form method="POST" action="{% url 'tms:task_checklist' task.id %}">
+                {% csrf_token %}
+
+                {% for item in checklist_status %}
+                    <div class="mb-3">
+                        <input type="checkbox"
+                               name="checklist"
+                               value="{{ item.id }}"
+                               {% if item.is_completed %}checked{% endif %}>
+                        &nbsp;
+                        {{ item.checklist.name }}
+                    </div>
+                {% endfor %}
+
+                <button class="btn btn-sm btn-primary" type="submit">Submit</button>
+            </form>
+        </div>
+    </div>
+{% endblock %}

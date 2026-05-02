@@ -17,6 +17,9 @@ from django.db import IntegrityError
 from django.http import HttpResponse
 
 from accounts.models import Departments
+from django.http import JsonResponse
+from django.urls import reverse
+from django.db.models import Q
 
 logger = logging.getLogger(__name__)
 
@@ -80,7 +83,9 @@ def StaffDashboardView(request):
         raise PermissionDenied("User profile not found")
     context = {}
     try:
+        my_asset = AssetRequest.objects.filter(requested_by=current_user)
         activity = AssetModel.objects.filter(handler=current_user)
+        context["my_asset"] = my_asset
         if activity.exists():
             context["activities"] = activity[:10]
         else:
@@ -420,6 +425,25 @@ def AssetView(request):
     )
 
 
+# load assets
+def load_assets(request):
+    department_id = request.GET.get("department_id")
+
+    assets = AssetModel.objects.filter(
+        department_id=department_id, is_active=True, requestable=True
+    ).select_related("category")
+
+    data = [
+        {
+            "id": asset.id,
+            "text": f"{asset.asset_tag} | {asset.name} | {asset.category.name}",
+        }
+        for asset in assets
+    ]
+
+    return JsonResponse(data, safe=False)
+
+
 # Asset Request View.
 def AssetRequestView(request):
     current_user = request.user
@@ -428,7 +452,7 @@ def AssetRequestView(request):
     except:
         raise PermissionDenied("User profile not found")
     context = {}
-    form = AssetRequestForm(request.POST or None)
+    form = AssetRequestForm(request.POST or None, user=request.user)
     try:
         if request.method == "POST":
             if form.is_valid():
@@ -444,9 +468,10 @@ def AssetRequestView(request):
                 asset_request.status = "pending"
                 asset_request.save()
                 context["success"] = "Asset request submitted successfully."
-                return redirect("ams:asset_requests")
+
+                return redirect("ams:success_asset")
         else:
-            form = AssetRequestForm()
+            form = AssetRequestForm(user=request.user)
 
         context = {
             "form": form,
@@ -765,3 +790,71 @@ def AllAssetsRequestsView(request):
     raise PermissionDenied(
         "You are not authorized to view this page. Please contact administrator!"
     )
+
+
+# admin asset update status.
+def AdminUpdateStatus(request, id):
+    user = request.user
+    try:
+        user_role = user.role
+    except AttributeError:
+        raise PermissionDenied("User profile not found.")
+
+    request_asset = get_object_or_404(AssetRequest, id=id)
+
+    if request.method == "POST":
+        new_status = request.POST.get("status")
+
+        if new_status == "APPROVED":
+            request_asset.status = new_status
+            request_asset.save(update_fields=["status"])
+
+        if new_status == "REJECTED":
+            request_asset.status = new_status
+            request_asset.save(update_fields=["status"])
+
+        return redirect("ams:admin_asset_requests")
+
+    view_name = request.resolver_match.view_name
+    if view_name == "ams:admin_update_status" and user_role == "Admin":
+        return redirect("ams:admin_asset_requests")
+    raise PermissionDenied("You are not authorized to view this page.")
+
+
+# admin assign asset handler.
+def AdminUpdateHandler(request, id):
+    user = request.user
+    try:
+        user_role = user.role
+    except AttributeError:
+        raise PermissionDenied("User profile not found.")
+
+    request_asset = get_object_or_404(AssetRequest, id=id)
+
+    if request.method == "POST":
+        form = AssetHandlerForm(request.POST, request=request)
+        if form.is_valid():
+            new_user = form.cleaned_data["handler"]
+            request_asset.handler = new_user
+            request_asset.save()
+
+            return redirect("ams:admin_asset_requests")
+
+    else:
+        form = AssetHandlerForm(request=request)
+
+    context = {
+        "form": form,
+        "asset": request_asset,
+    }
+    return render(request, "handler_select.html", context)
+
+
+# asset success.
+def AssetSuccessView(request):
+    if request.user.role == "Admin":
+        redirect_url = reverse("ams:admin_dashboard")
+    else:
+        redirect_url = reverse("ams:staff_dashboard")
+
+    return render(request, "asset_success.html", {"redirect_url": redirect_url})

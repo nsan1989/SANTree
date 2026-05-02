@@ -26,9 +26,6 @@ class TaskChecklistResources(resources.ModelResource):
             "id",
             "task_type",
             "name",
-            "is_completed",
-            "completed_by",
-            "completed_date",
         )
 
 
@@ -38,9 +35,6 @@ class TaskChecklistAdmin(ImportExportModelAdmin):
     list_display = (
         "task_type",
         "name",
-        "is_completed",
-        "completed_by",
-        "completed_date",
     )
 
 

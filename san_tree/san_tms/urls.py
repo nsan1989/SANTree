@@ -6,6 +6,12 @@ app_name = "tms"
 
 urlpatterns = [
     path("tasks_admin/dashboard/", TaskDashboard, name="tms_admin_dashboard"),
+    path("tasks_admin/dashboard/add_task_types/", AddTaskTypes, name="task_types"),
+    path(
+        "tasks_admin/dashboard/add_task_checklist/",
+        AddTaskChecklist,
+        name="task_checklist",
+    ),
     path("tasks_staff/dashboard/", StaffDashboard, name="tms_staff_dashboard"),
     #    path('tasks_pie_chart/', TasksPieChart, name='all_tasks_pie_chart'),
     path("tasks_admin/all_tasks/", AllTasks, name="tasks"),
@@ -25,6 +31,11 @@ urlpatterns = [
         name="admin_task_handover",
     ),
     path("tasks_staff/my_tasks/", MyTasks, name="my_tasks"),
+    path(
+        "tasks_staff/my_tasks/<int:task_id>/task_checklist/",
+        TaskChecklists,
+        name="task_checklist",
+    ),
     path(
         "tasks_staff/my_tasks/tasks_details/<int:id>/",
         TasksDetails,

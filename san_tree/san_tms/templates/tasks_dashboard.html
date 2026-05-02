@@ -44,13 +44,34 @@
             </h5>
           </div>
         </div>
-        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 d-md-none flex-column">
+        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 d-none d-md-flex">
           <div class="task-create-wrapper gap-2 mb-3 d-flex flex-column">
             <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createModal"><i
               class="fa-solid fa-plus"></i>&nbsp;create</button>
             <p class="mb-0 text-primary">click here to create a new task.</p>
           </div>
-          <div class="calendar-filters d-md-none d-flex flex-column gap-2 mb-3">
+          <div class="calendar-filters d-flex flex-column gap-2 mb-3">
+            <div class="dropdown">
+              <button class="btn btn-warning dropdown-toggle calendarFilterBtn" type="button"
+                      data-bs-toggle="dropdown" aria-expanded="false">
+                select
+              </button>
+              <ul class="dropdown-menu calendarFilterOptions">
+                <li><a class="dropdown-item" data-view="dayGridMonth" href="#">Month</a></li>
+                <li><a class="dropdown-item" data-view="timeGridWeek" href="#">Week</a></li>
+                <li><a class="dropdown-item" data-view="timeGridDay" href="#">Day</a></li>
+              </ul>
+            </div>
+            <p class="mb-0 text-warning">click to change calendar view.</p>
+          </div>
+        </div>
+        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 d-md-none d-flex flex-column">
+          <div class="task-create-wrapper gap-2 mb-3 d-flex flex-column">
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createModal"><i
+              class="fa-solid fa-plus"></i>&nbsp;create</button>
+            <p class="mb-0 text-primary">click here to create a new task.</p>
+          </div>
+          <div class="calendar-filters d-flex flex-column gap-2 mb-3">
             <div class="dropdown">
               <button class="btn btn-warning dropdown-toggle calendarFilterBtn" type="button"
                       data-bs-toggle="dropdown" aria-expanded="false">
@@ -69,27 +90,6 @@
           <div class="calender-wrapper">
             <div id="calendar"></div>
           </div>
-        </div>
-      </div>
-      <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 d-none d-md-flex flex-column">
-        <div class="task-create-wrapper d-flex align-items-center gap-4 mb-3">
-          <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createModal"><i
-            class="fa-solid fa-plus"></i>&nbsp;create</button>
-          <p class="mb-0 text-primary">click here to create a new task.</p>
-        </div>
-        <div class="calendar-filters d-none d-md-flex flex-column gap-2 mb-3">
-          <div class="dropdown">
-            <button class="btn btn-warning dropdown-toggle calendarFilterBtn" type="button"
-                    data-bs-toggle="dropdown" aria-expanded="false">
-              select
-            </button>
-            <ul class="dropdown-menu calendarFilterOptions">
-              <li><a class="dropdown-item" data-view="dayGridMonth" href="#">Month</a></li>
-              <li><a class="dropdown-item" data-view="timeGridWeek" href="#">Week</a></li>
-              <li><a class="dropdown-item" data-view="timeGridDay" href="#">Day</a></li>
-            </ul>
-          </div>
-          <p class="mb-0 text-primary">click to change calendar view.</p>
         </div>
       </div>
     </div>

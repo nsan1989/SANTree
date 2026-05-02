@@ -727,7 +727,7 @@ def AddTaskTypeView(request):
         else:
             messages.error(request, "Please correct the errors below.")
     else:
-        form = AddComplaintType()
+        form = AddTaskType()
 
     return render(request, "add_tasks_type.html", {"form": form})
 

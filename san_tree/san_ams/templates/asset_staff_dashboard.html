@@ -212,13 +212,13 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                {% if activities %}
-                                    {% for activity in activities %}
+                                {% if my_asset %}
+                                    {% for asset in my_asset %}
                                         <tr class="table-info">
-                                            <td>{{activity.created_at}}</td>
-                                            <td>{{activity.status}}</td>
-                                            <td>{{activity.requested_to}}</td>
-                                            <td>{{activity.name}}</td>
+                                            <td>{{asset.created_at}}</td>
+                                            <td>{{asset.status}}</td>
+                                            <td>{{asset.requested_to}}</td>
+                                            <td>{{asset.asset.name}}</td>
                                         </tr>
                                     {% endfor %}
                                 {% else %}

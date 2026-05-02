@@ -153,19 +153,21 @@
 
                       <form method="POST" action="{% url 'tms:staff_update_task_status' task.id %}">
                         {% csrf_token %}
-                        {% for item in task.checklist_items.all %}
-                          <div class="form-check">
-                            <input type="checkbox"
-                                   name="checklist_items"
-                                   value="{{ item.id }}"
-                                   id="checklist-{{ item.id }}"
-                                   {% if item.is_completed %}checked{% endif %}>
-
-                            <label for="checklist-{{ item.id }}">
-                              {{ item.template_item.item_text }}
-                            </label>
+                        {% if task.status == "In Progress" %}
+                            <!--checklist link-->
+                          <div class="checklist-link mb-3">
+                            <a
+                              class="open-modal text-primary" data-url="{% url 'tms:task_checklist' task.id %}"
+                              style="
+                                     text-decoration: none;
+                                     cursor: pointer;
+                                    "
+                            >
+                              Checklist
+                            </a>
                           </div>
-                        {% endfor %}
+                            <!------------------>
+                        {% endif %}
                         <select class="mb-2 status-select" name="status" data-reason-target="remarks-desktop-{{ task.id }}" required>
                           <option value="">select</option>
                           {% if task.status == 'Waiting' %}
@@ -339,50 +341,21 @@
     document.addEventListener('DOMContentLoaded', function () {
       const modalElement = document.getElementById('dynamicModal');
       const modalBody = document.getElementById('modalBody');
+
+  // 🔹 OPEN MODAL
       document.querySelectorAll('.open-modal').forEach(function (el) {
         el.addEventListener('click', function (e) {
           e.preventDefault();
           const url = this.getAttribute('data-url');
 
-      // Fetch content and show modal
           fetch(url)
             .then(response => response.text())
             .then(html => {
               modalBody.innerHTML = html;
               const modal = new bootstrap.Modal(modalElement);
               modal.show();
-
-          // Attach form handler AFTER modal content loads
-              const form = modalBody.querySelector('form');
-              if (form) {
-                form.addEventListener('submit', function (e) {
-                  e.preventDefault();
-
-                  const formData = new FormData(form);
-                  fetch(form.action, {
-                    method: 'POST',
-                    body: formData,
-                    headers: {
-                      'X-Requested-With': 'XMLHttpRequest',
-                    }
-                  })
-                    .then(response => {
-                // If redirected (success), reload or redirect
-                      if (response.redirected) {
-                        window.location.href = response.url;
-                      } else {
-                        return response.text().then(html => {
-                          modalBody.innerHTML = html; // re-render form if error
-                        });
-                      }
-                    })
-                    .catch(error => {
-                      modalBody.innerHTML = '<div class="alert alert-danger">Error submitting form.</div>';
-                    });
-                });
-              }
             })
-            .catch(error => {
+            .catch(() => {
               modalBody.innerHTML = '<p>Error loading content.</p>';
               const modal = new bootstrap.Modal(modalElement);
               modal.show();
@@ -390,15 +363,64 @@
         });
       });
 
+  // 🔥 GLOBAL FORM SUBMIT HANDLER (handles ALL modal forms)
+      document.addEventListener('submit', function (e) {
+        const form = e.target;
+
+    // Only handle forms inside modal
+        if (!form.closest('#dynamicModal')) return;
+
+        e.preventDefault();
+
+        const formData = new FormData(form);
+
+        fetch(form.action, {
+          method: 'POST',
+          body: formData,
+          headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+          }
+        })
+          .then(response => {
+            const contentType = response.headers.get("content-type");
+
+      // ✅ JSON → success (close modal)
+            if (contentType && contentType.includes("application/json")) {
+              return response.json().then(data => {
+                if (data.success) {
+                  const modalInstance = bootstrap.Modal.getInstance(modalElement);
+                  modalInstance.hide();
+
+            // optional refresh
+                  location.reload();
+                }
+              });
+            }
+
+      // ✅ Redirect → go to page
+            if (response.redirected) {
+              window.location.href = response.url;
+              return;
+            }
+
+      // ✅ HTML → re-render modal (validation errors)
+            return response.text().then(html => {
+              modalBody.innerHTML = html;
+            });
+          })
+          .catch(() => {
+            modalBody.innerHTML = '<div class="alert alert-danger">Error submitting form.</div>';
+          });
+      });
+
+  // 🔹 Existing logic (unchanged)
       function togglePostponeReason(selectEl) {
         const reasonId = selectEl.getAttribute('data-reason-target');
-        if (!reasonId) {
-          return;
-        }
+        if (!reasonId) return;
+
         const reasonInput = document.getElementById(reasonId);
-        if (!reasonInput) {
-          return;
-        }
+        if (!reasonInput) return;
+
         if (selectEl.value === 'Postponed') {
           reasonInput.classList.remove('d-none');
           reasonInput.required = true;
@@ -415,6 +437,7 @@
           togglePostponeReason(selectEl);
         });
       });
+
     });
   </script>
 
@@ -438,23 +461,5 @@
         icon.classList.add("fa-plus");
       }
     }
-  </script>
-
-  <script>
-    document.querySelectorAll('form[action*="staff_update_task_status"]').forEach(form => {
-      form.addEventListener("submit", function (e) {
-
-        const select = form.querySelector(".status-select");
-        if (!select) return;
-
-        const taskId = select.getAttribute("data-reason-target")?.split("-").pop();
-        const checkbox = document.getElementById(`btncheck-${taskId}`);
-
-        if (select.value === "Completed" && (!checkbox || !checkbox.checked)) {
-          e.preventDefault();
-          alert("Please check the 'Completed' checkbox before updating status.");
-        }
-      });
-    });
   </script>
 {% endblock %}

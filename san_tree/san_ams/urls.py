@@ -69,5 +69,17 @@ urlpatterns = [
     path("admin/asset_users/", AssetUsersView, name="admin_asset_users"),
     path("staff/asset_users/", AssetUsersView, name="staff_asset_users"),
     path("asset-requests/", AssetRequestView, name="asset_requests"),
+    path("asset-requests/success/", AssetSuccessView, name="success_asset"),
     path("admin/asset_requests/", AllAssetsRequestsView, name="admin_asset_requests"),
+    path(
+        "admin/asset_requests/<int:id>/update_status/",
+        AdminUpdateStatus,
+        name="admin_update_status",
+    ),
+    path(
+        "admin/asset_requests/<int:id>/update_handler/",
+        AdminUpdateHandler,
+        name="admin_update_handler",
+    ),
+    path("ajax/load-assets/", load_assets, name="ajax_load_assets"),
 ]

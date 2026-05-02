@@ -32,15 +32,6 @@ class TaskChecklist(models.Model):
         TasksTypes, on_delete=models.CASCADE, related_name="checklist_task"
     )
     name = models.CharField(max_length=255)
-    is_completed = models.BooleanField(default=False)
-    completed_by = models.ForeignKey(
-        CustomUsers,
-        on_delete=models.CASCADE,
-        related_name="checklist_by",
-        null=True,
-        blank=True,
-    )
-    completed_date = models.DateField(auto_now_add=True)
 
     def __str__(self):
         return f"{self.name} {self.task_type.name}"
@@ -189,6 +180,23 @@ class Tasks(models.Model):
 def task_remark_image_path(instance, filename):
     filename = os.path.basename(filename)
     return f"task_remark_images/{filename}"
+
+
+# Checklist status update.
+class TaskChecklistStatus(models.Model):
+    task = models.ForeignKey(
+        Tasks, on_delete=models.CASCADE, related_name="checklist_status"
+    )
+    checklist = models.ForeignKey(TaskChecklist, on_delete=models.CASCADE)
+
+    is_completed = models.BooleanField(default=False)
+    completed_by = models.ForeignKey(
+        CustomUsers, on_delete=models.SET_NULL, null=True, blank=True
+    )
+    completed_date = models.DateTimeField(null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.task} - {self.checklist.name}"
 
 
 # Tasks Remarks.

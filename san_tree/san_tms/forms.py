@@ -1,8 +1,15 @@
 from django import forms
 
-from accounts.models import CustomUsers
+from accounts.models import CustomUsers, Departments
 
-from .models import Departments, TaskHandover, Tasks, TasksRemarks, TasksTypes
+from .models import (
+    Departments,
+    TaskHandover,
+    Tasks,
+    TasksRemarks,
+    TasksTypes,
+    TaskChecklist,
+)
 
 
 # Tasks Form.
@@ -80,6 +87,7 @@ class RemarkForm(forms.ModelForm):
                 self.fields["tasks"].queryset = Tasks.objects.none()
 
 
+# Task Handover Form.
 class TaskHandoverForm(forms.ModelForm):
     class Meta:
         model = TaskHandover
@@ -102,3 +110,51 @@ class TaskHandoverForm(forms.ModelForm):
             if task.assigned_to_id:
                 queryset = queryset.exclude(id=task.assigned_to_id)
             self.fields["to_user"].queryset = queryset
+
+
+# Task Type Form.
+class AddTaskType(forms.ModelForm):
+    class Meta:
+        model = TasksTypes
+        fields = ["name"]
+
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop("user", None)
+        super().__init__(*args, **kwargs)
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+
+        if not self.user or not self.user.department:
+            raise ValueError("User does not have a department assigned")
+
+        instance.department = self.user.department
+
+        if commit:
+            instance.save()
+
+        return instance
+
+
+# Task Checklist Form.
+class AddTaskChecklistForm(forms.ModelForm):
+    class Meta:
+        model = TaskChecklist
+        fields = ["task_type", "name"]
+
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop("user", None)
+        super().__init__(*args, **kwargs)
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+
+        if not self.user or not self.user.department:
+            raise ValueError("User does not have a department assigned")
+
+        instance.department = self.user.department
+
+        if commit:
+            instance.save()
+
+        return instance
