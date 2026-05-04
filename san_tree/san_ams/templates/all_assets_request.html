@@ -52,17 +52,17 @@
                                     <td>{{asset.status}}</td>
                                     <td>
                                         {% if asset.status == "pending" %}
-                                        <form method="POST" action="{% url 'ams:admin_update_status' asset.id %}">
-                                            {% csrf_token %}
-                                            <select class="mb-2 status-select" name="status" required>
-                                                <option value="">select</option>
-                                                <option value="APPROVED" {% if asset.status == 'APPROVED' %} selected {% endif %}>Approved</option>
-                                                <option value="REJECTED" {% if asset.status == 'REJECTED' %} selected {% endif %}>Rejected</option>
-                                            </select>
-                                            <button class="btn btn-sm btn-primary mt-2" type="submit">Update</button>
-                                        </form>
+                                            <form method="POST" action="{% url 'ams:admin_update_status' asset.id %}">
+                                                {% csrf_token %}
+                                                <select class="mb-2 status-select" name="status" required>
+                                                    <option value="">select</option>
+                                                    <option value="APPROVED" {% if asset.status == 'APPROVED' %} selected {% endif %}>Approved</option>
+                                                    <option value="REJECTED" {% if asset.status == 'REJECTED' %} selected {% endif %}>Rejected</option>
+                                                </select>
+                                                <button class="btn btn-sm btn-primary mt-2" type="submit">Update</button>
+                                            </form>
                                         {% else %}
-                                        --
+                                            --
                                         {% endif %}
                                     </td>
                                     <td>
@@ -84,76 +84,76 @@
     </div>
 
     <!--Modal Block-->
-  <div class="modal fade" id="dynamicModal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-sm"> <!-- Adjust size as needed -->
-      <div class="modal-content">
-        <div class="modal-header">
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body w-100" id="modalBody">
+    <div class="modal fade" id="dynamicModal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-sm"> <!-- Adjust size as needed -->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body w-100" id="modalBody">
         <!-- Content loads here -->
+                </div>
+            </div>
         </div>
-      </div>
     </div>
-  </div>
 <!--------------->
 
 <!--Open Modal Script-->
-  <script>
-    document.addEventListener('DOMContentLoaded', function () {
-      const modalElement = document.getElementById('dynamicModal');
-      const modalBody = document.getElementById('modalBody');
-      document.querySelectorAll('.open-modal').forEach(function (el) {
-        el.addEventListener('click', function (e) {
-          e.preventDefault();
-          const url = this.getAttribute('data-url');
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const modalElement = document.getElementById('dynamicModal');
+            const modalBody = document.getElementById('modalBody');
+            document.querySelectorAll('.open-modal').forEach(function (el) {
+                el.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const url = this.getAttribute('data-url');
 
         // Fetch content and show modal
-          fetch(url)
-            .then(response => response.text())
-            .then(html => {
-              modalBody.innerHTML = html;
-              const modal = new bootstrap.Modal(modalElement);
-              modal.show();
+                    fetch(url)
+                        .then(response => response.text())
+                        .then(html => {
+                            modalBody.innerHTML = html;
+                            const modal = new bootstrap.Modal(modalElement);
+                            modal.show();
 
             // Attach form handler AFTER modal content loads
-              const form = modalBody.querySelector('form');
-              if (form) {
-                form.addEventListener('submit', function (e) {
-                  e.preventDefault();
+                            const form = modalBody.querySelector('form');
+                            if (form) {
+                                form.addEventListener('submit', function (e) {
+                                    e.preventDefault();
 
-                  const formData = new FormData(form);
-                  fetch(form.action, {
-                    method: 'POST',
-                    body: formData,
-                    headers: {
-                      'X-Requested-With': 'XMLHttpRequest',
-                    }
-                  })
-                    .then(response => {
+                                    const formData = new FormData(form);
+                                    fetch(form.action, {
+                                        method: 'POST',
+                                        body: formData,
+                                        headers: {
+                                            'X-Requested-With': 'XMLHttpRequest',
+                                        }
+                                    })
+                                        .then(response => {
                     // If redirected (success), reload or redirect
-                      if (response.redirected) {
-                        window.location.href = response.url;
-                      } else {
-                        return response.text().then(html => {
-                          modalBody.innerHTML = html; // re-render form if error
+                                            if (response.redirected) {
+                                                window.location.href = response.url;
+                                            } else {
+                                                return response.text().then(html => {
+                                                    modalBody.innerHTML = html; // re-render form if error
+                                                });
+                                            }
+                                        })
+                                        .catch(error => {
+                                            modalBody.innerHTML = '<div class="alert alert-danger">Error submitting form.</div>';
+                                        });
+                                });
+                            }
+                        })
+                        .catch(error => {
+                            modalBody.innerHTML = '<p>Error loading content.</p>';
+                            const modal = new bootstrap.Modal(modalElement);
+                            modal.show();
                         });
-                      }
-                    })
-                    .catch(error => {
-                      modalBody.innerHTML = '<div class="alert alert-danger">Error submitting form.</div>';
-                    });
                 });
-              }
-            })
-            .catch(error => {
-              modalBody.innerHTML = '<p>Error loading content.</p>';
-              const modal = new bootstrap.Modal(modalElement);
-              modal.show();
             });
         });
-      });
-    });
-  </script>
+    </script>
 
 {% endblock %}

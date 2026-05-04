@@ -5,16 +5,7 @@ from django.db import models, transaction
 from django.utils import timezone
 
 from accounts.models import CustomUsers, Departments, Location
-
-# license status choices.
-LICENSE_STATUS = [
-    ("active", "Active"),
-    ("assigned", "Assigned"),
-    ("available", "Available"),
-    ("renewal due", "Renewal Due"),
-    ("expired", "Expired"),
-    ("revoked", "Revoked"),
-]
+from .enums import licenseChoices, assetChoices
 
 
 # license model.
@@ -30,7 +21,9 @@ class LicenseModel(models.Model):
     quantity = models.PositiveSmallIntegerField(default=0)
     cost = models.DecimalField(max_digits=6, decimal_places=2)
     is_expire = models.BooleanField(default=False)
-    status = models.CharField(max_length=20, choices=LICENSE_STATUS, default="active")
+    status = models.CharField(
+        max_length=20, choices=licenseChoices, default=licenseChoices.ACTIVE
+    )
     assigned_to = models.ForeignKey(
         CustomUsers,
         on_delete=models.CASCADE,
@@ -211,18 +204,6 @@ def asset_image_path(instance, filename):
     return f"asset_images/{filename}"
 
 
-# asset status choices.
-ASSET_STATUS = [
-    ("available", "Available"),
-    ("requested", "Requested"),
-    ("deployed", "Deployed"),
-    ("ready to deploy", "Ready to Deploy"),
-    ("repair", "Repair"),
-    ("broken", "Broken"),
-    ("waiting", "Waiting"),
-]
-
-
 # asset model.
 class AssetModel(models.Model):
     asset_tag = models.CharField(max_length=20, unique=True, blank=True, null=True)
@@ -249,7 +230,9 @@ class AssetModel(models.Model):
     asset_license = models.ManyToManyField(
         LicenseModel, blank=True, related_name="asset_licenses"
     )
-    status = models.CharField(max_length=20, choices=ASSET_STATUS, default="available")
+    status = models.CharField(
+        max_length=20, choices=assetChoices, default=assetChoices.AVAILABLE
+    )
     handler = models.ForeignKey(
         CustomUsers,
         on_delete=models.CASCADE,
@@ -360,13 +343,8 @@ class AssetRequest(models.Model):
     )
     status = models.CharField(
         max_length=20,
-        choices=[
-            ("PENDING", "Pending"),
-            ("APPROVED", "Approved"),
-            ("REJECTED", "Rejected"),
-            ("DEPLOYED", "Deployed"),
-        ],
-        default="PENDING",
+        choices=assetChoices,
+        default=assetChoices.PANDING,
     )
     remarks = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -377,3 +355,6 @@ class AssetRequest(models.Model):
     class Meta:
         ordering = ["created_at"]
         verbose_name_plural = "Asset Requests"
+
+
+# past asset users model.

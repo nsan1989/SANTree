@@ -84,7 +84,7 @@ def StaffDashboardView(request):
     context = {}
     try:
         my_asset = AssetRequest.objects.filter(requested_by=current_user)
-        activity = AssetModel.objects.filter(handler=current_user)
+        activity = AssetRequest.objects.filter(asset__handler=current_user)
         context["my_asset"] = my_asset
         if activity.exists():
             context["activities"] = activity[:10]
@@ -125,7 +125,7 @@ def AdminDashboardView(request):
         raise PermissionDenied("User profile not found")
     context = {}
     try:
-        activity = AssetModel.objects.all()
+        activity = AssetRequest.objects.all()
         if activity.exists():
             context["activities"] = activity
         else:
@@ -404,12 +404,18 @@ def AssetView(request):
         raise PermissionDenied("User profile not found")
     context = {}
     try:
-        assets = AssetModel.objects.filter(department=current_user.department).all()
-        statuses = [choice[0] for choice in ASSET_STATUS]
+        if current_user_role == "Admin":
+            assets = AssetModel.objects.filter(department=current_user.department).all()
+        else:
+            assets = AssetRequest.objects.filter(
+                Q(asset__handler=current_user) | Q(asset__assigned_to=current_user)
+            )
+        statuses = [choice[1] for choice in assetChoices.choices]
         if assets.exists():
             context = {
                 "assets": assets,
                 "statuses": statuses,
+                "user": current_user,
             }
         else:
             context["assets_message"] = "No assets found!"
@@ -483,34 +489,47 @@ def AssetRequestView(request):
 
 
 # Assigned Asset View.
-def AssignedAssetView(request, asset_id):
+def AssignedAssetView(request, id):
     current_user = request.user
     try:
         current_user_role = current_user.role
     except:
         raise PermissionDenied("User profile not found")
-    asset = get_object_or_404(AssetModel, id=asset_id)
-    users = CustomUsers.objects.exclude(department_id=current_user.department_id)
+    request_asset = get_object_or_404(AssetRequest, id=id)
+    asset = request_asset.asset
+    request_user = CustomUsers.objects.filter(
+        username=request_asset.requested_by.username
+    )
     context = {"asset": asset}
 
-    form = AssignedAssetForm(request.POST or None, users=users)
+    form = AssignedAssetForm(request.POST or None, users=request_user)
 
     try:
         if request.method == "POST":
             if form.is_valid():
-                selected_user_id = form.cleaned_data["assigned_to"]
-                selected_user = get_object_or_404(users, id=selected_user_id)
-                asset.assigned_to = selected_user
-                asset.status = "assigned"
-                asset.save()
-                context["success"] = (
-                    f"Asset assigned to {selected_user.username} successfully."
+                asset.assigned_to = request_asset.requested_by
+                asset.status = "ASSIGNED"
+                asset.requestable = False
+                asset.save(
+                    update_fields=[
+                        "assigned_to",
+                        "status",
+                    ]
                 )
-                return redirect("ams:admin_assets")
+                request_asset.status = "ASSIGNED"
+                request_asset.save(update_fields=["status"])
+                context["success"] = (
+                    f"Asset assigned to {asset.assigned_to.username} successfully."
+                )
+                if current_user_role == "Admin":
+                    return redirect("ams:admin_assets")
+                else:
+                    return redirect("ams:staff_assets")
 
         context = {
             "form": form,
             "asset": asset,
+            "request_asset": request_asset,
         }
 
     except Exception as e:
@@ -802,16 +821,22 @@ def AdminUpdateStatus(request, id):
 
     request_asset = get_object_or_404(AssetRequest, id=id)
 
+    asset = request_asset.asset
+
     if request.method == "POST":
         new_status = request.POST.get("status")
 
         if new_status == "APPROVED":
             request_asset.status = new_status
             request_asset.save(update_fields=["status"])
+            asset.status = new_status
+            asset.save(update_fields=["status"])
 
         if new_status == "REJECTED":
             request_asset.status = new_status
             request_asset.save(update_fields=["status"])
+            asset.status = new_status
+            asset.save(update_fields=["status"])
 
         return redirect("ams:admin_asset_requests")
 
@@ -831,23 +856,72 @@ def AdminUpdateHandler(request, id):
 
     request_asset = get_object_or_404(AssetRequest, id=id)
 
+    asset = request_asset.asset
+
     if request.method == "POST":
-        form = AssetHandlerForm(request.POST, request=request)
+        form = AssetHandlerForm(request.POST, instance=asset, request=request)
         if form.is_valid():
-            new_user = form.cleaned_data["handler"]
-            request_asset.handler = new_user
-            request_asset.save()
+            form.save()
 
             return redirect("ams:admin_asset_requests")
 
     else:
-        form = AssetHandlerForm(request=request)
+        form = AssetHandlerForm(instance=asset, request=request)
 
     context = {
         "form": form,
-        "asset": request_asset,
+        "asset": asset,
+        "request_obj": request_asset,
     }
     return render(request, "handler_select.html", context)
+
+
+# staff update stautus.
+def StaffUpdateStatus(request, id):
+    user = request.user
+    try:
+        user_role = user.role
+    except AttributeError:
+        raise PermissionDenied("User profile not found.")
+
+    request_asset = get_object_or_404(AssetRequest, id=id)
+
+    asset = request_asset.asset
+
+    if request.method == "POST":
+        new_status = request.POST.get("status")
+
+        if new_status == "DEPLOYED":
+            request_asset.status = new_status
+            request_asset.save(update_fields=["status"])
+            asset.status = new_status
+            asset.save(update_fields=["status"])
+
+        if new_status == "ASSIGNED":
+            request_asset.status = new_status
+            request_asset.save(update_fields=["status"])
+            asset.status = new_status
+            asset.save(update_fields=["status"])
+
+        if new_status == "FAULTY":
+            request_asset.status = new_status
+            request_asset.save(update_fields=["status"])
+            asset.status = new_status
+            asset.save(update_fields=["status"])
+
+        if new_status == "REPAIR":
+            request_asset.status = new_status
+            request_asset.save(update_fields=["status"])
+            asset.status = new_status
+            asset.assigned_to = None
+            asset.save(update_fields=["status", "assigned_to"])
+
+        return redirect("ams:staff_assets")
+
+    view_name = request.resolver_match.view_name
+    if view_name == "ams:staff_update_status" and user_role == "User":
+        return redirect("ams:staff_assets")
+    raise PermissionDenied("You are not authorized to view this page.")
 
 
 # asset success.

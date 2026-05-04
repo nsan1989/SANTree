@@ -31,7 +31,7 @@ urlpatterns = [
     path("admin/dashboard/", AdminDashboardView, name="admin_dashboard"),
     path("admin/assets/", AssetView, name="admin_assets"),
     path(
-        "admin/assets/assign_asset/<int:asset_id>/",
+        "admin/assets/assign_asset/<int:id>/",
         AssignedAssetView,
         name="admin_assigned_assets",
     ),
@@ -42,7 +42,12 @@ urlpatterns = [
     ),
     path("staff/assets/", AssetView, name="staff_assets"),
     path(
-        "staff/assets/assign_asset/<int:asset_id>/",
+        "staff/assets/<int:id>/update_status/",
+        StaffUpdateStatus,
+        name="staff_update_status",
+    ),
+    path(
+        "staff/assets/assign_asset/<int:id>/",
         AssignedAssetView,
         name="staff_assigned_assets",
     ),

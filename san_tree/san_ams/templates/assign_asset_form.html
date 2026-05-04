@@ -1,6 +1,6 @@
 {% load crispy_forms_tags %}
 
-<form id="assignForm" class="assigned_form" method="post" novalidate>
+<form id="assignForm" action="{% url 'ams:staff_assigned_assets' request_asset.id %}" class="assigned_form" method="post">
   {% csrf_token %}
   {{ form|crispy }}
   <button type="submit" id="submitBtn" class="btn btn-primary">Assign</button>

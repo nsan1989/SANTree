@@ -19,27 +19,27 @@
 </script>
 
 <script>
-document.addEventListener("DOMContentLoaded", function () {
+  document.addEventListener("DOMContentLoaded", function () {
     const deptSelect = document.getElementById("id_department");
     const assetSelect = document.getElementById("id_asset");
 
     deptSelect.addEventListener("change", function () {
-        const departmentId = this.value;
+      const departmentId = this.value;
 
-        assetSelect.innerHTML = '<option value="">Loading...</option>';
+      assetSelect.innerHTML = '<option value="">Loading...</option>';
 
-        fetch(`/ajax/load-assets/?department_id=${departmentId}`)
-            .then(response => response.json())
-            .then(data => {
-                assetSelect.innerHTML = '<option value="">Select an asset</option>';
+      fetch(`/ajax/load-assets/?department_id=${departmentId}`)
+        .then(response => response.json())
+        .then(data => {
+          assetSelect.innerHTML = '<option value="">Select an asset</option>';
 
-                data.forEach(asset => {
-                    let option = document.createElement("option");
-                    option.value = asset.id;
-                    option.textContent = asset.text;
-                    assetSelect.appendChild(option);
-                });
-            });
+          data.forEach(asset => {
+            let option = document.createElement("option");
+            option.value = asset.id;
+            option.textContent = asset.text;
+            assetSelect.appendChild(option);
+          });
+        });
     });
-});
+  });
 </script>

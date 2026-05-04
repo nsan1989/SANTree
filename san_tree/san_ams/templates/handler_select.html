@@ -15,7 +15,7 @@
         <div class="card shadow-lg border-0 rounded-4">
           <div class="card-body p-2">
             <h4 class="card-title text-center mb-4">Reassigned To</h4>
-            <form id="handlerForm" method="post" action="{% url 'ams:admin_update_handler' asset.id %}">
+            <form id="handlerForm" method="post" action="{% url 'ams:admin_update_handler' request_obj.id %}">
               {% csrf_token %} {{ form|crispy }}
 
               <div class="d-grid mt-4">

@@ -54,6 +54,7 @@
     </style>
 
     <div class="container-fluid">
+        <!--asset handler content-->
         {% if activities %}
             <div class="row mb-3">
                 <div class="col-12">
@@ -146,8 +147,8 @@
                                         <tr class="table-info">
                                             <td>{{activity.created_at}}</td>
                                             <td>{{activity.status}}</td>
-                                            <td>{{activity.created_by}}</td>
-                                            <td>{{activity.name}}</td>
+                                            <td>{{activity.requested_by}}</td>
+                                            <td>{{activity.asset.name}}</td>
                                             <td>{{activity.requested_to}}</td>
                                         </tr>
                                     {% endfor %}
@@ -174,6 +175,7 @@
                     </div>
                 </div>
             </div>
+            <!--asset requester view-->
         {% else %}
             <div class="row mb-3">
                 <div class="col-12 col-md-6">

@@ -150,7 +150,8 @@ class AssetRequestForm(forms.ModelForm):
     )
 
     asset = forms.ModelChoiceField(
-        queryset=AssetModel.objects.all(), empty_label="Select an asset"
+        queryset=AssetModel.objects.filter(requestable=True),
+        empty_label="Select an asset",
     )
 
     class Meta:
@@ -184,7 +185,7 @@ class AssetHandlerForm(forms.ModelForm):
 
             if user_department:
                 self.fields["handler"].queryset = CustomUsers.objects.filter(
-                    Q(department=user_department)
+                    Q(department=user_department) & Q(is_active=True)
                 ).exclude(id=self.request.user.id)
             else:
                 self.fields["handler"].queryset = CustomUsers.objects.none()
