@@ -358,3 +358,26 @@ class AssetRequest(models.Model):
 
 
 # past asset users model.
+class AssetLastUser(models.Model):
+    asset = models.ForeignKey(
+        AssetModel,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="asset_last_used",
+    )
+    user = models.ForeignKey(
+        CustomUsers,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="asset_last_users",
+    )
+    assigned_at = models.DateTimeField(auto_now_add=True)
+    unassigned_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        ordering = ["-assigned_at"]
+
+    def __str__(self):
+        return f"{self.asset} -> {self.user}"
