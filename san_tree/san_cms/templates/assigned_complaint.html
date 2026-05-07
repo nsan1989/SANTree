@@ -115,19 +115,21 @@
         <div class="alert alert-{{ message.tags }}">{{ message }}</div>
       {% endfor %}
     {% endif %}
+    <!--Desktop View-->
     <div class="col-12 d-none d-lg-flex table-responsive">
       <table class="table table-bordered">
         <thead class="table-danger">
           <tr style="font-family: 'Open Sans', sans-serif;">
+            <th scope="col">Complaint No.</th>
+            <th scope="col">Description</th>
             <th scope="col">Status</th>
             <th scope="col">Priority</th>
             <th scope="col">Created At</th>
-            <th scope="col">Updated At</th>
             <th scope="col">TAT</th>
             <th scope="col">Status</th>
             <th scope="col">Handover</th>
             <th scope="col">Remark</th>
-            <th scope="col">Details</th>
+            <th scope="col">View</th>
           </tr>
         </thead>
         <tbody>
@@ -137,16 +139,13 @@
                 style="font-family: 'Poppins', sans-serif;"
                 class="{% if complaints.complaint.status == 'In Progress' %}table-warning{% elif complaints.complaint.status == 'Resolved' %}table-success{% elif complaints.complaint.status == 'Cancelled' %}table-danger{% elif complaints.complaint.status == 'Review' %}table-info{% endif %}"
               >
+                <td>{{complaints.complaint.complaint_number}}</td>
+                <td>{{complaints.complaint.description|default:"No Data"}}</td>
                 <td>{{complaints.complaint.status}}</td>
                 <td>{{complaints.complaint.priority}}</td>
                 <td>{{complaints.complaint.created_at}}</td>
-                {% if complaints.status_change_to != 'In Progress' or complaints.status_change_to != 'Resolved' %}
-                  <td>{{complaints.timestamp}}</td>
-                {% else %}
-                  <td>Not yet updated!</td>
-                {% endif %}
                 <td>{{ complaints.complaint.time_taken|duration_display }}</td>
-                {% if complaints.complaint.assigned_to == request.user or complaints.complaint.status == 'Review' %}
+                {% if complaints.complaint.assigned_to == request.user or complaints.complaint.status|lower == 'review' %}
                   {% if complaints.complaint.status != 'Cancelled' and complaints.complaint.status != 'Resolved' %}
                     <td>
                       <form method="POST" action="{% url 'cms:admin_update_complaint_status' complaints.complaint.id %}">
@@ -194,12 +193,13 @@
             {% endfor %}
           {% else %}
             <tr>
-              <td colspan="9">No complaints have been assigned!</td>
+              <td colspan="100%">No complaints have been assigned!</td>
             </tr>
           {% endif %}
         </tbody>
       </table>
     </div>
+    <!--Mobile View-->
     <div class="col-12 d-md-none">
       <div class="task-title mb-3">
         <h5 class="fw-bold">Complaint List</h5>
@@ -250,6 +250,10 @@
                      font-family: 'Poppins', sans-serif;
                     "
             >
+
+              <div class="complaint-description">
+                {{complaints.complaint.description|default:"No Data"}}
+              </div>
               <div>
                 <i class="fa-regular fa-calendar"></i>
                 <p>{{complaints.complaint.created_at}}</p>

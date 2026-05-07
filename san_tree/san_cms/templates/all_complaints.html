@@ -34,22 +34,33 @@
       margin-bottom: 0;
     }
 
+    .complaint-body {
+      display: none;
+    }
+
     .complaint-body.active {
-      display: block !important;
+      display: table-row;
     }
 
-    .complaint-body div {
-      display: flex;
-      height: 2.5rem;
-    }
-
-    .complaint-body div i {
-      width: 2rem;
+    .complaint-detail-content div {
       height: 2rem;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
     }
 
-    .complaint-body p {
-      margin-bottom: 0;
+    .complaint-detail-content div a {
+      height: 2rem;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .complaint-detail-content div a i {
+      text-decoration: none;
+      color: #000;
     }
   </style>
 
@@ -94,6 +105,7 @@
       </ul>
     </nav>
     <div class="row px-2">
+      <!--Desktop view-->
       <div class="col-12 d-none d-lg-flex table-responsive p-0">
         <table class="table table-bordered">
           <thead class="table-danger">
@@ -164,122 +176,111 @@
           </tbody>
         </table>
       </div>
+      <!--Mobile view-->
       <div class="col-12 d-md-none p-0">
         <div class="complaint-wrapper">
           <div class="complaint-title mb-3">
-            <h5>Complaint List</h5>
+            <h5 style="color: wheat;">Complaint List</h5>
           </div>
-          {% if page_obj %}
-            {% for complaint in page_obj %}
-              <div
-                class="complaint-header"
-                style="
-                       display: flex;
-                       justify-content: space-between;
-                       background-color: #7ae1f5;
-                       border: 1px solid #5eb5c7;
-                       border-radius: 0.2rem;
-                       padding: 0.5rem;
-                       font-family: 'Poppins', sans-serif;
-                      "
-                onClick="toggleTask(this)"
-              >
-                <div class="complaint-number">
-                  <p>{{complaint.complaint.complaint_number}}</p>
-                </div>
-                <div class="complaint-status">
-                  <p>{{complaint.complaint.status}}</p>
-                </div>
-                <div class="complaint-priority">
-                  <p>{{complaint.complaint.priority}}</p>
-                </div>
-                <div class="complaint-detail">
-                  <i class="fa-solid fa-plus"></i>
-                </div>
-              </div>
-              <div
-                class="complaint-body"
-                style="
-                       display: none;
-                       align-items: center;
-                       background-color: #fff;
-                       padding: 0.5rem;
-                       font-family: 'Poppins', sans-serif;
-                      "
-              >
-                <div>
-                  <i class="fa-regular fa-building"></i>
-                  <p>{{complaint.complaint.department}}</p>
-                </div>
-                <div>
-                  <i class="fa-regular fa-calendar"></i>
-                  <p>{{complaint.complaint.created_at}}</p>
-                </div>
-                <div>
-                  <i class="fa-solid fa-magnifying-glass-chart"></i>
-                  {% if complaint.status_changed_to != 'Cancelled' %}
-                    {% if complaint.complaint.status != 'In Progress' and complaint.complaint.status != 'Resolved' and complaint.complaint.status != 'Closed'  %}
+          <div class="complaint-content table-responsive">
+            <table class="table table-bordered">
+              <thead class="table-danger">
+                <tr>
+                  <th scope="col">No.</th>
+                  <th scope="col">Status</th>
+                  <th scope="col">Priority</th>
+                  <th scope="col">Detail</th>
+                </tr>
+              </thead>
+              <tbody class="table-info">
+                {% if page_obj %}
+                  {% for complaint in page_obj %}
+                    <tr
+                      class="complaint-summary-row"
+                      onClick="toggleTask(this)"
+                    >
+                      <td>{{complaint.complaint.complaint_number}}</td>
+                      <td>{{complaint.complaint.status}}</td>
+                      <td>{{complaint.complaint.priority}}</td>
+                      <td><i class="fa-solid fa-plus"></i></td>
+                    </tr>
+                    <tr
+                      class="complaint-body"
+                    >
+                      <td
+                        colspan="4"
+                      >
+                        <div
+                          class="complaint-detail-content"      "
+                        >
+                          <div>
+                            <i class="fa-regular fa-building"></i>
+                            <p>{{complaint.complaint.department}}</p>
+                          </div>
+                          <div>
+                            <i class="fa-regular fa-calendar"></i>
+                            <p>{{complaint.complaint.created_at}}</p>
+                          </div>
+                          <div>
+                            <i class="fa-solid fa-magnifying-glass-chart"></i>
+                            {% if complaint.status_changed_to != 'Cancelled' %}
+                              {% if complaint.complaint.status != 'In Progress' and complaint.complaint.status != 'Resolved' and complaint.complaint.status != 'Closed'  %}
 
-                      <form method="POST" action="{% url 'cms:cancel_complaint' complaint.id %}">
-                        {% csrf_token %}
-                        <input type="hidden" name="status" value="Cancelled">
-                        <button class="btn btn-danger" type="submit" aria-label="Cancel Complaint">Cancel</button>
-                      </form>
-                    {% else %}
-                      <p style="font-family:'Poppins', sans-serif;">Cancel window closed</p>
-                    {% endif %}
-                  {% else %}
-                    <p style="font-family:'Poppins', sans-serif;">Cancel window closed</p>
-                  {% endif %}
-                </div>
-                <div>
-                  <i class="fa-regular fa-calendar"></i>
-                  <p>{{complaint.timestamp}}</p>
-                </div>
-                <div>
-                  <i class="fa-regular fa-calendar"></i>
-                  <p>{{complaint.complaint.completed_at}}</p>
-                </div>
-                <div>
-                  <i class="fa-regular fa-clock"></i>
-                  <p>{{ complaint.complaint.time_taken|duration_display }}</p>
-                </div>
-                <div>
-                  {% if request.user.role == 'User' %}
-                    <a
-                      href="{% url 'cms:staff_complaints_details' complaint.id %}"
-                      style="text-decoration: none; display: flex;"
-                    >
-                      <i class="fa-solid fa-eye"></i>
-                      <p>View Details</p>
-                    </a>
-                  {% elif request.user.role == 'Admin' %}
-                    <a
-                      href="{% url 'cms:incharge_complaints_details' complaint.id %}"
-                      style="text-decoration: none; display: flex;"
-                    >
-                      <i class="fa-solid fa-eye"></i>
-                      <p>View Details</p>
-                    </a>
-                  {% endif %}
-                </div>
-              </div>
-            {% endfor %}
-          {% else %}
-            <div
-              class="complaint-header"
-              style="
-                     background-color: #fff;
-                     border-radius: 0.2rem;
-                     padding: 0.5rem;
-                     font-family: 'Poppins', sans-serif;
-                    "
-            >
-              <div class="complaint-number">
-                <p>No Complaints!</p>
-              </div>
-            </div>
-          {% endif %}
+                                <form method="POST" action="{% url 'cms:cancel_complaint' complaint.id %}">
+                                  {% csrf_token %}
+                                  <input type="hidden" name="status" value="Cancelled">
+                                  <button class="btn btn-danger" type="submit" aria-label="Cancel Complaint">Cancel</button>
+                                </form>
+                              {% else %}
+                                <p style="font-family:'Poppins', sans-serif;">Cancel window closed</p>
+                              {% endif %}
+                            {% else %}
+                              <p style="font-family:'Poppins', sans-serif;">Cancel window closed</p>
+                            {% endif %}
+                          </div>
+                          <div>
+                            <i class="fa-regular fa-calendar"></i>
+                            <p>{{complaint.timestamp}}</p>
+                          </div>
+                          <div>
+                            <i class="fa-regular fa-calendar"></i>
+                            <p>{{complaint.complaint.completed_at}}</p>
+                          </div>
+                          <div>
+                            <i class="fa-regular fa-clock"></i>
+                            <p>{{ complaint.complaint.time_taken|duration_display }}</p>
+                          </div>
+                          <div>
+                            {% if request.user.role == 'User' %}
+                              <a
+                                href="{% url 'cms:staff_complaints_details' complaint.id %}"
+                                style="text-decoration: none; display: flex;"
+                              >
+                                <i class="fa-solid fa-eye"></i>
+                                <p>View Details</p>
+                              </a>
+                            {% elif request.user.role == 'Admin' %}
+                              <a
+                                href="{% url 'cms:incharge_complaints_details' complaint.id %}"
+                                style="text-decoration: none; display: flex;"
+                              >
+                                <i class="fa-solid fa-eye"></i>
+                                <p>View Details</p>
+                              </a>
+                            {% endif %}
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+                  {% endfor %}
+                {% else %}
+                  <tr>
+                    <td colspan="100%">No complaints!</td>
+                  </tr>
+                {% endif %}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>

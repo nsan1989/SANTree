@@ -15,6 +15,48 @@
         .table {
             font-family: 'poppins', sans-serif;
         }
+
+        .trip-body {
+            display: none;
+        }
+
+        .trip-body.active {
+            display: table-row;
+        }
+
+        .trip-body-content div {
+            height: 2rem;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .trip-body-content p {
+            margin-bottom: 0;
+        }
+
+        .trip-body-content div i {
+            text-decoration: none;
+            color: #000;
+            height: 1rem;
+            width: 1rem;
+        }
+
+        .trip-body-content div a {
+            height: 2rem;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .trip-body-content div a i {
+            text-decoration: none;
+            color: #000;
+            height: 1rem;
+            width: 1rem;
+        }
     </style>
 
     {% if request.user.department.name|lower != "transport" %}
@@ -47,20 +89,21 @@
                     {% endif %}
                 </ul>
             </nav>
-    <!--Paginator-->
-            <div class="content-body">
-                <div class="table-responsive">
+            <!--Paginator-->
+            <!--Desktop view-->
+            <div class="content-body d-none d-md-flex">
+                <div class="table-responsive w-100">
                     <table class="table table-bordered">
                         <thead class="table-danger">
                             <tr>
-                                <th>Booking ID</th>
-                                <th>Type</th>
-                                <th>Pickup Location</th>
-                                <th>Drop Location</th>
-                                <th>Vehicle</th>
-                                <th>Driver</th>
-                                <th>Phone No.</th>
-                                <th>Status</th>
+                                <th scope="col">Booking ID</th>
+                                <th scope="col">Type</th>
+                                <th scope="col">Pickup Location</th>
+                                <th scope="col">Drop Location</th>
+                                <th scope="col">Vehicle</th>
+                                <th scope="col">Driver</th>
+                                <th scope="col">Phone No.</th>
+                                <th scope="col">Status</th>
                             </tr>
                         </thead>
                         <tbody class="table-info">
@@ -86,14 +129,82 @@
                     </table>
                 </div>
             </div>
+            <!--Mobile view-->
+            <div class="content-body d-md-none">
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead class="table-danger">
+                            <tr>
+                                <th scope="col">ID</th>
+                                <th scope="col">Pickup</th>
+                                <th scope="col">Driver</th>
+                                <th scope="col">Detail</th>
+                            </tr>
+                        </thead>
+                        <tbody class="table-info">
+                            {% if page_obj %}
+                                {% for trip in page_obj %}
+                                    <tr
+                                        class="trip-summary-row"
+                                        onclick="toggleTrip(this)"
+                                    >
+                                        <td>{{ trip.id }}</td>
+                                        <td>{{ trip.pickup_location }}</td>
+                                        <td>{{ trip.driver.user.username|default:"-" }}</td>
+                                        <td><i class="fa-solid fa-plus"></i></td>
+                                    </tr>
+                                    <tr class="trip-body">
+                                        <td colspan="4">
+                                            <div class="trip-body-content">
+                                                <div>
+                                                    <i class="fa-solid fa-signal"></i>
+                                                    <p>{{ trip.status}}</p>
+                                                </div>
+                                                <div>
+                                                    <i class="fa-solid fa-exclamation"></i>
+                                                    <p>{{ trip.booking_type }}</p>
+                                                </div>
+                                                <div>
+                                                    <i class="fa-solid fa-location-dot"></i>
+                                                    <p>{{ trip.drop_location }}</p>
+                                                </div>
+                                                <div>
+                                                    <i class="fa-solid fa-car-rear"></i>
+                                                    <p>{{ trip.vehicle.vehicle_number|default:"-" }}</p>
+                                                </div>
+                                                <div>
+                                                    <i class="fa-regular fa-user"></i>
+                                                    <p>{{ trip.driver.user.username }}</p>
+                                                </div>
+                                                <div>
+                                                    <i class="fa-solid fa-phone"></i>
+                                                    <p>{{ trip.driver.user.phone_number|default:"-" }}</p>
+                                                </div>
+                                                <div>
+                                                    <i class="fa-regular fa-clock"></i>
+                                                    <p>{{ trip.pickup_time }}</p>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="100%">No Bookings</td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
-    {% else %}
+        {% else %}
         <div class="container-fluid">
             <div class="content-header mb-3">
                 <h3 class="mb-0 fw-bold">Upcoming Trips</h3>
                 <p class="mb-0 text-light">list of upcoming trips</p>
             </div>
-    <!--Paginator-->
+            <!--Paginator-->
             <nav class="mb-3">
                 <ul class="pagination">
                     {% if page_obj.has_previous %}
@@ -117,9 +228,10 @@
                     {% endif %}
                 </ul>
             </nav>
-    <!--Paginator-->
-            <div class="content-body">
-                <div class="table-responsive">
+            <!--Paginator-->
+            <!--Desktop view-->
+            <div class="content-body d-none d-md-flex">
+                <div class="table-responsive w-100">
                     <table class="table table-bordered">
                         <thead class="table-danger">
                             <tr>
@@ -174,6 +286,90 @@
                     </table>
                 </div>
             </div>
+            <!--Mobile view-->
+            <div class="content-body d-md-none">
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead class="table-danger">
+                            <tr>
+                                <th scope="col">ID</th>
+                                <th scope="col">Pickup</th>
+                                <th scope="col">Customer</th>
+                                <th scope="col">Detail</th>
+                            </tr>
+                        </thead>
+                        <tbody class="table-info">
+                            {% if page_obj %}
+                                {% for trip in page_obj %}
+                                    <tr
+                                        class="trip-summary-row"
+                                        onclick="toggleTrip(this)"
+                                    >
+                                        <td>{{ trip.id }}</td>
+                                        <td>{{ trip.pickup_location }}</td>
+                                        <td>{{ trip.booked_by.username }}</td>
+                                        <td><i class="fa-solid fa-plus"></i></td>
+                                    </tr>
+                                    <tr class="trip-body">
+                                        <td colspan="4">
+                                            <div class="trip-body-content">
+                                                <div>
+                                                    <i class="fa-solid fa-signal"></i>
+                                                    <p>{{ trip.status}}</p>
+                                                </div>
+                                                <div>
+                                                    <i class="fa-solid fa-exclamation"></i>
+                                                    <p>{{ trip.booking_type }}</p>
+                                                </div>
+                                                <div>
+                                                    <i class="fa-solid fa-location-dot"></i>
+                                                    <p>{{ trip.drop_location }}</p>
+                                                </div>
+                                                <div>
+                                                    <i class="fa-solid fa-car-rear"></i>
+                                                    <p>{{ trip.vehicle.vehicle_number|default:"-" }}</p>
+                                                </div>
+                                                <div>
+                                                    <i class="fa-regular fa-user"></i>
+                                                    <p>{{ trip.driver.user.username }}</p>
+                                                </div>
+                                                <div>
+                                                    <i class="fa-solid fa-phone"></i>
+                                                    <p>{{ trip.driver.user.phone_number|default:"-" }}</p>
+                                                </div>
+                                                <div>
+                                                    <i class="fa-regular fa-clock"></i>
+                                                    <p>{{ trip.pickup_time }}</p>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="100%">No Bookings</td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     {% endif %}
+
+    <script>
+        function toggleTrip(element) {
+            const body = element.nextElementSibling;
+            body.classList.toggle("active");
+
+            const icon = element.querySelector("i");
+            if (body.classList.contains("active")) {
+                icon.classList.remove("fa-plus");
+                icon.classList.add("fa-minus");
+            } else {
+                icon.classList.remove("fa-minus");
+                icon.classList.add("fa-plus");
+            }
+        }
+    </script>
 {% endblock %}

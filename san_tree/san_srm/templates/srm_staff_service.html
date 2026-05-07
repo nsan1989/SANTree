@@ -18,20 +18,65 @@
       font-family: 'Poppins', sans-serif;
       color: wheat;
     }
+
     th {
       font-family: 'Poppins', sans-serif;
       font-size: 0.9rem;
     }
+
     td {
       font-family: 'Poppins', sans-serif;
       font-size: 0.85rem;
     }
+
     .status-open > td { background-color: #0ba50b; color: #fff;}
     .status-progress > td   { background-color: #e7c60b; color: black; }
     .status-pending > td   { background-color: #990000; color: white; }
     .status-waiting > td  { background-color: #ff9900; color: #000; }
     .status-completed > td { background-color: #003300; color: #fff; }
     .status-onhold  > td  { background-color: #d2d2d2; color: #000; }
+
+    .service-body {
+      display: none;
+    }
+
+    .service-body.active {
+      display: table-row;
+    }
+
+    .service-body-content div {
+      height: 2rem;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .service-body-content p {
+      margin-bottom: 0;
+    }
+
+    .service-body-content div i {
+      text-decoration: none;
+      color: #000;
+      height: 1rem;
+      width: 1rem;
+    }
+
+    .service-body-content div a {
+      height: 2rem;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .service-body-content div a i {
+      text-decoration: none;
+      color: #000;
+      height: 1rem;
+      width: 1rem;
+    }
   </style>
 
   <div class="container-fluid">
@@ -87,7 +132,8 @@
         </div>
       </div>
       <div class="row">
-        <div class="col-12 table-responsive">
+        <!--Desktop view-->
+        <div class="col-12 d-none d-md-flex table-responsive">
           <table class="table">
             <thead class="table-danger">
               <tr>
@@ -153,6 +199,90 @@
             </tbody>
           </table>
         </div>
+        <!--Mobile view-->
+        <div class="col-12 d-md-none table-responsive">
+          <table class="table table-bordered">
+            <thead class="table-danger">
+              <tr>
+                <th scope="col">No.</th>
+                <th scope="col">Type</th>
+                <th scope="col">Status</th>
+                <th scope="col">Detail</th>
+              </tr>
+            </thead>
+            <tbody class="table-info">
+              {% if page_obj %}
+                {% for service in page_obj %}
+                  <tr
+                    class="service-summary-row"
+                    onclick="toggleService(this)"
+                  >
+                    <td>{{service.service_number}}</td>
+                    <td>{{service.service_type}}</td>
+                    <td>{{service.status}}</td>
+                    <td><i class="fa-solid fa-plus"></i></td>
+                  </tr>
+                  <tr class="service-body">
+                    <td
+                      colspan="4"
+                    >
+                      <div class="service-body-content">
+                        <div>
+                          <i class="fa-regular fa-id-badge"></i>
+                          <p>{{service.UHID}}</p>
+                        </div>
+                        <div>
+                          <i class="fa-solid fa-signal"></i>
+                          <p>{{service.status}}</p>
+                        </div>
+                        <div>
+                          <i class="fa-solid fa-user-gear"></i>
+                          <p>{{service.service_type}}</p>
+                        </div>
+                        <div>
+                          <i class="fa-solid fa-exclamation"></i>
+                          <p>{{service.request_type}}</p>
+                        </div>
+                        <div>
+                          <i class="fa-solid fa-person"></i>
+                          <p>{{service.assigned_to}}</p>
+                        </div>
+                        <div>
+                          <i class="fa-solid fa-location-arrow"></i>
+                          <p>{{service.from_location}}</p>
+                        </div>
+                        <div>
+                          <i class="fa-solid fa-location-arrow"></i>
+                          <p>{{service.to_location}}</p>
+                        </div>
+                        <div>
+                          <i class="fa-solid fa-hourglass-start"></i>
+                          {% if service.start_time %}
+                            <p>{{service.start_time|duration_display}}</p>
+                          {% else %}
+                            <p>NA</p>
+                          {% endif %}
+                        </div>
+                        <div>
+                          <i class="fa-solid fa-hourglass-start"></i>
+                          {% if service.time_taken %}
+                            <p>{{service.time_taken|duration_display}}</p>
+                          {% else %}
+                            <p>NA</p>
+                          {% endif %}
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                {% endfor %}
+              {% else %}
+                <tr>
+                  <td colspan="100%">No Service</td>
+                </tr>
+              {% endif %}
+            </tbody>
+          </table>
+        </div>
       </div>
     {% else %}
       <div class="row mb-3">
@@ -206,7 +336,8 @@
         </div>
       </div>
       <div class="row">
-        <div class="col-12 table-responsive">
+        <!--Desktop view.-->
+        <div class="col-12 d-none d-md-flex table-responsive">
           <table class="table">
             <thead class="table-danger">
               <tr>
@@ -310,6 +441,109 @@
             </tbody>
           </table>
         </div>
+        <!--Mobile view-->
+        <div class="col-12 d-md-none table-responsive">
+          <table class="table table-bordered">
+            <thead class="table-danger">
+              <tr>
+                <th scope="col">No.</th>
+                <th scope="col">Type</th>
+                <th scope="col">Status</th>
+                <th scope="col">Detail</th>
+              </tr>
+            </thead>
+            <tbody class="table-info">
+              {% if page_obj %}
+                {% for service in page_obj %}
+                  <tr
+                    class="service-summary-row"
+                    onclick="toggleService(this)"
+                  >
+                    <td>{{service.service_number}}</td>
+                    <td>{{service.service_type}}</td>
+                    <td>{{service.status}}</td>
+                    <td><i class="fa-solid fa-plus"></i></td>
+                  </tr>
+                  <tr class="service-body">
+                    <td colspan="4">
+                      <div class="service-body-content">
+                        <div>
+                          <i class="fa-regular fa-id-badge"></i>
+                          <p>{{service.UHID}}</p>
+                        </div>
+                        <div>
+                          <i class="fa-solid fa-signal"></i>
+                          <p>{{service.status}}</p>
+                        </div>
+                        <div>
+                          <i class="fa-solid fa-user-gear"></i>
+                          <p>{{service.service_type}}</p>
+                        </div>
+                        <div>
+                          <i class="fa-solid fa-exclamation"></i>
+                          <p>{{service.request_type}}</p>
+                        </div>
+                        <div>
+                          <i class="fa-solid fa-location-arrow"></i>
+                          <p>{{service.from_location}}</p>
+                        </div>
+                        <div>
+                          <i class="fa-solid fa-location-arrow"></i>
+                          <p>{{service.to_location}}</p>
+                        </div>
+                        <div>
+                          <i class="fa-solid fa-hourglass-start"></i>
+                          {% if service.start_time %}
+                            <p>{{service.start_time|duration_display}}</p>
+                          {% else %}
+                            <p>NA</p>
+                          {% endif %}
+                        </div>
+                        <div>
+                          <i class="fa-solid fa-hourglass-start"></i>
+                          {% if service.time_taken %}
+                            <p>{{service.time_taken|duration_display}}</p>
+                          {% else %}
+                            <p>NA</p>
+                          {% endif %}
+                        </div>
+                        <div>
+                          <i class="fa-solid fa-pencil"></i>
+                          <p>{{ service.latest_remark_text|default:"-" }}</p>
+                        </div>
+                        <div>
+                          {% if service.status != 'Completed' and service.status != 'Pending' %}
+                            <form method="POST" action="{% url 'srm:staff_update_service_status' service.id %}">
+                              {% csrf_token %}
+                              <select name="status" class="statusSelect" data-service-id="{{ service.id }}" required>
+                                <option value="">select</option>
+                                {% if service.status != 'Completed' and service.status != 'Pending' and service.status == 'Open' %}
+                                  <option value="In Progress" {% if service.status == 'In Progress' %} selected {% endif %}>In Progress</option>
+                                {% elif service.status != 'Completed' and service.status != 'Pending' and service.status == 'In Progress' %}
+                                  <option value="Completed" {% if service.status == 'Completed' %} selected {% endif %}>Completed</option>
+                                  <option value="On Hold" {% if service.status == 'On Hold' %} selected {% endif %}>On Hold</option>
+                                {% elif service.status != 'Completed' and service.status != 'Pending' and service.status == 'On Hold' %}
+                                  <option value="Completed" {% if service.status == 'Completed' %} selected {% endif %}>Completed</option>
+                                {% endif %}
+                              </select>
+                              <button class="btn btn-sm btn-primary mt-2" type="submit">Update</button>
+                            </form>
+                          {% else %}
+                            <p>No action needed</p>
+                          {% endif %}
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                {% endfor %}
+              {% else %}
+                <tr>
+                  <td colspan="100%">No Service</td>
+                </tr>
+              {% endif %}
+            </tbody>
+          </table>
+        </div>
       </div>
     {% endif %}
   </div>
@@ -382,6 +616,22 @@
       });
     });
 
+  </script>
+
+  <script>
+    function toggleService(element) {
+      const body = element.nextElementSibling;
+      body.classList.toggle("active");
+
+      const icon = element.querySelector("i");
+      if (body.classList.contains("active")) {
+        icon.classList.remove("fa-plus");
+        icon.classList.add("fa-minus");
+      } else {
+        icon.classList.remove("fa-minus");
+        icon.classList.add("fa-plus");
+      }
+    }
   </script>
 
 {% endblock %}

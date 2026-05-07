@@ -242,7 +242,7 @@ def AllTripsView(request):
         else:
             all_requests = Booking.objects.filter(
                 booked_by=current_user,
-                status__in=["COMPLETED", "IN_PROGRESS", "CANCELLED"],
+                status__in=["ACKNOWLEDGE", "COMPLETED", "IN_PROGRESS", "CANCELLED"],
             ).order_by("-created_at")
         page_number = request.GET.get("page")
         paginator = Paginator(all_requests, 10)

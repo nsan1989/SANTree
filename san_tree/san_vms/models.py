@@ -93,14 +93,18 @@ class Driver(models.Model):
         return self.user.username
 
     def save(self, *args, **kwargs):
-        if Driver.objects.filter(
-            user__username__iexact=self.user.username,
-            license_number__iexact=self.license_number,
+        if (
+            Driver.objects.filter(
+                user__username__iexact=self.user.username,
+                license_number__iexact=self.license_number,
+            )
+            .exclude(pk=self.pk)
+            .exists()
         ):
             raise ValidationError(
                 f"A Driver with the name '{self.user.username}' and '{self.license_number}' already exists."
             )
-        self().save(*args, **kwargs)
+        super().save(*args, **kwargs)
 
     class Meta:
         ordering = ["user__username"]

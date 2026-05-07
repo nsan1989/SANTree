@@ -507,7 +507,7 @@ def AssignedComplaint(request):
             | Q(complaint__status="Halt")
             | Q(complaint__status="Review")
         )
-    ).order_by("complaint__created_at")
+    ).order_by("-complaint__created_at")
 
     # Halt the open tasks if it exceeds 24hr.
     for complaint in complaints:

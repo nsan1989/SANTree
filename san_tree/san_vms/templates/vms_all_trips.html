@@ -11,8 +11,55 @@
             color: wheat;
             font-family: 'poppins', sans-serif;
         }
+
         .table {
             font-family: 'poppins', sans-serif;
+        }
+
+        .request-body {
+            display: none;
+        }
+
+        .request-body.active {
+            display: table-row;
+        }
+
+        .request-body-content div {
+            height: 2rem;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .request-body-content p {
+            margin-bottom: 0;
+        }
+
+        .request-body-content div i {
+            text-decoration: none;
+            color: #000;
+            height: 1rem;
+            width: 1rem;
+        }
+
+        .request-body-content div a {
+            height: 2rem;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .request-body-content div a i {
+            text-decoration: none;
+            color: #000;
+            height: 1rem;
+            width: 1rem;
+        }
+
+        .request-body-content form {
+            height: auto;
         }
     </style>
 
@@ -47,8 +94,9 @@
                 </ul>
             </nav>
             <!--Paginator-->
-            <div class="content-body">
-                <div class="table-responsive">
+            <!--Desktop view-->
+            <div class="content-body d-none d-md-flex">
+                <div class="table-responsive w-100">
                     <table class="table table-bordered">
                         <thead class="table-danger">
                             <tr>
@@ -80,6 +128,66 @@
                                 <tr>
                                     <td colspan="100%">No requests available</td>
                                 </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <!--Mobile view-->
+            <div class="content-body d-md-none">
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead class="table-danger">
+                            <tr>
+                                <th scope="col">ID</th>
+                                <th scope="col">Status</th>
+                                <th scope="col">Driver</th>
+                                <th scope="col">Detail</th>
+                            </tr>
+                        </thead>
+                        <tbody class="table-info">
+                            {% if page_obj %}
+                                {% for request in page_obj %}
+                                <tr
+                                    class="request-summary-row"
+                                    onclick="toggleRequest(this)"
+                                >
+                                    <td>{{request.id}}</td>
+                                    <td>{{request.status}}</td>
+                                    <td>{{request.driver}}</td>
+                                    <td><i class="fa-solid fa-plus"></i></td>
+                                </tr>
+                                <tr class="request-body">
+                                    <td colspan="4">
+                                        <div class="request-body-content">
+                                            <div>
+                                                <i class="fa-solid fa-exclamation"></i>
+                                                <p>{{ request.booking_type }}</p>
+                                            </div>
+                                            <div>
+                                                <i class="fa-solid fa-location-dot"></i>
+                                                <p>{{ request.pickup_location }}</p>
+                                            </div>
+                                            <div>
+                                                <i class="fa-solid fa-location-dot"></i>
+                                                <p>{{ request.drop_location }}</p>
+                                            </div>
+                                            <div>
+                                                <i class="fa-solid fa-box"></i>
+                                                <p>{{ request.cargo }}</p>
+                                            </div>
+                                            <div>
+                                                <i class="fa-solid fa-car"></i>
+                                                <p>{{ request.vehicle }}</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            {% else %}
+                            <tr>
+                                <td colspan="100%">No Bookings</td>
+                            </tr>
                             {% endif %}
                         </tbody>
                     </table>
@@ -117,8 +225,9 @@
                 </ul>
             </nav>
             <!--Paginator-->
-            <div class="content-body">
-                <div class="table-responsive">
+            <!--Desktop view-->
+            <div class="content-body d-none d-md-flex">
+                <div class="table-responsive w-100">
                     <table
                         class="table table-bordered"
                     >
@@ -188,6 +297,101 @@
                     </table>
                 </div>
             </div>
+            <!--Mobile view-->
+            <div class="content-body d-md-none">
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead class="table-danger">
+                            <tr>
+                                <th scope="col">ID</th>
+                                <th scope="col">Status</th>
+                                <th scope="col">Customer</th>
+                                <th scope="col">Detail</th>
+                            </tr>
+                        </thead>
+                        <tbody class="table-info">
+                            {% if page_obj %}
+                                {% for request in page_obj %}
+                                <tr
+                                    class="request-summary-row"
+                                    onclick="toggleRequest(this)"
+                                >
+                                    <td>{{ request.id }}</td>
+                                    <td>{{ request.status }}</td>
+                                    <td>{{ request.booked_by }}</td>
+                                    <td><i class="fa-solid fa-plus"></i></td>
+                                </tr>
+                                <tr
+                                    class="request-body"
+                                >
+                                    <td colspan="4">
+                                        <div class="request-body-content">
+                                            <div>
+                                                <i class="fa-solid fa-exclamation"></i>
+                                                <p>{{ request.booking_type }}</p>
+                                            </div>
+                                            <div>
+                                                <i class="fa-solid fa-location-dot"></i>
+                                                <p>{{ request.pickup_location }}</p>
+                                            </div>
+                                            <div>
+                                                <i class="fa-solid fa-location-dot"></i>
+                                                <p>{{ request.drop_location }}</p>
+                                            </div>
+                                            <div>
+                                                <i class="fa-solid fa-box"></i>
+                                                <p>{{ request.cargo|default:"NA" }}</p>
+                                            </div>
+                                            <div>
+                                                <i class="fa-solid fa-car"></i>
+                                                <p>{{ request.vehicle }}</p>
+                                            </div>
+                                            <div
+                                                style="height: 4rem;"
+                                            >
+                                                <form method="POST" action="{% url 'vms:staff_update_booking_status' request.id %}"
+                                                      style="display: flex; flex-direction: column; gap: 5px;">
+                                                    {% csrf_token %}
+                                                    <select name="status" class="statusSelect" required>
+                                                        <option value="">select</option>
+                                                        {% if request.status == 'ACKNOWLEDGE' %}
+                                                            <option value="IN_PROGRESS">In Progress</option>
+                                                        {% elif request.status == 'IN_PROGRESS' %}
+                                                            <option value="COMPLETED">Completed</option>
+                                                        {% endif %}
+                                                    </select>
+                                                    <button class="btn btn-sm btn-primary" type="submit">Update</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            {% else %}
+                            <tr>
+                                <td colspan="100%">No Bookings</td>
+                            </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     {% endif %}
+
+    <script>
+        function toggleRequest(element) {
+            const body = element.nextElementSibling;
+            body.classList.toggle("active");
+
+            const icon = element.querySelector("i");
+            if (body.classList.contains("active")) {
+                icon.classList.remove("fa-plus");
+                icon.classList.add("fa-minus");
+            } else {
+                icon.classList.remove("fa-minus");
+                icon.classList.add("fa-plus");
+            }
+        }
+    </script>
 {% endblock %}
