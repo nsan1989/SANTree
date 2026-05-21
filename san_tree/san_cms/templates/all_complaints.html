@@ -58,6 +58,10 @@
       gap: 1rem;
     }
 
+    .complaint-detail-content div p {
+      margin-bottom: 0;
+    }
+
     .complaint-detail-content div a i {
       text-decoration: none;
       color: #000;
@@ -141,7 +145,7 @@
                   <td>{{complaint.complaint.created_at}}</td>
                   <td>{{complaint.complaint.status}}</td>
                   {% if complaint.status_changed_to != 'Cancelled' %}
-                    {% if complaint.complaint.status != 'In Progress' and complaint.complaint.status != 'Resolved' and complaint.complaint.status != 'Closed'  %}
+                    {% if complaint.complaint.status not in 'In Progress,Resolved,Closed,Review,Rejected' %}
                       <td>
                         <form method="POST" action="{% url 'cms:cancel_complaint' complaint.id %}">
                           {% csrf_token %}
@@ -224,8 +228,7 @@
                           <div>
                             <i class="fa-solid fa-magnifying-glass-chart"></i>
                             {% if complaint.status_changed_to != 'Cancelled' %}
-                              {% if complaint.complaint.status != 'In Progress' and complaint.complaint.status != 'Resolved' and complaint.complaint.status != 'Closed'  %}
-
+                              {% if complaint.complaint.status not in 'In Progress,Resolved,Closed,Review,Rejected' %}
                                 <form method="POST" action="{% url 'cms:cancel_complaint' complaint.id %}">
                                   {% csrf_token %}
                                   <input type="hidden" name="status" value="Cancelled">

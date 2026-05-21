@@ -44,6 +44,39 @@
     .task-body div p {
       margin-bottom: 0;
     }
+
+    .complaint-body {
+      display: none;
+    }
+
+    .complaint-body.active {
+      display: table-row;
+    }
+
+    .complaint-detail-content div {
+      height: 2rem;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .complaint-detail-content div a {
+      height: 2rem;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .complaint-detail-content div p {
+      margin-bottom: 0;
+    }
+
+    .complaint-detail-content div a i {
+      text-decoration: none;
+      color: #000;
+    }
   </style>
 
   <link rel="stylesheet" href="{% static 'styles/assigned_complaint.css' %}" />
@@ -110,11 +143,6 @@
         </a>
       </div>
     </div>
-    {% if messages %}
-      {% for message in messages %}
-        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
-      {% endfor %}
-    {% endif %}
     <!--Desktop View-->
     <div class="col-12 d-none d-lg-flex table-responsive">
       <table class="table table-bordered">
@@ -146,14 +174,17 @@
                 <td>{{complaints.complaint.created_at}}</td>
                 <td>{{ complaints.complaint.time_taken|duration_display }}</td>
                 {% if complaints.complaint.assigned_to == request.user or complaints.complaint.status|lower == 'review' %}
-                  {% if complaints.complaint.status != 'Cancelled' and complaints.complaint.status != 'Resolved' %}
+                  {% if complaints.complaint.status not in 'Cancelled,Resolved' %}
                     <td>
                       <form method="POST" action="{% url 'cms:admin_update_complaint_status' complaints.complaint.id %}">
                         {% csrf_token %}
                         <select name="status" required>
                           <option value="">select</option>
+                          {% if complaints.complaint.status == "Open" %}
                           <option value="In Progress" {% if complaints.status == 'In Progress' %} selected {% endif %}>In Progress</option>
+                          {% elif complaints.complaint.status == "In Progress" %}
                           <option value="Resolved" {% if complaints.status == 'Resolved' %} selected {% endif %}>Resolved</option>
+                          {% endif %}
                         </select>
                         <button class="btn btn-sm btn-primary mt-2" type="submit">Update</button>
                       </form>
@@ -169,11 +200,11 @@
                     <td class="text-center">--</td>
                   {% else %}
                     <td class="text-center">
-                      <a class="open-modal" data-url="{% url 'cms:reassign_complaints' complaints.id %}">
+                      <a class="open-modal" data-url="{% url 'cms:reassign_complaints' complaints.complaint.id %}">
                         <i class="fa-solid fa-handshake-simple"></i>
                       </a>
                       &nbsp;&nbsp;&nbsp;
-                      <a class="open-modal" data-url="{% url 'cms:reassign_departments' complaints.id %}">
+                      <a class="open-modal" data-url="{% url 'cms:reassign_departments' complaints.complaint.id %}">
                         <i class="fa-solid fa-building"></i>
                       </a>
                     </td>
@@ -201,173 +232,151 @@
     </div>
     <!--Mobile View-->
     <div class="col-12 d-md-none">
-      <div class="task-title mb-3">
-        <h5 class="fw-bold">Complaint List</h5>
-      </div>
-      {% if page_obj %}
-        {% for complaints in page_obj %}
-          <div
-            class="task-wrapper"
-            style="
-                   border: 1px soild #fff;
-                   border-radius: 0.2rem;
-                  "
-          >
-            <div
-              class="task-header"
-              style="
-                     display: flex;
-                     justify-content: space-between;
-                     cursor: pointer;
-                     background-color: #7ae1f5;
-                     padding: 0.5rem;
-                     border-radius: 0.2rem;
-                     color: #000;
-                     font-family: 'Poppins', sans-serif;
-                    "
-              onClick="toggleTask(this)"
-            >
-              <div class="complaint-number">
-                {{complaints.complaint.complaint_number}}
-              </div>
-              <div class="complaint-status">
-                {{complaints.complaint.status}}
-              </div>
-              <div class="complaint-priority">
-                {{complaints.complaint.priority}}
-              </div>
-              <div class="task-details">
-                <i class="fa-solid fa-plus"></i>
-              </div>
-            </div>
-            <div
-              class="task-body"
-              style="
-                     display: none;
-                     align-items: center;
-                     background-color: #fff;
-                     padding: 0.5rem;
-                     font-family: 'Poppins', sans-serif;
-                    "
-            >
-
-              <div class="complaint-description">
-                {{complaints.complaint.description|default:"No Data"}}
-              </div>
-              <div>
-                <i class="fa-regular fa-calendar"></i>
-                <p>{{complaints.complaint.created_at}}</p>
-              </div>
-              <div>
-                <i class="fa-regular fa-calendar"></i>
-                {% if complaints.status_change_to != 'In Progress' or complaints.status_change_to != 'Resolved' %}
-                  <p>{{complaints.timestamp}}</p>
-                {% else %}
-                  <p>Not yet updated!</p>
-                {% endif %}
-              </div>
-              <div>
-                <i class="fa-regular fa-flag"></i>
-                <p>{{complaints.complaint.priority}}</p>
-              </div>
-              <div>
-                <i class="fa-regular fa-clock"></i>
-                <p>{{ complaints.complaint.time_taken|duration_display }}</p>
-              </div>
-              <div>
-                <i class="fa-solid fa-magnifying-glass-chart"></i>
-                {% if complaints.complaint.assigned_to == request.user or complaints.complaint.status == 'Review' %}
-                  {% if complaints.complaint.status != 'Cancelled' and complaints.complaint.status != 'Resolved' %}
-                    <p>
-                      <form method="POST" action="{% url 'cms:admin_update_complaint_status' complaints.complaint.id %}">
-                        {% csrf_token %}
-                        <select name="status" required>
-                          <option value="">select</option>
-                          <option value="In Progress" {% if complaints.status == 'In Progress' %} selected {% endif %}>In Progress</option>
-                          <option value="Resolved" {% if complaints.status == 'Resolved' %} selected {% endif %}>Resolved</option>
-                        </select>
-                        <button class="btn btn-sm btn-primary mt-2" type="submit">Update</button>
-                      </form>
-                    </p>
-                  {% else %}
-                    <p>--</p>
-                  {% endif %}
-                {% else %}
-                  <p>--</p>
-                {% endif %}
-              </div>
-              <div>
-                {% if complaints.complaint.assigned_to == request.user %}
-                  {% if complaints.complaint.status == 'Resolved' %}
-                    <p class="text-center">--</p>
-                  {% else %}
-                    <a
-                      class="open-modal"
-                      data-url="{% url 'cms:reassign_complaints' complaints.id %}"
-                      style="
-                             text-decoration: none;
-                            "
-                    >
-                      <i class="fa-solid fa-handshake-simple"></i>
-                      Assigned to Staff
-                    </a>
-                  {% endif %}
-                {% endif %}
-              </div>
-              <div>
-                {% if complaints.complaint.assigned_to == request.user %}
-                  {% if complaints.complaint.status == 'Resolved' %}
-                    <p class="text-center">--</p>
-                  {% else %}
-                    <a
-                      class="open-modal"
-                      data-url="{% url 'cms:reassign_departments' complaints.id %}"
-                      style="
-                             text-decoration: none;
-                            "
-                    >
-                      <i class="fa-solid fa-building"></i>
-                      Handover to Department
-                    </a>
-                  {% endif %}
-                {% endif %}
-              </div>
-              <div>
-                {% if complaints.complaint.status == 'Resolved' %}
-                  <p class="text-center">--</p>
-                {% else %}
-                  <a class="open-modal" data-url="{% url 'cms:complaints_remarks' complaints.id %}" style="text-decoration: none;">
-                    <i class="fa-solid fa-pen"></i>
-                    Add Remark
-                  </a>
-                {% endif %}
-              </div>
-              <div>
-                <a href="{% url 'cms:assigned_complaint_details' complaints.complaint.id %}"
-                   style="text-decoration: none;">
-                  <i class="fa-solid fa-eye"></i>
-                  Details
-                </a>
-              </div>
-            </div>
-          </div>
-        {% endfor %}
-      {% else %}
-        <div
-          class="task-wrapper"
-          style="
-                 display: flex;
-                 align-items: center;
-                 justify-content: space-between;
-                 border: 1px soild #fff;
-                 background-color: #fff;
-                 border-radius: 0.2rem;
-                 padding: 0.5rem;
-                "
-        >
-          <p>No Data</p>
+      <div class="assigned-complaint-wrapper">
+        <div class="assigned-complaint-title mb-3">
+          <h5 style="color: wheat;">Assigned Complaint List</h5>
         </div>
-      {% endif %}
+        <div class="assigned-complaint-content table-responsive">
+          <table class="table table-bordered">
+            <thead class="table-danger">
+              <tr>
+                <th scope="col">No.</th>
+                <th scope="col">Status</th>
+                <th scope="col">Priority</th>
+                <th scope="col">Detail</th>
+              </tr>
+            </thead>
+            <tbody class="table-info">
+              {% if page_obj %}
+                {% for complaints in page_obj %}
+                  <tr
+                    class="complaint-summary-row"
+                    onClick="toggleTask(this)"
+                  >
+                    <td>{{complaints.complaint.complaint_number}}</td>
+                    <td>{{complaints.complaint.status}}</td>
+                    <td>{{complaints.complaint.priority}}</td>
+                    <td><i class="fa-solid fa-plus"></i></td>
+                  </tr>
+                  <tr
+                    class="complaint-body"
+                  >
+                    <td
+                      colspan="4"
+                    >
+                      <div class="complaint-detail-content">
+                        <div>
+                          <i class="fa-solid fa-info"></i>
+                          <p>{{complaints.complaint.description|default:"No Data"}}</p>
+                        </div>
+                        <div>
+                          <i class="fa-regular fa-calendar"></i>
+                          <p>{{complaints.complaint.created_at}}</p>
+                        </div>
+                        <div>
+                          <i class="fa-regular fa-calendar"></i>
+                          {% if complaints.status_change_to != 'In Progress' or complaints.status_change_to != 'Resolved' %}
+                            <p>{{complaints.timestamp}}</p>
+                          {% else %}
+                            <p>Not yet updated!</p>
+                          {% endif %}
+                        </div>
+                        <div>
+                          <i class="fa-regular fa-flag"></i>
+                          <p>{{complaints.complaint.priority}}</p>
+                        </div>
+                        <div>
+                          <i class="fa-regular fa-clock"></i>
+                          <p>{{ complaints.complaint.time_taken|duration_display }}</p>
+                        </div>
+                        <div>
+                          <i class="fa-solid fa-magnifying-glass-chart"></i>
+                          {% if complaints.complaint.assigned_to == request.user or complaints.complaint.status == 'Review' %}
+                            {% if complaints.complaint.status != 'Cancelled' and complaints.complaint.status != 'Resolved' %}
+                              <p>
+                                <form method="POST" action="{% url 'cms:admin_update_complaint_status' complaints.complaint.id %}">
+                                  {% csrf_token %}
+                                  <select name="status" required>
+                                    <option value="">select</option>
+                                    <option value="In Progress" {% if complaints.status == 'In Progress' %} selected {% endif %}>In Progress</option>
+                                    <option value="Resolved" {% if complaints.status == 'Resolved' %} selected {% endif %}>Resolved</option>
+                                  </select>
+                                  <button class="btn btn-sm btn-primary mt-2" type="submit">Update</button>
+                                </form>
+                              </p>
+                            {% else %}
+                              <p>--</p>
+                            {% endif %}
+                          {% else %}
+                            <p>--</p>
+                          {% endif %}
+                        </div>
+                        <div>
+                          {% if complaints.complaint.assigned_to == request.user %}
+                            {% if complaints.complaint.status == 'Resolved' %}
+                              <p class="text-center">--</p>
+                            {% else %}
+                              <a
+                                class="open-modal"
+                                data-url="{% url 'cms:reassign_complaints' complaints.id %}"
+                                style="
+                                      text-decoration: none;
+                                      "
+                              >
+                                <i class="fa-solid fa-handshake-simple"></i>
+                                Assigned to Staff
+                              </a>
+                            {% endif %}
+                          {% endif %}
+                        </div>
+                        <div>
+                          {% if complaints.complaint.assigned_to == request.user %}
+                            {% if complaints.complaint.status == 'Resolved' %}
+                              <p class="text-center">--</p>
+                            {% else %}
+                              <a
+                                class="open-modal"
+                                data-url="{% url 'cms:reassign_departments' complaints.id %}"
+                                style="
+                                      text-decoration: none;
+                                      "
+                              >
+                                <i class="fa-solid fa-building"></i>
+                                Handover to Department
+                              </a>
+                            {% endif %}
+                          {% endif %}
+                        </div>
+                        <div>
+                          {% if complaints.complaint.status == 'Resolved' %}
+                            <p class="text-center">--</p>
+                          {% else %}
+                            <a class="open-modal" data-url="{% url 'cms:complaints_remarks' complaints.id %}" style="text-decoration: none;">
+                              <i class="fa-solid fa-pen"></i>
+                              Add Remark
+                            </a>
+                          {% endif %}
+                        </div>
+                        <div>
+                          <a href="{% url 'cms:assigned_complaint_details' complaints.complaint.id %}"
+                            style="text-decoration: none;">
+                            <i class="fa-solid fa-eye"></i>
+                            Details
+                          </a>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                {% endfor %}
+              {% else %}
+                <tr>
+                  <td colspan="100%">No complaints!</td>
+                </tr>
+              {% endif %}
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   </div>
 <!--Modal Block-->
@@ -445,11 +454,11 @@
 
   <script>
     function toggleTask(element) {
-      const wrapper = element.parentElement;
-      wrapper.classList.toggle("active");
+      const body = element.nextElementSibling;
+      body.classList.toggle("active");
 
       const icon = element.querySelector("i");
-      if (wrapper.classList.contains("active")) {
+      if (body.classList.contains("active")) {
         icon.classList.remove("fa-plus");
         icon.classList.add("fa-minus");
       } else {

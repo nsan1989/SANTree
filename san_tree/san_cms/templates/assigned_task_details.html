@@ -54,6 +54,10 @@
               <p class="m-0">{{task.complaint.complaint_type}}</p>
             </li>
             <li class="d-flex">
+              <span class="fw-bold detail-title">Complaint Number:</span>&nbsp;
+              <p class="m-0">{{task.complaint.complaint_number}}</p>
+            </li>
+            <li class="d-flex">
               <span class="fw-bold detail-title">Description:</span>&nbsp;
               {% if task.complaint.description %}
                 <p class="m-0">{{task.complaint.description}}</p>

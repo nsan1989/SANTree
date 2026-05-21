@@ -76,6 +76,7 @@ def accessory_image_path(instance, filename):
 
 # accessory model.
 class AccessoryModel(models.Model):
+    # Add Department
     name = models.CharField(max_length=100)
     category = models.ForeignKey(
         AccessoryCategoryModel,
@@ -119,6 +120,7 @@ def consumable_image_path(instance, filename):
 
 # consumable model.
 class ConsumableModel(models.Model):
+    #
     name = models.CharField(max_length=100)
     category = models.ForeignKey(
         ConsumableCategoryModel,

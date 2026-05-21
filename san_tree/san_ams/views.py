@@ -125,7 +125,7 @@ def AdminDashboardView(request):
         raise PermissionDenied("User profile not found")
     context = {}
     try:
-        activity = AssetRequest.objects.all()
+        activity = AssetRequest.objects.filter(department=current_user.department)
         if activity.exists():
             context["activities"] = activity
         else:
@@ -133,8 +133,10 @@ def AdminDashboardView(request):
         total_asset_users = CustomUsers.objects.filter(
             id__in=AssetModel.objects.values("assigned_to")
         ).count()
-        total_assets = AssetModel.objects.count()
-        total_licenses = LicenseModel.objects.count()
+        assets = AssetModel.objects.filter(department=current_user.department)
+        total_assets = assets.count()
+        licenses = LicenseModel.objects.filter(department=current_user.department)
+        total_licenses = licenses.count()
         total_components = ComponentModel.objects.count()
         total_consumables = ConsumableModel.objects.count()
         total_assessories = AccessoryModel.objects.count()

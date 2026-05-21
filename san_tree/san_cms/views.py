@@ -762,7 +762,10 @@ def ReassignDepartmentView(request, complaint_id):
                 department=department, role="Admin"
             ).first()
             if assign_user:
+                complaint.assigned_to.status = "vacant"
                 complaint.assigned_to = assign_user
+                assign_user.status = "engaged"
+                assign_user.save()
                 complaint.department = department
                 complaint.save()
                 return redirect("cms:assigned_complaint")

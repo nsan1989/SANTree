@@ -35,7 +35,7 @@
           {% endif %}
         </div>
     <!--Right items-->
-        <div class="right-items d-flex align-items-center">
+        <div class="right-items d-flex align-items-center gap-3">
           <div>
             {% if request.user.role != 'Super Admin' %}
               <a class="nav-link text-light d-flex align-items-center" href="{% url 'main_dashboard' %}">
@@ -48,7 +48,7 @@
             {% endif %}
           </div>
           {% if request.user.role != 'Super Admin' %}
-            <div class="px-3">
+            <div>
               <a class="nav-link text-light d-flex align-items-center" href="{% url 'profile' %}">
                 <i class="fa-solid fa-user" title="Profile" style="font-size: 0.9rem; color: #990000;"></i>
               </a>

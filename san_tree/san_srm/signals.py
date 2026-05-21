@@ -34,9 +34,7 @@ def send_push_notification(username, title, message):
 def service_notification(sender, instance, created, **kwargs):
 
     if created and instance.assigned_to:
-        print("Signal triggered")
         staff = instance.assigned_to
-        print("Staff:", staff)
         if not staff:
             return
 
