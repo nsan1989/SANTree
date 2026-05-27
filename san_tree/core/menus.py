@@ -279,7 +279,7 @@ MENU_STRUCTURE = {
         ],
     },
     "vms": {
-        "admin": [
+        "transport_admin": [
             {
                 "name": "Dashboard",
                 "url_name": "vms:vms_admin_dashboard",
@@ -315,6 +315,26 @@ MENU_STRUCTURE = {
                 "url_name": "vms:driver_schedule",
                 "view_name": "DriverScheduleView",
                 "icon": "fa-solid fa-calendar",
+            },
+        ],
+        "admin": [
+            {
+                "name": "Dashboard",
+                "url_name": "vms:vms_admin_dashboard",
+                "view_name": "AdminDashboardView",
+                "icon": "fa-solid fa-chart-line",
+            },
+            {
+                "name": "Upcoming",
+                "url_name": "vms:vms_upcoming_trips",
+                "view_name": "UpcomingTripsView",
+                "icon": "fa-solid fa-calendar",
+            },
+            {
+                "name": "Trips",
+                "url_name": "vms:vms_all_trips",
+                "view_name": "CabRequestView",
+                "icon": "fa-solid fa-car",
             },
         ],
         "user": [

@@ -162,23 +162,23 @@
                                         <div class="request-body-content">
                                             <div>
                                                 <i class="fa-solid fa-exclamation"></i>
-                                                <p>{{ request.booking_type }}</p>
+                                                <p>{{ request.booking_type|default:"NA" }}</p>
                                             </div>
                                             <div>
                                                 <i class="fa-solid fa-location-dot"></i>
-                                                <p>{{ request.pickup_location }}</p>
+                                                <p>{{ request.pickup_location|default:"NA" }}</p>
                                             </div>
                                             <div>
                                                 <i class="fa-solid fa-location-dot"></i>
-                                                <p>{{ request.drop_location }}</p>
+                                                <p>{{ request.drop_location|default:"NA" }}</p>
                                             </div>
                                             <div>
                                                 <i class="fa-solid fa-box"></i>
-                                                <p>{{ request.cargo }}</p>
+                                                <p>{{ request.cargo|default:"NA" }}</p>
                                             </div>
                                             <div>
                                                 <i class="fa-solid fa-car"></i>
-                                                <p>{{ request.vehicle }}</p>
+                                                <p>{{ request.vehicle|default:"NA" }}</p>
                                             </div>
                                         </div>
                                     </td>
@@ -328,15 +328,15 @@
                                         <div class="request-body-content">
                                             <div>
                                                 <i class="fa-solid fa-exclamation"></i>
-                                                <p>{{ request.booking_type }}</p>
+                                                <p>{{ request.booking_type|default:"NA" }}</p>
                                             </div>
                                             <div>
                                                 <i class="fa-solid fa-location-dot"></i>
-                                                <p>{{ request.pickup_location }}</p>
+                                                <p>{{ request.pickup_location|default:"NA" }}</p>
                                             </div>
                                             <div>
                                                 <i class="fa-solid fa-location-dot"></i>
-                                                <p>{{ request.drop_location }}</p>
+                                                <p>{{ request.drop_location|default:"NA" }}</p>
                                             </div>
                                             <div>
                                                 <i class="fa-solid fa-box"></i>
@@ -344,7 +344,7 @@
                                             </div>
                                             <div>
                                                 <i class="fa-solid fa-car"></i>
-                                                <p>{{ request.vehicle }}</p>
+                                                <p>{{ request.vehicle|default:"NA" }}</p>
                                             </div>
                                             <div
                                                 style="height: 4rem;"

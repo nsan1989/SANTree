@@ -558,7 +558,7 @@ def ComplaintView(request):
     except:
         raise PermissionDenied("User profile not found")
 
-    reg_dept = Departments.objects.all()
+    reg_dept = Departments.objects.filter(complaint__isnull=False).distinct()
     dept_id = request.GET.get("department")
     all_status = Complaint._meta.get_field("status").choices
     status_value = request.GET.get("status")

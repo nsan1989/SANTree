@@ -8,7 +8,7 @@ from .models import *
 # complaint resources.
 class ComplaintResource(resources.ModelResource):
     class Meta:
-        models = Complaint
+        model = Complaint
         fields = (
             "id",
             "complaint_number",
