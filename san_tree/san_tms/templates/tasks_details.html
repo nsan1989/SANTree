@@ -22,18 +22,14 @@
             font-family: 'Poppins', sans-serif;
             font-size: 0.9rem;
         }
+        .task-mobile-body {
+            display: none;
+        }
         .task-mobile-body.active {
-            display: block !important;
+            display: table-row;
         }
-        .task-mobile-body div {
+        .task-body-content div {
             display: flex;
-            gap: 0.5rem;
-            margin-bottom: 0.5rem;
-            font-family: 'Poppins', sans-serif;
-            font-size: 0.85rem;
-        }
-        .task-mobile-body p {
-            margin-bottom: 0;
         }
     </style>
 
@@ -53,6 +49,7 @@
                 <h3 class="fw-bold py-2">Tasks Details</h3>
             </div>
         </div>
+        <!--Desktop view-->
         <div class="row d-none d-md-flex">
             <div class="col-12 table-responsive">
                 <table class="table table-bordered">
@@ -80,48 +77,6 @@
                     </tbody>
                 </table>
             </div>
-        </div>
-        <div class="row d-md-none mb-3">
-            <div class="col-12">
-                <div
-                    class="task-mobile-header d-flex align-items-center justify-content-between flex-wrap"
-                    style="
-                           background-color: #7ae1f5;
-                           border: 1px solid #5eb5c7;
-                           border-radius: 0.4rem;
-                           padding: 0.6rem 0.75rem;
-                           gap: 0.5rem;
-                           cursor: pointer;
-                          "
-                    onclick="toggleTaskDetails(this)"
-                >
-                    <div style="flex: 1; min-width: 120px;">
-                        <p class="mb-0 text-truncate fw-semibold">
-                            {{ tasks.tasks_types.name }}
-                        </p>
-                    </div>
-                    <div style="flex-shrink: 0;">
-                        <span class="badge bg-primary">
-                            {{ tasks.status }}
-                        </span>
-                    </div>
-                    <div style="flex-shrink: 0;">
-                        <i class="fa-solid fa-plus"></i>
-                    </div>
-                </div>
-                <div
-                    class="task-mobile-body"
-                    style="display:none; background-color:#fff; padding:0.6rem; border-radius:0.2rem; margin-top:0.3rem;"
-                >
-                    <div><strong>Frequency:</strong><p>{{tasks.task_frequency}}</p></div>
-                    <div><strong>Location:</strong><p>{{tasks.location}}</p></div>
-                    <div><strong>Created At:</strong><p>{{tasks.created_at}}</p></div>
-                    <div><strong>Next Date:</strong><p>{{tasks.next_date}}</p></div>
-                    <div><strong>Status:</strong><p>{{tasks.status}}</p></div>
-                </div>
-            </div>
-        </div>
-        <div class="row d-none d-md-flex">
             <div class="col-12">
                 <div class="remark-title">
                     <h5>Handover History</h5>
@@ -157,36 +112,12 @@
                     </tbody>
                 </table>
             </div>
-        </div>
-        <div class="row d-md-none mb-3">
-            <div class="col-12">
-                <div class="remark-title">
-                    <h5>Handover History</h5>
-                </div>
-            </div>
-            <div class="col-12">
-                {% if handover_history %}
-                    {% for handover in handover_history %}
-                        <div style="background:#fff; border-radius:0.2rem; padding:0.6rem; margin-bottom:0.5rem; font-family:'Poppins', sans-serif; font-size:0.85rem;">
-                            <p><strong>From:</strong> {{ handover.from_user }}</p>
-                            <p><strong>To:</strong> {{ handover.to_user }}</p>
-                            <p><strong>Reason:</strong> {{ handover.reason }}</p>
-                            <p><strong>By:</strong> {{ handover.created_by }}</p>
-                            <p><strong>At:</strong> {{ handover.created_at }}</p>
-                        </div>
-                    {% endfor %}
-                {% else %}
-                    <div style="background:#fff; border-radius:0.2rem; padding:0.6rem;">No handover history!</div>
-                {% endif %}
-            </div>
-        </div>
-        <div class="row">
             <div class="col-12">
                 <div class="remark-title">
                     <h5>Remarks</h5>
                 </div>
             </div>
-            <div class="col-12 table-responsive d-none d-md-block">
+            <div class="col-12 table-responsive">
                 <table class="table table-bordered">
                     <thead class="table-danger">
                         <tr>
@@ -220,7 +151,68 @@
                     </tbody>
                 </table>
             </div>
-            <div class="col-12 d-md-none">
+        </div>
+        <!--Mobile view-->
+        <div class="row d-md-none mb-3">
+            <div class="col-12 mb-2">
+                <table class="table table-bordered">
+                    <thead class="table-danger">
+                        <tr>
+                            <th scope="col">Task No.</th>
+                            <th scope="col">Status</th>
+                            <th scope="col">View</th>
+                        </tr>
+                    </thead>
+                    <tbody class="table-info">
+                        <tr
+                            class="task-summary-row"
+                            onClick="toggleTaskDetails(this)"
+                            style="
+                                   cursor: pointer;
+                                  "
+                        >
+                            <td>{{tasks.tasks_number}}</td>
+                            <td>{{tasks.status}}</td>
+                            <td><i class="fa-solid fa-plus"></i></td>
+                        </tr>
+                        <tr
+                            class="task-mobile-body border"
+                        >
+                            <td colspan="3">
+                                <div class="task-body-content">
+                                    <div><strong>Frequency:</strong>&nbsp;<p>{{tasks.task_frequency}}</p></div>
+                                    <div><strong>Location:</strong>&nbsp;<p>{{tasks.location}}</p></div>
+                                    <div><strong>Created At:</strong>&nbsp;<p>{{tasks.created_at}}</p></div>
+                                    <div><strong>Date:</strong>&nbsp;<p>{{tasks.next_date}}</p></div>
+                                    <div><strong>Status:</strong>&nbsp;<p>{{tasks.status}}</p></div>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-12 mb-2">
+                <div class="handover-title mb-3">
+                    <h5>Handover History</h5>
+                </div>
+                {% if handover_history %}
+                    {% for handover in handover_history %}
+                        <div style="background:#fff; border-radius:0.2rem; padding:0.6rem; margin-bottom:0.5rem; font-family:'Poppins', sans-serif; font-size:0.85rem;">
+                            <p><strong>From:</strong> {{ handover.from_user }}</p>
+                            <p><strong>To:</strong> {{ handover.to_user }}</p>
+                            <p><strong>Reason:</strong> {{ handover.reason }}</p>
+                            <p><strong>By:</strong> {{ handover.created_by }}</p>
+                            <p><strong>At:</strong> {{ handover.created_at }}</p>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div style="background:#fff; border-radius:0.2rem; padding:0.6rem;">No handover history!</div>
+                {% endif %}
+            </div>
+            <div class="col-12">
+                <div class="remark-title mb-3">
+                    <h5>Remarks</h5>
+                </div>
                 {% if remark %}
                     {% for remarks in remark %}
                         <div style="background:#fff; border-radius:0.2rem; padding:0.6rem; margin-bottom:0.5rem; font-family:'Poppins', sans-serif; font-size:0.85rem;">

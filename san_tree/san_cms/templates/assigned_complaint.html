@@ -144,7 +144,7 @@
       </div>
     </div>
     <!--Desktop View-->
-    <div class="col-12 d-none d-lg-flex table-responsive">
+    <div class="col-12 d-none d-md-flex table-responsive">
       <table class="table table-bordered">
         <thead class="table-danger">
           <tr style="font-family: 'Open Sans', sans-serif;">
@@ -181,9 +181,9 @@
                         <select name="status" required>
                           <option value="">select</option>
                           {% if complaints.complaint.status == "Open" %}
-                          <option value="In Progress" {% if complaints.status == 'In Progress' %} selected {% endif %}>In Progress</option>
+                            <option value="In Progress" {% if complaints.status == 'In Progress' %} selected {% endif %}>In Progress</option>
                           {% elif complaints.complaint.status == "In Progress" %}
-                          <option value="Resolved" {% if complaints.status == 'Resolved' %} selected {% endif %}>Resolved</option>
+                            <option value="Resolved" {% if complaints.status == 'Resolved' %} selected {% endif %}>Resolved</option>
                           {% endif %}
                         </select>
                         <button class="btn btn-sm btn-primary mt-2" type="submit">Update</button>
@@ -320,13 +320,15 @@
                                 class="open-modal"
                                 data-url="{% url 'cms:reassign_complaints' complaints.id %}"
                                 style="
-                                      text-decoration: none;
+                                       text-decoration: none;
                                       "
                               >
                                 <i class="fa-solid fa-handshake-simple"></i>
                                 Assigned to Staff
                               </a>
                             {% endif %}
+                          {% else %}
+                            <p class="text-center">--</p>
                           {% endif %}
                         </div>
                         <div>
@@ -338,13 +340,15 @@
                                 class="open-modal"
                                 data-url="{% url 'cms:reassign_departments' complaints.id %}"
                                 style="
-                                      text-decoration: none;
+                                       text-decoration: none;
                                       "
                               >
                                 <i class="fa-solid fa-building"></i>
                                 Handover to Department
                               </a>
                             {% endif %}
+                          {% else %}
+                            <p class="text-center">--</p>
                           {% endif %}
                         </div>
                         <div>
@@ -359,7 +363,7 @@
                         </div>
                         <div>
                           <a href="{% url 'cms:assigned_complaint_details' complaints.complaint.id %}"
-                            style="text-decoration: none;">
+                             style="text-decoration: none;">
                             <i class="fa-solid fa-eye"></i>
                             Details
                           </a>

@@ -102,4 +102,9 @@ urlpatterns = [
         name="ajax_load_complaint_types",
     ),
     path("export/excel/", TasksExport, name="export_tasks_excel"),
+    path(
+        "incharge/department_complaints/",
+        AdminAllComplaints,
+        name="department_complaints",
+    ),
 ]

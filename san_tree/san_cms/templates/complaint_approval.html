@@ -46,8 +46,12 @@
       color: white;
     }
 
+    .complaint-body {
+      display: none;
+    }
+
     .complaint-body.active {
-      display: block !important;
+      display: table-row;
     }
 
     .complaint-body div {
@@ -70,64 +74,42 @@
         </div>
       </div>
     </div>
+    <!--Pagination-->
     <div class="row mb-3">
-      <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 mb-2">
-        <nav>
-          <ul class="pagination">
-            {% if page_obj.has_previous %}
-              <li class="page-item">
-                <a class="page-link"
-                   href="?page={{ page_obj.previous_page_number }}">Previous</a>
-              </li>
-            {% endif %}
+      <nav>
+        <ul class="pagination">
+          {% if page_obj.has_previous %}
+            <li class="page-item">
+              <a class="page-link"
+                 href="?page={{ page_obj.previous_page_number }}">Previous</a>
+            </li>
+          {% endif %}
 
-            {% for num in page_obj.paginator.page_range %}
-              {% if num >= page_obj.number|add:'-2' and num <= page_obj.number|add:'2' %}
-                {% if page_obj.number == num %}
-                  <li class="page-item active"><span class="page-link">{{ num }}</span></li>
-                {% else %}
-                  <li class="page-item">
-                    <a class="page-link"
-                       href="?page={{ num }}">{{ num
-                      }}</a>
-                  </li>
-                {% endif %}
+          {% for num in page_obj.paginator.page_range %}
+            {% if num >= page_obj.number|add:'-2' and num <= page_obj.number|add:'2' %}
+              {% if page_obj.number == num %}
+                <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+              {% else %}
+                <li class="page-item">
+                  <a class="page-link"
+                     href="?page={{ num }}">{{ num
+                    }}</a>
+                </li>
               {% endif %}
-            {% endfor %}
-
-            {% if page_obj.has_next %}
-              <li class="page-item">
-                <a class="page-link"
-                   href="?page={{ page_obj.next_page_number }}">Next</a>
-              </li>
             {% endif %}
-          </ul>
-        </nav>
-      </div>
-      <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 col-xl-8 d-flex justify-content-end align-items-center">
-        <form method="get" action="{% url 'cms:export_tasks_excel' %}" class="export-form">
-          <div class="row d-flex gap-2">
-            <div class="col-auto">
-              <div class="form-group" style="display: flex; flex-direction: column;">
-                <input type="date" id="start_date" name="start_date" class="form-control form-control-sm"
-                       style="max-width: 140px;" required>
-              </div>
-            </div>
-            <div class="col-auto">
-              <div class="form-group" style="display: flex; flex-direction: column;">
-                <input type="date" id="end_date" name="end_date" class="form-control form-control-sm"
-                       style="max-width: 140px;" required>
-              </div>
-            </div>
-          </div>
-        </form>
-        <a class="btn btn-sm btn-primary ms-2" href="{% url 'cms:export_tasks_excel' %}" style="text-decoration: none;">
-          <i class="fa-solid fa-up-right-from-square"></i>
-          &nbsp;export
-        </a>
-      </div>
+          {% endfor %}
+
+          {% if page_obj.has_next %}
+            <li class="page-item">
+              <a class="page-link"
+                 href="?page={{ page_obj.next_page_number }}">Next</a>
+            </li>
+          {% endif %}
+        </ul>
+      </nav>
     </div>
     <div class="row w-100 m-0">
+      <!--Desktop view-->
       <div class="col-12 d-none d-lg-flex table-responsive p-0">
         <table class="table table-bordered">
           <thead class="table-danger">
@@ -222,6 +204,7 @@
           </tbody>
         </table>
       </div>
+      <!--Mobile view-->
       <div class="col-12 d-md-none p-0">
         <div class="complaint-title mb-3">
           <h5
@@ -233,123 +216,109 @@
             Complaint List
           </h5>
         </div>
-        {% if page_obj %}
-          {% for complaints in page_obj %}
-            <div class="complaint-wrapper">
-              <div
-                class="complaint-header"
-                style="
-                       background-color: #7ae1f5;
-                       border: 1px solid #5eb5c7;
-                       font-family: 'Poppins', sans-serif;
-                       display: flex;
-                       justify-content: space-between;
-                       padding: 0.5rem;
-                       border-radius: 0.2rem;
-                      "
-                onClick="toggleTask(this)"
-              >
-                <div>
-                  {{complaints.complaint.complaint_number}}
-                </div>
-                <div>
-                  {{complaints.complaint.status}}
-                </div>
-                <div>
-                  {{complaints.complaint.priority}}
-                </div>
-                <div>
-                  <i class="fa-solid fa-plus"></i>
-                </div>
-              </div>
-              <div
-                class="complaint-body"
-                style="
-                       display: none;
-                       align-items: center;
-                       background-color: #fff;
-                       padding: 0.5rem;
-                       font-family: 'Poppins', sans-serif;
-                      "
-              >
-                <div>
-                  <i class="fa-regular fa-building"></i>
-                  <p>{{complaints.complaint.created_by.department}}</p>
-                </div>
-                <div>
-                  <i class="fa-regular fa-clipboard"></i>
-                  <p>{{complaints.complaint.complaint_type}}</p>
-                </div>
-                <div>
-                  <i class="fa-solid fa-location-dot"></i>
-                  <p>{{complaints.complaint.location}}</p>
-                </div>
-                <div>
-                  <i class="fa-regular fa-calendar"></i>
-                  <p>{{complaints.complaint.created_at}}</p>
-                </div>
-                <div>
-                  <i class="fa-regular fa-flag"></i>
-                  {% if complaints.complaint.assigned_to == request.user %}
-                    {% if complaints.complaint.status != 'Cancelled' and complaints.complaint.status != 'Resolved' %}
-                      <form method="POST" action="{% url 'cms:review_complaint_update_status' complaints.complaint.id %}">
-                        {% csrf_token %}
-                        <select name="status" required>
-                          <option value="">select</option>
-                          <option value="Open" {% if complaints.status == 'Open' %} selected {% endif %}>Open</option>
-                          <option value="Rejected" {% if complaints.status == 'Rejected' %} selected {% endif %}>Rejected</option>
-                        </select>
-                        <button class="btn btn-sm btn-primary" type="submit">Update</button>
-                      </form>
-                    {% elif complaints.complaint.status != 'Review' %}
-                      <form method="POST" action="{% url 'cms:review_complaint_update_status' complaints.complaint.id %}">
-                        {% csrf_token %}
-                        <select name="status" required>
-                          <option value="">select</option>
-                          <option value="Rejected" {% if complaints.status == 'Rejected' %} selected {% endif %}>Rejected</option>
-                          <option value="Resolved" {% if complaints.status == 'Resolved' %} selected {% endif %}>Resolved</option>
-                        </select>
-                        <button class="btn btn-sm btn-primary" type="submit">Update</button>
-                      </form>
-                    {% else %}
-                      <p>--</p>
-                    {% endif %}
-                  {% else %}
-                    <p>--</p>
-                  {% endif %}
-                </div>
-                <div>
-                  {% if complaints.complaint.status == 'Resolved' %}
-                    <td class="text-center">--</td>
-                  {% else %}
-                    <a class="open-modal" data-url="{% url 'cms:complaints_remarks' complaints.id %}" style="text-decoration: none;">
-                      <i class="fa-solid fa-pen"></i>
-                      Add Remark
-                    </a>
-                  {% endif %}
-                </div>
-                <div>
-                  <a href="{% url 'cms:review_complaint_details' complaints.complaint.id %}" style="text-decoration: none;">
-                    <i class="fa-solid fa-eye" title="view details"></i>
-                    View Details
-                  </a>
-                </div>
-              </div>
-            </div>
-          {% endfor %}
-        {% else %}
-          <div
-            class="complaint-header"
-            style="
-                   background-color: #7ae1f5;
-                   font-family: 'Poppins', sans-serif;
-                   border-radius: 0.2rem;
-                   padding: 0.5rem;
-                  "
-          >
-            <p class="mb-0">No Complaints!</p>
-          </div>
-        {% endif %}
+        <div class="complaint-wrapper">
+          <table class="table table-bordered">
+            <thead class="table-danger">
+              <tr>
+                <th scope="col">Comp. No.</th>
+                <th scope="col">Status</th>
+                <th scope="col">Priority</th>
+                <th scope="col">View</th>
+              </tr>
+            </thead>
+            <tbody class="table-info">
+
+              {% if page_obj %}
+                {% for complaints in page_obj %}
+                  <tr
+                    class="complaint-summary-row"
+                    onClick="toggleTask(this)"
+                  >
+                    <td>{{complaints.complaint.complaint_number}}</td>
+                    <td>{{complaints.complaint.status}}</td>
+                    <td>{{complaints.complaint.priority}}</td>
+                    <td><i class="fa-solid fa-plus"></i></td>
+                  </tr>
+                  <tr class="complaint-body">
+                    <td colspan="4">
+                      <div>
+                        <i class="fa-regular fa-building"></i>
+                        <p>{{complaints.complaint.created_by.department}}</p>
+                      </div>
+                      <div>
+                        <i class="fa-regular fa-clipboard"></i>
+                        <p>{{complaints.complaint.complaint_type}}</p>
+                      </div>
+                      <div>
+                        <i class="fa-solid fa-info"></i>
+                        <p>{{complaints.complaint.description}}</p>
+                      </div>
+                      <div>
+                        <i class="fa-solid fa-location-dot"></i>
+                        <p>{{complaints.complaint.location}}</p>
+                      </div>
+                      <div>
+                        <i class="fa-regular fa-calendar"></i>
+                        <p>{{complaints.complaint.created_at}}</p>
+                      </div>
+                      <div>
+                        <i class="fa-regular fa-flag"></i>
+                        {% if complaints.complaint.assigned_to == request.user %}
+                          {% if complaints.complaint.status != 'Cancelled' and complaints.complaint.status != 'Resolved' %}
+                            <form method="POST" action="{% url 'cms:review_complaint_update_status' complaints.complaint.id %}">
+                              {% csrf_token %}
+                              <select name="status" required>
+                                <option value="">select</option>
+                                <option value="Open" {% if complaints.status == 'Open' %} selected {% endif %}>Open</option>
+                                <option value="Rejected" {% if complaints.status == 'Rejected' %} selected {% endif %}>Rejected</option>
+                              </select>
+                              <button class="btn btn-sm btn-primary" type="submit">Update</button>
+                            </form>
+                          {% elif complaints.complaint.status != 'Review' %}
+                            <form method="POST" action="{% url 'cms:review_complaint_update_status' complaints.complaint.id %}">
+                              {% csrf_token %}
+                              <select name="status" required>
+                                <option value="">select</option>
+                                <option value="Rejected" {% if complaints.status == 'Rejected' %} selected {% endif %}>Rejected</option>
+                                <option value="Resolved" {% if complaints.status == 'Resolved' %} selected {% endif %}>Resolved</option>
+                              </select>
+                              <button class="btn btn-sm btn-primary" type="submit">Update</button>
+                            </form>
+                          {% else %}
+                            <p>--</p>
+                          {% endif %}
+                        {% else %}
+                          <p>--</p>
+                        {% endif %}
+                      </div>
+                      <div>
+                        {% if complaints.complaint.status == 'Resolved' %}
+                          <td class="text-center">--</td>
+                        {% else %}
+                          <a class="open-modal" data-url="{% url 'cms:complaints_remarks' complaints.id %}" style="text-decoration: none;">
+                            <i class="fa-solid fa-pen"></i>
+                            Add Remark
+                          </a>
+                        {% endif %}
+                      </div>
+                      <div>
+                        <a href="{% url 'cms:review_complaint_details' complaints.complaint.id %}" style="text-decoration: none;">
+                          <i class="fa-solid fa-eye" title="view details"></i>
+                          View Details
+                        </a>
+                      </div>
+                    </td>
+                  </tr>
+                {% endfor %}
+              {% else %}
+                <tr
+                >
+                  <td colspan="100%">No Complaints!</td>
+                </tr>
+              {% endif %}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   </div>

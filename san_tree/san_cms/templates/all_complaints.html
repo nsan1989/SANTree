@@ -217,92 +217,92 @@
                       >
                         <div
                           class="complaint-detail-content"      "
-                        >
-                          <div>
-                            <i class="fa-regular fa-building"></i>
-                            <p>{{complaint.complaint.department}}</p>
-                          </div>
-                          <div>
-                            <i class="fa-regular fa-calendar"></i>
-                            <p>{{complaint.complaint.created_at}}</p>
-                          </div>
-                          <div>
-                            <i class="fa-solid fa-magnifying-glass-chart"></i>
-                            {% if complaint.status_changed_to != 'Cancelled' %}
-                              {% if complaint.complaint.status not in 'In Progress,Resolved,Closed,Review,Rejected' %}
-                                <form method="POST" action="{% url 'cms:cancel_complaint' complaint.id %}">
-                                  {% csrf_token %}
-                                  <input type="hidden" name="status" value="Cancelled">
-                                  <button class="btn btn-danger" type="submit" aria-label="Cancel Complaint">Cancel</button>
-                                </form>
-                              {% else %}
-                                <p style="font-family:'Poppins', sans-serif;">Cancel window closed</p>
-                              {% endif %}
-                            {% else %}
-                              <p style="font-family:'Poppins', sans-serif;">Cancel window closed</p>
-                            {% endif %}
-                          </div>
-                          <div>
-                            <i class="fa-regular fa-calendar"></i>
-                            <p>{{complaint.timestamp}}</p>
-                          </div>
-                          <div>
-                            <i class="fa-regular fa-calendar"></i>
-                            <p>{{complaint.complaint.completed_at}}</p>
-                          </div>
-                          <div>
-                            <i class="fa-regular fa-clock"></i>
-                            <p>{{ complaint.complaint.time_taken|duration_display }}</p>
-                          </div>
-                          <div>
-                            {% if request.user.role == 'User' %}
-                              <a
-                                href="{% url 'cms:staff_complaints_details' complaint.id %}"
-                                style="text-decoration: none; display: flex;"
-                              >
-                                <i class="fa-solid fa-eye"></i>
-                                <p>View Details</p>
-                              </a>
-                            {% elif request.user.role == 'Admin' %}
-                              <a
-                                href="{% url 'cms:incharge_complaints_details' complaint.id %}"
-                                style="text-decoration: none; display: flex;"
-                              >
-                                <i class="fa-solid fa-eye"></i>
-                                <p>View Details</p>
-                              </a>
-                            {% endif %}
-                          </div>
-                        </div>
-                      </td>
-                    </tr>
-                  {% endfor %}
-                {% else %}
-                  <tr>
-                    <td colspan="100%">No complaints!</td>
-                  </tr>
-                {% endif %}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+                                                                 >
+                                                                 <div>
+                                                                 <i class="fa-regular fa-building"></i>
+                                                                                                                            <p>{{complaint.complaint.department}}</p>
+                                                                                                                            </div>
+                                                                                                                            <div>
+                                                                                                                            <i class="fa-regular fa-calendar"></i>
+                                                                                                                                                                                       <p>{{complaint.complaint.created_at}}</p>
+                                                                                                                                                                                       </div>
+                                                                                                                                                                                       <div>
+                                                                                                                                                                                       <i class="fa-solid fa-magnifying-glass-chart"></i>
+                                                                                                                                                                                                                                                              {% if complaint.status_changed_to != 'Cancelled' %}
+                                                                                                                                                                                                                                                                {% if complaint.complaint.status not in 'In Progress,Resolved,Closed,Review,Rejected' %}
+                                                                                                                                                                                                                                                                  <form method="POST" action="{% url 'cms:cancel_complaint' complaint.id %}">
+                                                                                                                                                                                                                                                                                                                                                                          {% csrf_token %}
+                                                                                                                                                                                                                                                                                                                                                                          <input type="hidden" name="status" value="Cancelled">
+                                                                                                                                                                                                                                                                                                                                                                                                                       <button class="btn btn-danger" type="submit" aria-label="Cancel Complaint">Cancel</button>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                    </form>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                  {% else %}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <p style="font-family:'Poppins', sans-serif;">Cancel window closed</p>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  {% endif %}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                {% else %}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  <p style="font-family:'Poppins', sans-serif;">Cancel window closed</p>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  {% endif %}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  </div>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  <div>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  <i class="fa-regular fa-calendar"></i>
+                                                                                                                                                                                                                                                                                                                                                                                                                                       <p>{{complaint.timestamp}}</p>
+                                                                                                                                                                                                                                                                                                                                                                                                                                       </div>
+                                                                                                                                                                                                                                                                                                                                                                                                                                       <div>
+                                                                                                                                                                                                                                                                                                                                                                                                                                       <i class="fa-regular fa-calendar"></i>
+                                                                                                                                                                                                                                                                                                                                                                                                                <p>{{complaint.complaint.completed_at}}</p>
+                                                                                                                                                                                                                                                                                                                                                                                                                </div>
+                                                                                                                                                                                                                                                                                                                                                                                                                <div>
+                                                                                                                                                                                                                                                                                                                                                                                                                <i class="fa-regular fa-clock"></i>
+                                                                                                                                                                                                                                                                                                                                                              <p>{{ complaint.complaint.time_taken|duration_display }}</p>
+                                                                                                                                                                                                                                                                                                                                                              </div>
+                                                                                                                                                                                                                                                                                                                                                              <div>
+                                                                                                                                                                                                                                                                                                                                                              {% if request.user.role == 'User' %}
+                                                                                                                                                                                                                                                                                                                                                                <a
+                                                                                                                                                                                                                                                                                                                                                                href="{% url 'cms:staff_complaints_details' complaint.id %}"
+                                                                                        style="text-decoration: none; display: flex;"
+                                                                         >
+                                                                         <i class="fa-solid fa-eye"></i>
+                                                                                                                               <p>View Details</p>
+                                                                                                                               </a>
+                                                                                                                             {% elif request.user.role == 'Admin' %}
+                                                                                                                               <a
+                                                                                                                               href="{% url 'cms:incharge_complaints_details' complaint.id %}"
+                                                                                           style="text-decoration: none; display: flex;"
+                                                                         >
+                                                                         <i class="fa-solid fa-eye"></i>
+                                                                                                                               <p>View Details</p>
+                                                                                                                               </a>
+                                                                                                                             {% endif %}
+                                                                                                                             </div>
+                                                                                                                             </div>
+                                                                                                                             </td>
+                                                                                                                             </tr>
+                                                                                                                     {% endfor %}
+                                                                                                                   {% else %}
+                                                                                                                     <tr>
+                                                                                                                     <td colspan="100%">No complaints!</td>
+                                                                                                                                                         </tr>
+                                                                                                                                                       {% endif %}
+                                                                                                                                                       </tbody>
+                                                                                                                                                       </table>
+                                                                                                                                                       </div>
+                                                                                                                                                       </div>
+                                                                                                                                                       </div>
+                                                                                                                                                       </div>
+                                                                                                                                                       </div>
 
-  <script>
-    function toggleTask(element) {
-      const body = element.nextElementSibling;
-      body.classList.toggle("active");
+                                                                                                                                                       <script>
+                                                                                                                                                       function toggleTask(element) {
+                                                                                                                                                       const body = element.nextElementSibling;
+                                                                                                                                                       body.classList.toggle("active");
 
-      const icon = element.querySelector("i");
-      if (body.classList.contains("active")) {
-        icon.classList.remove("fa-plus");
-        icon.classList.add("fa-minus");
-      } else {
-        icon.classList.remove("fa-minus");
-        icon.classList.add("fa-plus");
-      }
-    }
-  </script>
-{% endblock %}
+                                                                                                                                                                                                     const icon = element.querySelector("i");
+                                                                                                                                                                                                                                                           if (body.classList.contains("active")) {
+                                                                                                                                                                                                                                                                      icon.classList.remove("fa-plus");
+                                                                                                                                                                                                                                                             icon.classList.add("fa-minus");
+                                                                                                                                                                                                                                                          } else {
+                                                                                                                                                                                                                                                          icon.classList.remove("fa-minus");
+                                                                                                                                                                                                                                                            icon.classList.add("fa-plus");
+                                                                                                                                                                                                                                                  }
+                                                                                                                                                                                                                                                  }
+                                                                                                                                                                                                                                                  </script>
+                                                                                                                                                                                                                                  {% endblock %}

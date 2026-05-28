@@ -21,6 +21,11 @@ MENU_STRUCTURE = {
                 "url_name": "cms:assigned_complaint",
                 "icon": "fa-regular fa-square-check",
             },
+            {
+                "name": "All Complaints",
+                "url_name": "cms:department_complaints",
+                "icon": "fa-solid fa-list",
+            },
         ],
         "user": [
             {

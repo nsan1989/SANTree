@@ -1,0 +1,165 @@
+{% extends 'index.html' %}
+{% load static %}
+
+{% block title %}
+    Department Complaints
+{% endblock %}
+
+{% block start %}
+
+    <style>
+        .content-header h3 {
+            color: wheat;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        thead,
+        tbody {
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .complaint-body {
+            display: none;
+        }
+
+        .complaint-body.active {
+            display: table-row;
+        }
+
+        .complaint-body div {
+            display: flex;
+            gap: 0.5rem;
+        }
+    </style>
+
+    <div class="container-fluid">
+        <div class="content-header mb-3">
+            <h3>Department Complaints</h3>
+        </div>
+        <div class="complaint-content">
+        <!--Desktop view-->
+            <div class="row d-none d-md-flex">
+                <div class="col-12">
+                    <table class="table table-bordered">
+                        <thead class="table-danger">
+                            <tr>
+                                <th scope="col">Comp. No.</th>
+                                <th scope="col">Comp. Type</th>
+                                <th scope="col">Status</th>
+                                <th scope="col">Priority</th>
+                                <th scope="col">Created By</th>
+                                <th scope="col">Assigned to</th>
+                                <th scope="col">Completed At</th>
+                            </tr>
+                        </thead>
+                        <tbody class="table-info">
+                            {% if comp %}
+                                {% for c in comp %}
+                                    <tr>
+                                        <td>{{c.complaint_number}}</td>
+                                        <td>{{c.complaint_type}}</td>
+                                        <td>{{c.status}}</td>
+                                        <td>{{c.priority}}</td>
+                                        <td>{{c.created_by}}</td>
+                                        <td>{{c.assigned_to}}</td>
+                                        <td>{{c.completed_at|default:"No Data"}}</td>
+                                    </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td>No Complaints!</td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        <!--Mobile View-->
+            <div class="row d-md-none">
+                <div class="col-12">
+                    <table class="table table-bordered">
+                        <thead class="table-danger">
+                            <tr>
+                                <th scope="col">No.</th>
+                                <th scope="col">Status</th>
+                                <th scope="col">Priority</th>
+                                <th scope="col">View</th>
+                            </tr>
+                        </thead>
+                        <tbody class="table-info">
+                            {% if comp %}
+                                {% for c in comp %}
+                                    <tr
+                                        class="complaint-summary-row"
+                                        onClick="toggleTask(this)"
+                                    >
+                                        <td>{{c.complaint_number}}</td>
+                                        <td>{{c.status}}</td>
+                                        <td>{{c.priority}}</td>
+                                        <td><i class="fa-solid fa-plus"></i></td>
+                                    </tr>
+                                    <tr class="complaint-body">
+                                        <td colspan="4">
+                                            <div>
+                                                <i class="fa-regular fa-building"></i>
+                                                <p>{{c.department}}</p>
+                                            </div>
+                                            <div>
+                                                <i class="fa-regular fa-clipboard"></i>
+                                                <p>{{c.complaint_type}}</p>
+                                            </div>
+                                            <div>
+                                                <i class="fa-solid fa-location-pin"></i>
+                                                <p>{{c.location}}</p>
+                                            </div>
+                                            <div>
+                                                <i class="fa-solid fa-info"></i>
+                                                <p>{{c.description}}</p>
+                                            </div>
+                                            <div>
+                                                <i class="fa-solid fa-user"></i>
+                                                <p>{{c.assigned_to}}</p>
+                                            </div>
+                                            <div>
+                                                <i class="fa-solid fa-user"></i>
+                                                <p>{{c.created_by}}</p>
+                                            </div>
+                                            <div>
+                                                <i class="fa-regular fa-calendar"></i>
+                                                <p>{{c.created_at}}</p>
+                                            </div>
+                                            <div>
+                                                <i class="fa-regular fa-calendar"></i>
+                                                <p>{{c.completed_at|default:"No Data"}}</p>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="100%">No Complaints!</td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleTask(element) {
+            const body = element.nextElementSibling;
+            body.classList.toggle("active");
+
+            const icon = element.querySelector("i");
+            if (body.classList.contains("active")) {
+                icon.classList.remove("fa-plus");
+                icon.classList.add("fa-minus");
+            } else {
+                icon.classList.remove("fa-minus");
+                icon.classList.add("fa-plus");
+            }
+        }
+    </script>
+{% endblock %}

@@ -111,294 +111,271 @@
               </ul>
             </nav>
           </div>
-
-        <!-- Export Section -->
-          <div class="col-12 col-md-6 mb-3">
-            <div class="export-button d-flex justify-content-md-end">
-              <form method="get" action="{% url 'cms:export_tasks_excel' %}" class="export-form d-flex flex-wrap gap-2"
-                    style="font-size: 0.875rem;">
-                <div class="form-group">
-                  <input type="date" id="start_date" name="start_date" class="form-control form-control-sm"
-                         style="max-width: 140px;" required>
-                </div>
-                <div class="form-group">
-                  <input type="date" id="end_date" name="end_date" class="form-control form-control-sm"
-                         style="max-width: 140px;" required>
-                </div>
-                <a class="btn btn-sm btn-primary d-flex align-items-center" href="{% url 'cms:export_tasks_excel' %}"
-                   style="text-decoration: none;">
-                  <i class="fa-solid fa-up-right-from-square"></i>
-                  &nbsp;export
-                </a>
-              </form>
-            </div>
-          </div>
         </div>
-      </div>
-      <div class="col-12 d-none d-lg-flex table-responsive">
-        <table class="table table-bordered">
-          <thead class="table-primary">
-            <tr>
-              <th scope="col">Complaint No.</th>
-              <th scope="col">Created By</th>
-              <th scope="col">Complaint</th>
-              <th scope="col">Location</th>
-              <th scope="col">Priority</th>
-              <th scope="col">Status</th>
-              <th scope="col">Created At</th>
-              <th scope="col">Status</th>
-              <th scope="col">Remarks</th>
-              <th scope="col">Details</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% if page_obj %}
-              {% for task in page_obj %}
-                <tr
-                  {% if task.complaint.status == 'In Progress' %}
-                    class="status-progress"
-                  {% elif task.complaint.status == 'Resolved' %}
-                    class="status-resolved"
-                  {% elif task.complaint.status == 'Closed' %}
-                    class="status-closed"
-                  {% elif task.complaint.status == 'Cancelled' %}
-                    class="status-cancelled"
-                  {% endif %}
-                >
-                  <td>{{task.complaint.complaint_number}}</td>
-                  <td>{{task.complaint.created_by.department}}</td>
-                  <td>{{task.complaint.complaint_type}}</td>
-                  <td>{{task.complaint.location}}</td>
-                  <td>{{task.complaint.priority}}</td>
-                  <td>{{task.complaint.status}}</td>
-                  <td>{{task.complaint.created_at}}</td>
-                  {% if task.complaint.status != 'Cancelled' and task.complaint.status != 'Resolved' and task.complaint.status != 'Halt' and task.complaint.status != 'Review' %}
-                    <td class="d-flex align-items-center">
-                      <form method="POST" action="{% url 'cms:staff_update_complaint_status' task.complaint.id %}">
-                        {% csrf_token %}
-                        <select name="status" required>
-                          <option value="">select</option>
-                          <option value="Review" {% if complaints.status == 'Review' %} selected {% endif %}>Review</option>
-                        </select>
-                        <button class="btn btn-sm btn-primary mt-2" type="submit">Update</button>
-                      </form>
-                    </td>
-                  {% else %}
-                    <td>--</td>
-                  {% endif %}
-                  {% if task.complaint.status == 'Resolved' %}
-                    <td class="text-center">--</td>
-                  {% else %}
-                    <td class="text-center"><a class="open-modal"
-                                               data-url="{% url 'cms:complaints_remarks' task.complaint.id %}"><i class="fa-solid fa-pen"></i></a></td>
-                  {% endif %}
-                  <td class="text-center"><a href="{% url 'cms:staff_assigned_tasks_details' task.complaint.id %}"
-                                             style="text-decoration: none;"><i class="fa-solid fa-eye"></i></a></td>
-                </tr>
-              {% endfor %}
-            {% else %}
-              <tr>
-                <td colspan="10">No complaints!</td>
-              </tr>
-            {% endif %}
-          </tbody>
-        </table>
-      </div>
-      <!--Mobile view-->
-      <div class="col-12 d-md-none">
-        <div class="task-title mb-3">
-          <h5 class="fw-bold">Complaint List</h5>
-        </div>
-        <div class="task-content table-responsive">
+        <div class="col-12 d-none d-md-flex table-responsive">
           <table class="table table-bordered">
-            <thead class="table-danger">
+            <thead class="table-primary">
               <tr>
-                <th scope="col">No.</th>
-                <th scope="col">Status</th>
+                <th scope="col">Complaint No.</th>
+                <th scope="col">Created By</th>
+                <th scope="col">Complaint</th>
+                <th scope="col">Location</th>
                 <th scope="col">Priority</th>
-                <th scope="col">Detail</th>
+                <th scope="col">Status</th>
+                <th scope="col">Created At</th>
+                <th scope="col">Status</th>
+                <th scope="col">Remarks</th>
+                <th scope="col">Details</th>
               </tr>
             </thead>
-            <tbody class="table-info">
+            <tbody>
               {% if page_obj %}
                 {% for task in page_obj %}
                   <tr
-                    class="task-summary-row"
-                    onClick="toggleTask(this)"
+                    {% if task.complaint.status == 'In Progress' %}
+                      class="status-progress"
+                    {% elif task.complaint.status == 'Resolved' %}
+                      class="status-resolved"
+                    {% elif task.complaint.status == 'Closed' %}
+                      class="status-closed"
+                    {% elif task.complaint.status == 'Cancelled' %}
+                      class="status-cancelled"
+                    {% endif %}
                   >
                     <td>{{task.complaint.complaint_number}}</td>
-                    <td>{{task.complaint.status}}</td>
+                    <td>{{task.complaint.created_by.department}}</td>
+                    <td>{{task.complaint.complaint_type}}</td>
+                    <td>{{task.complaint.location}}</td>
                     <td>{{task.complaint.priority}}</td>
-                    <td><i class="fa-solid fa-plus"></i></td>
-                  </tr>
-                  <tr
-                    class="task-body"
-                  >
-                    <td
-                      colspan="4"
-                    >
-                      <div class="task-detail-content">
-                        <div>
-                          <i class="fa-regular fa-user"></i>
-                          <p>{{task.complaint.created_by.department}}</p>
-                        </div>
-                        <div>
-                          <i class="fa-regular fa-clipboard"></i>
-                          <p>{{task.complaint.complaint_type}}</p>
-                        </div>
-                        <div>
-                          <i class="fa-solid fa-location-dot"></i>
-                          <p>{{task.complaint.location}}</p>
-                        </div>
-                        <div>
-                          <i class="fa-regular fa-flag"></i>
-                          <p>{{task.complaint.priority}}</p>
-                        </div>
-                        <div>
-                          <i class="fa-regular fa-calendar"></i>
-                          <p>{{task.complaint.created_at}}</p>
-                        </div>
-                        <div class="d-flex align-items-center">
-                          <i class="fa-solid fa-magnifying-glass-chart"></i>
-                          {% if task.complaint.status != 'Cancelled' and task.complaint.status != 'Resolved' and task.complaint.status != 'Halt' %}
-                            <form method="POST" action="{% url 'cms:staff_update_complaint_status' task.complaint.id %}">
-                              {% csrf_token %}
-                              <select name="status" required>
-                                <option value="">select</option>
-                                <option value="Review" {% if complaints.status == 'Review' %} selected {% endif %}>Review</option>
-                              </select>
-                              <button class="btn btn-sm btn-primary" type="submit">Update</button>
-                            </form>
-                          {% else %}
-                            <p>--</p>
-                          {% endif %}
-                        </div>
-                        <div class="d-flex align-items-center">
-                          {% if task.complaint.status == 'Resolved' %}
-                            <p class="text-center">--</p>
-                          {% else %}
-                            <a
-                              class="open-modal d-flex"
-                              data-url="{% url 'cms:complaints_remarks' task.complaint.id %}"
-                              style="text-decoration: none;"
-                            >
-                              <i class="fa-solid fa-pen"></i>
-                              <p>Add Remark</p>
-                            </a>
-                          {% endif %}
-                        </div>
-                        <div>
-                          <a
-                            class="d-flex align-items-center"
-                            href="{% url 'cms:staff_assigned_tasks_details' task.complaint.id %}"
-                            style="text-decoration: none;"
-                          >
-                            <i class="fa-solid fa-eye"></i>
-                            <p>See Details</p>
-                          </a>
-                        </div>
-                      </div>
-                    </td>
+                    <td>{{task.complaint.status}}</td>
+                    <td>{{task.complaint.created_at}}</td>
+                    {% if task.complaint.status != 'Cancelled' and task.complaint.status != 'Resolved' and task.complaint.status != 'Halt' and task.complaint.status != 'Review' %}
+                      <td class="d-flex align-items-center">
+                        <form method="POST" action="{% url 'cms:staff_update_complaint_status' task.complaint.id %}">
+                          {% csrf_token %}
+                          <select name="status" required>
+                            <option value="">select</option>
+                            <option value="Review" {% if complaints.status == 'Review' %} selected {% endif %}>Review</option>
+                          </select>
+                          <button class="btn btn-sm btn-primary mt-2" type="submit">Update</button>
+                        </form>
+                      </td>
+                    {% else %}
+                      <td>--</td>
+                    {% endif %}
+                    {% if task.complaint.status == 'Resolved' %}
+                      <td class="text-center">--</td>
+                    {% else %}
+                      <td class="text-center"><a class="open-modal"
+                                                 data-url="{% url 'cms:complaints_remarks' task.complaint.id %}"><i class="fa-solid fa-pen"></i></a></td>
+                    {% endif %}
+                    <td class="text-center"><a href="{% url 'cms:staff_assigned_tasks_details' task.complaint.id %}"
+                                               style="text-decoration: none;"><i class="fa-solid fa-eye"></i></a></td>
                   </tr>
                 {% endfor %}
               {% else %}
                 <tr>
-                  <td colspan="100%">No complaints</td>
+                  <td colspan="10">No complaints!</td>
                 </tr>
               {% endif %}
             </tbody>
           </table>
         </div>
+      <!--Mobile view-->
+        <div class="col-12 d-md-none">
+          <div class="task-title mb-3">
+            <h5 class="fw-bold">Complaint List</h5>
+          </div>
+          <div class="task-content table-responsive">
+            <table class="table table-bordered">
+              <thead class="table-danger">
+                <tr>
+                  <th scope="col">No.</th>
+                  <th scope="col">Status</th>
+                  <th scope="col">Priority</th>
+                  <th scope="col">Detail</th>
+                </tr>
+              </thead>
+              <tbody class="table-info">
+                {% if page_obj %}
+                  {% for task in page_obj %}
+                    <tr
+                      class="task-summary-row"
+                      onClick="toggleTask(this)"
+                    >
+                      <td>{{task.complaint.complaint_number}}</td>
+                      <td>{{task.complaint.status}}</td>
+                      <td>{{task.complaint.priority}}</td>
+                      <td><i class="fa-solid fa-plus"></i></td>
+                    </tr>
+                    <tr
+                      class="task-body"
+                    >
+                      <td
+                        colspan="4"
+                      >
+                        <div class="task-detail-content">
+                          <div>
+                            <i class="fa-regular fa-user"></i>
+                            <p>{{task.complaint.created_by.department}}</p>
+                          </div>
+                          <div>
+                            <i class="fa-regular fa-clipboard"></i>
+                            <p>{{task.complaint.complaint_type}}</p>
+                          </div>
+                          <div>
+                            <i class="fa-solid fa-location-dot"></i>
+                            <p>{{task.complaint.location}}</p>
+                          </div>
+                          <div>
+                            <i class="fa-regular fa-flag"></i>
+                            <p>{{task.complaint.priority}}</p>
+                          </div>
+                          <div>
+                            <i class="fa-regular fa-calendar"></i>
+                            <p>{{task.complaint.created_at}}</p>
+                          </div>
+                          <div class="d-flex align-items-center">
+                            <i class="fa-solid fa-magnifying-glass-chart"></i>
+                            {% if task.complaint.status != 'Cancelled' and task.complaint.status != 'Resolved' and task.complaint.status != 'Halt' %}
+                              <form method="POST" action="{% url 'cms:staff_update_complaint_status' task.complaint.id %}">
+                                {% csrf_token %}
+                                <select name="status" required>
+                                  <option value="">select</option>
+                                  <option value="Review" {% if complaints.status == 'Review' %} selected {% endif %}>Review</option>
+                                </select>
+                                <button class="btn btn-sm btn-primary" type="submit">Update</button>
+                              </form>
+                            {% else %}
+                              <p>--</p>
+                            {% endif %}
+                          </div>
+                          <div class="d-flex align-items-center">
+                            {% if task.complaint.status == 'Resolved' %}
+                              <p class="text-center">--</p>
+                            {% else %}
+                              <a
+                                class="open-modal d-flex"
+                                data-url="{% url 'cms:complaints_remarks' task.complaint.id %}"
+                                style="text-decoration: none;"
+                              >
+                                <i class="fa-solid fa-pen"></i>
+                                <p>Add Remark</p>
+                              </a>
+                            {% endif %}
+                          </div>
+                          <div>
+                            <a
+                              class="d-flex align-items-center"
+                              href="{% url 'cms:staff_assigned_tasks_details' task.complaint.id %}"
+                              style="text-decoration: none;"
+                            >
+                              <i class="fa-solid fa-eye"></i>
+                              <p>See Details</p>
+                            </a>
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+                  {% endfor %}
+                {% else %}
+                  <tr>
+                    <td colspan="100%">No complaints</td>
+                  </tr>
+                {% endif %}
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
     </div>
-  </div>
 
 <!--Modal Block-->
-  <div class="modal fade" id="dynamicModal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-sm"> <!-- Adjust size as needed -->
-      <div class="modal-content">
-        <div class="modal-header">
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body w-100" id="modalBody">
+    <div class="modal fade" id="dynamicModal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-sm"> <!-- Adjust size as needed -->
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body w-100" id="modalBody">
         <!-- Content loads here -->
+          </div>
         </div>
       </div>
     </div>
-  </div>
 <!--------------->
 
 <!--Open Modal Script-->
-  <script>
-    document.addEventListener('DOMContentLoaded', function () {
-      const modalElement = document.getElementById('dynamicModal');
-      const modalBody = document.getElementById('modalBody');
-      document.querySelectorAll('.open-modal').forEach(function (el) {
-        el.addEventListener('click', function (e) {
-          e.preventDefault();
-          const url = this.getAttribute('data-url');
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        const modalElement = document.getElementById('dynamicModal');
+        const modalBody = document.getElementById('modalBody');
+        document.querySelectorAll('.open-modal').forEach(function (el) {
+          el.addEventListener('click', function (e) {
+            e.preventDefault();
+            const url = this.getAttribute('data-url');
 
         // Fetch content and show modal
-          fetch(url)
-            .then(response => response.text())
-            .then(html => {
-              modalBody.innerHTML = html;
-              const modal = new bootstrap.Modal(modalElement);
-              modal.show();
+            fetch(url)
+              .then(response => response.text())
+              .then(html => {
+                modalBody.innerHTML = html;
+                const modal = new bootstrap.Modal(modalElement);
+                modal.show();
 
             // Attach form handler AFTER modal content loads
-              const form = modalBody.querySelector('form');
-              if (form) {
-                form.addEventListener('submit', function (e) {
-                  e.preventDefault();
+                const form = modalBody.querySelector('form');
+                if (form) {
+                  form.addEventListener('submit', function (e) {
+                    e.preventDefault();
 
-                  const formData = new FormData(form);
-                  fetch(form.action, {
-                    method: 'POST',
-                    body: formData,
-                    headers: {
-                      'X-Requested-With': 'XMLHttpRequest',
-                    }
-                  })
-                    .then(response => {
-                    // If redirected (success), reload or redirect
-                      if (response.redirected) {
-                        window.location.href = response.url;
-                      } else {
-                        return response.text().then(html => {
-                          modalBody.innerHTML = html; // re-render form if error
-                        });
+                    const formData = new FormData(form);
+                    fetch(form.action, {
+                      method: 'POST',
+                      body: formData,
+                      headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
                       }
                     })
-                    .catch(error => {
-                      modalBody.innerHTML = '<div class="alert alert-danger">Error submitting form.</div>';
-                    });
-                });
-              }
-            })
-            .catch(error => {
-              modalBody.innerHTML = '<p>Error loading content.</p>';
-              const modal = new bootstrap.Modal(modalElement);
-              modal.show();
-            });
+                      .then(response => {
+                    // If redirected (success), reload or redirect
+                        if (response.redirected) {
+                          window.location.href = response.url;
+                        } else {
+                          return response.text().then(html => {
+                            modalBody.innerHTML = html; // re-render form if error
+                          });
+                        }
+                      })
+                      .catch(error => {
+                        modalBody.innerHTML = '<div class="alert alert-danger">Error submitting form.</div>';
+                      });
+                  });
+                }
+              })
+              .catch(error => {
+                modalBody.innerHTML = '<p>Error loading content.</p>';
+                const modal = new bootstrap.Modal(modalElement);
+                modal.show();
+              });
+          });
         });
       });
-    });
-  </script>
+    </script>
 
-  <script>
-    function toggleTask(element) {
-      const body = element.nextElementSibling;
-      body.classList.toggle("active");
+    <script>
+      function toggleTask(element) {
+        const body = element.nextElementSibling;
+        body.classList.toggle("active");
 
-      const icon = element.querySelector("i");
-      if (body.classList.contains("active")) {
-        icon.classList.remove("fa-plus");
-        icon.classList.add("fa-minus");
-      } else {
-        icon.classList.remove("fa-minus");
-        icon.classList.add("fa-plus");
+        const icon = element.querySelector("i");
+        if (body.classList.contains("active")) {
+          icon.classList.remove("fa-plus");
+          icon.classList.add("fa-minus");
+        } else {
+          icon.classList.remove("fa-minus");
+          icon.classList.add("fa-plus");
+        }
       }
-    }
-  </script>
+    </script>
 {% endblock %}

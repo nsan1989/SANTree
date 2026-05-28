@@ -892,6 +892,24 @@ def TasksExport(request):
     return response
 
 
+# All complaints data.
+def AdminAllComplaints(request):
+    user = request.user
+    try:
+        user_role = user.role
+    except:
+        raise PermissionDenied("User profile not found.")
+    dept_comp = Complaint.objects.filter(
+        Q(created_by__department=user.department)
+        | Q(assigned_to__department=user.department)
+    ).distinct()
+    context = {"comp": dept_comp}
+    view_name = request.resolver_match.view_name
+    if view_name == "cms:department_complaints" and user_role == "Admin":
+        return render(request, "department_complaints.html", context)
+    raise PermissionDenied("You are not authorized to view this page.")
+
+
 # Success view.
 def ComplaintSuccessView(request):
     if request.user.role == "Admin":

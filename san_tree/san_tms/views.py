@@ -224,7 +224,7 @@ def StaffDashboard(request):
                 {
                     "title": f"{tasks.tasks_types} - Next ({tasks.task_frequency})",
                     "start": tasks.next_date.strftime("%Y-%m-%d"),
-                    "url": reverse("tms:admin_tasks_details", args=[tasks.id]),
+                    "url": reverse("tms:staff_tasks_details", args=[tasks.id]),
                     "color": color,
                 }
             )
