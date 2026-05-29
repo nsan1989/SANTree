@@ -803,6 +803,23 @@ def ProfileView(request):
     return render(request, "profile.html", context)
 
 
+def ProfileUpdateView(request):
+    user = request.user
+
+    if request.method == "POST":
+        form = ProfileUpdateForm(request.POST, instance=user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Profile updated successfully.")
+            return redirect("profile")
+        messages.error(request, "Please correct the errors below.")
+    else:
+        form = ProfileUpdateForm(instance=user)
+
+    context = {"form": form, "user": user}
+    return render(request, "profile_edit.html", context)
+
+
 # Save User Subscription Info
 def save_information(request):
     if request.method != "POST" or not request.user.is_authenticated:

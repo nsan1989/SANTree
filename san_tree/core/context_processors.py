@@ -14,9 +14,18 @@ def sidebar_menu(request):
     # If an app defines transport-specific admin menu, route admin users by department.
     if role == "admin" and "transport_admin" in app_menus:
         department_name = (
-            getattr(getattr(user, "department", None), "name", "") or ""
-        ).strip().lower()
+            (getattr(getattr(user, "department", None), "name", "") or "")
+            .strip()
+            .lower()
+        )
         menu_role = "transport_admin" if department_name == "transport" else "admin"
+    elif role == "user" and "transport_user" in app_menus:
+        department_name = (
+            (getattr(getattr(user, "department", None), "name", "") or "")
+            .strip()
+            .lower()
+        )
+        menu_role = "transport_user" if department_name == "transport" else "user"
 
     menu = app_menus.get(menu_role, app_menus.get(role, []))
 

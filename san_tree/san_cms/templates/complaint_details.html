@@ -70,15 +70,15 @@
               {% endif %}
             </li>
             <li class="d-flex">
-              <spna class="fw-bold detail-title">Status:</spna>&nbsp;
+              <span class="fw-bold detail-title">Status:</span>&nbsp;
               <p class="m-0">{{complaint.status_changed_to}}</p>
             </li>
             <li class="d-flex">
-              <spna class="fw-bold detail-title">Assigned To:</spna>&nbsp;
+              <span class="fw-bold detail-title">Assigned To:</span>&nbsp;
               <p class="m-0">{{complaint.complaint.assigned_to}}</p>
             </li>
             <li class="d-flex">
-              <spna class="fw-bold detail-title">Attachment:</spna>&nbsp;
+              <span class="fw-bold detail-title">Attachment:</span>&nbsp;
               {% if complaint.attachment %}
                 <img src="{{ complaint.attachment.url }}" alt="Complaint Attachment" style="max-width: 20vw; height: 16vh;" />
               {% else %}

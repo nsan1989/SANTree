@@ -57,9 +57,22 @@
         <!--asset handler content-->
         {% if activities %}
             <div class="row mb-3">
-                <div class="col-12">
+                <div class="col-12 d-flex gap-3">
                     <div class="header-title">
                         <h3>Dashboard</h3>
+                    </div>
+                    <div class="header-content d-flex align-items-center gap-3">
+                            <p class="mb-0 text-warning">click here to request an asset</p>
+                            <a
+                                data-url="{% url 'ams:asset_requests' %}"
+                                class="open-modal btn btn-primary"
+                                style="
+                                    text-decoration: none;
+                                    color: #fff;
+                                "
+                            >
+                                Request Asset
+                            </a>
                     </div>
                 </div>
             </div>
@@ -135,21 +148,19 @@
                             <thead>
                                 <tr class="table-danger">
                                     <th scope="col">Date</th>
-                                    <th scope="col">Activity</th>
+                                    <th scope="col">Status</th>
                                     <th scope="col">Requested By</th>
                                     <th scope="col">Asset</th>
-                                    <th scope="col">Target</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% if activities %}
                                     {% for activity in activities %}
                                         <tr class="table-info">
-                                            <td>{{activity.created_at}}</td>
-                                            <td>{{activity.status}}</td>
-                                            <td>{{activity.requested_by}}</td>
-                                            <td>{{activity.asset.name}}</td>
-                                            <td>{{activity.requested_to}}</td>
+                                            <td>{{activity.created_at|default:"N/A"}}</td>
+                                            <td>{{activity.status|default:"N/A"}}</td>
+                                            <td>{{activity.requested_by|default:"N/A"}}</td>
+                                            <td>{{activity.asset.name|default:"N/A"}}</td>
                                         </tr>
                                     {% endfor %}
                                 {% else %}
@@ -182,19 +193,18 @@
                     <div class="header-title">
                         <h3>Dashboard</h3>
                     </div>
-                </div>
-                <div class="col-12 col-md-6">
-                    <div class="header-title">
-                        <h3>Request Asset</h3>
-                        <div class="d-flex header-link">
-                            <p class="mb-0 text-warning">click here to request an asset</p>&nbsp;
+                    <div class="header-content d-flex align-items-center gap-3">
+                            <p class="mb-0 text-warning">click here to request an asset</p>
                             <a
                                 data-url="{% url 'ams:asset_requests' %}"
-                                class="open-modal"
+                                class="open-modal btn btn-primary"
+                                style="
+                                    text-decoration: none;
+                                    color: #fff;
+                                "
                             >
                                 Request Asset
                             </a>
-                        </div>
                     </div>
                 </div>
             </div>

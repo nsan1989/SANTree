@@ -182,7 +182,7 @@
                           <option value="">select</option>
                           {% if complaints.complaint.status == "Open" %}
                             <option value="In Progress" {% if complaints.status == 'In Progress' %} selected {% endif %}>In Progress</option>
-                          {% elif complaints.complaint.status == "In Progress" %}
+                          {% elif complaints.complaint.status == "Review" %}
                             <option value="Resolved" {% if complaints.status == 'Resolved' %} selected {% endif %}>Resolved</option>
                           {% endif %}
                         </select>

@@ -81,26 +81,33 @@ class ComplaintHistoryAdmin(ImportExportModelAdmin):
 class ReassignedComplaintResources(resources.ModelResource):
     class Meta:
         models = ReassignedComplaint
-        fields = ("id", "complaint", "reassigned_to", "duration", "timestamp")
+        fields = (
+            "id",
+            "complaint",
+            "reassigned_to",
+            "duration",
+            "message",
+            "timestamp",
+        )
 
 
 @admin.register(ReassignedComplaint)
 class ReassignedComplaintAdmin(ImportExportModelAdmin):
     resource_class = ReassignedComplaintResources
-    list_display = ("complaint", "reassigned_to", "duration", "timestamp")
+    list_display = ("complaint", "reassigned_to", "duration", "message", "timestamp")
 
 
 # reassigned department resources
 class ReassignedDepartmentResources(resources.ModelResource):
     class Meta:
         models = ReassignDepartment
-        fields = ("id", "complaint", "reassign_to", "timestamp")
+        fields = ("id", "complaint", "reassign_to", "reason", "timestamp")
 
 
 @admin.register(ReassignDepartment)
 class ReassignedDepartmentAdmin(ImportExportModelAdmin):
     resource_class = ReassignedDepartmentResources
-    list_display = ("complaint", "reassign_to", "timestamp")
+    list_display = ("complaint", "reassign_to", "reason", "timestamp")
 
 
 # complaint remarks resources

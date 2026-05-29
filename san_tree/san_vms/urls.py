@@ -15,8 +15,12 @@ urlpatterns = [
         AdminUpdateBookingStatusView,
         name="update_booking_status",
     ),
+    path(
+        "admin/upcoming_trips/", AdminUpcomingTripsView, name="vms_admin_upcoming_trips"
+    ),
     path("staff/dashboard/", StaffDashboardView, name="vms_staff_dashboard"),
-    path("staff/cab_request/", CabRequestView, name="vms_cab_request"),
+    path("cab_request/", CabRequestView, name="vms_cab_request"),
+    path("staff/assigned_trips/", AssignedTripsView, name="vms_assigned_trips"),
     path("staff/upcoming_trips/", UpcomingTripsView, name="vms_upcoming_trips"),
     path(
         "staff/upcoming_trips/update_booking_status/<int:booking_id>/",
@@ -29,10 +33,11 @@ urlpatterns = [
     path("admin/all_staffs/", StaffView, name="vms_all_staffs"),
     path("admin/add_schedule/", ScheduleForm, name="add_schedule"),
     path(
-        "incharge/dashboard/schedules/edit_schedule/<int:id>/",
+        "admin/dashboard/schedules/edit_schedule/<int:id>/",
         ShiftEditView,
         name="edit_schedule",
     ),
     path("admin/driver_schedule/", DriverScheduleView, name="driver_schedule"),
     path("schedule-toggle/<int:pk>/", ToggleSchedule, name="toggle_schedule"),
+    path("cab_request/success/", BookingSuccessView, name="booking_success"),
 ]

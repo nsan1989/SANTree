@@ -6,6 +6,7 @@ from django.contrib import messages
 import json
 from django.http import JsonResponse
 from datetime import timedelta
+from django.urls import reverse
 
 from .forms import *
 from .models import *
@@ -191,7 +192,7 @@ def CabRequestView(request):
     except:
         raise PermissionDenied("User profile not found")
 
-    if current_user_role != "User":
+    if current_user_role not in ["User", "Admin"]:
         raise PermissionDenied("Unauthorized access")
 
     if request.method == "POST":
@@ -213,7 +214,7 @@ def CabRequestView(request):
             #                if booking.priority == BookingPriority.CRITICAL:
             #                    HandleCriticalBooking(booking)
 
-            return redirect("vms:vms_cab_request")
+            return redirect("vms:booking_success")
     else:
         form = BookingForm()
 
@@ -242,7 +243,7 @@ def AllTripsView(request):
         else:
             all_requests = Booking.objects.filter(
                 booked_by=current_user,
-                status__in=["ACKNOWLEDGE", "COMPLETED", "IN_PROGRESS", "CANCELLED"],
+                status__in=["COMPLETED", "IN_PROGRESS", "CANCELLED"],
             ).order_by("-created_at")
         page_number = request.GET.get("page")
         paginator = Paginator(all_requests, 10)
@@ -253,6 +254,45 @@ def AllTripsView(request):
     view_name = request.resolver_match.view_name
     if view_name == "vms:vms_all_trips" and current_user_role == "User":
         return render(request, "vms_all_trips.html", context)
+    raise PermissionDenied(
+        "You are not authorized to view this page. Please contact administrator!"
+    )
+
+
+# Assigned trips view.
+def AssignedTripsView(request):
+    current_user = request.user
+    try:
+        current_user_role = current_user.role
+    except:
+        raise PermissionDenied("User profile not found")
+    assigned_trip = Booking.objects.filter(
+        assigned_to=current_user, status="CONFIRMED"
+    ).order_by("-created_at")
+    context = {"assigned": assigned_trip}
+    view_name = request.resolver_match.view_name
+    if view_name == "vms:vms_assigned_trips" and current_user_role == "User":
+        return render(request, "vms_assigned_trips.html", context)
+    raise PermissionDenied(
+        "You are not authorized to view this page. Please contact administrator!"
+    )
+
+
+# Admin upcoming trips.
+def AdminUpcomingTripsView(request):
+    current_user = request.user
+    try:
+        current_user_role = current_user.role
+    except:
+        raise PermissionDenied("User profile not found")
+    upcoming = Booking.objects.filter(
+        booked_by=current_user,
+        status="CONFIRMED",
+    ).order_by("-created_at")
+    context = {"upcomings": upcoming}
+    view_name = request.resolver_match.view_name
+    if view_name == "vms:vms_admin_upcoming_trips" and current_user_role == "Admin":
+        return render(request, "vms_admin_upcoming_trips.html", context)
     raise PermissionDenied(
         "You are not authorized to view this page. Please contact administrator!"
     )
@@ -272,7 +312,9 @@ def UpcomingTripsView(request):
             and "transport" in current_user.department.name.lower()
         ):
             upcoming = Booking.objects.filter(
-                status__in=["CONFIRMED", "ACKNOWLEDGE"]
+                status__in=[
+                    "CONFIRMED",
+                ]
             ).order_by("-created_at")
         else:
             upcoming = Booking.objects.filter(
@@ -486,3 +528,13 @@ def recurring_bookings():
         booking.driver = None
 
         booking.save()
+
+
+# Success view.
+def BookingSuccessView(request):
+    if request.user.role == "Admin":
+        redirect_url = reverse("vms:vms_admin_dashboard")
+    else:
+        redirect_url = reverse("cms:vms:vms_staff_dashboard")
+
+    return render(request, "vms_booking_success.html", {"redirect_url": redirect_url})

@@ -1,0 +1,48 @@
+{% extends 'index.html' %}
+{% load static %}
+
+{% block title %}
+    Success
+{% endblock %}
+
+{% block start %}
+
+    <style>
+        .success-wrapper {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        .success-text {
+            text-align: center;
+        }
+    </style>
+
+    <div class="container-fluid">
+        <div class="success-wrapper">
+            <div class="success-text">
+                <h2>✅ Booking submitted successfully!</h2>
+                <p>Redirecting to dashboard in <span id="countdown">5</span> seconds...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let seconds = 5;
+        const countdownEl = document.getElementById("countdown");
+        const redirectUrl = "{{ redirect_url }}";
+
+        const interval = setInterval(() => {
+            seconds--;
+            countdownEl.textContent = seconds;
+
+            if (seconds <= 0) {
+                clearInterval(interval);
+                window.location.href = redirectUrl;
+            }
+        }, 1000);
+    </script>
+
+{% endblock %}

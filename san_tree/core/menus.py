@@ -331,8 +331,28 @@ MENU_STRUCTURE = {
             },
             {
                 "name": "Upcoming",
-                "url_name": "vms:vms_upcoming_trips",
-                "view_name": "UpcomingTripsView",
+                "url_name": "vms:vms_admin_upcoming_trips",
+                "view_name": "AdminUpcomingTripsView",
+                "icon": "fa-solid fa-calendar",
+            },
+            {
+                "name": "Trips",
+                "url_name": "vms:vms_admin_trips",
+                "view_name": "CabRequestView",
+                "icon": "fa-solid fa-car",
+            },
+        ],
+        "transport_user": [
+            {
+                "name": "Dashboard",
+                "url_name": "vms:vms_staff_dashboard",
+                "view_name": "StaffDashboardView",
+                "icon": "fa-solid fa-chart-line",
+            },
+            {
+                "name": "Assigned",
+                "url_name": "vms:vms_assigned_trips",
+                "view_name": "AssignedTripsView",
                 "icon": "fa-solid fa-calendar",
             },
             {

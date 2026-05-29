@@ -62,6 +62,7 @@ urlpatterns = [
     path("add_service_type/", AddServiceTypeView, name="add_service_type"),
     path("add_block/", AddBlockView, name="add_block"),
     path("profile/", ProfileView, name="profile"),
+    path("profile/edit/", ProfileUpdateView, name="edit_profile"),
     path("webpush/save_information/", save_information, name="save_subscription"),
     path(
         "anonymous_service_generate/",

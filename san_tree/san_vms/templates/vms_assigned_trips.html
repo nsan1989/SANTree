@@ -1,0 +1,154 @@
+{% extends 'index.html' %}
+
+{% block title %}
+    Assigned Trips
+{% endblock %}
+
+{% block start %}
+
+    <style>
+        .page-title h3 {
+            color: wheat;
+            font-family: 'poppins', sans-serif;
+            font-weight: bold;
+        }
+
+        .page-title p {
+            color: #fff;
+            font-family: 'poppins', sans-serif;
+        }
+
+        thead,
+        tbody {
+            font-family: 'poppins', sans-serif;
+        }
+        .trip-body {
+            display: none;
+        }
+
+        .trip-body.active {
+            display: table-row;
+        }
+    </style>
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="page-title mb-3">
+                <h3 class="mb-0">Assigned Trips</h3>
+                <p class="mb-0">list of assigned trips</p>
+            </div>
+            <!--Desktop view-->
+            <div class="page-content table-responsive d-none d-md-flex">
+                <table class="table table-bordered">
+                    <thead class="table-danger">
+                        <tr>
+                            <th scope="col">Booked by</th>
+                            <th scope="col">Customer No.</th>
+                            <th scope="col">Type</th>
+                            <th scope="col">Pickup</th>
+                            <th scope="col">Drop</th>
+                            <th scope="col">Cargo</th>
+                            <th scope="col">Status</th>
+                            <th scope="col">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody class="table-info">
+                        {% if assigned %}
+                            {% for trip in assigned %}
+                                <tr>
+                                    <td>{{ trip.booked_by.username }}</td>
+                                    <td>{{ trip.booked_by.phone_number }}</td>
+                                    <td>{{ trip.booking_type }}</td>
+                                    <td>{{ trip.pickup_location }}</td>
+                                    <td>{{ trip.drop_location }}</td>
+                                    <td>{{ trip.cargo|default:"NA" }}</td>
+                                    <td>{{ trip.status }}</td>
+                                    <td
+                                        style="
+                                               display: flex;
+                                               align-items: center;
+                                              "
+                                    >
+                                        <form method="POST" action="{% url 'vms:staff_update_booking_status' trip.id %}"
+                                              style="display: flex; flex-direction: column; gap: 5px;">
+                                            {% csrf_token %}
+                                            <select name="status" class="statusSelect" required>
+                                                <option value="">select</option>
+                                                {% if trip.status == 'CONFIRMED' %}
+                                                    <option value="ACKNOWLEDGE">Acknowledge</option>
+                                                {% endif %}
+                                            </select>
+                                            <button class="btn btn-sm btn-primary" type="submit">Update</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="100%">No Data</td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+            <!--Mobile view-->
+            <div class="page-content d-md-none">
+                <table class="table table-bordered">
+                    <thead class="table-danger">
+                        <tr>
+                            <th scope="col">Booked by</th>
+                            <th scope="col">Status</th>
+                            <th scope="col">View</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if assigned %}
+                            {% for trip in assigned %}
+                                <tr
+                                    class="trip-summary-row"
+                                    onclick="toggleTrip(this)"
+                                >
+                                    <td>{{ trip.booked_by.username }}</td>
+                                    <td>{{ trip.status }}</td>
+                                    <td><i class="fa-solid fa-plus"></i></td>
+                                </tr>
+                                <tr class="trip-body">
+                                    <td colspan="3">
+                                        <div>
+                                            <i class="fa-solid fa-phone"></i>
+                                            <p>{{ trip.booked_by.phone_number }}</p>
+                                        </div>
+                                        <div>
+                                            <i class="fa-solid fa-exclamation"></i>
+                                            <p>{{ trip.booking_type }}</p>
+                                        </div>
+                                        <div>
+                                            <i class="fa-solid fa-location-dot"></i>
+                                            <p>{{ trip.pickup_location }}</p>
+                                        </div>
+                                        <div>
+                                            <i class="fa-solid fa-location-dot"></i>
+                                            <p>{{ trip.drop_location }}</p>
+                                        </div>
+                                        <div>
+                                            <i class="fa-solid fa-box"></i>
+                                            <p>{{ trip.cargo }}</p>
+                                        </div>
+                                        <div>
+                                            <i class="fa-regular fa-clock"></i>
+                                            <p>{{ trip.pickup_time }}</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="100%">No Data</td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}

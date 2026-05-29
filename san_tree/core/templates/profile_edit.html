@@ -1,0 +1,48 @@
+{% extends 'index.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %} Edit Profile {% endblock %}
+
+{% block start %}
+  <style>
+    .card-body {
+      font-family: 'Poppins', sans-serif;
+    }
+  </style>
+
+  <div class="container-fluid py-3">
+    <div class="mb-3">
+      <a href="{% url 'profile' %}" class="col-12 d-flex align-items-center justify-content-start text-warning" style="text-decoration: none">
+        <i class="fa-solid fa-arrow-left"></i>
+        &nbsp;back
+      </a>
+    </div>
+
+    <div class="row justify-content-center">
+      <div class="col-12 col-sm-10 col-md-6 col-lg-5">
+        <div class="card shadow-sm border-0 rounded-2">
+          <div class="card-body p-3">
+            <h5 class="fw-bold mb-3" style="color: #6b1d20;">Edit Profile</h5>
+            <hr>
+
+            {% if form.errors %}
+              <div class="alert alert-danger" role="alert">
+                {{ form.errors }}
+              </div>
+            {% endif %}
+
+            <form method="post">
+              {% csrf_token %}
+              {{ form|crispy }}
+              <small class="text-muted d-block mb-3">Phone number is required.</small>
+              <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary">Update</button>
+                <a href="{% url 'profile' %}" class="btn btn-outline-secondary">Cancel</a>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

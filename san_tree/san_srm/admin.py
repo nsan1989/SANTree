@@ -59,6 +59,7 @@ class ShiftScheduleAdmin(ImportExportModelAdmin):
         "status",
         "is_active",
     )
+    list_filter = ("status",)
 
 
 # service resources

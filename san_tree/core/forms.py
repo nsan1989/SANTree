@@ -1,6 +1,6 @@
 from django import forms
 
-from accounts.models import Departments, Location
+from accounts.models import CustomUsers, Departments, Location
 from san_cms.models import ComplaintType
 from san_srm.models import Blocks, ServiceTypes
 from san_tms.models import TasksTypes
@@ -67,3 +67,13 @@ class AnonymousServiceGenerateForm(forms.ModelForm):
         self.fields["from_location"].required = True
 
         self.fields["to_location"].required = True
+
+
+class ProfileUpdateForm(forms.ModelForm):
+    class Meta:
+        model = CustomUsers
+        fields = ["username", "email", "phone_number"]
+
+    def __init__(self, *args, **kwargs):
+        super(ProfileUpdateForm, self).__init__(*args, **kwargs)
+        self.fields["phone_number"].required = True

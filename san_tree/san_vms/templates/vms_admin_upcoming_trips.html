@@ -1,0 +1,117 @@
+{% extends 'index.html' %}
+
+{% block title %}
+    Upcoming Trips
+{% endblock %}
+
+{% block start %}
+    <div class="container-fluid">
+        <div class="page-title mb-3">
+            <h3>Upcoming Trips</h3>
+            <p class="mb-0">list of upcoming trips</p>
+        </div>
+    <!--Desktop view-->
+        <div class="page-content table-responsive d-none d-md-flex">
+            <table class="table table-bordered">
+                <thead class="table-danger">
+                    <tr>
+                        <th scope="col">Booking ID</th>
+                        <th scope="col">Type</th>
+                        <th scope="col">Pickup Location</th>
+                        <th scope="col">Drop Location</th>
+                        <th scope="col">Vehicle</th>
+                        <th scope="col">Driver</th>
+                        <th scope="col">Phone No.</th>
+                        <th scope="col">Status</th>
+                    </tr>
+                </thead>
+                <tbody class="table-info">
+                    {% if upcomings %}
+                        {% for trip in upcomings %}
+                            <tr>
+                                <td>{{ trip.id }}</td>
+                                <td>{{ trip.booking_type }}</td>
+                                <td>{{ trip.pickup_location }}</td>
+                                <td>{{ trip.drop_location }}</td>
+                                <td>{{ trip.vehicle.vehicle_number|default:"-" }}</td>
+                                <td>{{ trip.driver.user.username|default:"-" }}</td>
+                                <td>{{ trip.driver.user.phone_number|default:"-" }}</td>
+                                <td>{{ trip.status}}</td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="100%">No upcoming trips found.</td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    <!--Mobile view-->
+        <div class="page-content table-responsive d-md-none">
+            <table class="table table-bordered">
+                <thead class="table-danger">
+                    <tr>
+                        <th scope="col">ID</th>
+                        <th scope="col">Pickup</th>
+                        <th scope="col">Driver</th>
+                        <th scope="col">Detail</th>
+                    </tr>
+                </thead>
+                <tbody class="table-info">
+                    {% if upcomings %}
+                        {% for trip in upcomings %}
+                            <tr
+                                class="trip-summary-row"
+                                onclick="toggleTrip(this)"
+                            >
+                                <td>{{ trip.id }}</td>
+                                <td>{{ trip.pickup_location }}</td>
+                                <td>{{ trip.driver.user.username|default:"-" }}</td>
+                                <td><i class="fa-solid fa-plus"></i></td>
+                            </tr>
+                            <tr class="trip-body">
+                                <td colspan="4">
+                                    <div class="trip-body-content">
+                                        <div>
+                                            <i class="fa-solid fa-circle-check"></i>
+                                            <p>{{ trip.status}}</p>
+                                        </div>
+                                        <div>
+                                            <i class="fa-solid fa-exclamation"></i>
+                                            <p>{{ trip.booking_type }}</p>
+                                        </div>
+                                        <div>
+                                            <i class="fa-solid fa-location-dot"></i>
+                                            <p>{{ trip.drop_location }}</p>
+                                        </div>
+                                        <div>
+                                            <i class="fa-solid fa-car-rear"></i>
+                                            <p>{{ trip.vehicle.vehicle_number|default:"-" }}</p>
+                                        </div>
+                                        <div>
+                                            <i class="fa-regular fa-user"></i>
+                                            <p>{{ trip.driver.user.username }}</p>
+                                        </div>
+                                        <div>
+                                            <i class="fa-solid fa-phone"></i>
+                                            <p>{{ trip.driver.user.phone_number|default:"-" }}</p>
+                                        </div>
+                                        <div>
+                                            <i class="fa-regular fa-clock"></i>
+                                            <p>{{ trip.pickup_time }}</p>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="100%">No upcoming trips found.</td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}

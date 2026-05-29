@@ -162,10 +162,14 @@ class AssetRequestForm(forms.ModelForm):
         user = kwargs.pop("user", None)
         super().__init__(*args, **kwargs)
 
+        department_qs = Departments.objects.filter(
+            asset_department__isnull=False
+        ).distinct()
+
         if user and user.department:
-            self.fields["department"].queryset = Departments.objects.exclude(
-                id=user.department.id
-            )
+            department_qs = department_qs.exclude(id=user.department.id)
+
+        self.fields["department"].queryset = department_qs
 
 
 # Asset Handler Form.

@@ -67,7 +67,7 @@
         <div class="container-fluid">
             <div class="content-header mb-3">
                 <h3 class="mb-0">All Trips</h3>
-                <p class="mb-0 text-light">all the cab service requested by you</p>
+                <p class="mb-0 text-light">List of all trips</p>
             </div>
             <!--Paginator-->
             <nav class="mb-3">
@@ -148,46 +148,46 @@
                         <tbody class="table-info">
                             {% if page_obj %}
                                 {% for request in page_obj %}
-                                <tr
-                                    class="request-summary-row"
-                                    onclick="toggleRequest(this)"
-                                >
-                                    <td>{{request.id}}</td>
-                                    <td>{{request.status}}</td>
-                                    <td>{{request.driver}}</td>
-                                    <td><i class="fa-solid fa-plus"></i></td>
-                                </tr>
-                                <tr class="request-body">
-                                    <td colspan="4">
-                                        <div class="request-body-content">
-                                            <div>
-                                                <i class="fa-solid fa-exclamation"></i>
-                                                <p>{{ request.booking_type|default:"NA" }}</p>
+                                    <tr
+                                        class="request-summary-row"
+                                        onclick="toggleRequest(this)"
+                                    >
+                                        <td>{{request.id}}</td>
+                                        <td>{{request.status}}</td>
+                                        <td>{{request.driver}}</td>
+                                        <td><i class="fa-solid fa-plus"></i></td>
+                                    </tr>
+                                    <tr class="request-body">
+                                        <td colspan="4">
+                                            <div class="request-body-content">
+                                                <div>
+                                                    <i class="fa-solid fa-exclamation"></i>
+                                                    <p>{{ request.booking_type|default:"NA" }}</p>
+                                                </div>
+                                                <div>
+                                                    <i class="fa-solid fa-location-dot"></i>
+                                                    <p>{{ request.pickup_location|default:"NA" }}</p>
+                                                </div>
+                                                <div>
+                                                    <i class="fa-solid fa-location-dot"></i>
+                                                    <p>{{ request.drop_location|default:"NA" }}</p>
+                                                </div>
+                                                <div>
+                                                    <i class="fa-solid fa-box"></i>
+                                                    <p>{{ request.cargo|default:"NA" }}</p>
+                                                </div>
+                                                <div>
+                                                    <i class="fa-solid fa-car"></i>
+                                                    <p>{{ request.vehicle|default:"NA" }}</p>
+                                                </div>
                                             </div>
-                                            <div>
-                                                <i class="fa-solid fa-location-dot"></i>
-                                                <p>{{ request.pickup_location|default:"NA" }}</p>
-                                            </div>
-                                            <div>
-                                                <i class="fa-solid fa-location-dot"></i>
-                                                <p>{{ request.drop_location|default:"NA" }}</p>
-                                            </div>
-                                            <div>
-                                                <i class="fa-solid fa-box"></i>
-                                                <p>{{ request.cargo|default:"NA" }}</p>
-                                            </div>
-                                            <div>
-                                                <i class="fa-solid fa-car"></i>
-                                                <p>{{ request.vehicle|default:"NA" }}</p>
-                                            </div>
-                                        </div>
-                                    </td>
-                                </tr>
+                                        </td>
+                                    </tr>
                                 {% endfor %}
                             {% else %}
-                            <tr>
-                                <td colspan="100%">No Bookings</td>
-                            </tr>
+                                <tr>
+                                    <td colspan="100%">No Bookings</td>
+                                </tr>
                             {% endif %}
                         </tbody>
                     </table>
@@ -240,6 +240,7 @@
                                 <th>Cargo</th>
                                 <th>Vehicle</th>
                                 <th>Passenger</th>
+                                <th>Customer No.</th>
                                 <th>Status</th>
                             </tr>
                         </thead>
@@ -253,37 +254,30 @@
                                         <td>{{ request.drop_location }}</td>
                                         <td>{{ request.cargo }}</td>
                                         <td>{{ request.vehicle }}</td>
-                                        <td>{{ request.booked_by }}</td>
+                                        <td>{{ request.passengers }}</td>
+                                        <td>{{ request.booked_by.phone_number }}</td>
                                         <td
                                             style="
                                                    display: flex;
                                                    align-items: center;
                                                   "
                                         >
-                                            {% if request.status == 'ACKNOWLEDGE' %}
+                                            {% if request.status != 'COMPLETED'%}
                                                 <form method="POST" action="{% url 'vms:staff_update_booking_status' request.id %}"
                                                       style="display: flex; flex-direction: column; gap: 5px;">
                                                     {% csrf_token %}
                                                     <select name="status" class="statusSelect" required>
                                                         <option value="">select</option>
-                                                        <option value="IN_PROGRESS">In Progress</option>
+                                                        {% if request.status == 'ACKNOWLEDGE' %}
+                                                            <option value="IN_PROGRESS">In Progress</option>
+                                                        {% elif request.status == "IN_PROGRESS" %}
+                                                            <option value="COMPLETED">Completed</option>
+                                                        {% endif %}
                                                     </select>
                                                     <button class="btn btn-sm btn-primary" type="submit">Update</button>
                                                 </form>
-
-                                            {% elif request.status == 'IN_PROGRESS' %}
-                                                <form method="POST" action="{% url 'vms:staff_update_booking_status' request.id %}"
-                                                      style="display: flex; flex-direction: column; gap: 5px;">
-                                                    {% csrf_token %}
-                                                    <select name="status" class="statusSelect" required>
-                                                        <option value="">select</option>
-                                                        <option value="COMPLETED">Completed</option>
-                                                    </select>
-                                                    <button class="btn btn-sm btn-primary" type="submit">Update</button>
-                                                </form>
-
                                             {% else %}
-                                                <span class="badge bg-success">{{ request.status }}</span>
+                                                {{ request.status }}
                                             {% endif %}
                                         </td>
                                     </tr>
@@ -304,7 +298,6 @@
                         <thead class="table-danger">
                             <tr>
                                 <th scope="col">ID</th>
-                                <th scope="col">Status</th>
                                 <th scope="col">Customer</th>
                                 <th scope="col">Detail</th>
                             </tr>
@@ -312,65 +305,72 @@
                         <tbody class="table-info">
                             {% if page_obj %}
                                 {% for request in page_obj %}
-                                <tr
-                                    class="request-summary-row"
-                                    onclick="toggleRequest(this)"
-                                >
-                                    <td>{{ request.id }}</td>
-                                    <td>{{ request.status }}</td>
-                                    <td>{{ request.booked_by }}</td>
-                                    <td><i class="fa-solid fa-plus"></i></td>
-                                </tr>
-                                <tr
-                                    class="request-body"
-                                >
-                                    <td colspan="4">
-                                        <div class="request-body-content">
-                                            <div>
-                                                <i class="fa-solid fa-exclamation"></i>
-                                                <p>{{ request.booking_type|default:"NA" }}</p>
+                                    <tr
+                                        class="request-summary-row"
+                                        onclick="toggleRequest(this)"
+                                    >
+                                        <td>{{ request.id }}</td>
+                                        <td>{{ request.booked_by.username }}</td>
+                                        <td><i class="fa-solid fa-plus"></i></td>
+                                    </tr>
+                                    <tr
+                                        class="request-body"
+                                    >
+                                        <td colspan="4">
+                                            <div class="request-body-content">
+                                                <div>
+                                                    <i class="fa-solid fa-circle-check"></i>
+                                                    {{ request.status }}
+                                                </div>
+                                                <div>
+                                                    <i class="fa-solid fa-phone"></i>
+                                                    <p>{{ request.booked_by.phone_number }}</p>
+                                                </div>
+                                                <div>
+                                                    <i class="fa-solid fa-exclamation"></i>
+                                                    <p>{{ request.booking_type|default:"NA" }}</p>
+                                                </div>
+                                                <div>
+                                                    <i class="fa-solid fa-location-dot"></i>
+                                                    <p>{{ request.pickup_location|default:"NA" }}</p>
+                                                </div>
+                                                <div>
+                                                    <i class="fa-solid fa-location-dot"></i>
+                                                    <p>{{ request.drop_location|default:"NA" }}</p>
+                                                </div>
+                                                <div>
+                                                    <i class="fa-solid fa-box"></i>
+                                                    <p>{{ request.cargo|default:"NA" }}</p>
+                                                </div>
+                                                <div>
+                                                    <i class="fa-solid fa-car"></i>
+                                                    <p>{{ request.vehicle|default:"NA" }}</p>
+                                                </div>
+                                                <div
+                                                    style="height: 4rem;"
+                                                >
+                                                    <form method="POST" action="{% url 'vms:staff_update_booking_status' request.id %}"
+                                                          style="display: flex; flex-direction: column; gap: 5px;">
+                                                        {% csrf_token %}
+                                                        <select name="status" class="statusSelect" required>
+                                                            <option value="">select</option>
+                                                            {% if request.status == 'ACKNOWLEDGE' %}
+                                                                <option value="IN_PROGRESS">In Progress</option>
+                                                            {% elif request.status == 'IN_PROGRESS' %}
+                                                                <option value="COMPLETED">Completed</option>
+                                                            {% endif %}
+                                                        </select>
+                                                        <button class="btn btn-sm btn-primary" type="submit">Update</button>
+                                                    </form>
+                                                </div>
                                             </div>
-                                            <div>
-                                                <i class="fa-solid fa-location-dot"></i>
-                                                <p>{{ request.pickup_location|default:"NA" }}</p>
-                                            </div>
-                                            <div>
-                                                <i class="fa-solid fa-location-dot"></i>
-                                                <p>{{ request.drop_location|default:"NA" }}</p>
-                                            </div>
-                                            <div>
-                                                <i class="fa-solid fa-box"></i>
-                                                <p>{{ request.cargo|default:"NA" }}</p>
-                                            </div>
-                                            <div>
-                                                <i class="fa-solid fa-car"></i>
-                                                <p>{{ request.vehicle|default:"NA" }}</p>
-                                            </div>
-                                            <div
-                                                style="height: 4rem;"
-                                            >
-                                                <form method="POST" action="{% url 'vms:staff_update_booking_status' request.id %}"
-                                                      style="display: flex; flex-direction: column; gap: 5px;">
-                                                    {% csrf_token %}
-                                                    <select name="status" class="statusSelect" required>
-                                                        <option value="">select</option>
-                                                        {% if request.status == 'ACKNOWLEDGE' %}
-                                                            <option value="IN_PROGRESS">In Progress</option>
-                                                        {% elif request.status == 'IN_PROGRESS' %}
-                                                            <option value="COMPLETED">Completed</option>
-                                                        {% endif %}
-                                                    </select>
-                                                    <button class="btn btn-sm btn-primary" type="submit">Update</button>
-                                                </form>
-                                            </div>
-                                        </div>
-                                    </td>
-                                </tr>
+                                        </td>
+                                    </tr>
                                 {% endfor %}
                             {% else %}
-                            <tr>
-                                <td colspan="100%">No Bookings</td>
-                            </tr>
+                                <tr>
+                                    <td colspan="100%">No Bookings</td>
+                                </tr>
                             {% endif %}
                         </tbody>
                     </table>

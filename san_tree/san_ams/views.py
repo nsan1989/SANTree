@@ -20,6 +20,7 @@ from accounts.models import Departments
 from django.http import JsonResponse
 from django.urls import reverse
 from django.db.models import Q
+from itertools import chain
 
 logger = logging.getLogger(__name__)
 
@@ -83,11 +84,13 @@ def StaffDashboardView(request):
         raise PermissionDenied("User profile not found")
     context = {}
     try:
-        my_asset = AssetRequest.objects.filter(requested_by=current_user)
-        activity = AssetRequest.objects.filter(asset__handler=current_user)
-        context["my_asset"] = my_asset
+        req_asset = AssetRequest.objects.filter(requested_by=current_user)
+        req_handler = AssetRequest.objects.filter(asset__handler=current_user)
+        asset_handler = AssetModel.objects.filter(handler=current_user)
+        activity = req_handler if req_handler.exists() else asset_handler
+        context["my_asset"] = req_asset
         if activity.exists():
-            context["activities"] = activity[:10]
+            context["activities"] = activity
         else:
             context["activity_message"] = "No current activity!"
         total_asset_users = CustomUsers.objects.filter(

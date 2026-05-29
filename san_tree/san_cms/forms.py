@@ -44,14 +44,9 @@ class ComplaintForm(forms.ModelForm):
 
         user_department = getattr(user, "department", None) if user else None
 
-        department_qs = Departments.objects.all()
-
-        #        department_qs = Departments.objects.annotate(
-        #            valid_complaint_type_count=Count(
-        #                'complaint_types',
-        #                filter=~Q(complaint_types__name__iexact='Others')
-        #            )
-        #        ).filter(valid_complaint_type_count__gt=0)
+        department_qs = Departments.objects.filter(
+            complaint_types__isnull=False
+        ).distinct()
 
         if user_department:
             department_qs = department_qs.exclude(id=user_department.id)
@@ -79,7 +74,7 @@ class ReassignedForm(forms.ModelForm):
 
     class Meta:
         model = ReassignedComplaint
-        fields = ["reassigned_to", "duration"]
+        fields = ["reassigned_to", "duration", "message"]
 
     def __init__(self, *args, **kwargs):
         self.request = kwargs.pop("request", None)
@@ -100,7 +95,7 @@ class ReassignedForm(forms.ModelForm):
 class ReassignedDepartmentForm(forms.ModelForm):
     class Meta:
         model = ReassignDepartment
-        fields = ["reassign_to"]
+        fields = ["reassign_to", "reason"]
 
     def __init__(self, *args, **kwargs):
         user = kwargs.pop("user", None)

@@ -181,6 +181,7 @@ class ReassignedComplaint(models.Model):
         default="00:00",
         verbose_name="Duration",
     )
+    message = models.CharField(max_length=255, null=True, blank=True)
     timestamp = models.DateTimeField(auto_now=True)
 
     def __str__(self):
@@ -197,6 +198,7 @@ class ReassignDepartment(models.Model):
         blank=True,
         related_name="reassign_departments",
     )
+    reason = models.CharField(max_length=255, null=True, blank=True)
     timestamp = models.DateTimeField(auto_now=True)
 
     def __str__(self):
