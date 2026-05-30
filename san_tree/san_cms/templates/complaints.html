@@ -74,6 +74,52 @@
           }
         });
       });
+
+      $('#id_facility').change(function () {
+        const url = "{% url 'cms:ajax_load_blocks' %}";
+        const facilityId = $(this).val();
+
+        $.ajax({
+          url: url,
+          data: {
+            'facility': facilityId
+          },
+          success: function (data) {
+            const blockSelect = $('#id_block');
+            const locationSelect = $('#id_location');
+
+            blockSelect.empty();
+            blockSelect.append('<option value="">Select Block</option>');
+            locationSelect.empty();
+            locationSelect.append('<option value="">Select Location</option>');
+
+            data.forEach(function (item) {
+              blockSelect.append(`<option value="${item.id}">${item.name}</option>`);
+            });
+          }
+        });
+      });
+
+      $('#id_block').change(function () {
+        const url = "{% url 'cms:ajax_load_locations' %}";
+        const blockId = $(this).val();
+
+        $.ajax({
+          url: url,
+          data: {
+            'block': blockId
+          },
+          success: function (data) {
+            const locationSelect = $('#id_location');
+            locationSelect.empty();
+            locationSelect.append('<option value="">Select Location</option>');
+
+            data.forEach(function (item) {
+              locationSelect.append(`<option value="${item.id}">${item.name}</option>`);
+            });
+          }
+        });
+      });
     });
 
   //submit button script

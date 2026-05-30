@@ -5,6 +5,48 @@ from import_export.admin import ImportExportModelAdmin
 from .models import *
 
 
+# facility resources.
+class FacilityResource(resources.ModelResource):
+    class Meta:
+        model = Facility
+        fields = ("id", "name", "is_active")
+
+
+# facility admin.
+@admin.register(Facility)
+class FacilityAdmin(ImportExportModelAdmin):
+    resource_class = FacilityResource
+    list_display = ("name", "is_active")
+
+
+# block resources.
+class BlockResources(resources.ModelResource):
+    class Meta:
+        model = Block
+        fields = ("id", "facility", "name", "block_admin", "is_active")
+
+
+# block admin.
+@admin.register(Block)
+class BlockAdmin(ImportExportModelAdmin):
+    resource_class = BlockResources
+    list_display = ("facility", "name", "block_admin", "is_active")
+
+
+# location resources.
+class LocationResources(resources.ModelResource):
+    class Meta:
+        model = Location
+        fields = ("id", "name", "block", "is_active")
+
+
+# location admin.
+@admin.register(Location)
+class LocationAdmin(ImportExportModelAdmin):
+    resource_class = LocationResources
+    list_display = ("name", "block", "is_active")
+
+
 # complaint resources.
 class ComplaintResource(resources.ModelResource):
     class Meta:
@@ -15,6 +57,8 @@ class ComplaintResource(resources.ModelResource):
             "complaint_type",
             "description",
             "assigned_to",
+            "facility",
+            "block",
             "location",
             "status",
             "priority",
@@ -34,6 +78,8 @@ class ComplaintAdmin(ImportExportModelAdmin):
         "complaint_type",
         "description",
         "assigned_to",
+        "facility",
+        "block",
         "location",
         "status",
         "priority",

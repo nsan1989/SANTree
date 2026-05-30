@@ -73,12 +73,13 @@
   <div class="container-fluid">
     <div class="row">
       <div class="col-12 d-flex flex-column align-items-start mb-3">
-        <div class="content-title mb-2 mb-md-0">
-          <h3 class="mb-0">All Complaints</h3>
+        <div class="content-title mb-3">
+          <h3 class="mb-0">Raised Complaints</h3>
+          <p class="mb-0 text-light">List of all complaints raised by you.</p>
         </div>
         <div class="complaint-link">
           <p class="mb-0 text-light">
-            Raise a complaint &nbsp;<a class="text-warning fw-bold" href="{% url 'cms:complaints' %}" style="text-decoration: none;">click here.</a>
+            Raise a complaint &nbsp;<a class="btn btn-primary fw-bold" href="{% url 'cms:complaints' %}" style="text-decoration: none;">click here.</a>
           </p>
         </div>
       </div>
@@ -184,9 +185,6 @@
       <!--Mobile view-->
       <div class="col-12 d-md-none p-0">
         <div class="complaint-wrapper">
-          <div class="complaint-title mb-3">
-            <h5 style="color: wheat;">Complaint List</h5>
-          </div>
           <div class="complaint-content table-responsive">
             <table class="table table-bordered">
               <thead class="table-danger">

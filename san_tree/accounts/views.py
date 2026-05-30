@@ -21,6 +21,7 @@ def RegisterView(request):
                 "Housekeeping",
                 "Administration",
                 "Public Relations",
+                "ENM",
             ]
             department_name = register_user.department.name.strip().lower()
 

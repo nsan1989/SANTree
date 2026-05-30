@@ -18,6 +18,10 @@
             font-family: 'Poppins', sans-serif;
         }
 
+        tbody {
+            font-size: 0.8rem;
+        }
+
         .complaint-body {
             display: none;
         }
@@ -39,16 +43,22 @@
         <div class="complaint-content">
         <!--Desktop view-->
             <div class="row d-none d-md-flex">
-                <div class="col-12">
+                <div class="col-12 table-responsive">
                     <table class="table table-bordered">
                         <thead class="table-danger">
                             <tr>
                                 <th scope="col">Comp. No.</th>
+                                <th scope="col">Department</th>
                                 <th scope="col">Comp. Type</th>
+                                <th scope="col">Description</th>
+                                <th scope="col">Facility</th>
+                                <th scope="col">Block</th>
+                                <th scope="col">Location</th>
                                 <th scope="col">Status</th>
                                 <th scope="col">Priority</th>
                                 <th scope="col">Created By</th>
                                 <th scope="col">Assigned to</th>
+                                <th scope="col">Created At</th>
                                 <th scope="col">Completed At</th>
                             </tr>
                         </thead>
@@ -57,11 +67,17 @@
                                 {% for c in comp %}
                                     <tr>
                                         <td>{{c.complaint_number}}</td>
+                                        <td>{{c.department}}</td>
                                         <td>{{c.complaint_type}}</td>
+                                        <td>{{c.description|default:"No Data"}}</td>
+                                        <td>{{c.facility}}</td>
+                                        <td>{{c.block}}</td>
+                                        <td>{{c.location}}</td>
                                         <td>{{c.status}}</td>
                                         <td>{{c.priority}}</td>
                                         <td>{{c.created_by}}</td>
                                         <td>{{c.assigned_to}}</td>
+                                        <td>{{c.created_at}}</td>
                                         <td>{{c.completed_at|default:"No Data"}}</td>
                                     </tr>
                                 {% endfor %}
@@ -109,20 +125,36 @@
                                                 <p>{{c.complaint_type}}</p>
                                             </div>
                                             <div>
-                                                <i class="fa-solid fa-location-pin"></i>
-                                                <p>{{c.location}}</p>
-                                            </div>
-                                            <div>
                                                 <i class="fa-solid fa-info"></i>
-                                                <p>{{c.description}}</p>
+                                                <p>{{c.description|default:"No Data"}}</p>
+                                            </div>
+                                            <div>
+                                                <i class="fa-solid fa-building"></i>
+                                                <p>{{c.facility.name}}</p>
+                                            </div>
+                                            <div>
+                                                <i class="fa-solid fa-layer-group"></i>
+                                                <p>{{c.block.name}}</p>
+                                            </div>
+                                            <div>
+                                                <i class="fa-solid fa-location-pin"></i>
+                                                <p>{{c.location.name}}</p>
+                                            </div>
+                                            <div>
+                                                <i class="fa-solid fa-flag"></i>
+                                                <p>{{c.status}}</p>
+                                            </div>
+                                            <div>
+                                                <i class="fa-solid fa-sort"></i>
+                                                <p>{{c.priority}}</p>
                                             </div>
                                             <div>
                                                 <i class="fa-solid fa-user"></i>
-                                                <p>{{c.assigned_to}}</p>
+                                                <p>{{c.created_by.username}}</p>
                                             </div>
                                             <div>
                                                 <i class="fa-solid fa-user"></i>
-                                                <p>{{c.created_by}}</p>
+                                                <p>{{c.assigned_to.username}}</p>
                                             </div>
                                             <div>
                                                 <i class="fa-regular fa-calendar"></i>

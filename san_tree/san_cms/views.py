@@ -12,10 +12,12 @@ from accounts.models import CustomUsers, Departments
 
 from .forms import ComplaintForm, ReassignedDepartmentForm, ReassignedForm, RemarksForm
 from .models import (
+    Block,
     Complaint,
     ComplaintHistory,
     ComplaintRemarks,
     ComplaintType,
+    Location,
     ReassignedComplaint,
 )
 
@@ -309,6 +311,22 @@ def load_complaint_types(request):
     return JsonResponse(list(complaint_types.values("id", "name")), safe=False)
 
 
+def load_blocks(request):
+    facility_id = request.GET.get("facility")
+    blocks = Block.objects.filter(facility_id=facility_id, is_active=True).order_by(
+        "name"
+    )
+    return JsonResponse(list(blocks.values("id", "name")), safe=False)
+
+
+def load_locations(request):
+    block_id = request.GET.get("block")
+    locations = Location.objects.filter(block_id=block_id, is_active=True).order_by(
+        "name"
+    )
+    return JsonResponse(list(locations.values("id", "name")), safe=False)
+
+
 # Complaints View.
 def ComplaintView(request):
     user = request.user
@@ -362,14 +380,15 @@ def ComplaintView(request):
                 new_complaint.save()
 
             if user.role == "Admin":
-                admins = CustomUsers.objects.filter(
-                    department=department, role="Admin", is_active=True
+                block_admin = (
+                    new_complaint.block.block_admin if new_complaint.block else None
                 )
-                if admins.exists():
-                    assigned_user = random.choice(list(admins))
+                if not block_admin or not block_admin.is_active:
+                    form.add_error("block", "Selected block has no active block admin.")
+                    return render(request, "complaints.html", {"form": form})
 
-                    new_complaint.assigned_to = assigned_user
-                    new_complaint.status = "Open"
+                new_complaint.assigned_to = block_admin
+                new_complaint.status = "Open"
                 new_complaint.save()
 
             ComplaintHistory.objects.create(
@@ -465,14 +484,23 @@ def ReviewComplaintUpdateView(request, id):
     if request.method == "POST":
         new_status = request.POST.get("status")
         if new_status == "Open":
+            block_admin = (
+                complaint.complaint.block.block_admin
+                if complaint.complaint.block
+                else None
+            )
+            if not block_admin or not block_admin.is_active:
+                messages.error(
+                    request,
+                    "Cannot open complaint: selected block has no active block admin.",
+                )
+                return redirect("cms:review_complaints")
+
             complaint.changed_by = request.user
             complaint.status_changed_to = new_status
             complaint.save()
 
-            assigned_user = CustomUsers.objects.filter(
-                department=complaint.complaint.department, role="Admin"
-            ).first()
-            complaint.complaint.assigned_to = assigned_user
+            complaint.complaint.assigned_to = block_admin
             complaint.complaint.status = new_status
             complaint.complaint.save()
         elif new_status == "Rejected":
@@ -498,16 +526,9 @@ def AssignedComplaint(request):
     except:
         raise PermissionDenied("User profile not found.")
 
-    complaints = ComplaintHistory.objects.filter(
-        (Q(complaint__assigned_to=user) | Q(complaint__department=user.department))
-        & (
-            Q(complaint__status="Open")
-            | Q(complaint__status="In Progress")
-            | Q(complaint__status="Resolved")
-            | Q(complaint__status="Halt")
-            | Q(complaint__status="Review")
-        )
-    ).order_by("-complaint__created_at")
+    complaints = ComplaintHistory.objects.filter(complaint__assigned_to=user).order_by(
+        "-complaint__created_at"
+    )
 
     # Halt the open tasks if it exceeds 24hr.
     for complaint in complaints:

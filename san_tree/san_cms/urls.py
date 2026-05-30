@@ -101,6 +101,8 @@ urlpatterns = [
         load_complaint_types,
         name="ajax_load_complaint_types",
     ),
+    path("ajax/load-blocks/", load_blocks, name="ajax_load_blocks"),
+    path("ajax/load-locations/", load_locations, name="ajax_load_locations"),
     path("export/excel/", TasksExport, name="export_tasks_excel"),
     path(
         "incharge/department_complaints/",

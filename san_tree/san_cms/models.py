@@ -4,9 +4,50 @@ from io import BytesIO
 from django.core.files.base import ContentFile
 from django.db import models
 from django.utils import timezone
-from PIL import Image, UnidentifiedImageError
+from PIL import Image
 
-from accounts.models import CustomUsers, Departments, Location
+from accounts.models import CustomUsers, Departments
+
+
+# Facility model.
+class Facility(models.Model):
+    name = models.CharField(max_length=255)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        verbose_name_plural = "Facilities"
+
+    def __str__(self):
+        return self.name
+
+
+# Complaint block model.
+class Block(models.Model):
+    facility = models.ForeignKey(Facility, on_delete=models.CASCADE)
+    name = models.CharField(max_length=255)
+    block_admin = models.ForeignKey(
+        CustomUsers, on_delete=models.SET_NULL, null=True, blank=True
+    )
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        verbose_name_plural = "Complaint Blocks"
+
+    def __str__(self):
+        return self.name
+
+
+# Complaint location model.
+class Location(models.Model):
+    name = models.CharField(max_length=255)
+    block = models.ForeignKey(Block, on_delete=models.CASCADE)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        verbose_name_plural = "Locations"
+
+    def __str__(self):
+        return self.name
 
 
 # Predefine Complaint Types.
@@ -26,6 +67,7 @@ STATUS_CHOICES = (
     ("rejected", "Rejected"),
     ("open", "Open"),
     ("cancelled", "Cancelled"),
+    ("acknowledged", "Acknowledged"),
     ("in_progress", "In Progress"),
     ("resolved", "Resolved"),
     ("halt", "Halt"),
@@ -55,6 +97,20 @@ class Complaint(models.Model):
         null=True,
         blank=True,
     )
+    facility = models.ForeignKey(
+        Facility,
+        related_name="complaint_facilities",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+    )
+    block = models.ForeignKey(
+        Block,
+        related_name="complaint_blocks",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+    )
     location = models.ForeignKey(
         Location,
         related_name="complaint_locations",
@@ -73,10 +129,6 @@ class Complaint(models.Model):
     attachment = models.ImageField(
         upload_to=complaint_image_path, null=True, blank=True
     )
-
-    # Method to define string representation of an object.
-    def __str__(self):
-        return str(self.complaint_type)
 
     def save(self, *args, **kwargs):
         is_new = self.pk is None

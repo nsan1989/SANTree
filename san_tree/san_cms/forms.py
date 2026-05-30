@@ -4,6 +4,9 @@ from django.db.models import Count, Q
 from accounts.models import CustomUsers, Departments
 
 from .models import (
+    Facility,
+    Block,
+    Location,
     Complaint,
     ComplaintRemarks,
     ComplaintType,
@@ -19,6 +22,8 @@ class ComplaintForm(forms.ModelForm):
         fields = [
             "department",
             "complaint_type",
+            "facility",
+            "block",
             "location",
             "priority",
             "attachment",
@@ -32,9 +37,13 @@ class ComplaintForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         user = kwargs.pop("user", None)
-        super(ComplaintForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
         self.fields["complaint_type"].required = True
+
+        self.fields["facility"].required = True
+
+        self.fields["block"].required = True
 
         self.fields["location"].required = True
 
@@ -52,21 +61,43 @@ class ComplaintForm(forms.ModelForm):
             department_qs = department_qs.exclude(id=user_department.id)
 
         self.fields["department"].queryset = department_qs
+        self.fields["facility"].queryset = Facility.objects.filter(
+            is_active=True
+        ).order_by("name")
 
         self.fields["complaint_type"].queryset = ComplaintType.objects.none()
+        self.fields["block"].queryset = Block.objects.none()
+        self.fields["location"].queryset = Location.objects.none()
 
-        if "department" in self.data:
-            try:
-                department_id = int(self.data.get("department"))
-                self.fields["complaint_type"].queryset = ComplaintType.objects.filter(
-                    department_id=department_id
-                ).order_by("name")
-            except (ValueError, TypeError):
-                pass
-        elif self.instance.pk and self.instance.department:
+        department_id = self.data.get("department")
+
+        if not department_id and self.instance.pk:
+            department_id = self.instance.department_id
+
+        if department_id:
             self.fields["complaint_type"].queryset = ComplaintType.objects.filter(
-                department=self.instance.department
-            )
+                department_id=department_id
+            ).order_by("name")
+
+        facility_id = self.data.get("facility")
+
+        if not facility_id and self.instance.pk:
+            facility_id = self.instance.facility_id
+
+        if facility_id:
+            self.fields["block"].queryset = Block.objects.filter(
+                facility_id=facility_id
+            ).order_by("name")
+
+        block_id = self.data.get("block")
+
+        if not block_id and self.instance.pk:
+            block_id = self.instance.block_id
+
+        if block_id:
+            self.fields["location"].queryset = Location.objects.filter(
+                block_id=block_id
+            ).order_by("name")
 
 
 # Reassigned Form
