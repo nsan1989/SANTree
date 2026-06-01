@@ -74,7 +74,7 @@ MENU_STRUCTURE = {
                     },
                     {
                         "name": "Task Checklist",
-                        "url_name": "tms:task_checklist",
+                        "url_name": "tms:task_checklists",
                         "view_name": "AddTaskChecklist",
                         "icon": "fa-solid fa-plus",
                     },

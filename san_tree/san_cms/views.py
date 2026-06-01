@@ -18,7 +18,9 @@ from .models import (
     ComplaintRemarks,
     ComplaintType,
     Location,
+    PRIORITY_CHOICES,
     ReassignedComplaint,
+    STATUS_CHOICES,
 )
 
 matplotlib.use("Agg")
@@ -920,11 +922,27 @@ def AdminAllComplaints(request):
         user_role = user.role
     except:
         raise PermissionDenied("User profile not found.")
+
+    selected_status = (request.GET.get("status") or "").strip()
+    selected_priority = (request.GET.get("priority") or "").strip()
+
     dept_comp = Complaint.objects.filter(
         Q(created_by__department=user.department)
         | Q(assigned_to__department=user.department)
     ).distinct()
-    context = {"comp": dept_comp}
+
+    if selected_status:
+        dept_comp = dept_comp.filter(status__iexact=selected_status)
+    if selected_priority:
+        dept_comp = dept_comp.filter(priority__iexact=selected_priority)
+
+    context = {
+        "comp": dept_comp,
+        "status_choices": STATUS_CHOICES,
+        "priority_choices": PRIORITY_CHOICES,
+        "selected_status": selected_status,
+        "selected_priority": selected_priority,
+    }
     view_name = request.resolver_match.view_name
     if view_name == "cms:department_complaints" and user_role == "Admin":
         return render(request, "department_complaints.html", context)

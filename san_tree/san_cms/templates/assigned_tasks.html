@@ -114,7 +114,7 @@
         </div>
         <div class="col-12 d-none d-md-flex table-responsive">
           <table class="table table-bordered">
-            <thead class="table-primary">
+            <thead class="table-danger">
               <tr>
                 <th scope="col">Complaint No.</th>
                 <th scope="col">Created By</th>
@@ -128,7 +128,7 @@
                 <th scope="col">Details</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody class="table-info">
               {% if page_obj %}
                 {% for task in page_obj %}
                   <tr

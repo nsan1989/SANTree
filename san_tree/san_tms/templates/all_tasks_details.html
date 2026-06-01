@@ -9,7 +9,8 @@
 
     <style>
         .tasks-details-title h3,
-        .remark-title h5 {
+        .handover-history-title h3,
+        .remark-title h3 {
             font-family: 'Poppins', sans-serif;
             color: wheat;
         }
@@ -25,7 +26,7 @@
     </style>
 
     <div class="container-fluid">
-        <div class="row pt-3">
+        <div class="row pt-3 mb-3">
             <div>
                 <a
                     href="javascript:history.back()"
@@ -36,11 +37,11 @@
                     &nbsp;back
                 </a>
             </div>
+        </div>
+        <div class="row mb-3">
             <div class="col-12 col-md-6 tasks-details-title">
                 <h3 class="fw-bold py-2">Tasks Details</h3>
             </div>
-        </div>
-        <div class="row">
             <div class="col-12 table-responsive">
                 <table class="table table-bordered">
                     <thead class="table-danger">
@@ -48,6 +49,7 @@
                             <th scope="col" style="width: 25%;">Task</th>
                             <th scope="col" style="width: 15%;">Location</th>
                             <th scope="col" style="width: 15%;">Created At</th>
+                            <th scope="col" style="width: 15%;">Next Date</th>
                             <th scope="col" style="width: 15%;">Completed At</th>
                         </tr>
                     </thead>
@@ -57,6 +59,7 @@
                                 <td>{{tasks.tasks_types.name}}</td>
                                 <td>{{tasks.location}}</td>
                                 <td>{{tasks.created_at}}</td>
+                                <td>{{tasks.next_date}}</td>
                                 <td>{{tasks.completed_at}}</td>
                             </tr>
                         {% endif %}
@@ -64,7 +67,10 @@
                 </table>
             </div>
         </div>
-        <div class="row">
+        <div class="row mb-3">
+            <div class="col-12 col-md-6 handover-history-title">
+                <h3 class="fw-bold py-2">Handover History</h3>
+            </div>
             <div class="col-12 table-responsive">
                 <table class="table table-bordered">
                     <thead class="table-danger">
@@ -97,10 +103,8 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-12">
-                <div class="remark-title">
-                    <h5>Remarks</h5>
-                </div>
+            <div class="col-12 col-md-6 remark-title">
+                <h3 class="fw-bold py-2">Remarks</h3>
             </div>
             <div class="col-12 table-responsive">
                 <table class="table table-bordered">

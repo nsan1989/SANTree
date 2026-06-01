@@ -12,6 +12,13 @@ def task_free_up_staff(*args, **kwargs):
 
 
 @shared_task
+def task_free_up_onhold_staff(*args, **kwargs):
+    # On-hold services are handled by the same timeout logic as free_up_staff.
+    result = free_up_staff()
+    return f"task_free_up_onhold_staff done: {result}"
+
+
+@shared_task
 def task_hold_service(*args, **kwargs):
     result = hold_service()
     return f"task_hold_service done: {result}"

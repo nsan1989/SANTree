@@ -10,7 +10,7 @@ urlpatterns = [
     path(
         "tasks_admin/dashboard/add_task_checklist/",
         AddTaskChecklist,
-        name="task_checklist",
+        name="task_checklists",
     ),
     path("tasks_staff/dashboard/", StaffDashboard, name="tms_staff_dashboard"),
     #    path('tasks_pie_chart/', TasksPieChart, name='all_tasks_pie_chart'),
