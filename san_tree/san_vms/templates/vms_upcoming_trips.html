@@ -137,8 +137,7 @@
                             <tr>
                                 <th scope="col">ID</th>
                                 <th scope="col">Pickup</th>
-                                <th scope="col">Driver</th>
-                                <th scope="col">Detail</th>
+                                <th scope="col">Action</th>
                             </tr>
                         </thead>
                         <tbody class="table-info">
@@ -150,7 +149,6 @@
                                     >
                                         <td>{{ trip.id }}</td>
                                         <td>{{ trip.pickup_location }}</td>
-                                        <td>{{ trip.driver.user.username|default:"-" }}</td>
                                         <td><i class="fa-solid fa-plus"></i></td>
                                     </tr>
                                     <tr class="trip-body">

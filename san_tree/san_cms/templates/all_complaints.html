@@ -1,34 +1,38 @@
-{% extends 'index.html' %}
-{% load time_extra %}
-{% load static %}
-
-{% block title %}
-  Complaint
-{% endblock %}
-
-{% block start %}
+{% extends 'index.html' %} {% load time_extra %} {% load static %} {% block title %} Complaint {% endblock %} {% block start %}
 
   <style>
     .content-title h3 {
       color: wheat;
-      font-family: 'Poppins', sans-serif;
+      font-family: "Poppins", sans-serif;
       font-weight: bold;
     }
     th {
-      font-family: 'Poppins', sans-serif;
+      font-family: "Poppins", sans-serif;
       font-size: 0.9rem;
     }
     td {
-      font-family: 'Poppins', sans-serif;
+      font-family: "Poppins", sans-serif;
       font-size: 0.85rem;
     }
     .table-responsive {
       overflow-x: auto !important;
     }
-    .status-resolved > td { background-color: #003300; color: white; }
-    .status-progress > td { background-color: #ff6600; color: white; }
-    .status-closed > td { background-color: #666666; color: white; }
-    .status-cancelled > td { background-color: #cc0000; color: white; }
+    .status-resolved > td {
+      background-color: #003300;
+      color: white;
+    }
+    .status-progress > td {
+      background-color: #ff6600;
+      color: white;
+    }
+    .status-closed > td {
+      background-color: #666666;
+      color: white;
+    }
+    .status-cancelled > td {
+      background-color: #cc0000;
+      color: white;
+    }
 
     .complaint-header div p {
       margin-bottom: 0;
@@ -79,228 +83,306 @@
         </div>
         <div class="complaint-link">
           <p class="mb-0 text-light">
-            Raise a complaint &nbsp;<a class="btn btn-primary fw-bold" href="{% url 'cms:complaints' %}" style="text-decoration: none;">click here.</a>
-          </p>
+            Raise a complaint &nbsp;<a
+              class="btn btn-primary fw-bold"
+              href="{% url 'cms:complaints' %}"
+              style="text-decoration: none"
+            >click here.</a
+              >
+            </p>
+          </div>
         </div>
       </div>
-    </div>
-    <!--Paginator-->
-    <nav class="mb-3">
-      <ul class="pagination">
-        {% if page_obj.has_previous %}
-          <li class="page-item">
-            <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a>
-          </li>
-        {% endif %}
-        {% for num in page_obj.paginator.page_range %}
-          {% if num >= page_obj.number|add:'-2' and num <= page_obj.number|add:'2' %}
-            {% if page_obj.number == num %}
-              <li class="page-item active"><span class="page-link">{{ num }}</span></li>
-            {% else %}
-              <li class="page-item">
-                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+  <!--Paginator-->
+      <nav class="mb-3">
+        <ul class="pagination">
+          {% if page_obj.has_previous %}
+            <li class="page-item">
+              <a class="page-link" href="?page={{ page_obj.previous_page_number }}"
+              >Previous</a
+                >
               </li>
-            {% endif %}
+          {% endif %} {% for num in page_obj.paginator.page_range %} {% if num >= page_obj.number|add:'-2' and num <= page_obj.number|add:'2' %} {% if page_obj.number == num %}
+            <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+          {% else %}
+            <li class="page-item">
+              <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+            </li>
+          {% endif %} {% endif %} {% endfor %} {% if page_obj.has_next %}
+            <li class="page-item">
+              <a class="page-link" href="?page={{ page_obj.next_page_number }}"
+              >Next</a
+                >
+              </li>
           {% endif %}
-        {% endfor %}
-        {% if page_obj.has_next %}
-          <li class="page-item">
-            <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
-          </li>
+</ul>
+</nav>
+<div class="row px-2">
+    <!--Desktop view-->
+  <div class="col-12 d-none d-lg-flex table-responsive p-0">
+    <table class="table table-bordered">
+      <thead class="table-danger">
+        <tr>
+          <th scope="col">Complaint No.</th>
+          <th scope="col">Department</th>
+          <th scope="col">Created On</th>
+          <th scope="col">Status</th>
+          <th scope="col">Cancel Complaint</th>
+          <th scope="col">Priority</th>
+          <th scope="col">Updated At</th>
+          <th scope="col">Completed At</th>
+          <th scope="col">TAT</th>
+          <th scope="col">View Details</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% if page_obj %} {% for complaint in page_obj %}
+          <tr
+            {%
+            if
+            complaint.complaint.status=""
+            ="In Progress"
+            %}
+            class="status-progress"
+            {%
+            elif
+            complaint.complaint.status=""
+            ="Resolved"
+            %}
+            class="status-resolved"
+            {%
+            elif
+            complaint.complaint.status=""
+            ="Closed"
+            %}
+            class="status-closed"
+            {%
+            elif
+            complaint.complaint.status=""
+            ="Cancelled"
+            %}
+            class="status-cancelled"
+            {%
+            endif
+            %}
+          >
+            <td>{{complaint.complaint.complaint_number}}</td>
+            <td>{{complaint.complaint.department}}</td>
+            <td>{{complaint.complaint.created_at}}</td>
+            <td>{{complaint.complaint.status}}</td>
+            {% if complaint.status_changed_to != 'Cancelled' %} {% if complaint.complaint.status not in 'In Progress,Resolved,Closed,Review,Rejected' %}
+              <td>
+                <form
+                  method="POST"
+                  action="{% url 'cms:cancel_complaint' complaint.id %}"
+                >
+                  {% csrf_token %}
+                  <input type="hidden" name="status" value="Cancelled" />
+                  <button
+                    class="btn btn-danger"
+                    type="submit"
+                    aria-label="Cancel Complaint"
+                  >
+                    Cancel
+                  </button>
+                </form>
+              </td>
+            {% else %}
+              <td>
+                <p style="font-family: &quot;Poppins&quot;, sans-serif">
+                  Cancel window closed
+                </p>
+              </td>
+            {% endif %} 
+        {% else %}
+          <td>
+            <p style="font-family: &quot;Poppins&quot;, sans-serif">
+              Cancel window closed
+            </p>
+          </td>
         {% endif %}
-      </ul>
-    </nav>
-    <div class="row px-2">
-      <!--Desktop view-->
-      <div class="col-12 d-none d-lg-flex table-responsive p-0">
+          <td>{{complaint.complaint.priority}}</td>
+          <td>{{complaint.timestamp}}</td>
+          <td>{{complaint.complaint.completed_at}}</td>
+          <td>{{ complaint.complaint.time_taken|duration_display }}</td>
+          {% if request.user.role == 'User' %}
+            <td>
+              <a
+                href="{% url 'cms:staff_complaints_details' complaint.id %}"
+                style="text-decoration: none"
+              ><i class="fa-solid fa-eye"></i
+                ></a>
+              </td>
+          {% elif request.user.role == 'Admin' %}
+            <td>
+              <a
+                href="{% url 'cms:incharge_complaints_details' complaint.id %}"
+                style="text-decoration: none"
+              ><i class="fa-solid fa-eye"></i
+                ></a>
+              </td>
+          {% endif %}
+          </tr>
+        {% endfor %} {% else %}
+          <tr>
+            <td colspan="100%">No complaints have been raised!</td>
+          </tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+    <!--Mobile view-->
+  <div class="col-12 d-md-none p-0">
+    <div class="complaint-wrapper">
+      <div class="complaint-content table-responsive">
         <table class="table table-bordered">
           <thead class="table-danger">
             <tr>
-              <th scope="col">Complaint No.</th>
-              <th scope="col">Department</th>
-              <th scope="col">Created On</th>
-              <th scope="col">Status</th>
-              <th scope="col">Cancel Complaint</th>
+              <th scope="col">Comp. No.</th>
               <th scope="col">Priority</th>
-              <th scope="col">Updated At</th>
-              <th scope="col">Completed At</th>
-              <th scope="col">TAT</th>
-              <th scope="col">View Details</th>
+              <th scope="col">Detail</th>
             </tr>
           </thead>
-          <tbody>
-            {% if page_obj %}
-              {% for complaint in page_obj %}
-                <tr
-                  {% if complaint.complaint.status == 'In Progress' %}
-                    class="status-progress"
-                  {% elif complaint.complaint.status == 'Resolved' %}
-                    class="status-resolved"
-                  {% elif complaint.complaint.status == 'Closed' %}
-                    class="status-closed"
-                  {% elif complaint.complaint.status == 'Cancelled' %}
-                    class="status-cancelled"
-                  {% endif %}
-                >
-                  <td>{{complaint.complaint.complaint_number}}</td>
-                  <td>{{complaint.complaint.department}}</td>
-                  <td>{{complaint.complaint.created_at}}</td>
-                  <td>{{complaint.complaint.status}}</td>
-                  {% if complaint.status_changed_to != 'Cancelled' %}
-                    {% if complaint.complaint.status not in 'In Progress,Resolved,Closed,Review,Rejected' %}
-                      <td>
-                        <form method="POST" action="{% url 'cms:cancel_complaint' complaint.id %}">
+          <tbody class="table-info">
+            {% if page_obj %} {% for complaint in page_obj %}
+              <tr 
+              class="complaint-summary-row" onClick="toggleTask(this)"
+              {%
+            if
+            complaint.complaint.status=""
+            ="In Progress"
+            %}
+            class="status-progress"
+            {%
+            elif
+            complaint.complaint.status=""
+            ="Resolved"
+            %}
+            class="status-resolved"
+            {%
+            elif
+            complaint.complaint.status=""
+            ="Closed"
+            %}
+            class="status-closed"
+            {%
+            elif
+            complaint.complaint.status=""
+            ="Cancelled"
+            %}
+            class="status-cancelled"
+            {%
+            endif
+            %}
+              >
+                <td>{{complaint.complaint.complaint_number}}</td>
+                <td>{{complaint.complaint.priority}}</td>
+                <td><i class="fa-solid fa-plus"></i></td>
+              </tr>
+              <tr class="complaint-body">
+                <td colspan="4">
+                  <div class="complaint-detail-content">
+                    <div>
+                      <i class="fa-regular fa-building"></i>
+                      <p>{{complaint.complaint.department}}</p>
+                    </div>
+                    <div>
+                      <i class="fa-regular fa-flag"></i>
+                      <p>{{complaint.complaint.status}}</p>
+                    </div>
+                    <div>
+                      <i class="fa-regular fa-calendar"></i>
+                      <p>{{complaint.complaint.created_at}}</p>
+                    </div>
+                    <div>
+                      <i class="fa-solid fa-magnifying-glass-chart"></i>
+                      {% if complaint.status_changed_to != 'Cancelled' %} {% if complaint.complaint.status not in 'In Progress,Resolved,Closed,Review,Rejected' %}
+                        <form
+                          method="POST"
+                          action="{% url 'cms:cancel_complaint' complaint.id %}"
+                        >
                           {% csrf_token %}
-                          <input type="hidden" name="status" value="Cancelled">
-                          <button class="btn btn-danger" type="submit" aria-label="Cancel Complaint">Cancel</button>
+                          <input type="hidden" name="status" value="Cancelled" />
+                          <button
+                            class="btn btn-danger"
+                            type="submit"
+                            aria-label="Cancel Complaint"
+                          >
+                            Cancel
+                          </button>
                         </form>
-                      </td>
-                    {% else %}
-                      <td>
-                        <p style="font-family:'Poppins', sans-serif;">Cancel window closed</p>
-                      </td>
-                    {% endif %}
-                  {% else %}
-                    <td><p style="font-family:'Poppins', sans-serif;">Cancel window closed</p></td>
-                  {% endif %}
-                  <td>{{complaint.complaint.priority}}</td>
-                  <td>{{complaint.timestamp}}</td>
-                  <td>{{complaint.complaint.completed_at}}</td>
-                  <td>{{ complaint.complaint.time_taken|duration_display }}</td>
-                  {% if request.user.role == 'User' %}
-                    <td><a href="{% url 'cms:staff_complaints_details' complaint.id %}" style="text-decoration: none;"><i class="fa-solid fa-eye"></i></a></td>
-                  {% elif request.user.role == 'Admin' %}
-                    <td><a href="{% url 'cms:incharge_complaints_details' complaint.id %}" style="text-decoration: none;"><i class="fa-solid fa-eye"></i></a></td>
-                  {% endif %}
-                </tr>
-              {% endfor %}
-            {% else %}
+                      {% else %}
+                        <p style="font-family: &quot;Poppins&quot;, sans-serif">
+                          Cancel window closed
+                        </p>
+                      {% endif %} {% else %}
+              <p style="font-family: &quot;Poppins&quot;, sans-serif">
+                Cancel window closed
+              </p>
+            {% endif %}
+              </div>
+              <div>
+                <i class="fa-regular fa-calendar"></i>
+                <p>{{complaint.timestamp}}</p>
+              </div>
+              <div>
+                <i class="fa-regular fa-calendar"></i>
+                <p>{{complaint.complaint.completed_at}}</p>
+              </div>
+              <div>
+                <i class="fa-regular fa-clock"></i>
+                <p>
+                  {{ complaint.complaint.time_taken|duration_display }}
+                </p>
+              </div>
+              <div>
+                {% if request.user.role == 'User' %}
+                  <a
+                    href="{% url 'cms:staff_complaints_details' complaint.id %}"
+                    style="text-decoration: none; display: flex"
+                  >
+                    <i class="fa-solid fa-eye"></i>
+                    <p>View Details</p>
+                  </a>
+                {% elif request.user.role == 'Admin' %}
+                  <a
+                    href="{% url 'cms:incharge_complaints_details' complaint.id %}"
+                    style="text-decoration: none; display: flex"
+                  >
+                    <i class="fa-solid fa-eye"></i>
+                    <p>View Details</p>
+                  </a>
+                {% endif %}
+              </div>
+              </div>
+              </td>
+              </tr>
+            {% endfor %} {% else %}
               <tr>
-                <td colspan="100%">No complaints have been raised!</td>
+                <td colspan="100%">No complaints!</td>
               </tr>
             {% endif %}
           </tbody>
         </table>
       </div>
-      <!--Mobile view-->
-      <div class="col-12 d-md-none p-0">
-        <div class="complaint-wrapper">
-          <div class="complaint-content table-responsive">
-            <table class="table table-bordered">
-              <thead class="table-danger">
-                <tr>
-                  <th scope="col">No.</th>
-                  <th scope="col">Status</th>
-                  <th scope="col">Priority</th>
-                  <th scope="col">Detail</th>
-                </tr>
-              </thead>
-              <tbody class="table-info">
-                {% if page_obj %}
-                  {% for complaint in page_obj %}
-                    <tr
-                      class="complaint-summary-row"
-                      onClick="toggleTask(this)"
-                    >
-                      <td>{{complaint.complaint.complaint_number}}</td>
-                      <td>{{complaint.complaint.status}}</td>
-                      <td>{{complaint.complaint.priority}}</td>
-                      <td><i class="fa-solid fa-plus"></i></td>
-                    </tr>
-                    <tr
-                      class="complaint-body"
-                    >
-                      <td
-                        colspan="4"
-                      >
-                        <div
-                          class="complaint-detail-content"      "
-                                                                 >
-                                                                 <div>
-                                                                 <i class="fa-regular fa-building"></i>
-                                                                                                                            <p>{{complaint.complaint.department}}</p>
-                                                                                                                            </div>
-                                                                                                                            <div>
-                                                                                                                            <i class="fa-regular fa-calendar"></i>
-                                                                                                                                                                                       <p>{{complaint.complaint.created_at}}</p>
-                                                                                                                                                                                       </div>
-                                                                                                                                                                                       <div>
-                                                                                                                                                                                       <i class="fa-solid fa-magnifying-glass-chart"></i>
-                                                                                                                                                                                                                                                              {% if complaint.status_changed_to != 'Cancelled' %}
-                                                                                                                                                                                                                                                                {% if complaint.complaint.status not in 'In Progress,Resolved,Closed,Review,Rejected' %}
-                                                                                                                                                                                                                                                                  <form method="POST" action="{% url 'cms:cancel_complaint' complaint.id %}">
-                                                                                                                                                                                                                                                                                                                                                                          {% csrf_token %}
-                                                                                                                                                                                                                                                                                                                                                                          <input type="hidden" name="status" value="Cancelled">
-                                                                                                                                                                                                                                                                                                                                                                                                                       <button class="btn btn-danger" type="submit" aria-label="Cancel Complaint">Cancel</button>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                    </form>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                  {% else %}
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <p style="font-family:'Poppins', sans-serif;">Cancel window closed</p>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  {% endif %}
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                {% else %}
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  <p style="font-family:'Poppins', sans-serif;">Cancel window closed</p>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  {% endif %}
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  </div>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  <div>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  <i class="fa-regular fa-calendar"></i>
-                                                                                                                                                                                                                                                                                                                                                                                                                                       <p>{{complaint.timestamp}}</p>
-                                                                                                                                                                                                                                                                                                                                                                                                                                       </div>
-                                                                                                                                                                                                                                                                                                                                                                                                                                       <div>
-                                                                                                                                                                                                                                                                                                                                                                                                                                       <i class="fa-regular fa-calendar"></i>
-                                                                                                                                                                                                                                                                                                                                                                                                                <p>{{complaint.complaint.completed_at}}</p>
-                                                                                                                                                                                                                                                                                                                                                                                                                </div>
-                                                                                                                                                                                                                                                                                                                                                                                                                <div>
-                                                                                                                                                                                                                                                                                                                                                                                                                <i class="fa-regular fa-clock"></i>
-                                                                                                                                                                                                                                                                                                                                                              <p>{{ complaint.complaint.time_taken|duration_display }}</p>
-                                                                                                                                                                                                                                                                                                                                                              </div>
-                                                                                                                                                                                                                                                                                                                                                              <div>
-                                                                                                                                                                                                                                                                                                                                                              {% if request.user.role == 'User' %}
-                                                                                                                                                                                                                                                                                                                                                                <a
-                                                                                                                                                                                                                                                                                                                                                                href="{% url 'cms:staff_complaints_details' complaint.id %}"
-                                                                                        style="text-decoration: none; display: flex;"
-                                                                         >
-                                                                         <i class="fa-solid fa-eye"></i>
-                                                                                                                               <p>View Details</p>
-                                                                                                                               </a>
-                                                                                                                             {% elif request.user.role == 'Admin' %}
-                                                                                                                               <a
-                                                                                                                               href="{% url 'cms:incharge_complaints_details' complaint.id %}"
-                                                                                           style="text-decoration: none; display: flex;"
-                                                                         >
-                                                                         <i class="fa-solid fa-eye"></i>
-                                                                                                                               <p>View Details</p>
-                                                                                                                               </a>
-                                                                                                                             {% endif %}
-                                                                                                                             </div>
-                                                                                                                             </div>
-                                                                                                                             </td>
-                                                                                                                             </tr>
-                                                                                                                     {% endfor %}
-                                                                                                                   {% else %}
-                                                                                                                     <tr>
-                                                                                                                     <td colspan="100%">No complaints!</td>
-                                                                                                                                                         </tr>
-                                                                                                                                                       {% endif %}
-                                                                                                                                                       </tbody>
-                                                                                                                                                       </table>
-                                                                                                                                                       </div>
-                                                                                                                                                       </div>
-                                                                                                                                                       </div>
-                                                                                                                                                       </div>
-                                                                                                                                                       </div>
+    </div>
+  </div>
+</div>
+</div>
 
-                                                                                                                                                       <script>
-                                                                                                                                                       function toggleTask(element) {
-                                                                                                                                                       const body = element.nextElementSibling;
-                                                                                                                                                       body.classList.toggle("active");
+<script>
+  function toggleTask(element) {
+    const body = element.nextElementSibling;
+    body.classList.toggle("active");
 
-                                                                                                                                                                                                     const icon = element.querySelector("i");
-                                                                                                                                                                                                                                                           if (body.classList.contains("active")) {
-                                                                                                                                                                                                                                                                      icon.classList.remove("fa-plus");
-                                                                                                                                                                                                                                                             icon.classList.add("fa-minus");
-                                                                                                                                                                                                                                                          } else {
-                                                                                                                                                                                                                                                          icon.classList.remove("fa-minus");
-                                                                                                                                                                                                                                                            icon.classList.add("fa-plus");
-                                                                                                                                                                                                                                                  }
-                                                                                                                                                                                                                                                  }
-                                                                                                                                                                                                                                                  </script>
-                                                                                                                                                                                                                                  {% endblock %}
+    const icon = element.querySelector("i");
+    if (body.classList.contains("active")) {
+      icon.classList.remove("fa-plus");
+      icon.classList.add("fa-minus");
+    } else {
+      icon.classList.remove("fa-minus");
+      icon.classList.add("fa-plus");
+    }
+  }
+</script>
+{% endblock %}

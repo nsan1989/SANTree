@@ -57,12 +57,12 @@
         <!--asset handler content-->
         {% if activities %}
             <div class="row mb-3">
-                <div class="col-12 d-flex gap-3">
+                <div class="col-12 d-flex flex-column gap-2">
                     <div class="header-title">
                         <h3>Dashboard</h3>
                     </div>
                     <div class="header-content d-flex align-items-center gap-3">
-                            <p class="mb-0 text-warning">click here to request an asset</p>
+                            <p class="mb-0 text-warning">request an asset</p>
                             <a
                                 data-url="{% url 'ams:asset_requests' %}"
                                 class="open-modal btn btn-primary"
@@ -71,7 +71,7 @@
                                     color: #fff;
                                 "
                             >
-                                Request Asset
+                                Request
                             </a>
                     </div>
                 </div>
@@ -194,7 +194,7 @@
                         <h3>Dashboard</h3>
                     </div>
                     <div class="header-content d-flex align-items-center gap-3">
-                            <p class="mb-0 text-warning">click here to request an asset</p>
+                            <p class="mb-0 text-warning">request an asset</p>
                             <a
                                 data-url="{% url 'ams:asset_requests' %}"
                                 class="open-modal btn btn-primary"
@@ -203,7 +203,7 @@
                                     color: #fff;
                                 "
                             >
-                                Request Asset
+                                Request
                             </a>
                     </div>
                 </div>

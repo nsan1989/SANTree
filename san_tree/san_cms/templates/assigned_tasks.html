@@ -112,6 +112,7 @@
             </nav>
           </div>
         </div>
+        <!--Desktop view-->
         <div class="col-12 d-none d-md-flex table-responsive">
           <table class="table table-bordered">
             <thead class="table-danger">
@@ -183,15 +184,11 @@
         </div>
       <!--Mobile view-->
         <div class="col-12 d-md-none">
-          <div class="task-title mb-3">
-            <h5 class="fw-bold">Complaint List</h5>
-          </div>
           <div class="task-content table-responsive">
             <table class="table table-bordered">
               <thead class="table-danger">
                 <tr>
-                  <th scope="col">No.</th>
-                  <th scope="col">Status</th>
+                  <th scope="col">Comp. No.</th>
                   <th scope="col">Priority</th>
                   <th scope="col">Detail</th>
                 </tr>
@@ -204,7 +201,6 @@
                       onClick="toggleTask(this)"
                     >
                       <td>{{task.complaint.complaint_number}}</td>
-                      <td>{{task.complaint.status}}</td>
                       <td>{{task.complaint.priority}}</td>
                       <td><i class="fa-solid fa-plus"></i></td>
                     </tr>
@@ -215,6 +211,10 @@
                         colspan="4"
                       >
                         <div class="task-detail-content">
+                          <div>
+                            <i class="fa-regular fa-flag"></i>
+                            <p>{{task.complaint.status}}</p>
+                          </div>
                           <div>
                             <i class="fa-regular fa-user"></i>
                             <p>{{task.complaint.created_by.department}}</p>

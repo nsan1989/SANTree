@@ -204,8 +204,7 @@
           <table class="table table-bordered">
             <thead class="table-danger">
               <tr>
-                <th scope="col">No.</th>
-                <th scope="col">Type</th>
+                <th scope="col">Serv. No.</th>
                 <th scope="col">Status</th>
                 <th scope="col">Detail</th>
               </tr>
@@ -218,7 +217,6 @@
                     onclick="toggleService(this)"
                   >
                     <td>{{service.service_number}}</td>
-                    <td>{{service.service_type}}</td>
                     <td>{{service.status}}</td>
                     <td><i class="fa-solid fa-plus"></i></td>
                   </tr>
@@ -227,6 +225,10 @@
                       colspan="4"
                     >
                       <div class="service-body-content">
+                        <div>
+                          <i class="fa-solid fa-screwdriver-wrench"></i>
+                          <p>{{service.service_type}}</p>
+                        </div>
                         <div>
                           <i class="fa-regular fa-id-badge"></i>
                           <p>{{service.UHID}}</p>

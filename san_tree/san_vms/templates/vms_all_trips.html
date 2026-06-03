@@ -141,8 +141,7 @@
                             <tr>
                                 <th scope="col">ID</th>
                                 <th scope="col">Status</th>
-                                <th scope="col">Driver</th>
-                                <th scope="col">Detail</th>
+                                <th scope="col">Action</th>
                             </tr>
                         </thead>
                         <tbody class="table-info">
@@ -154,12 +153,15 @@
                                     >
                                         <td>{{request.id}}</td>
                                         <td>{{request.status}}</td>
-                                        <td>{{request.driver}}</td>
                                         <td><i class="fa-solid fa-plus"></i></td>
                                     </tr>
                                     <tr class="request-body">
                                         <td colspan="4">
                                             <div class="request-body-content">
+                                                <div>
+                                                    <i class="fa-solid fa-user"></i>
+                                                    <p>{{ request.driver.user.username|default:"NA" }}</p>
+                                                </div>
                                                 <div>
                                                     <i class="fa-solid fa-exclamation"></i>
                                                     <p>{{ request.booking_type|default:"NA" }}</p>

@@ -14,6 +14,26 @@
         .header-title p {
             color: wheat;
         }
+
+        .asset-body {
+            display: none;
+        }
+
+        .asset-body.active {
+            display: table-row;
+        }
+
+        .asset-detail-content div {
+            height: 2rem;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .asset-detail-content div p {
+            margin-bottom: 0;
+        }
     </style>
 
     <div class="container-fluid">
@@ -21,14 +41,15 @@
             <div class="col-12">
                 <div class="header-title">
                     <h3 class="mb-0">Assets</h3>
-                    <p class="mb-0">track all of your assets here!</p>
+                    <p class="mb-0">List of all assets!</p>
                 </div>
             </div>
         </div>
-        {% for asset in assets %}
             <!--asset handler content-->
-            {% if asset.asset.handler == user %}
-            <div class="row">
+            {% for asset in assets %}
+            {% if asset.handler == request_user %}
+            <!--Desktop view-->
+            <div class="row d-none d-md-flex">
                 <div class="col-12 table-responsive">
                     <table class="table table-bordered">
                         <thead>
@@ -47,10 +68,10 @@
                             {% if assets %}
                                 {% for asset in assets %}
                                     <tr class="table-info">
-                                        <td>{{asset.asset.asset_tag}}</td>
-                                        <td>{{asset.asset.name}}</td>
-                                        {% if asset.asset.image %}
-                                            <td>{{asset.asset.image}}</td>
+                                        <td>{{asset.asset_tag}}</td>
+                                        <td>{{asset.name}}</td>
+                                        {% if asset.image %}
+                                            <td>{{asset.image}}</td>
                                         {% else %}
                                             <td>NA</td>
                                         {% endif %}
@@ -78,10 +99,10 @@
                                             --
                                             {% endif %}
                                         </td>
-                                        <td>{{asset.asset.assigned_to}}</td>
-                                        <td>{{asset.asset.location}}</td>
+                                        <td>{{asset.assigned_to}}</td>
+                                        <td>{{asset.location}}</td>
                                         <td class="d-flex align-items-center gap-3">
-                                            {% if asset.asset.assigned_to == None %}
+                                            {% if asset.assigned_to == None %}
                                             <div class="assign_asset_icon">
                                                 <a data-url="{% url 'ams:staff_assigned_assets' asset.id %}"
                                                 class="open-modal"
@@ -108,9 +129,54 @@
                     </table>
                 </div>
             </div>
+            <!--Mobile view-->
+            <div class="row d-md-none">
+                <div class="col-12 table-responsive">
+                    <table class="table table-bordered">
+                        <thead class="table-danger">
+                            <tr>
+                                <th scope="col">Asset No.</th>
+                                <th scope="col">Status</th>
+                                <th scope="col">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody class="table-info">
+                            {% if assets %}
+                                {% for asset in assets %}
+                                    <tr
+                                        class="asset-summary-row"
+                                        onclick="toggleTask(this)"
+                                    >
+                                        <td>{{asset.asset_tag}}</td>
+                                        <td>{{asset.status}}</td>
+                                        <td><i class="fa-solid fa-plus"></i></td>
+                                    </tr>
+                                    <tr
+                                        class="asset-body"
+                                    >
+                                        <td colspan="4">
+                                            <div class="asset-detail-content">
+                                                <div>
+                                                    <i class="fa-solid fa-gears"></i>
+                                                    <p>{{asset.name}}</p>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            {% else %}
+                            <tr>
+                                <td colspan="100%">No assets found!</td>
+                            </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
             <!--asset user content-->
             {% else %}
-            <div class="row">
+            <!--Desktop view-->
+            <div class="row d-none d-md-flex">
                 <div class="col-12 table-responsive">
                     <table class="table table-bordered">
                         <thead>
@@ -130,10 +196,10 @@
                             {% if assets %}
                                 {% for asset in assets %}
                                     <tr class="table-info">
-                                        <td>{{asset.asset.asset_tag}}</td>
-                                        <td>{{asset.asset.name}}</td>
-                                        {% if asset.asset.image %}
-                                            <td>{{asset.asset.image}}</td>
+                                        <td>{{asset.asset_tag}}</td>
+                                        <td>{{asset.name}}</td>
+                                        {% if asset.image %}
+                                            <td>{{asset.image}}</td>
                                         {% else %}
                                             <td>NA</td>
                                         {% endif %}
@@ -152,8 +218,8 @@
                                             --
                                             {% endif %}
                                         </td>
-                                        <td>{{asset.asset.handler}}</td>
-                                        <td>{{asset.asset.location}}</td>
+                                        <td>{{asset.handler}}</td>
+                                        <td>{{asset.location}}</td>
                                         <td class="d-flex align-items-center">
                                             <div class="view_detail_icon">
                                                 <a href="{% url 'ams:staff_asset_detail' asset.id %}"
@@ -173,8 +239,50 @@
                     </table>
                 </div>
             </div>
+            <!--Mobile view-->
+            <div class="row d-md-none">
+                <div class="col-12 table-responsive">
+                    <table class="table table-bordered">
+                        <thead class="table-danger">
+                            <tr>
+                                <th scope="col">ID</th>
+                                <th scope="col">Status</th>
+                                <th scope="col">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody class="table-info">
+                            {% if assets %}
+                                {% for asset in assets %}
+                                    <tr
+                                        class="asset-summary-row"
+                                        onclick="toggleTask(this)"
+                                    >
+                                        <td>{{asset.asset_tag}}</td>
+                                        <td>{{asset.status}}</td>
+                                        <td><i class="fa-solid fa-plus"></i>
+                                    </tr>
+                                    <tr
+                                        class="asset-body"
+                                    >
+                                        <td colspan="4">
+                                            <div class="asset-detail-content">
+                                                <div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            {% else %}
+                            <tr>
+                                <td colspan="100%">No assets found!</td>
+                            </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
             {% endif %}
-        {% endfor %}
+            {% endfor %}
     </div>
 
 <!--Dynamic Modal-->
@@ -252,5 +360,21 @@
 
         });
     </script>
+
+    <script>
+    function toggleTask(element) {
+      const body = element.nextElementSibling;
+      body.classList.toggle("active");
+
+      const icon = element.querySelector("i");
+      if (body.classList.contains("active")) {
+        icon.classList.remove("fa-plus");
+        icon.classList.add("fa-minus");
+      } else {
+        icon.classList.remove("fa-minus");
+        icon.classList.add("fa-plus");
+      }
+    }
+  </script>
 
 {% endblock %}

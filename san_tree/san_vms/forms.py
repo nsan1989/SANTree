@@ -30,6 +30,10 @@ class DriverForm(forms.ModelForm):
         model = Driver
         fields = "__all__"
 
+    def __init__(self, *args, **kwargs):
+        kwargs.pop("user", None)
+        super().__init__(*args, **kwargs)
+
     def clean(self):
         cleaned_data = super().clean()
         return cleaned_data

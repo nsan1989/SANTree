@@ -5,8 +5,10 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib import messages
 import json
 from django.http import JsonResponse
-from datetime import timedelta
+import calendar
+from datetime import datetime, time, timedelta
 from django.urls import reverse
+from django.utils import timezone
 
 from .forms import *
 from .models import *
@@ -169,7 +171,7 @@ def StaffDashboardView(request):
                 "-created_at"
             )
         else:
-            all_bookings = Booking.objects.filter(created_by=current_user).order_by(
+            all_bookings = Booking.objects.filter(booked_by=current_user).order_by(
                 "-created_at"
             )
         context["bookings"] = all_bookings
@@ -454,7 +456,7 @@ def DriverScheduleView(request):
         raise PermissionDenied("User profile not found")
     context = {}
     try:
-        schedule = DriverSchedule.objects.filter(shift_type="ongoing")
+        schedule = DriverSchedule.objects.filter(status="ongoing")
         page_number = request.GET.get("page")
         paginator = Paginator(schedule, 10)
         page_obj = paginator.get_page(page_number)
@@ -497,11 +499,21 @@ def ToggleSchedule(request, pk):
 
 # Recurrence booking view.
 def recurring_bookings():
-    today = timezone.now().date()
+    today = timezone.localdate()
+    current_tz = timezone.get_current_timezone()
+    start_of_day = timezone.make_aware(datetime.combine(today, time.min), current_tz)
+    end_of_day = timezone.make_aware(datetime.combine(today, time.max), current_tz)
+
+    def add_one_month(dt_value):
+        next_month = 1 if dt_value.month == 12 else dt_value.month + 1
+        next_year = dt_value.year + 1 if dt_value.month == 12 else dt_value.year
+        last_day = calendar.monthrange(next_year, next_month)[1]
+        return dt_value.replace(year=next_year, month=next_month, day=min(dt_value.day, last_day))
 
     bookings = Booking.objects.filter(
         is_recurring=True,
-        pickup_time__date=today,
+        pickup_time__gte=start_of_day,
+        pickup_time__lte=end_of_day,
         status__in=["WAITING", "CONFIRMED", "COMPLETED"],
     )
 
@@ -513,14 +525,18 @@ def recurring_bookings():
             delta = timedelta(days=7)
 
         elif booking.recurrence_pattern == "MONTHLY":
-            delta = timedelta(months=1)
+            if booking.pickup_time:
+                booking.pickup_time = add_one_month(booking.pickup_time)
+            if booking.drop_time:
+                booking.drop_time = add_one_month(booking.drop_time)
+            delta = None
 
         else:
             continue
 
-        if booking.pickup_time:
+        if booking.pickup_time and delta:
             booking.pickup_time += delta
-        if booking.drop_time:
+        if booking.drop_time and delta:
             booking.drop_time += delta
 
         booking.status = "WAITING"
@@ -535,6 +551,6 @@ def BookingSuccessView(request):
     if request.user.role == "Admin":
         redirect_url = reverse("vms:vms_admin_dashboard")
     else:
-        redirect_url = reverse("cms:vms:vms_staff_dashboard")
+        redirect_url = reverse("vms:vms_staff_dashboard")
 
     return render(request, "vms_booking_success.html", {"redirect_url": redirect_url})
