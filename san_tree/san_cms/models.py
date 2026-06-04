@@ -1,6 +1,7 @@
 import os
 from io import BytesIO
 
+from django.core.exceptions import ValidationError
 from django.core.files.base import ContentFile
 from django.db import models
 from django.utils import timezone
@@ -76,6 +77,12 @@ STATUS_CHOICES = (
 
 # Prority Choices.
 PRIORITY_CHOICES = (("high", "High"), ("mid", "Mid"), ("low", "Low"))
+MAX_IMAGE_UPLOAD_SIZE = 5 * 1024 * 1024
+
+
+def validate_image_size(image):
+    if image and image.size > MAX_IMAGE_UPLOAD_SIZE:
+        raise ValidationError("Image size must not exceed 5 MB.")
 
 
 def complaint_image_path(instance, filename):
@@ -127,7 +134,10 @@ class Complaint(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     completed_at = models.DateTimeField(null=True, blank=True)
     attachment = models.ImageField(
-        upload_to=complaint_image_path, null=True, blank=True
+        upload_to=complaint_image_path,
+        null=True,
+        blank=True,
+        validators=[validate_image_size],
     )
 
     def save(self, *args, **kwargs):
@@ -275,7 +285,10 @@ class ComplaintRemarks(models.Model):
     )
     created_at = models.DateTimeField(auto_now=True)
     attachment = models.ImageField(
-        upload_to=complaint_remark_image_path, null=True, blank=True
+        upload_to=complaint_remark_image_path,
+        null=True,
+        blank=True,
+        validators=[validate_image_size],
     )
 
     def __str__(self):

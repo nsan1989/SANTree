@@ -21,6 +21,21 @@
         .booking-body.active {
             display: block !important;
         }
+        .request-body {
+            display: none;
+        }
+        .request-body.active {
+            display: table-row;
+        }
+        .request-body-content div {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            height: 2rem;
+        }
+        .request-body-content div p {
+            margin-bottom: 0;
+        }
     </style>
 
     <div class="container-fluid">
@@ -30,7 +45,7 @@
         </div>
         {% if request.user.department.name|lower != "transport" %}
             <div class="cab-request d-flex align-items-center mb-3">
-                <p class="mb-0 text-light">Booked a cab</p>&nbsp;<a class="btn btn-warning" href="{% url 'vms:vms_cab_request' %}">Book Now</a>
+                <p class="mb-0 text-light">Booked a cab</p>&nbsp;<a class="btn btn-primary" href="{% url 'vms:vms_cab_request' %}">Book Now</a>
             </div>
         {% endif %}
         <div class="dashboard-content">
@@ -38,6 +53,7 @@
                 <h3>Recent Activity</h3>
             </div>
             <div class="row">
+                <!--Desktop view.-->
                 <div class="col-12 d-none d-md-flex table-responsive">
                     <table class="table table-bordered">
                         <thead class="table-danger">
@@ -68,71 +84,61 @@
                         </tbody>
                     </table>
                 </div>
-                <div class="col-12 d-md-none">
-                    {% if bookings %}
-                        {% for booking in bookings %}
-                            <div class="booking-wrapper">
-                                <div
-                                    class="booking-header"
-                                    style="
-                                           display: flex;
-                                           justify-content: space-between;
-                                           cursor: pointer;
-                                           background-color: #7ae1f5;
-                                           padding: 0.5rem;
-                                           border-radius: 0.2rem;
-                                           color: #000;
-                                           font-family: 'Poppins', sans-serif;
-                                          "
-                                    onClick="toggleTask(this)"
-                                >
-                                    <div class="booking-number">
-                                        {{booking.id}}
-                                    </div>
-                                    <div class="booking-status">
-                                        {{booking.status}}
-                                    </div>
-                                    <div class="booking-detail">
-                                        <i class="fa-solid fa-plus"></i>
-                                    </div>
-                                </div>
-                                <div
-                                    class="booking-body"
-                                    style="
-                                           display: none;
-                                           align-items: center;
-                                           background-color: #fff;
-                                           padding: 0.5rem;
-                                           font-family: 'Poppins', sans-serif;
-                                          "
-                                >
-                                    <div>
-                                        <i class="fa-solid fa-location-arrow"></i>
-                                        <p>{{ booking.pickup_location }}</p>
-                                    </div>
-                                    <div>
-                                        <i class="fa-solid fa-location-arrow"></i>
-                                        <p>{{ booking.drop_location }}</p>
-                                    </div>
-                                    <div>
-                                        <i class="fa-solid fa-clock"></i>
-                                        <p>{{ booking.pickup_time }}</p>
-                                    </div>
-                                </div>
-                            </div>
-                        {% endfor %}
-                    {% else %}
-                        <div
-                            class="booking-header"
-                            style="
-                                   background-color: #7ae1f5;
-                                   padding: 0.5rem;
-                                   border-radius: 0.2rem;
-                                  "
-                        >
-                            <p class="mb-0">No Bookings!</p>
-                        </div>
-                    {% endif %}
+                <!--Mobile view-->
+                <div class="col-12 d-md-none table-responsive">
+                    <table class="table table-bordered">
+                        <thead class="table-danger">
+                            <tr>
+                                <th scope="col">Trip ID.</th>
+                                <th scope="col">Status</th>
+                                <th scope="col">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody class="table-info">
+                            {% if bookings %}
+                                {% for booking in bookings %}
+                                    <tr
+                                        class="booking-summary-row"
+                                        onclick="toggleTask(this)"
+                                    >
+                                        <td>{{booking.id}}</td>
+                                        <td>{{booking.status}}</td>
+                                        <td><i class="fa-solid fa-plus"></i></td>
+                                    </tr>
+                                    <tr class="request-body">
+                                        <td colspan="4">
+                                            <div class="request-body-content">
+                                                <div>
+                                                    <i class="fa-solid fa-location-arrow"></i>
+                                                    <p>{{ booking.pickup_location }}</p>
+                                                </div>
+                                                <div>
+                                                    <i class="fa-solid fa-location-arrow"></i>
+                                                    <p>{{ booking.drop_location }}</p>
+                                                </div>
+                                                <div>
+                                                    <i class="fa-solid fa-clock"></i>
+                                                    <p>{{ booking.pickup_time }}</p>
+                                                </div>
+                                                <div>
+                                                    <i class="fa-solid fa-user"></i>
+                                                    <p>{{ booking.driver.user.username }}</p>
+                                                </div>
+                                                <div>
+                                                    <i class="fa-solid fa-phone"></i>
+                                                    <p>{{ booking.driver.user.phone_number }}</p>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="100%">No bookings available.</td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>

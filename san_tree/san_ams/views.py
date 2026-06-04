@@ -403,7 +403,6 @@ def AddAssetView(request):
 # Asset View.
 def AssetView(request):
     current_user = request.user
-    print(current_user)
     try:
         current_user_role = current_user.role
     except:
@@ -412,19 +411,20 @@ def AssetView(request):
     try:
         if current_user_role == "Admin":
             asset = AssetModel.objects.filter(department=current_user.department).all()
-        else:
-            asset = AssetModel.objects.filter(
-                Q(handler=current_user) | Q(assigned_to=current_user)
-            )
-        statuses = [choice[1] for choice in assetChoices.choices]
-        if asset.exists():
             context = {
                 "assets": asset,
-                "statuses": statuses,
-                "request_user": current_user,
             }
         else:
-            context["assets_message"] = "No assets found!"
+            handled_assets = AssetModel.objects.filter(handler=current_user)
+            assigned_assets = AssetModel.objects.filter(assigned_to=current_user)
+
+            if handled_assets.exists() or assigned_assets.exists():
+                context = {
+                    "handled_assets": handled_assets,
+                    "assigned_assets": assigned_assets,
+                }
+            else:
+                context["assets_message"] = "No assets found!"
     except Exception as e:
         context["error"] = f"An unexpected error occurred: {e}"
     view_name = request.resolver_match.view_name

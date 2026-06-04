@@ -7,11 +7,20 @@
 {% block start %}
 
     <style>
-        .header-title h3 {
+        .header-title h3,
+        .header-title p {
             color: wheat;
         }
 
-        .header-title p {
+        .section-card {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 1rem;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .section-card h4 {
             color: wheat;
         }
 
@@ -24,11 +33,11 @@
         }
 
         .asset-detail-content div {
-            height: 2rem;
             width: 100%;
             display: flex;
             align-items: center;
-            gap: 1rem;
+            gap: 0.75rem;
+            padding: 0.35rem 0;
         }
 
         .asset-detail-content div p {
@@ -41,14 +50,14 @@
             <div class="col-12">
                 <div class="header-title">
                     <h3 class="mb-0">Assets</h3>
-                    <p class="mb-0">List of all assets!</p>
+                    <p class="mb-0">Track handled and assigned assets.</p>
                 </div>
             </div>
         </div>
-            <!--asset handler content-->
-            {% for asset in assets %}
-            {% if asset.handler == request_user %}
-            <!--Desktop view-->
+
+        <div class="section-card">
+            <h4 class="mb-3">Assets I Handle</h4>
+
             <div class="row d-none d-md-flex">
                 <div class="col-12 table-responsive">
                     <table class="table table-bordered">
@@ -65,71 +74,57 @@
                             </tr>
                         </thead>
                         <tbody>
-                            {% if assets %}
-                                {% for asset in assets %}
-                                    <tr class="table-info">
-                                        <td>{{asset.asset_tag}}</td>
-                                        <td>{{asset.name}}</td>
-                                        {% if asset.image %}
-                                            <td>{{asset.image}}</td>
+                            {% for asset in handled_assets %}
+                                <tr class="table-info">
+                                    <td>{{ asset.asset_tag }}</td>
+                                    <td>{{ asset.name }}</td>
+                                    <td>{% if asset.image %}{{ asset.image }}{% else %}NA{% endif %}</td>
+                                    <td>{{ asset.status }}</td>
+                                    <td>
+                                        {% if asset.status == "APPROVED" or asset.status == "FAULTY" %}
+                                            <form action="{% url 'ams:staff_update_status' asset.id %}" method="POST">
+                                                {% csrf_token %}
+                                                <select class="status-select" name="status" required>
+                                                    <option value="">select</option>
+                                                    {% if asset.status == "APPROVED" %}
+                                                        <option value="DEPLOYED">Deployed</option>
+                                                    {% elif asset.status == "FAULTY" %}
+                                                        <option value="REPAIR">Repair</option>
+                                                    {% endif %}
+                                                </select>
+                                                <button class="btn btn-sm btn-primary mt-2" type="submit">Update</button>
+                                            </form>
                                         {% else %}
-                                            <td>NA</td>
-                                        {% endif %}
-                                        <td>{{asset.status}}</td>
-                                        <td>
-                                            {% if asset.status == "APPROVED" %}
-                                            <form method="POST" action="{% url 'ams:staff_update_status' asset.id %}">
-                                                {% csrf_token %}
-                                                <select class="mb-2 status-select" name="status" required>
-                                                    <option value="">select</option>
-                                                    <option value="DEPLOYED" {% if asset.status == 'DEPLOYED' %} selected {% endif %}>Deployed</option>
-                                                </select>
-                                                <button class="btn btn-sm btn-primary mt-2" type="submit">Update</button>
-                                            </form>
-                                            {% elif asset.status == "FAULTY" %}
-                                            <form method="POST" action="{% url 'ams:staff_update_status' asset.id %}">
-                                                {% csrf_token %}
-                                                <select class="mb-2 status-select" name="status" required>
-                                                    <option value="">select</option>
-                                                    <option value="REPAIR" {% if asset.status == 'REPAIR' %} selected {% endif %}>Repair</option>
-                                                </select>
-                                                <button class="btn btn-sm btn-primary mt-2" type="submit">Update</button>
-                                            </form>
-                                            {% else %}
                                             --
-                                            {% endif %}
-                                        </td>
-                                        <td>{{asset.assigned_to}}</td>
-                                        <td>{{asset.location}}</td>
-                                        <td class="d-flex align-items-center gap-3">
-                                            {% if asset.assigned_to == None %}
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ asset.assigned_to|default:"NA" }}</td>
+                                    <td>{{ asset.location|default:"NA" }}</td>
+                                    <td class="d-flex align-items-center gap-3">
+                                        {% if not asset.assigned_to %}
                                             <div class="assign_asset_icon">
-                                                <a data-url="{% url 'ams:staff_assigned_assets' asset.id %}"
-                                                class="open-modal"
-                                                >
-                                                    <i class="fa-solid fa-arrow-rotate-right" title="Assigned Asset" style="cursor: pointer;"></i>
+                                                <a class="open-modal" data-url="{% url 'ams:staff_assigned_assets' asset.id %}">
+                                                    <i class="fa-solid fa-arrow-rotate-right" title="Assign Asset" style="cursor: pointer;"></i>
                                                 </a>
                                             </div>
-                                            {% endif %}
-                                            <div class="view_detail_icon">
-                                                <a href="{% url 'ams:staff_asset_detail' asset.id %}"
-                                                >
-                                                    <i class="fa-solid fa-eye" title="Asset Detail" style="cursor: pointer;"></i>
-                                                </a>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                {% endfor %}
-                            {% else %}
-                                <tr>
-                                    <td colspan="100%">No assets found!</td>
+                                        {% endif %}
+                                        <div class="view_detail_icon">
+                                            <a href="{% url 'ams:staff_asset_detail' asset.id %}">
+                                                <i class="fa-solid fa-eye" title="Asset Detail" style="cursor: pointer;"></i>
+                                            </a>
+                                        </div>
+                                    </td>
                                 </tr>
-                            {% endif %}
+                            {% empty %}
+                                <tr>
+                                    <td colspan="8">No handled assets found!</td>
+                                </tr>
+                            {% endfor %}
                         </tbody>
                     </table>
                 </div>
             </div>
-            <!--Mobile view-->
+
             <div class="row d-md-none">
                 <div class="col-12 table-responsive">
                     <table class="table table-bordered">
@@ -141,41 +136,89 @@
                             </tr>
                         </thead>
                         <tbody class="table-info">
-                            {% if assets %}
-                                {% for asset in assets %}
-                                    <tr
-                                        class="asset-summary-row"
-                                        onclick="toggleTask(this)"
-                                    >
-                                        <td>{{asset.asset_tag}}</td>
-                                        <td>{{asset.status}}</td>
-                                        <td><i class="fa-solid fa-plus"></i></td>
-                                    </tr>
-                                    <tr
-                                        class="asset-body"
-                                    >
-                                        <td colspan="4">
-                                            <div class="asset-detail-content">
-                                                <div>
-                                                    <i class="fa-solid fa-gears"></i>
-                                                    <p>{{asset.name}}</p>
-                                                </div>
+                            {% for asset in handled_assets %}
+                                <tr class="asset-summary-row" onclick="toggleTask(this)">
+                                    <td>{{ asset.asset_tag }}</td>
+                                    <td>{{ asset.status }}</td>
+                                    <td><i class="fa-solid fa-plus"></i></td>
+                                </tr>
+                                <tr class="asset-body">
+                                    <td colspan="3">
+                                        <div class="asset-detail-content">
+                                            <div>
+                                                <i class="fa-solid fa-gears"></i>
+                                                <p>{{ asset.name }}</p>
                                             </div>
-                                        </td>
-                                    </tr>
-                                {% endfor %}
-                            {% else %}
-                            <tr>
-                                <td colspan="100%">No assets found!</td>
-                            </tr>
-                            {% endif %}
+                                            <div>
+                                                <i class="fa-solid fa-image"></i>
+                                                <p>{{ asset.image|default:"NA" }}</p>
+                                            </div>
+                                            <div>
+                                                <i class="fa-solid fa-flag"></i>
+                                                <p>{{ asset.status }}</p>
+                                            </div>
+                                            <div>
+                                                <i class="fa-solid fa-user"></i>
+                                                <p>{{ asset.assigned_to|default:"NA" }}</p>
+                                            </div>
+                                            <div>
+                                                <i class="fa-solid fa-location-dot"></i>
+                                                <p>{{ asset.location|default:"NA" }}</p>
+                                            </div>
+                                            <div>
+                                                <i class="fa-solid fa-arrow-rotate-right"></i>
+                                                {% if asset.status == "APPROVED" or asset.status == "FAULTY" %}
+                                                    <form action="{% url 'ams:staff_update_status' asset.id %}" method="POST">
+                                                        {% csrf_token %}
+                                                        <select class="status-select" name="status" required>
+                                                            <option value="">select</option>
+                                                            {% if asset.status == "APPROVED" %}
+                                                                <option value="DEPLOYED">Deployed</option>
+                                                            {% elif asset.status == "FAULTY" %}
+                                                                <option value="REPAIR">Repair</option>
+                                                            {% endif %}
+                                                        </select>
+                                                        <button class="btn btn-sm btn-primary mt-2" type="submit">Update</button>
+                                                    </form>
+                                                {% else %}
+                                                    <p>NA</p>
+                                                {% endif %}
+                                            </div>
+                                            <div>
+                                                <i class="fa-solid fa-share"></i>
+                                                {% if not asset.assigned_to %}
+                                                    <div class="assign_asset_icon">
+                                                        <a class="open-modal" data-url="{% url 'ams:staff_assigned_assets' asset.id %}">
+                                                            <i class="fa-solid fa-arrow-rotate-right" title="Assign Asset" style="cursor: pointer;"></i>
+                                                        </a>
+                                                    </div>
+                                                {% else %}
+                                                    <p>NA</p>
+                                                {% endif %}
+                                            </div>
+                                            <div>
+                                                <i class="fa-solid fa-eye"></i>
+                                                <a href="{% url 'ams:staff_asset_detail' asset.id %}" style="text-decoration: none;">
+                                                    Detail
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% empty %}
+                                <tr>
+                                    <td colspan="3">No handled assets found!</td>
+                                </tr>
+                            {% endfor %}
                         </tbody>
                     </table>
                 </div>
             </div>
-            <!--asset user content-->
-            {% else %}
-            <!--Desktop view-->
+        </div>
+
+        <div class="section-card">
+            <h4 class="mb-3">Assets Assigned To Me</h4>
+
             <div class="row d-none d-md-flex">
                 <div class="col-12 table-responsive">
                     <table class="table table-bordered">
@@ -189,192 +232,182 @@
                                 <th>Handled By</th>
                                 <th>Location</th>
                                 <th>Details</th>
-                                </th>
                             </tr>
                         </thead>
                         <tbody>
-                            {% if assets %}
-                                {% for asset in assets %}
-                                    <tr class="table-info">
-                                        <td>{{asset.asset_tag}}</td>
-                                        <td>{{asset.name}}</td>
-                                        {% if asset.image %}
-                                            <td>{{asset.image}}</td>
-                                        {% else %}
-                                            <td>NA</td>
-                                        {% endif %}
-                                        <td>{{asset.status}}</td>
-                                        <td>
-                                            {% if asset.status == "ASSIGNED" %}
-                                            <form method="POST" action="{% url 'ams:staff_update_status' asset.id %}">
+                            {% for asset in assigned_assets %}
+                                <tr class="table-info">
+                                    <td>{{ asset.asset_tag }}</td>
+                                    <td>{{ asset.name }}</td>
+                                    <td>{% if asset.image %}{{ asset.image }}{% else %}NA{% endif %}</td>
+                                    <td>{{ asset.status }}</td>
+                                    <td>
+                                        {% if asset.status == "ASSIGNED" %}
+                                            <form action="{% url 'ams:staff_update_status' asset.id %}" method="POST">
                                                 {% csrf_token %}
                                                 <select class="mb-2 status-select" name="status" required>
                                                     <option value="">select</option>
-                                                    <option value="FAULTY" {% if asset.status == 'FAULTY' %} selected {% endif %}>Faulty</option>
+                                                    <option value="FAULTY">Faulty</option>
                                                 </select>
                                                 <button class="btn btn-sm btn-primary mt-2" type="submit">Update</button>
                                             </form>
-                                            {% else %}
+                                        {% else %}
                                             --
-                                            {% endif %}
-                                        </td>
-                                        <td>{{asset.handler}}</td>
-                                        <td>{{asset.location}}</td>
-                                        <td class="d-flex align-items-center">
-                                            <div class="view_detail_icon">
-                                                <a href="{% url 'ams:staff_asset_detail' asset.id %}"
-                                                >
-                                                    <i class="fa-solid fa-eye" title="Asset Detail" style="cursor: pointer;"></i>
-                                                </a>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                {% endfor %}
-                            {% else %}
-                                <tr>
-                                    <td colspan="100%">No assets found!</td>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ asset.handler|default:"NA" }}</td>
+                                    <td>{{ asset.location|default:"NA" }}</td>
+                                    <td class="d-flex align-items-center">
+                                        <div class="view_detail_icon">
+                                            <a href="{% url 'ams:staff_asset_detail' asset.id %}">
+                                                <i class="fa-solid fa-eye" title="Asset Detail" style="cursor: pointer;"></i>
+                                            </a>
+                                        </div>
+                                    </td>
                                 </tr>
-                            {% endif %}
+                            {% empty %}
+                                <tr>
+                                    <td colspan="8">No assigned assets found!</td>
+                                </tr>
+                            {% endfor %}
                         </tbody>
                     </table>
                 </div>
             </div>
-            <!--Mobile view-->
+
             <div class="row d-md-none">
                 <div class="col-12 table-responsive">
                     <table class="table table-bordered">
                         <thead class="table-danger">
                             <tr>
-                                <th scope="col">ID</th>
+                                <th scope="col">Asset No.</th>
                                 <th scope="col">Status</th>
                                 <th scope="col">Action</th>
                             </tr>
                         </thead>
                         <tbody class="table-info">
-                            {% if assets %}
-                                {% for asset in assets %}
-                                    <tr
-                                        class="asset-summary-row"
-                                        onclick="toggleTask(this)"
-                                    >
-                                        <td>{{asset.asset_tag}}</td>
-                                        <td>{{asset.status}}</td>
-                                        <td><i class="fa-solid fa-plus"></i>
-                                    </tr>
-                                    <tr
-                                        class="asset-body"
-                                    >
-                                        <td colspan="4">
-                                            <div class="asset-detail-content">
-                                                <div>
-                                                </div>
+                            {% for asset in assigned_assets %}
+                                <tr class="asset-summary-row" onclick="toggleTask(this)">
+                                    <td>{{ asset.asset_tag }}</td>
+                                    <td>{{ asset.status }}</td>
+                                    <td><i class="fa-solid fa-plus"></i></td>
+                                </tr>
+                                <tr class="asset-body">
+                                    <td colspan="3">
+                                        <div class="asset-detail-content">
+                                            <div>
+                                                <i class="fa-solid fa-gears"></i>
+                                                <p>{{ asset.name }}</p>
                                             </div>
-                                        </td>
-                                    </tr>
-                                {% endfor %}
-                            {% else %}
-                            <tr>
-                                <td colspan="100%">No assets found!</td>
-                            </tr>
-                            {% endif %}
+                                            <div>
+                                                <i class="fa-solid fa-image"></i>
+                                                <p>{{ asset.image|default:"NA" }}</p>
+                                            </div>
+                                            <div>
+                                                <i class="fa-solid fa-flag"></i>
+                                                <p>{{ asset.status }}</p>
+                                            </div>
+                                            <div>
+                                                <i class="fa-solid fa-user"></i>
+                                                <p>{{ asset.handler|default:"NA" }}</p>
+                                            </div>
+                                            <div>
+                                                <i class="fa-solid fa-location-dot"></i>
+                                                <p>{{ asset.location|default:"NA" }}</p>
+                                            </div>
+                                            <div>
+                                                <i class="fa-solid fa-arrow-rotate-right"></i>
+                                                {% if asset.status == "ASSIGNED" %}
+                                                    <form action="{% url 'ams:staff_update_status' asset.id %}" method="POST">
+                                                        {% csrf_token %}
+                                                        <select class="mb-2 status-select" name="status" required>
+                                                            <option value="">select</option>
+                                                            <option value="FAULTY">Faulty</option>
+                                                        </select>
+                                                        <button class="btn btn-sm btn-primary mt-2" type="submit">Update</button>
+                                                    </form>
+                                                {% else %}
+                                                    <p>NA</p>
+                                                {% endif %}
+                                            </div>
+                                            <div>
+                                                <i class="fa-solid fa-eye"></i>
+                                                <a href="{% url 'ams:staff_asset_detail' asset.id %}" style="text-decoration: none;">
+                                                    Detail
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% empty %}
+                                <tr>
+                                    <td colspan="3">No assigned assets found!</td>
+                                </tr>
+                            {% endfor %}
                         </tbody>
                     </table>
-                </div>
-            </div>
-            {% endif %}
-            {% endfor %}
-    </div>
-
-<!--Dynamic Modal-->
-    <div class="modal fade dynamic-modal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body" id="modalContent">
-        <!--Model Content Goes Here!-->
                 </div>
             </div>
         </div>
     </div>
 
-<!--Script-->
+    <div class="modal fade dynamic-modal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+                </div>
+                <div class="modal-body" id="modalContent"></div>
+            </div>
+        </div>
+    </div>
+
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            const modal = new bootstrap.Modal(document.querySelector('.dynamic-modal'));
-            const modalBody = document.getElementById('modalContent');
+            const modalElement = document.querySelector(".dynamic-modal");
+            const modalBody = document.getElementById("modalContent");
 
-            document.querySelectorAll(".open-modal").forEach(link => {
-                link.addEventListener("click", function(event) {
-                    event.preventDefault();
-                    const url = this.getAttribute("data-url");
-                    modalBody.innerHTML = `<div class="text-center p-3">Loading...</div>`;
+            if (modalElement) {
+                const modal = new bootstrap.Modal(modalElement);
 
-                    fetch(url)
-                        .then(response => response.text())
-                        .then(html => {
-                            modalBody.innerHTML = html;
-                            modal.show();
-                        })
-                        .catch(error => {
-                            modalBody.innerHTML = `<div class="text-danger p-3">An error occurred while loading content.</div>`;
-                        });
+                document.querySelectorAll(".open-modal").forEach(link => {
+                    link.addEventListener("click", function(event) {
+                        event.preventDefault();
+                        const url = this.getAttribute("data-url");
+                        modalBody.innerHTML = '<div class="text-center p-3">Loading...</div>';
+
+                        fetch(url)
+                            .then(response => response.text())
+                            .then(html => {
+                                modalBody.innerHTML = html;
+                                modal.show();
+                            })
+                            .catch(() => {
+                                modalBody.innerHTML = '<div class="text-danger p-3">An error occurred while loading content.</div>';
+                            });
+                    });
                 });
-            });
+            }
         });
+
+        function toggleTask(element) {
+            const body = element.nextElementSibling;
+            const icon = element.querySelector("i");
+
+            if (!body || !icon) {
+                return;
+            }
+
+            body.classList.toggle("active");
+
+            if (body.classList.contains("active")) {
+                icon.classList.remove("fa-plus");
+                icon.classList.add("fa-minus");
+            } else {
+                icon.classList.remove("fa-minus");
+                icon.classList.add("fa-plus");
+            }
+        }
     </script>
-
-<!--asset filtering script-->
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-
-            const filter = document.getElementById("statusFilter");
-            const rows = document.querySelectorAll(".asset-row");
-
-            filter.addEventListener("change", function() {
-                let selected = this.value.toLowerCase();
-                let visibleCount = 0;
-
-                rows.forEach(row => {
-                    let rowStatus = row.dataset.status.toLowerCase();
-
-                    if (!selected || rowStatus === selected) {
-                        row.style.display = "";
-                        visibleCount++;
-                    } else {
-                        row.style.display = "none";
-                    }
-                });
-
-        // Optional no-results message
-                let msg = document.getElementById("noResults");
-                if (!msg) {
-                    msg = document.createElement("tr");
-                    msg.id = "noResults";
-                    msg.innerHTML = `<td colspan="100%" class="text-center text-muted">No matching assets found</td>`;
-                    document.querySelector("tbody").appendChild(msg);
-                }
-                msg.style.display = visibleCount === 0 ? "" : "none";
-            });
-
-        });
-    </script>
-
-    <script>
-    function toggleTask(element) {
-      const body = element.nextElementSibling;
-      body.classList.toggle("active");
-
-      const icon = element.querySelector("i");
-      if (body.classList.contains("active")) {
-        icon.classList.remove("fa-plus");
-        icon.classList.add("fa-minus");
-      } else {
-        icon.classList.remove("fa-minus");
-        icon.classList.add("fa-plus");
-      }
-    }
-  </script>
 
 {% endblock %}

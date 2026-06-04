@@ -32,6 +32,21 @@
         .status-waiting > td  { background-color: #ff9900; color: #000; }
         .status-completed > td { background-color: #003300; color: #fff; }
         .status-onhold  > td  { background-color: #d2d2d2; color: #000; }
+        .service-body {
+            display: none;
+        }
+        .service-body.active {
+            display: table-row;
+        }
+        .service-detail-content div{
+            display: flex;
+            height: 2rem;
+            gap: 1rem;
+            align-items: center;
+        }
+        .service-detail-content div p {
+            margin-bottom: 0;
+        }
     </style>
 
     <div class="container-fluid">
@@ -42,10 +57,11 @@
                 </div>
             </div>
         </div>
+        <!--Pagination-->
         <div class="row mb-3">
             <div class="col-12">
                 <nav>
-                    <ul class="pagination flex-wrap justify-content-center">
+                    <ul class="pagination flex-wrap">
                         {% if page_obj.has_previous %}
                             <li class="page-item">
                                 <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a>
@@ -74,7 +90,8 @@
             </div>
         </div>
         <div class="row">
-            <div class="col table-responsive">
+            <!--Desktop view-->
+            <div class="col-12 d-none d-md-flex table-responsive">
                 <table class="table table-hover table-bordered">
                     <thead class="table-danger">
                         <tr>
@@ -140,6 +157,82 @@
                     </tbody>
                 </table>
             </div>
+            <!--Mobile view-->
+            <div class="col-12 d-md-none table-responsive">
+                <table class="table table-bordered">
+                    <thead class="table-danger">
+                        <tr>
+                            <th scope="col">Serv. No.</th>
+                            <th scope="col">Status</th>
+                            <th scope="col">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody class="table-info">
+                        {% if page_obj %}
+                            {% for service in page_obj %}
+                            <tr
+                                class="service-summary-row"
+                                onclick="toggleTask(this)"
+                            >
+                                <td>{{ service.service_number }}</td>
+                                <td>{{ service.status }}</td>
+                                <td><i class="fa-solid fa-plus"></i></td>
+                            </tr>
+                            <tr class="service-body">
+                                <td colspan="3">
+                                    <div class="service-detail-content">
+                                        <div>
+                                            <i class="fa-solid fa-gears"></i>
+                                            <p>{{ service.service_type }}</p>
+                                        </div>
+                                        <div>
+                                            <i class="fa-solid fa-info"></i>
+                                            <p>{{ service.description }}</p>
+                                        </div>
+                                        <div>
+                                            <i class="fa-solid fa-user"></i>
+                                            <p>{{ service.created_by }}</p>
+                                        </div>
+                                        <div>
+                                            <i class="fa-solid fa-people"></i>
+                                            <p>{{ service.assigned_to }}</p>
+                                        </div>
+                                        <div>
+                                            <i class="fa-solid fa-clock"></i>
+                                            <p>{{ service.started_at }}</p>
+                                        </div>
+                                        <div>
+                                            <i class="fa-solid fa-clock"></i>
+                                            <p>{{ service.completed_at }}</p>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="100%">No services found.</td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
+
+    <script>
+        function toggleTask(element) {
+            const body = element.nextElementSibling;
+            body.classList.toggle("active");
+
+            const icon = element.querySelector("i");
+            if (body.classList.contains("active")) {
+                icon.classList.remove("fa-plus");
+                icon.classList.add("fa-minus");
+            } else {
+                icon.classList.remove("fa-minus");
+                icon.classList.add("fa-plus");
+            }
+        }
+    </script>
 {% endblock %}

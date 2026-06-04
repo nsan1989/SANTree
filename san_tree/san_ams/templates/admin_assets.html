@@ -10,6 +10,21 @@
         .header-title h3 {
             color: wheat;
         }
+        .asset-body {
+            display: none;
+        }
+        .asset-body.active {
+            display: table-row;
+        }
+        .asset-content-details div {
+            display: flex;
+            align-items: center;
+            height: 2rem;
+            gap: 1rem;
+        }
+        .asset-content-details div p {
+            margin-bottom: 0;
+        }
     </style>
 
     <div class="container-fluid">
@@ -21,7 +36,7 @@
             </div>
             <div class="col-6 col-md-6">
                 <div class="asset-filters d-flex align-items-center">
-                    <label for="statusFilter" class="form-label mb-0 me-3">Filter by Status:</label>
+                    <label for="statusFilter" class="form-label mb-0 me-3">Filter:</label>
                     <select id="statusFilter" class="form-select form-select-sm w-auto">
                         <option value="">--select--</option>
                         {% for status in statuses %}
@@ -32,7 +47,8 @@
             </div>
         </div>
         <div class="row mb-3">
-            <div class="col-12 table-responsive">
+            <!--Desktop view-->
+            <div class="col-12 d-none d-md-flex table-responsive">
                 <table class="table table-bordered">
                     <thead>
                         <tr class="table-danger">
@@ -78,6 +94,64 @@
                                             >
                                                 <i class="fa-solid fa-eye" title="Asset Detail" style="cursor: pointer;"></i>
                                             </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr class="table-info">
+                                <td colspan="100%">{{assets_message}}</td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+            <!--Mobile view-->
+            <div class="col-12 d-md-none table-responsive">
+                <table class="table table-bordered">
+                    <thead class="table-danger">
+                        <tr>
+                            <th scope="col">Asset No.</th>
+                            <th scope="col">Status</th>
+                            <th scope="col">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody class="table-info">
+                        {% if assets %}
+                            {% for asset in assets %}
+                                <tr
+                                    class="asset-summary-row"
+                                    onclick="toggleTask(this)"
+                                >
+                                    <td>{{asset.asset_tag}}</td>
+                                    <td>{{asset.status}}</td>
+                                    <td><i class="fa-solid fa-plus"></i></tr>
+                                </tr>
+                                <tr
+                                    class="asset-body"
+                                >
+                                    <td colspan="3">
+                                        <div class="asset-content-details">
+                                            <div>
+                                                <i class="fa-solid fa-gears"></i>
+                                                <p>{{asset.name}}</p>
+                                            </div>
+                                            <div>
+                                                <i class="fa-solid fa-user"></i>
+                                                <p>{{asset.handler}}</p>
+                                            </div>
+                                            <div>
+                                                <i class="fa-solid fa-users"></i>
+                                                <p>{{asset.assigned_to}}</p>
+                                            </div>
+                                            <div>
+                                                <i class="fa-solid fa-building"></i>
+                                                <p>{{asset.department}}</p>
+                                            </div>
+                                            <div>
+                                                <i class="fa-solid fa-location-dot"></i>
+                                                <p>{{asset.location}}</p>
+                                            </div>
                                         </div>
                                     </td>
                                 </tr>
@@ -167,6 +241,25 @@
             });
 
         });
+
+        function toggleTask(element) {
+            const body = element.nextElementSibling;
+            const icon = element.querySelector("i");
+
+            if (!body || !icon) {
+                return;
+            }
+
+            body.classList.toggle("active");
+
+            if (body.classList.contains("active")) {
+                icon.classList.remove("fa-plus");
+                icon.classList.add("fa-minus");
+            } else {
+                icon.classList.remove("fa-minus");
+                icon.classList.add("fa-plus");
+            }
+        }
     </script>
 
 
