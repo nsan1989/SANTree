@@ -28,6 +28,11 @@ class RequireLoginMiddleware:
             "anonymous_service_generate",
             "success_page",
             "generate_qr",
+            "vms:patient_booking",
+            "vms:patient_booking_payment",
+            "vms:confirm_patient_payment",
+            "vms:patient_booking_success",
+            "vms:cancel_patient_payment",
         ]
 
         try:

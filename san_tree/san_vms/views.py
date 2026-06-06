@@ -9,6 +9,9 @@ import calendar
 from datetime import datetime, time, timedelta
 from django.urls import reverse
 from django.utils import timezone
+from django.core.files import File
+import qrcode
+from io import BytesIO
 
 from .forms import *
 from .models import *
@@ -508,7 +511,9 @@ def recurring_bookings():
         next_month = 1 if dt_value.month == 12 else dt_value.month + 1
         next_year = dt_value.year + 1 if dt_value.month == 12 else dt_value.year
         last_day = calendar.monthrange(next_year, next_month)[1]
-        return dt_value.replace(year=next_year, month=next_month, day=min(dt_value.day, last_day))
+        return dt_value.replace(
+            year=next_year, month=next_month, day=min(dt_value.day, last_day)
+        )
 
     bookings = Booking.objects.filter(
         is_recurring=True,
@@ -554,3 +559,150 @@ def BookingSuccessView(request):
         redirect_url = reverse("vms:vms_staff_dashboard")
 
     return render(request, "vms_booking_success.html", {"redirect_url": redirect_url})
+
+
+# Patient booking view.
+def PatientBookingView(request):
+    if request.user.is_authenticated:
+        try:
+            current_user_role = request.user.role
+        except AttributeError:
+            raise PermissionDenied("User profile not found")
+
+        if current_user_role in ["User", "Admin"]:
+            raise PermissionDenied("Unauthorized access")
+
+    if request.method == "POST":
+        form = PatientBookingForm(request.POST)
+        if form.is_valid():
+            with transaction.atomic():
+                booking = form.save(commit=False)
+
+                timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
+                booking_number = f"PB{timestamp}"
+                booking.booking_number = booking_number
+                booking.booked_by = form.cleaned_data.get("patient_name")
+                booking.save()
+
+            return redirect("vms:patient_booking_payment", id=booking.id)
+        else:
+            messages.error(request, "Please fix the errors in the form")
+    else:
+        form = PatientBookingForm()
+
+    context = {"form": form}
+
+    return render(request, "patient_templates/patient_booking.html", context)
+
+
+# Helper function to generate UPI QR code
+def generate_upi_qr(booking_id, amount, upi_id="hospital@upi", merchant_name="SANTree"):
+    """Generate UPI QR code for payment"""
+    upi_string = (
+        f"upi://pay?pa={upi_id}&pn={merchant_name}&"
+        f"am={amount}&tn=Booking{booking_id}&tr=BK{booking_id}"
+    )
+
+    qr = qrcode.QRCode(
+        version=1,
+        error_correction=qrcode.constants.ERROR_CORRECT_L,
+        box_size=10,
+        border=4,
+    )
+    qr.add_data(upi_string)
+    qr.make(fit=True)
+
+    img = qr.make_image(fill_color="black", back_color="white")
+
+    buffer = BytesIO()
+    img.save(buffer, format="PNG")
+    buffer.seek(0)
+
+    return buffer, upi_string
+
+
+# Patient booking payment view - Generate QR Code
+def PatientPaymentView(request, id):
+    booking = get_object_or_404(PatientBooking, id=id)
+    payment, created = PatientPayment.objects.get_or_create(
+        booking=booking, defaults={"amount": booking.total_amount or 0}
+    )
+
+    # Generate QR code if not already exists
+    if not payment.qr_code_image:
+        buffer, upi_string = generate_upi_qr(id, payment.amount)
+        payment.qr_code_image.save(f"upi_qr_{id}.png", File(buffer), save=True)
+        payment.upi_id = "hospital@upi"
+        payment.payment_method = "upi_qr"
+        payment.save()
+
+    context = {
+        "booking": booking,
+        "payment": payment,
+        "amount": payment.amount,
+    }
+    return render(request, "patient_templates/patient_payment.html", context)
+
+
+# Confirm payment after UPI transaction
+def ConfirmPatientPaymentView(request, id):
+    booking = get_object_or_404(PatientBooking, id=id)
+    payment = get_object_or_404(PatientPayment, booking=booking)
+
+    if request.method == "POST":
+        upi_transaction_ref = request.POST.get("upi_transaction_ref")
+
+        if upi_transaction_ref:
+            payment.upi_transaction_ref = upi_transaction_ref
+            payment.status = "SUCCESS"
+            payment.paid_at = timezone.now()
+            payment.save()
+
+            booking.status = "CONFIRMED"
+            booking.save()
+
+            return redirect("vms:patient_booking_success", id=booking.id)
+        else:
+            messages.error(request, "Please enter UPI transaction reference")
+
+    context = {"booking": booking, "payment": payment}
+    return render(request, "patient_templates/patient_payment.html", context)
+
+
+def CancelPatientPaymentView(request, id):
+    booking = get_object_or_404(PatientBooking, id=id)
+    payment = get_object_or_404(PatientPayment, booking=booking)
+
+    if request.method == "POST":
+        booking.status = "CANCELLED"
+        booking.save()
+
+        payment.status = "FAILED"
+        payment.failure_reason = "Cancelled by user"
+        payment.failed_at = timezone.now()
+        payment.save()
+
+        messages.success(
+            request, "Booking payment canceled and booking marked as cancelled."
+        )
+        return redirect("vms:cancel_patient_payment", id=booking.id)
+
+    context = {"booking": booking, "payment": payment}
+    return render(request, "patient_templates/booking_cancel.html", context)
+
+
+# Booking success view.
+def BookingSuccessView(request, id=None):
+    if id is None:
+        if request.user.role == "Admin":
+            redirect_url = reverse("vms:vms_admin_dashboard")
+        else:
+            redirect_url = reverse("vms:vms_staff_dashboard")
+        return render(
+            request, "vms_booking_success.html", {"redirect_url": redirect_url}
+        )
+
+    booking = get_object_or_404(PatientBooking, id=id)
+    return render(
+        request, "patient_templates/booking_success.html", {"booking": booking}
+    )

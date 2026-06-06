@@ -40,4 +40,26 @@ urlpatterns = [
     path("admin/driver_schedule/", DriverScheduleView, name="driver_schedule"),
     path("schedule-toggle/<int:pk>/", ToggleSchedule, name="toggle_schedule"),
     path("cab_request/success/", BookingSuccessView, name="booking_success"),
+    # patient urls
+    path("patient_booking/", PatientBookingView, name="patient_booking"),
+    path(
+        "patient_booking/<int:id>/payment/",
+        PatientPaymentView,
+        name="patient_booking_payment",
+    ),
+    path(
+        "patient_booking/<int:id>/payment/confirm/",
+        ConfirmPatientPaymentView,
+        name="confirm_patient_payment",
+    ),
+    path(
+        "patient_booking/<int:id>/payment/cancel/",
+        CancelPatientPaymentView,
+        name="cancel_patient_payment",
+    ),
+    path(
+        "patient_booking/<int:id>/payment/success/",
+        BookingSuccessView,
+        name="patient_booking_success",
+    ),
 ]

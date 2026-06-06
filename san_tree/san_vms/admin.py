@@ -154,3 +154,89 @@ class MaintenanceResources(resources.ModelResource):
 class MaintenanceAdmin(ImportExportModelAdmin):
     resource_class = MaintenanceResources
     list_display = ("id", "vehicle", "description", "start_date", "end_date")
+
+
+# PatientBooking Resources.
+class PatientBookingResources(resources.ModelResource):
+    class Meta:
+        model = PatientBooking
+        fields = (
+            "id",
+            "booking_number",
+            "service_type",
+            "patient_name",
+            "patient_uhid",
+            "patient_phone",
+            "hospital_location",
+            "drop_location_text",
+            "drop_latitude",
+            "drop_longitude",
+            "scheduled_drop_time",
+            "distance_km_estimated",
+            "distance_km_final",
+            "base_fare",
+            "per_km_rate",
+            "extra_charges",
+            "discount_amount",
+            "total_amount",
+            "status",
+            "remarks",
+            "booked_by",
+            "assigned_vehicle",
+            "assigned_driver",
+            "created_at",
+            "updated_at",
+        )
+
+
+# PatientBooking Admin.
+@admin.register(PatientBooking)
+class PatientBookingAdmin(ImportExportModelAdmin):
+    resource_class = PatientBookingResources
+    list_display = (
+        "id",
+        "booking_number",
+        "service_type",
+        "patient_name",
+        "patient_uhid",
+        "status",
+        "total_amount",
+        "booked_by",
+        "assigned_driver",
+        "created_at",
+    )
+
+
+# PatientPayment Resources.
+class PatientPaymentResources(resources.ModelResource):
+    class Meta:
+        model = PatientPayment
+        fields = (
+            "id",
+            "booking",
+            "amount",
+            "currency",
+            "payment_provider",
+            "payment_method",
+            "gateway_order_id",
+            "gateway_payment_id",
+            "status",
+            "initiated_at",
+            "paid_at",
+            "failure_reason",
+        )
+
+
+# PatientPayment Admin.
+@admin.register(PatientPayment)
+class PatientPaymentAdmin(ImportExportModelAdmin):
+    resource_class = PatientPaymentResources
+    list_display = (
+        "id",
+        "booking",
+        "amount",
+        "status",
+        "payment_provider",
+        "initiated_at",
+        "paid_at",
+    )

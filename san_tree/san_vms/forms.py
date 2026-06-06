@@ -198,3 +198,75 @@ class ShiftEditForm(forms.ModelForm):
 
         if start and end and start >= end:
             self.add_error("end_time", "End time must be after start time.")
+
+
+# Patient Booking Form.
+class PatientBookingForm(forms.ModelForm):
+    class Meta:
+        model = PatientBooking
+        fields = [
+            "patient_name",
+            "patient_uhid",
+            "patient_phone",
+            "hospital_location",
+            "drop_location_text",
+            "drop_latitude",
+            "drop_longitude",
+        ]
+        widgets = {
+            "hospital_location": forms.HiddenInput(),
+            "drop_latitude": forms.HiddenInput(),
+            "drop_longitude": forms.HiddenInput(),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # Patient Name
+        self.fields["patient_name"].required = True
+        self.fields["patient_name"].widget.attrs.update(
+            {"class": "form-control", "placeholder": "Patient Name"}
+        )
+
+        # Patient UHID - Optional
+        self.fields["patient_uhid"].required = False
+        self.fields["patient_uhid"].widget.attrs.update(
+            {"class": "form-control", "placeholder": "Patient UHID (Optional)"}
+        )
+
+        # Patient Phone
+        self.fields["patient_phone"].required = True
+        self.fields["patient_phone"].widget.attrs.update(
+            {"class": "form-control", "placeholder": "Patient Phone (10 digits)"}
+        )
+
+        # Hospital Location - Hidden but required
+        self.fields["hospital_location"].required = True
+        self.fields["hospital_location"].widget.attrs.update(
+            {"class": "form-control", "id": "hospital_location"}
+        )
+
+        # Drop Location
+        self.fields["drop_location_text"].required = True
+        self.fields["drop_location_text"].widget.attrs.update(
+            {"class": "form-control", "placeholder": "Enter drop-off location"}
+        )
+        self.fields["drop_location_text"].label = "Drop-off Location"
+
+        # Latitude & Longitude - Hidden fields
+        self.fields["drop_latitude"].required = False
+        self.fields["drop_latitude"].widget.attrs.update({"id": "drop_latitude"})
+
+        self.fields["drop_longitude"].required = False
+        self.fields["drop_longitude"].widget.attrs.update({"id": "drop_longitude"})
+
+    def clean(self):
+        cleaned_data = super().clean()
+        patient_phone = cleaned_data.get("patient_phone")
+
+        # Validate phone number
+        if patient_phone:
+            if not patient_phone.isdigit() or len(patient_phone) != 10:
+                self.add_error("patient_phone", "Phone number must be 10 digits")
+
+        return cleaned_data

@@ -25,6 +25,21 @@ class BookingStatus(models.TextChoices):
     CANCELLED = "CANCELLED", "Cancelled"
 
 
+# Payment status.
+class PaymentStatus(models.TextChoices):
+    PENDING = "PENDING", "Pending"
+    SUCCESS = "SUCCESS", "Success"
+    FAILED = "FAILED", "Failed"
+    REFUNDED = "REFUNDED", "Refunded"
+
+
+# Patient Service Type
+class PatientServiceType(models.TextChoices):
+    PATIENT_DROP = "PATIENT_DROP", "Patient Drop"
+    DECEASED_TRANSPORT = "DECEASED_TRANSPORT", "Deceased Transport"
+    OTHER = "OTHER", "Other"
+
+
 # Booking types.
 class BookingTypes(models.TextChoices):
     DROP = "DROP", "Drop"
@@ -252,3 +267,84 @@ class VehicleMaintenance(models.Model):
 
     def __str__(self):
         return f"{self.vehicle.vehicle_number} Maintenance"
+
+
+# Patient Booking model.
+class PatientBooking(models.Model):
+    booking_number = models.CharField(max_length=50, unique=True)
+    service_type = models.CharField(
+        max_length=50,
+        choices=PatientServiceType.choices,
+        default=PatientServiceType.PATIENT_DROP,
+    )
+    patient_name = models.CharField(max_length=255)
+    patient_uhid = models.CharField(max_length=50, unique=True, null=True, blank=True)
+    patient_phone = models.CharField(max_length=20, null=True, blank=True)
+    hospital_location = models.CharField(max_length=255)
+    drop_location_text = models.CharField(max_length=255)
+    drop_latitude = models.FloatField(null=True, blank=True)
+    drop_longitude = models.FloatField(null=True, blank=True)
+    distance_km_estimated = models.FloatField(null=True, blank=True)
+    distance_km_final = models.FloatField(null=True, blank=True)
+    base_fare = models.DecimalField(max_digits=10, decimal_places=2, default=0.0)
+    per_km_rate = models.DecimalField(max_digits=10, decimal_places=2, default=0.0)
+    extra_charges = models.DecimalField(max_digits=10, decimal_places=2, default=0.0)
+    discount_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.0)
+    total_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.0)
+    status = models.CharField(
+        max_length=20, choices=BookingStatus.choices, default=BookingStatus.WAITING
+    )
+    remarks = models.TextField(null=True, blank=True)
+    booked_by = models.CharField(max_length=255, null=True, blank=True)
+    assigned_vehicle = models.ForeignKey(
+        Vehicle,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="patient_bookings_vehicle",
+    )
+    assigned_driver = models.ForeignKey(
+        Driver,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="patient_bookings_driver",
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Patient Booking {self.booking_number}"
+
+
+# Patient Payment model.
+class PatientPayment(models.Model):
+    booking = models.ForeignKey(
+        PatientBooking, on_delete=models.CASCADE, related_name="payments"
+    )
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    currency = models.CharField(max_length=10, default="INR")
+    payment_provider = models.CharField(max_length=50, null=True, blank=True)
+    payment_method = models.CharField(max_length=50, null=True, blank=True)
+    gateway_order_id = models.CharField(
+        max_length=255, null=True, blank=True, db_index=True
+    )
+    gateway_payment_id = models.CharField(
+        max_length=255, null=True, blank=True, db_index=True
+    )
+    gateway_signature = models.CharField(max_length=255, null=True, blank=True)
+    status = models.CharField(
+        max_length=20, choices=PaymentStatus.choices, default=PaymentStatus.PENDING
+    )
+    initiated_at = models.DateTimeField(auto_now_add=True)
+    paid_at = models.DateTimeField(null=True, blank=True)
+    failed_at = models.DateTimeField(null=True, blank=True)
+    refunded_at = models.DateTimeField(null=True, blank=True)
+    failure_reason = models.TextField(null=True, blank=True)
+    raw_response = models.JSONField(null=True, blank=True)
+    upi_id = models.CharField(max_length=100, null=True, blank=True)
+    qr_code_image = models.ImageField(upload_to="payment_qr/", null=True, blank=True)
+    upi_transaction_ref = models.CharField(max_length=100, null=True, blank=True)
+
+    def __str__(self):
+        return f"Payment for Booking {self.booking.booking_number} - {self.status}"
