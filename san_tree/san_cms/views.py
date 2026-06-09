@@ -385,11 +385,31 @@ def ComplaintView(request):
                 block_admin = (
                     new_complaint.block.block_admin if new_complaint.block else None
                 )
-                if not block_admin or not block_admin.is_active:
-                    form.add_error("block", "Selected block has no active block admin.")
-                    return render(request, "complaints.html", {"form": form})
+                if (
+                    block_admin
+                    and block_admin.is_active
+                    and block_admin.department == new_complaint.department
+                ):
+                    new_complaint.assigned_to = block_admin
+                else:
+                    department_admin = (
+                        CustomUsers.objects.filter(
+                            department=new_complaint.department,
+                            role="Admin",
+                            is_active=True,
+                        )
+                        .exclude(id=user.id)
+                        .first()
+                    )
 
-                new_complaint.assigned_to = block_admin
+                    if not department_admin:
+                        form.add_error(
+                            None, "No active department admin available for assignment."
+                        )
+                        return render(request, "complaints.html", {"form": form})
+
+                    new_complaint.assigned_to = department_admin
+
                 new_complaint.status = "Open"
                 new_complaint.save()
 
@@ -442,8 +462,8 @@ def ReviewComplaints(request):
         raise PermissionDenied("User profile not found.")
     complaints = (
         ComplaintHistory.objects.filter(
-            complaint__created_by__department=user.department,
-            complaint__status="Waiting",
+            complaint__department=user.department,
+            complaint__status__in=["Waiting", "Review"],
         )
         .exclude(complaint__created_by=user)
         .order_by("complaint__created_at")
@@ -491,10 +511,31 @@ def ReviewComplaintUpdateView(request, id):
                 if complaint.complaint.block
                 else None
             )
-            if not block_admin or not block_admin.is_active:
+
+            assignee = None
+
+            if (
+                block_admin
+                and block_admin.is_active
+                and block_admin.department_id == complaint.complaint.department_id
+            ):
+                assignee = block_admin
+
+            if not assignee:
+                assignee = (
+                    CustomUsers.objects.filter(
+                        department=complaint.complaint.department,
+                        role="Admin",
+                        is_active=True,
+                    )
+                    .exclude(id=request.user.id)
+                    .first()
+                )
+
+            if not assignee:
                 messages.error(
                     request,
-                    "Cannot open complaint: selected block has no active block admin.",
+                    "Cannot open complaint: no active block admin or department admin available.",
                 )
                 return redirect("cms:review_complaints")
 
@@ -502,13 +543,23 @@ def ReviewComplaintUpdateView(request, id):
             complaint.status_changed_to = new_status
             complaint.save()
 
-            complaint.complaint.assigned_to = block_admin
+            complaint.complaint.assigned_to = assignee
             complaint.complaint.status = new_status
             complaint.complaint.save()
         elif new_status == "Rejected":
             complaint.changed_by = request.user
             complaint.status_changed_to = new_status
             complaint.save()
+
+            complaint.complaint.status = new_status
+            complaint.complaint.save()
+        elif new_status == "Resolved":
+            complaint.changed_by = request.user
+            complaint.status_changed_to = new_status
+            complaint.save()
+
+            complaint.complaint.assigned_to.status = "vacant"
+            complaint.complaint.assigned_to.save()
 
             complaint.complaint.status = new_status
             complaint.complaint.save()
@@ -528,9 +579,16 @@ def AssignedComplaint(request):
     except:
         raise PermissionDenied("User profile not found.")
 
-    complaints = ComplaintHistory.objects.filter(complaint__assigned_to=user).order_by(
-        "-complaint__created_at"
-    )
+    complaints = ComplaintHistory.objects.filter(
+        complaint__assigned_to=user,
+        complaint__status__in=[
+            "Open",
+            "Acknowledged",
+            "In Progress",
+            "Review",
+            "Resolved",
+        ],
+    ).order_by("-complaint__created_at")
 
     # Halt the open tasks if it exceeds 24hr.
     for complaint in complaints:
@@ -595,8 +653,6 @@ def StaffUpdateComplaintStatus(request, id):
 
     if complaint.complaint.status in ["Closed", "Cancelled"]:
         return redirect("cms:staff_assigned_tasks")
-
-    #    dept_admin = CustomUsers.objects.filter(department=user.department, role='Admin').first()
 
     if request.method == "POST":
         new_status = request.POST.get("status")

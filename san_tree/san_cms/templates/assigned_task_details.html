@@ -55,8 +55,8 @@
             </li>
             <li class="d-flex">
               <span class="fw-bold detail-title">Attachment:</span>&nbsp;
-              {% if complaint.complaint.attachment %}
-                <img src="{{ complaint.complaint.attachment.url }}" alt="Complaint Attachment" style="max-width: 20vw; height: 16vh;" />
+              {% if task.complaint.attachment %}
+                <img src="{{ task.complaint.attachment.url }}" alt="Complaint Attachment" style="max-width: 20vw; height: 16vh;" />
               {% else %}
                 <p class="m-0">No Image</p>
               {% endif %}

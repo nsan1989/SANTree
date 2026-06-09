@@ -34,6 +34,16 @@
             display: flex;
             gap: 0.5rem;
         }
+
+        .status-waiting > td   { background-color: #ffc107; color: #000; }
+        .status-open > td      { background-color: #0d6efd; color: #fff; }
+        .status-progress > td  { background-color: #17a2b8; color: #fff; }
+        .status-review > td    { background-color: #6f42c1; color: #fff; }
+        .status-resolved > td  { background-color: #198754; color: #fff; }
+        .status-rejected > td  { background-color: #dc3545; color: #fff; }
+        .status-cancelled > td { background-color: #fd7e14; color: #fff; }
+        .status-closed > td    { background-color: #6c757d; color: #fff; }
+        .status-halt > td      { background-color: #b02a37; color: #fff; }
     </style>
 
     <div class="container-fluid">
@@ -93,7 +103,29 @@
                         <tbody class="table-info">
                             {% if comp %}
                                 {% for c in comp %}
-                                    <tr>
+                                    <tr
+                                        class="
+                                            {% if c.status == 'Waiting' %}
+                                                status-waiting
+                                            {% elif c.status == 'Open' %}
+                                                status-open
+                                            {% elif c.status == 'In Progress' %}
+                                                status-progress
+                                            {% elif c.status == 'Rejected' %}
+                                                status-rejected
+                                            {% elif c.status == 'Review' %}
+                                                status-review
+                                            {% elif c.status == 'Resolved' %}
+                                                status-resolved
+                                            {% elif c.status == 'Acknowledged' %}
+                                                status-acknowledged
+                                            {% elif c.status == 'Cancelled' %}
+                                                status-cancelled
+                                            {% elif c.status == 'Halt' %}
+                                                status-halt
+                                            {% endif %}
+                                            "
+                                    >
                                         <td>{{c.complaint_number}}</td>
                                         <td>{{c.department}}</td>
                                         <td>{{c.complaint_type}}</td>
@@ -133,14 +165,56 @@
                             {% if comp %}
                                 {% for c in comp %}
                                     <tr
-                                        class="complaint-summary-row"
+                                        class="complaint-summary-row
+                                        {% if c.status == 'Waiting' %}
+                                            status-waiting
+                                        {% elif c.status == 'Open' %}
+                                            status-open
+                                        {% elif c.status == 'In Progress' %}
+                                            status-progress
+                                        {% elif c.status == 'Rejected' %}
+                                            status-rejected
+                                        {% elif c.status == 'Review' %}
+                                            status-review
+                                        {% elif c.status == 'Resolved' %}
+                                            status-resolved
+                                        {% elif c.status == 'Acknowledged' %}
+                                            status-acknowledged
+                                        {% elif c.status == 'Cancelled' %}
+                                            status-cancelled
+                                        {% elif c.status == 'Halt' %}
+                                            status-halt
+                                        {% endif %}
+                                        "
                                         onClick="toggleTask(this)"
                                     >
                                         <td>{{c.complaint_number}}</td>
                                         <td>{{c.status}}</td>
                                         <td><i class="fa-solid fa-plus"></i></td>
                                     </tr>
-                                    <tr class="complaint-body">
+                                    <tr 
+                                        class="complaint-body
+                                        {% if c.status == 'Waiting' %}
+                                            status-waiting
+                                        {% elif c.status == 'Open' %}
+                                            status-open
+                                        {% elif c.status == 'In Progress' %}
+                                            status-progress
+                                        {% elif c.status == 'Rejected' %}
+                                            status-rejected
+                                        {% elif c.status == 'Review' %}
+                                            status-review
+                                        {% elif c.status == 'Resolved' %}
+                                            status-resolved
+                                        {% elif c.status == 'Acknowledged' %}
+                                            status-acknowledged
+                                        {% elif c.status == 'Cancelled' %}
+                                            status-cancelled
+                                        {% elif c.status == 'Halt' %}
+                                            status-halt
+                                        {% endif %}
+                                        "
+                                    >
                                         <td colspan="4">
                                             <div>
                                                 <i class="fa-regular fa-building"></i>

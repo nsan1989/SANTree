@@ -77,6 +77,16 @@
       text-decoration: none;
       color: #000;
     }
+
+    .status-waiting > td   { background-color: #ffc107; color: #000; }
+    .status-open > td      { background-color: #0d6efd; color: #fff; }
+    .status-progress > td  { background-color: #17a2b8; color: #fff; }
+    .status-review > td    { background-color: #6f42c1; color: #fff; }
+    .status-resolved > td  { background-color: #198754; color: #fff; }
+    .status-rejected > td  { background-color: #dc3545; color: #fff; }
+    .status-cancelled > td { background-color: #fd7e14; color: #fff; }
+    .status-closed > td    { background-color: #6c757d; color: #fff; }
+    .status-halt > td      { background-color: #b02a37; color: #fff; }
   </style>
 
   <link rel="stylesheet" href="{% static 'styles/assigned_complaint.css' %}" />
@@ -165,7 +175,27 @@
             {% for complaints in page_obj %}
               <tr
                 style="font-family: 'Poppins', sans-serif;"
-                class="{% if complaints.complaint.status == 'In Progress' %}table-warning{% elif complaints.complaint.status == 'Resolved' %}table-success{% elif complaints.complaint.status == 'Cancelled' %}table-danger{% elif complaints.complaint.status == 'Review' %}table-info{% endif %}"
+                class="
+                  {% if complaint.complaint.status == 'Waiting' %}
+                      status-waiting
+                  {% elif complaint.complaint.status == 'Open' %}
+                      status-open
+                  {% elif complaint.complaint.status == 'In Progress' %}
+                      status-progress
+                  {% elif complaint.complaint.status == 'Rejected' %}
+                      status-rejected
+                  {% elif complaint.complaint.status == 'Review' %}
+                      status-review
+                  {% elif complaint.complaint.status == 'Resolved' %}
+                      status-resolved
+                  {% elif complaint.complaint.status == 'Acknowledged' %}
+                      status-acknowledged
+                  {% elif complaint.complaint.status == 'Cancelled' %}
+                      status-cancelled
+                  {% elif complaint.complaint.status == 'Halt' %}
+                      status-halt
+                  {% endif %}
+                "
               >
                 <td>{{complaints.complaint.complaint_number}}</td>
                 <td>{{complaints.complaint.description|default:"No Data"}}</td>
@@ -198,7 +228,7 @@
                   <td>--</td>
                 {% endif %}
                 {% if complaints.complaint.assigned_to == request.user %}
-                  {% if complaints.complaint.status == 'Resolved' %}
+                  {% if complaints.complaint.status == 'Resolved' or complaints.complaint.status == 'Cancelled' %}
                     <td class="text-center">--</td>
                   {% else %}
                     <td class="text-center">
@@ -214,7 +244,7 @@
                 {% else %}
                   <td>--</td>
                 {% endif %}
-                {% if complaints.complaint.status == 'Resolved' %}
+                {% if complaints.complaint.status == 'Resolved' or complaints.complaint.status == 'Cancelled' %}
                   <td class="text-center">--</td>
                 {% else %}
                   <td class="text-center"><a class="open-modal" data-url="{% url 'cms:complaints_remarks' complaints.id %}"><i
@@ -247,11 +277,31 @@
                 <th scope="col">Action</th>
               </tr>
             </thead>
-            <tbody class="table-info">
+            <tbody>
               {% if page_obj %}
                 {% for complaints in page_obj %}
                   <tr
-                    class="complaint-summary-row"
+                    class="
+                      {% if complaint.complaint.status == 'Waiting' %}
+                          status-waiting
+                      {% elif complaint.complaint.status == 'Open' %}
+                          status-open
+                      {% elif complaint.complaint.status == 'In Progress' %}
+                          status-progress
+                      {% elif complaint.complaint.status == 'Rejected' %}
+                          status-rejected
+                      {% elif complaint.complaint.status == 'Review' %}
+                          status-review
+                      {% elif complaint.complaint.status == 'Resolved' %}
+                          status-resolved
+                      {% elif complaint.complaint.status == 'Acknowledged' %}
+                          status-acknowledged
+                      {% elif complaint.complaint.status == 'Cancelled' %}
+                          status-cancelled
+                      {% elif complaint.complaint.status == 'Halt' %}
+                          status-halt
+                      {% endif %}
+                    "
                     onClick="toggleTask(this)"
                   >
                     <td>{{complaints.complaint.complaint_number}}</td>
@@ -259,7 +309,27 @@
                     <td><i class="fa-solid fa-plus"></i></td>
                   </tr>
                   <tr
-                    class="complaint-body"
+                    class="complaint-body
+                      {% if complaint.complaint.status == 'Waiting' %}
+                          status-waiting
+                      {% elif complaint.complaint.status == 'Open' %}
+                          status-open
+                      {% elif complaint.complaint.status == 'In Progress' %}
+                          status-progress
+                      {% elif complaint.complaint.status == 'Rejected' %}
+                          status-rejected
+                      {% elif complaint.complaint.status == 'Review' %}
+                          status-review
+                      {% elif complaint.complaint.status == 'Resolved' %}
+                          status-resolved
+                      {% elif complaint.complaint.status == 'Acknowledged' %}
+                          status-acknowledged
+                      {% elif complaint.complaint.status == 'Cancelled' %}
+                          status-cancelled
+                      {% elif complaint.complaint.status == 'Halt' %}
+                          status-halt
+                      {% endif %}
+                    "
                   >
                     <td
                       colspan="4"

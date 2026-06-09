@@ -158,7 +158,9 @@
                           <button class="btn btn-sm btn-primary" type="submit">Update</button>
                         </form>
                       </td>
-                    {% elif complaints.complaint.status != 'Review' %}
+                    {% endif %}
+                  {% else %}
+                    {% if complaints.complaint.status == 'Review' %}
                       <td>
                         <form method="POST" action="{% url 'cms:review_complaint_update_status' complaints.complaint.id %}">
                           {% csrf_token %}
@@ -170,11 +172,7 @@
                           <button class="btn btn-sm btn-primary" type="submit">Update</button>
                         </form>
                       </td>
-                    {% else %}
-                      <td>--</td>
                     {% endif %}
-                  {% else %}
-                    <td>--</td>
                   {% endif %}
               <!--Remark Part-->
                   {% if complaints.complaint.status == 'Resolved' %}
