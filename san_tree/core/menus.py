@@ -321,6 +321,12 @@ MENU_STRUCTURE = {
                 "view_name": "DriverScheduleView",
                 "icon": "fa-solid fa-calendar",
             },
+            {
+                "name": "Patient",
+                "url_name": "vms:all_patient_bookings",
+                "view_name": "AllPatientRequestView",
+                "icon": "fa-solid fa-users",
+            },
         ],
         "admin": [
             {

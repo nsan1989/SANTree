@@ -83,9 +83,20 @@ def AdminTripsView(request):
         raise PermissionDenied("User profile not found")
     context = {}
     try:
-        all_trips = Booking.objects.exclude(status=BookingStatus.WAITING).order_by(
-            "-created_at"
-        )
+        if (
+            request.user.department
+            and request.user.department.name.lower() == "transport"
+            and request.user.role == "Admin"
+        ):
+            all_trips = Booking.objects.exclude(status=BookingStatus.WAITING).order_by(
+                "-created_at"
+            )
+        else:
+            all_trips = (
+                Booking.objects.filter(booked_by=current_user)
+                .exclude(status=BookingStatus.WAITING)
+                .order_by("-created_at")
+            )
     except Exception as e:
         context["error"] = str(e)
     view_name = request.resolver_match.view_name
@@ -344,8 +355,16 @@ def StaffUpdateBookingStatusView(request, booking_id):
     if request.method == "POST":
         booking = get_object_or_404(Booking, id=booking_id)
         booking.status = request.POST.get("status")
-        booking.save()
-    return redirect("vms:vms_staff_dashboard")
+
+        if booking.status == "IN_PROGRESS":
+            booking.save()
+
+        if booking.status == "COMPLETED":
+            booking.driver.user.status = "vacant"
+            booking.driver.user.save()
+            booking.save()
+
+    return redirect("vms:vms_all_trips")
 
 
 # All Vehicles View.
@@ -706,3 +725,26 @@ def BookingSuccessView(request, id=None):
     return render(
         request, "patient_templates/booking_success.html", {"booking": booking}
     )
+
+
+# All patient request
+def AllPatientRequestView(request):
+    if request.user.is_authenticated:
+        try:
+            current_user_role = request.user.role
+        except AttributeError:
+            raise PermissionDenied("User profile not found")
+
+        if current_user_role in [
+            "User",
+        ]:
+            raise PermissionDenied("Unauthorized access")
+
+    try:
+        all_requests = PatientBooking.objects.all().order_by("-created_at")
+    except Exception as e:
+        context["error"] = str(e)
+
+    context = {"booking": all_requests}
+
+    return render(request, "patient_templates/all_patient_booking.html", context)

@@ -62,4 +62,5 @@ urlpatterns = [
         BookingSuccessView,
         name="patient_booking_success",
     ),
+    path("all_patient_bookings/", AllPatientRequestView, name="all_patient_bookings"),
 ]
