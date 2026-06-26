@@ -63,4 +63,5 @@ urlpatterns = [
         name="patient_booking_success",
     ),
     path("all_patient_bookings/", AllPatientRequestView, name="all_patient_bookings"),
+    path("export_bookings/", BookingExportView, name="booking_export"),
 ]

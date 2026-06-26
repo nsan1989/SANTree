@@ -4,7 +4,7 @@ from django.db import transaction
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib import messages
 import json
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 import calendar
 from datetime import datetime, time, timedelta
 from django.urls import reverse
@@ -12,6 +12,7 @@ from django.utils import timezone
 from django.core.files import File
 import qrcode
 from io import BytesIO
+import csv
 
 from .forms import *
 from .models import *
@@ -748,3 +749,54 @@ def AllPatientRequestView(request):
     context = {"booking": all_requests}
 
     return render(request, "patient_templates/all_patient_booking.html", context)
+
+
+# Booking export view.
+def BookingExportView(request):
+    response = HttpResponse(content_type="text/csv")
+    response["Content-Disposition"] = 'attachment; filename="bookings.csv"'
+
+    writer = csv.writer(response)
+    writer.writerow(
+        [
+            "Type",
+            "Priority",
+            "Pick Up",
+            "Drop Off",
+            "Pickup Time",
+            "Drop Time",
+            "Passengers",
+            "Description",
+            "Vehicle",
+            "Driver",
+            "Booked By",
+            "Assigned To",
+            "Status",
+        ]
+    )
+
+    bookings = Booking.objects.all()
+
+    for booking in bookings:
+        writer.writerow(
+            [
+                booking.booking_type,
+                booking.priority,
+                booking.pickup_location,
+                booking.drop_location,
+                booking.pickup_time,
+                booking.drop_time,
+                booking.passengers,
+                booking.description,
+                booking.vehicle,
+                booking.driver,
+                booking.booked_by,
+                booking.assigned_to,
+                booking.status,
+            ]
+        )
+
+    return response
+
+
+#

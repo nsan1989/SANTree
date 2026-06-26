@@ -129,7 +129,7 @@
 </nav>
 <div class="row px-2">
     <!--Desktop view-->
-  <div class="col-12 d-none d-lg-flex table-responsive p-0">
+  <div class="col-12 d-none d-md-flex table-responsive p-0">
     <table class="table table-bordered">
       <thead class="table-danger">
         <tr>
@@ -145,7 +145,7 @@
           <th scope="col">View Details</th>
         </tr>
       </thead>
-      <tbody>
+      <tbody class="table-info">
         {% if page_obj %} {% for complaint in page_obj %}
           <tr
             class="

@@ -46,7 +46,7 @@
           <h3 class="fw-bold">Complaint Details</h3>
         </div>
       </div>
-      <div class="col-12">
+      <div class="col-12 mb-3">
         {% if complaint %}
           <ul class="ps-0">
             <li class="d-flex">
@@ -90,7 +90,8 @@
           <p>No complaint details found.</p>
         {% endif %}
       </div>
-      <div class="col-12 table-responsive">
+      <!--Complaint remarks-->
+      <div class="col-12 table-responsive mb-3">
         <div class="table-title">
           <h5 class="text-light" style="font-family: 'Poppins', sans-serif;">Remarks</h5>
         </div>
@@ -116,6 +117,70 @@
             {% endif %}
           </tbody>
         </table>
+      </div>
+      <!--Reassigned to staff history-->
+      <div class="col-12 mb-3">
+        <div class="reassigned-title">
+          <h5>Reassigned to staff list</h5>
+        </div>
+        <div class="reassigned-table table-responsive">
+          <table class="table table-bordered">
+            <thead class="table-danger">
+              <tr>
+                <th scope="col">Reassigned To</th>
+                <th scope="col">Message</th>
+                <th scope="col">Assigned At</th>
+              </tr>
+            </thead>
+            <tbody class="table-info">
+              {% if reassigned_staff %}
+                {% for staff in reassigned_staff %}
+                  <tr>
+                    <td>{{staff.reassigned_to}}</td>
+                    <td>{{staff.message}}</td>
+                    <td>{{staff.timestamp}}</td>
+                  </tr>
+                {% endfor %}
+              {% else %}
+              <tr>
+                <td colspan="100%">No staff!</td>
+              </tr>
+              {% endif %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <!--Reassigned to department history -->
+      <div class="col-12">
+        <div class="reassigned-title">
+          <h5>Reassigned to Department list</h5>
+        </div>
+        <div class="reassigned-table table-responsive">
+          <table class="table table-bordered">
+            <thead class="table-danger">
+              <tr>
+                <th scope="col">Reassigned To</th>
+                <th scope="col">Reason</th>
+                <th scope="col">Assigned At</th>
+              </tr>
+            </thead>
+            <tbody class="table-info">
+              {% if reassigned_department %}
+                {% for dept in reassigned_department %}
+                  <tr>
+                    <td>{{dept.reassigned_to}}</td>
+                    <td>{{dept.reason}}</td>
+                    <td>{{dept.timestamp}}</td>
+                  </tr>
+                {% endfor %}
+              {% else %}
+              <tr>
+                <td colspan="100%">No department!</td>
+              </tr>
+              {% endif %}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   </div>

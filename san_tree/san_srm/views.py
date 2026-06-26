@@ -1,12 +1,12 @@
 from datetime import timedelta
-
+import csv
 import matplotlib
 import structlog
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator
 from django.db.models import Q
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.urls import reverse
@@ -795,3 +795,43 @@ def SuccessView(request):
         redirect_url = reverse("srm:staff_dashboard")
 
     return render(request, "service_success.html", {"redirect_url": redirect_url})
+
+
+# Export service.
+def ExportService(request):
+    response = HttpResponse(content_type="text/csv")
+    response["Content-Disposition"] = 'attachment; filename="services.csv"'
+
+    writer = csv.writer(response)
+    writer.writerow(
+        [
+            "Service No.",
+            "Service Type",
+            "Created By",
+            "Assigned To",
+            "UHID",
+            "Description",
+            "Status",
+            "Started At",
+            "Completed At",
+        ]
+    )
+
+    service = Service.objects.all()
+
+    for ser in service:
+        writer.writerow(
+            [
+                ser.service_number,
+                ser.service_type,
+                ser.created_by,
+                ser.assigned_to,
+                ser.UHID,
+                ser.description,
+                ser.status,
+                ser.started_at,
+                ser.completed_at,
+            ]
+        )
+
+    return response

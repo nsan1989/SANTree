@@ -1,4 +1,5 @@
 import matplotlib
+import csv
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator
@@ -20,6 +21,7 @@ from .models import (
     Location,
     PRIORITY_CHOICES,
     ReassignedComplaint,
+    ReassignDepartment,
     STATUS_CHOICES,
 )
 
@@ -462,8 +464,8 @@ def ReviewComplaints(request):
         raise PermissionDenied("User profile not found.")
     complaints = (
         ComplaintHistory.objects.filter(
-            complaint__department=user.department,
-            complaint__status__in=["Waiting", "Review"],
+            complaint__created_by__department=user.department,
+            complaint__status="Waiting",
         )
         .exclude(complaint__created_by=user)
         .order_by("complaint__created_at")
@@ -487,7 +489,10 @@ def ReviewComplaintDetails(request, id):
     complaint = get_object_or_404(ComplaintHistory, complaint_id=id)
     remark = ComplaintRemarks.objects.filter(complaint_id=id)
 
-    context = {"complaint": complaint, "remarks": remark}
+    context = {
+        "complaint": complaint,
+        "remarks": remark,
+    }
     view_name = request.resolver_match.view_name
     if view_name == "cms:review_complaint_details" and user_role == "Admin":
         return render(request, "review_complaint_details.html", context)
@@ -580,14 +585,15 @@ def AssignedComplaint(request):
         raise PermissionDenied("User profile not found.")
 
     complaints = ComplaintHistory.objects.filter(
-        complaint__assigned_to=user,
-        complaint__status__in=[
-            "Open",
-            "Acknowledged",
-            "In Progress",
-            "Review",
-            "Resolved",
-        ],
+        (Q(complaint__assigned_to=user) | Q(complaint__department=user.department))
+        & (
+            Q(complaint__status="Open")
+            | Q(complaint__status="In Progress")
+            | Q(complaint__status="Resolved")
+            | Q(complaint__status="Halt")
+            | Q(complaint__status="Review")
+            | Q(complaint__status="Acknowledged")
+        )
     ).order_by("-complaint__created_at")
 
     # Halt the open tasks if it exceeds 24hr.
@@ -755,9 +761,16 @@ def ComplaintDetails(request, id):
     except:
         raise PermissionDenied("User profile not found.")
     complaint = get_object_or_404(ComplaintHistory, complaint_id=id)
+    reassigned_staff = ReassignedComplaint.objects.filter(complaint_id=id)
+    reassigned_department = ReassignDepartment.objects.filter(complaint_id=id)
     remark = ComplaintRemarks.objects.filter(id=id)
 
-    context = {"complaint": complaint, "remarks": remark}
+    context = {
+        "complaint": complaint,
+        "remarks": remark,
+        "reassigned_staff": reassigned_staff,
+        "reassigned_department": reassigned_department,
+    }
 
     view_name = request.resolver_match.view_name
     if view_name == "cms:staff_complaints_details" and user_role == "User":
@@ -1013,3 +1026,51 @@ def ComplaintSuccessView(request):
         redirect_url = reverse("cms:staff_complaints_history")
 
     return render(request, "complaint_success.html", {"redirect_url": redirect_url})
+
+
+# Export complaints.
+def ExportComplaints(request):
+    response = HttpResponse(content_type="text/csv")
+    response["Content-Disposition"] = 'attachment; filename="complaints.csv"'
+
+    writer = csv.writer(response)
+    writer.writerow(
+        [
+            "Complaint No.",
+            "Department",
+            "Complaint Type",
+            "Description",
+            "Facility",
+            "Block",
+            "Location",
+            "Priority",
+            "Status",
+            "Created By",
+            "Assigned To",
+            "Created At",
+            "Completed At",
+        ]
+    )
+
+    complaints = Complaint.objects.all()
+
+    for comp in complaints:
+        writer.writerow(
+            [
+                comp.complaint_number,
+                comp.department,
+                comp.complaint_type,
+                comp.description,
+                comp.facility,
+                comp.block,
+                comp.location,
+                comp.priority,
+                comp.status,
+                comp.created_by,
+                comp.assigned_to,
+                comp.created_at,
+                comp.completed_at,
+            ]
+        )
+
+    return response

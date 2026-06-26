@@ -109,4 +109,5 @@ urlpatterns = [
         AdminAllComplaints,
         name="department_complaints",
     ),
+    path("export_complaints/", ExportComplaints, name="export_complaint"),
 ]

@@ -110,7 +110,7 @@
     </div>
     <div class="row w-100 m-0">
       <!--Desktop view-->
-      <div class="col-12 d-none d-lg-flex table-responsive p-0">
+      <div class="col-12 d-none d-md-flex table-responsive p-0">
         <table class="table table-bordered">
           <thead class="table-danger">
             <tr style="font-family: 'Open Sans', sans-serif;">
@@ -125,7 +125,7 @@
               <th scope="col">Details</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody class="table-info">
             {% if page_obj %}
               {% for complaints in page_obj %}
                 <tr
@@ -146,7 +146,7 @@
                   <td>{{complaints.complaint.priority}}</td>
                   <td>{{complaints.complaint.created_at}}</td>
                   {% if complaints.complaint.assigned_to == request.user %}
-                    {% if complaints.complaint.status != 'Cancelled' and complaints.complaint.status != 'Resolved' %}
+                    {% if complaints.complaint.status == 'Waiting' %}
                       <td>
                         <form method="POST" action="{% url 'cms:review_complaint_update_status' complaints.complaint.id %}">
                           {% csrf_token %}

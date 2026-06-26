@@ -40,4 +40,5 @@ urlpatterns = [
     path("service_remark/<int:id>/remark/", ServiceRemark, name="service_remarks"),
     path("update_status/", UpdateUserStatus, name="update_status"),
     path("schedule-toggle/<int:pk>/", ToggleSchedule, name="toggle_schedule"),
+    path("export_services/", ExportService, name="export_services"),
 ]
