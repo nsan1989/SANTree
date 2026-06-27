@@ -24,7 +24,7 @@
         <div class="card shadow-lg border-0 rounded-4">
           <div class="card-body p-4">
             <h4 class="card-title text-center mb-4">Tasks Type</h4>
-            <form id="taskChecklistForm" method="post" enctype="multipart/form-data" action="{% url 'tms:task_checklist' %}">
+            <form id="taskChecklistForm" method="post" enctype="multipart/form-data" action="{% url 'tms:task_checklists' %}">
               {% csrf_token %} {{ form|crispy }}
 
               <div class="d-grid mt-4">

@@ -170,30 +170,29 @@
             <th scope="col">View</th>
           </tr>
         </thead>
-        <tbody class="table-info">
+        <tbody>
           {% if page_obj %}
             {% for complaints in page_obj %}
               <tr
-                style="font-family: 'Poppins', sans-serif;"
                 class="
-                  {% if complaint.complaint.status == 'Waiting' %}
-                      status-waiting
-                  {% elif complaint.complaint.status == 'Open' %}
-                      status-open
-                  {% elif complaint.complaint.status == 'In Progress' %}
-                      status-progress
-                  {% elif complaint.complaint.status == 'Rejected' %}
-                      status-rejected
-                  {% elif complaint.complaint.status == 'Review' %}
-                      status-review
-                  {% elif complaint.complaint.status == 'Resolved' %}
-                      status-resolved
-                  {% elif complaint.complaint.status == 'Acknowledged' %}
-                      status-acknowledged
-                  {% elif complaint.complaint.status == 'Cancelled' %}
-                      status-cancelled
-                  {% elif complaint.complaint.status == 'Halt' %}
-                      status-halt
+                  {% if complaints.complaint.status == 'Waiting' %}
+                    status-waiting
+                  {% elif complaints.complaint.status == 'Open' %}
+                    status-open
+                  {% elif complaints.complaint.status == 'In Progress' %}
+                    status-progress
+                  {% elif complaints.complaint.status == 'Rejected' %}
+                    status-rejected
+                  {% elif complaints.complaint.status == 'Review' %}
+                    status-review
+                  {% elif complaints.complaint.status == 'Resolved' %}
+                    status-resolved
+                  {% elif complaints.complaint.status == 'Acknowledged' %}
+                    status-acknowledged
+                  {% elif complaints.complaint.status == 'Cancelled' %}
+                    status-cancelled
+                  {% elif complaints.complaint.status == 'Halt' %}
+                    status-halt
                   {% endif %}
                 "
               >

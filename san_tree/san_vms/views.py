@@ -95,7 +95,7 @@ def AdminTripsView(request):
         else:
             all_trips = (
                 Booking.objects.filter(booked_by=current_user)
-                .exclude(status=BookingStatus.WAITING)
+                .exclude(status__in=[BookingStatus.WAITING, BookingStatus.CONFIRMED])
                 .order_by("-created_at")
             )
     except Exception as e:
@@ -615,7 +615,7 @@ def PatientBookingView(request):
     return render(request, "patient_templates/patient_booking.html", context)
 
 
-# Helper function to generate UPI QR code
+# Helper function to generate UPI QR code.
 def generate_upi_qr(booking_id, amount, upi_id="hospital@upi", merchant_name="SANTree"):
     """Generate UPI QR code for payment"""
     upi_string = (
@@ -641,7 +641,7 @@ def generate_upi_qr(booking_id, amount, upi_id="hospital@upi", merchant_name="SA
     return buffer, upi_string
 
 
-# Patient booking payment view - Generate QR Code
+# Patient booking payment view - Generate QR Code.
 def PatientPaymentView(request, id):
     booking = get_object_or_404(PatientBooking, id=id)
     payment, created = PatientPayment.objects.get_or_create(
@@ -664,7 +664,7 @@ def PatientPaymentView(request, id):
     return render(request, "patient_templates/patient_payment.html", context)
 
 
-# Confirm payment after UPI transaction
+# Confirm payment after UPI transaction.
 def ConfirmPatientPaymentView(request, id):
     booking = get_object_or_404(PatientBooking, id=id)
     payment = get_object_or_404(PatientPayment, booking=booking)
@@ -689,6 +689,7 @@ def ConfirmPatientPaymentView(request, id):
     return render(request, "patient_templates/patient_payment.html", context)
 
 
+# Cancel payment view.
 def CancelPatientPaymentView(request, id):
     booking = get_object_or_404(PatientBooking, id=id)
     payment = get_object_or_404(PatientPayment, booking=booking)
@@ -728,7 +729,7 @@ def BookingSuccessView(request, id=None):
     )
 
 
-# All patient request
+# All patient request.
 def AllPatientRequestView(request):
     if request.user.is_authenticated:
         try:
