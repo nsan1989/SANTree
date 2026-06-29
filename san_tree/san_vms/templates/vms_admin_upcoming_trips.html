@@ -14,6 +14,32 @@
         .table {
             font-family: 'Poppins', sans-serif;
         }
+        .trip-body {
+            display: none;
+        }
+        .trip-body.active {
+            display: table-row;
+        }
+        .trip-body-content div {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            height: 2rem;
+            width: 100%;
+        }
+        .trip-body-content div i {
+            width: 1rem;
+            height: 1rem;
+        }
+        .trip-body-content div p {
+            margin-bottom: 0;
+        }
+        .status-waiting > td   { background-color: #ffc107; color: #000; }
+        .status-acknowledged > td      { background-color: #0d6efd; color: #fff; }
+        .status-confirmed > td  { background-color: #17a2b8; color: #fff; }
+        .status-progress > td    { background-color: #6f42c1; color: #fff; }
+        .status-completed > td  { background-color: #198754; color: #fff; }
+        .status-cancelled > td { background-color: #fd7e14; color: #fff; }
     </style>
 
     <div class="container-fluid">
@@ -39,7 +65,23 @@
                 <tbody class="table-info">
                     {% if upcomings %}
                         {% for trip in upcomings %}
-                            <tr>
+                            <tr
+                                class="
+                                    {% if trip.status == 'WAITING' %}
+                                        status-waiting
+                                    {% elif trip.status == 'ACKNOWLEDGED' %}
+                                        status-acknowledged
+                                    {% elif trip.status == 'IN PROGRESS' %}
+                                        status-progress
+                                    {% elif trip.status == 'CONFIRMED' %}
+                                        status-confirmed
+                                    {% elif trip.status == 'COMPLETED' %}
+                                        status-completed
+                                    {% elif trip.status == 'CANCELLED' %}
+                                        status-cancelled
+                                    {% endif %}
+                                    "
+                            >
                                 <td>{{ trip.id }}</td>
                                 <td>{{ trip.booking_type }}</td>
                                 <td>{{ trip.pickup_location }}</td>
@@ -64,24 +106,51 @@
                 <thead class="table-danger">
                     <tr>
                         <th scope="col">ID</th>
-                        <th scope="col">Pickup</th>
                         <th scope="col">Driver</th>
-                        <th scope="col">Detail</th>
+                        <th scope="col">Action</th>
                     </tr>
                 </thead>
                 <tbody class="table-info">
                     {% if upcomings %}
                         {% for trip in upcomings %}
                             <tr
-                                class="trip-summary-row"
-                                onclick="toggleTrip(this)"
+                                class="trip-summary-row
+                                    {% if trip.status == 'WAITING' %}
+                                        status-waiting
+                                    {% elif trip.status == 'ACKNOWLEDGED' %}
+                                        status-acknowledged
+                                    {% elif trip.status == 'IN PROGRESS' %}
+                                        status-progress
+                                    {% elif trip.status == 'CONFIRMED' %}
+                                        status-confirmed
+                                    {% elif trip.status == 'COMPLETED' %}
+                                        status-completed
+                                    {% elif trip.status == 'CANCELLED' %}
+                                        status-cancelled
+                                    {% endif %}
+                                    "
+                                onClick="toggleTask(this)"
                             >
                                 <td>{{ trip.id }}</td>
-                                <td>{{ trip.pickup_location }}</td>
                                 <td>{{ trip.driver.user.username|default:"-" }}</td>
                                 <td><i class="fa-solid fa-plus"></i></td>
                             </tr>
-                            <tr class="trip-body">
+                            <tr class="trip-body
+                                    {% if trip.status == 'WAITING' %}
+                                        status-waiting
+                                    {% elif trip.status == 'ACKNOWLEDGED' %}
+                                        status-acknowledged
+                                    {% elif trip.status == 'IN PROGRESS' %}
+                                        status-progress
+                                    {% elif trip.status == 'CONFIRMED' %}
+                                        status-confirmed
+                                    {% elif trip.status == 'COMPLETED' %}
+                                        status-completed
+                                    {% elif trip.status == 'CANCELLED' %}
+                                        status-cancelled
+                                    {% endif %}
+                                    "
+                                >
                                 <td colspan="4">
                                     <div class="trip-body-content">
                                         <div>
@@ -91,6 +160,10 @@
                                         <div>
                                             <i class="fa-solid fa-exclamation"></i>
                                             <p>{{ trip.booking_type }}</p>
+                                        </div>
+                                        <div>
+                                            <i class="fa-solid fa-location-dot"></i>
+                                            <p>{{ trip.pickup_location }}</p>
                                         </div>
                                         <div>
                                             <i class="fa-solid fa-location-dot"></i>
@@ -125,4 +198,20 @@
             </table>
         </div>
     </div>
+
+    <script>
+    function toggleTask(element) {
+      const body = element.nextElementSibling;
+      body.classList.toggle("active");
+
+      const icon = element.querySelector("i");
+      if (body.classList.contains("active")) {
+        icon.classList.remove("fa-plus");
+        icon.classList.add("fa-minus");
+      } else {
+        icon.classList.remove("fa-minus");
+        icon.classList.add("fa-plus");
+      }
+    }
+  </script>
 {% endblock %}

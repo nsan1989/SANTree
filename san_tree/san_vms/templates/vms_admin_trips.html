@@ -25,6 +25,33 @@
         tbody {
             font-family: 'poppins', sans-serif;
         }
+
+        .trip-body {
+            display: none;
+        }
+
+        .trip-body.active {
+            display: table-row;
+        }
+
+        .trip-detail-content div {
+            height: 2rem;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .trip-detail-content div p {
+            margin-bottom: 0;
+        }
+
+        .status-waiting > td   { background-color: #ffc107; color: #000; }
+        .status-acknowledged > td      { background-color: #0d6efd; color: #fff; }
+        .status-confirmed > td  { background-color: #17a2b8; color: #fff; }
+        .status-progress > td    { background-color: #6f42c1; color: #fff; }
+        .status-completed > td  { background-color: #198754; color: #fff; }
+        .status-cancelled > td { background-color: #fd7e14; color: #fff; }
     </style>
 
     <div class="container-fluid">
@@ -39,28 +66,45 @@
                 </a>
             </div>
         </div>
-        <div class="content-body">
+        <!--Desktop view-->
+        <div class="content-body d-none d-md-flex">
             <div class="table-responsive">
                 <table class="table table-bordered">
                     <thead class="table-danger">
                         <tr>
-                            <th>Type</th>
-                            <th>Priority</th>
-                            <th>Pick Up</th>
-                            <th>Drop Off</th>
-                            <th>Pickup Time</th>
-                            <th>Drop Time</th>
-                            <th>Vehicle</th>
-                            <th>Driver</th>
-                            <th>Booked By</th>
-                            <th>Assigned To</th>
-                            <th>Status</th>
+                            <th scope="col">Type</th>
+                            <th scope="col">Priority</th>
+                            <th scope="col">Pick Up</th>
+                            <th scope="col">Drop Off</th>
+                            <th scope="col">Pickup Time</th>
+                            <th scope="col">Drop Time</th>
+                            <th scope="col">Vehicle</th>
+                            <th scope="col">Driver</th>
+                            <th scope="col">Booked By</th>
+                            <th scope="col">Assigned To</th>
+                            <th scope="col">Status</th>
                         </tr>
                     </thead>
-                    <tbody class="table-info">
+                    <tbody>
                         {% if all_trips %}
                             {% for trip in all_trips %}
-                                <tr>
+                                <tr
+                                    class="
+                                    {% if trip.status == 'WAITING' %}
+                                        status-waiting
+                                    {% elif trip.status == 'ACKNOWLEDGED' %}
+                                        status-acknowledged
+                                    {% elif trip.status == 'IN PROGRESS' %}
+                                        status-progress
+                                    {% elif trip.status == 'CONFIRMED' %}
+                                        status-confirmed
+                                    {% elif trip.status == 'COMPLETED' %}
+                                        status-completed
+                                    {% elif trip.status == 'CANCELLED' %}
+                                        status-cancelled
+                                    {% endif %}
+                                    "
+                                >
                                     <td>{{ trip.booking_type }}</td>
                                     <td>{{ trip.priority }}</td>
                                     <td>{{ trip.pickup_location }}</td>
@@ -83,5 +127,135 @@
                 </table>
             </div>
         </div>
+        <!--Mobile view-->
+        <div class="content-body d-md-none">
+            <div class="table-responsive">
+                <table class="table table-bordered">
+                    <thead class="table-danger">
+                        <tr>
+                            <th scope="col">ID</th>
+                            <th scope="col">TYPE</th>
+                            <th scope="col">ACTION</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if all_trips %}
+                            {% for trip in all_trips %}
+                            <tr
+                                class="
+                                    {% if trip.status == 'WAITING' %}
+                                        status-waiting
+                                    {% elif trip.status == 'ACKNOWLEDGED' %}
+                                        status-acknowledged
+                                    {% elif trip.status == 'IN PROGRESS' %}
+                                        status-progress
+                                    {% elif trip.status == 'CONFIRMED' %}
+                                        status-confirmed
+                                    {% elif trip.status == 'COMPLETED' %}
+                                        status-completed
+                                    {% elif trip.status == 'CANCELLED' %}
+                                        status-cancelled
+                                    {% endif %}
+                                    "
+                                onClick="toggleTask(this)"
+                            >
+                                <td>{{ trip.id }}</td>
+                                <td>{{ trip.booking_type }}</td>
+                                <td><i class="fa-solid fa-plus"></i></td>
+                            </tr>
+                            <tr
+                                class="trip-body
+                                    {% if trip.status == 'WAITING' %}
+                                        status-waiting
+                                    {% elif trip.status == 'ACKNOWLEDGED' %}
+                                        status-acknowledged
+                                    {% elif trip.status == 'IN PROGRESS' %}
+                                        status-progress
+                                    {% elif trip.status == 'CONFIRMED' %}
+                                        status-confirmed
+                                    {% elif trip.status == 'COMPLETED' %}
+                                        status-completed
+                                    {% elif trip.status == 'CANCELLED' %}
+                                        status-cancelled
+                                    {% endif %}
+                                    "
+                            >
+                                <td
+                                    colspan="3"
+                                >
+                                    <div class="trip-detail-content">
+                                        <div>
+                                            <i class="fa-solid fa-book"></i>
+                                            <p>{{ trip.booking_type }}</p>
+                                        </div>
+                                        <div>
+                                            <i class="fa-solid fa-sort"></i>
+                                            <p>{{ trip.priority }}</p>
+                                        </div>
+                                        <div>
+                                            <i class="fa-solid fa-location-dot"></i>
+                                            <p>{{ trip.pickup_location }}</p>
+                                        </div>
+                                        <div>
+                                            <i class="fa-solid fa-location-dot"></i>
+                                            <p>{{ trip.drop_location }}</p>
+                                        </div>
+                                        <div>
+                                            <i class="fa-solid fa-clock"></i>
+                                            <p>{{ trip.pickup_time }}</p>
+                                        </div>
+                                        <div>
+                                            <i class="fa-solid fa-clock"></i>
+                                            <p>{{ trip.drop_time }}</p>
+                                        </div>
+                                        <div>
+                                            <i class="fa-solid fa-car"></i>
+                                            <p>{{ trip.vehicle }}</p>
+                                        </div>
+                                        <div>
+                                            <i class="fa-solid fa-user"></i>
+                                            <p>{{ trip.driver }}</p>
+                                        </div>
+                                        <div>
+                                            <i class="fa-solid fa-user"></i>
+                                            <p>{{ trip.booked_by }}</p>
+                                        </div>
+                                        <div>
+                                            <i class="fa-solid fa-user"></i>
+                                            <p>{{ trip.assigned_to }}</p>
+                                        </div>
+                                        <div>
+                                            <i class="fa-solid fa-flag"></i>
+                                            <p>{{ trip.status }}</p>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                        <tr>
+                            <td>No trips found.</td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
+
+    <script>
+    function toggleTask(element) {
+      const body = element.nextElementSibling;
+      body.classList.toggle("active");
+
+      const icon = element.querySelector("i");
+      if (body.classList.contains("active")) {
+        icon.classList.remove("fa-plus");
+        icon.classList.add("fa-minus");
+      } else {
+        icon.classList.remove("fa-minus");
+        icon.classList.add("fa-plus");
+      }
+    }
+  </script>
 {% endblock %}

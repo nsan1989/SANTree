@@ -30,10 +30,15 @@
       cursor: pointer;
     }
 
-    .status-resolved > td { background-color: #003300; color: white; }
-    .status-progress > td { background-color: #ff6600; color: white; }
-    .status-closed > td { background-color: #666666; color: white; }
-    .status-cancelled > td { background-color: #cc0000; color: white; }
+    .status-waiting > td   { background-color: #ffc107; color: #000; }
+    .status-open > td      { background-color: #0d6efd; color: #fff; }
+    .status-progress > td  { background-color: #17a2b8; color: #fff; }
+    .status-review > td    { background-color: #6f42c1; color: #fff; }
+    .status-resolved > td  { background-color: #198754; color: #fff; }
+    .status-rejected > td  { background-color: #dc3545; color: #fff; }
+    .status-cancelled > td { background-color: #fd7e14; color: #fff; }
+    .status-closed > td    { background-color: #6c757d; color: #fff; }
+    .status-halt > td      { background-color: #b02a37; color: #fff; }
 
     .task-body {
       display: none;
@@ -133,16 +138,28 @@
               {% if page_obj %}
                 {% for task in page_obj %}
                   <tr
-                    {% if task.complaint.status == 'In Progress' %}
-                      class="status-progress"
-                    {% elif task.complaint.status == 'Resolved' %}
-                      class="status-resolved"
-                    {% elif task.complaint.status == 'Closed' %}
-                      class="status-closed"
-                    {% elif task.complaint.status == 'Cancelled' %}
-                      class="status-cancelled"
-                    {% endif %}
-                  >
+                class="
+                  {% if task.complaint.status == 'Waiting' %}
+                    status-waiting
+                  {% elif task.complaint.status == 'Open' %}
+                    status-open
+                  {% elif task.complaint.status == 'In Progress' %}
+                    status-progress
+                  {% elif task.complaint.status == 'Rejected' %}
+                    status-rejected
+                  {% elif task.complaint.status == 'Review' %}
+                    status-review
+                  {% elif task.complaint.status == 'Resolved' %}
+                    status-resolved
+                  {% elif task.complaint.status == 'Acknowledged' %}
+                    status-acknowledged
+                  {% elif task.complaint.status == 'Cancelled' %}
+                    status-cancelled
+                  {% elif task.complaint.status == 'Halt' %}
+                    status-halt
+                  {% endif %}
+                "
+              >
                     <td>{{task.complaint.complaint_number}}</td>
                     <td>{{task.complaint.created_by.department}}</td>
                     <td>{{task.complaint.complaint_type}}</td>
@@ -171,7 +188,7 @@
                                                  data-url="{% url 'cms:complaints_remarks' task.complaint.id %}"><i class="fa-solid fa-pen"></i></a></td>
                     {% endif %}
                     <td class="text-center"><a href="{% url 'cms:staff_assigned_tasks_details' task.complaint.id %}"
-                                               style="text-decoration: none;"><i class="fa-solid fa-eye"></i></a></td>
+                                               style="text-decoration: none;"><i class="fa-solid fa-eye" style="color: #fff;"></i></a></td>
                   </tr>
                 {% endfor %}
               {% else %}
@@ -197,7 +214,27 @@
                 {% if page_obj %}
                   {% for task in page_obj %}
                     <tr
-                      class="task-summary-row"
+                      class="task-summary-row
+                      {% if task.complaint.status == 'Waiting' %}
+                          status-waiting
+                      {% elif task.complaint.status == 'Open' %}
+                          status-open
+                      {% elif task.complaint.status == 'In Progress' %}
+                          status-progress
+                      {% elif task.complaint.status == 'Rejected' %}
+                          status-rejected
+                      {% elif task.complaint.status == 'Review' %}
+                          status-review
+                      {% elif task.complaint.status == 'Resolved' %}
+                          status-resolved
+                      {% elif task.complaint.status == 'Acknowledged' %}
+                          status-acknowledged
+                      {% elif task.complaint.status == 'Cancelled' %}
+                          status-cancelled
+                      {% elif task.complaint.status == 'Halt' %}
+                          status-halt
+                      {% endif %}
+                    "
                       onClick="toggleTask(this)"
                     >
                       <td>{{task.complaint.complaint_number}}</td>
@@ -205,8 +242,28 @@
                       <td><i class="fa-solid fa-plus"></i></td>
                     </tr>
                     <tr
-                      class="task-body"
-                    >
+                    class="task-body
+                      {% if task.complaint.status == 'Waiting' %}
+                          status-waiting
+                      {% elif task.complaint.status == 'Open' %}
+                          status-open
+                      {% elif task.complaint.status == 'In Progress' %}
+                          status-progress
+                      {% elif task.complaint.status == 'Rejected' %}
+                          status-rejected
+                      {% elif task.complaint.status == 'Review' %}
+                          status-review
+                      {% elif task.complaint.status == 'Resolved' %}
+                          status-resolved
+                      {% elif task.complaint.status == 'Acknowledged' %}
+                          status-acknowledged
+                      {% elif task.complaint.status == 'Cancelled' %}
+                          status-cancelled
+                      {% elif task.complaint.status == 'Halt' %}
+                          status-halt
+                      {% endif %}
+                    "
+                  >
                       <td
                         colspan="4"
                       >
@@ -251,6 +308,7 @@
                             {% endif %}
                           </div>
                           <div class="d-flex align-items-center">
+                            <i class="fa-solid fa-pen"></i>
                             {% if task.complaint.status == 'Resolved' %}
                               <p class="text-center">--</p>
                             {% else %}
@@ -268,9 +326,9 @@
                             <a
                               class="d-flex align-items-center"
                               href="{% url 'cms:staff_assigned_tasks_details' task.complaint.id %}"
-                              style="text-decoration: none;"
+                              style="text-decoration: none; color: #fff;"
                             >
-                              <i class="fa-solid fa-eye"></i>
+                              <i class="fa-solid fa-eye" style="color: #fff;"></i>
                               <p>See Details</p>
                             </a>
                           </div>

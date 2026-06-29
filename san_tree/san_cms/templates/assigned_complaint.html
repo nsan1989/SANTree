@@ -281,23 +281,23 @@
                 {% for complaints in page_obj %}
                   <tr
                     class="
-                      {% if complaint.complaint.status == 'Waiting' %}
+                      {% if complaints.complaint.status == 'Waiting' %}
                           status-waiting
-                      {% elif complaint.complaint.status == 'Open' %}
+                      {% elif complaints.complaint.status == 'Open' %}
                           status-open
-                      {% elif complaint.complaint.status == 'In Progress' %}
+                      {% elif complaints.complaint.status == 'In Progress' %}
                           status-progress
-                      {% elif complaint.complaint.status == 'Rejected' %}
+                      {% elif complaints.complaint.status == 'Rejected' %}
                           status-rejected
-                      {% elif complaint.complaint.status == 'Review' %}
+                      {% elif complaints.complaint.status == 'Review' %}
                           status-review
-                      {% elif complaint.complaint.status == 'Resolved' %}
+                      {% elif complaints.complaint.status == 'Resolved' %}
                           status-resolved
-                      {% elif complaint.complaint.status == 'Acknowledged' %}
+                      {% elif complaints.complaint.status == 'Acknowledged' %}
                           status-acknowledged
-                      {% elif complaint.complaint.status == 'Cancelled' %}
+                      {% elif complaints.complaint.status == 'Cancelled' %}
                           status-cancelled
-                      {% elif complaint.complaint.status == 'Halt' %}
+                      {% elif complaints.complaint.status == 'Halt' %}
                           status-halt
                       {% endif %}
                     "
@@ -309,23 +309,23 @@
                   </tr>
                   <tr
                     class="complaint-body
-                      {% if complaint.complaint.status == 'Waiting' %}
+                      {% if complaints.complaint.status == 'Waiting' %}
                           status-waiting
-                      {% elif complaint.complaint.status == 'Open' %}
+                      {% elif complaints.complaint.status == 'Open' %}
                           status-open
-                      {% elif complaint.complaint.status == 'In Progress' %}
+                      {% elif complaints.complaint.status == 'In Progress' %}
                           status-progress
-                      {% elif complaint.complaint.status == 'Rejected' %}
+                      {% elif complaints.complaint.status == 'Rejected' %}
                           status-rejected
-                      {% elif complaint.complaint.status == 'Review' %}
+                      {% elif complaints.complaint.status == 'Review' %}
                           status-review
-                      {% elif complaint.complaint.status == 'Resolved' %}
+                      {% elif complaints.complaint.status == 'Resolved' %}
                           status-resolved
-                      {% elif complaint.complaint.status == 'Acknowledged' %}
+                      {% elif complaints.complaint.status == 'Acknowledged' %}
                           status-acknowledged
-                      {% elif complaint.complaint.status == 'Cancelled' %}
+                      {% elif complaints.complaint.status == 'Cancelled' %}
                           status-cancelled
-                      {% elif complaint.complaint.status == 'Halt' %}
+                      {% elif complaints.complaint.status == 'Halt' %}
                           status-halt
                       {% endif %}
                     "
@@ -385,6 +385,7 @@
                           {% endif %}
                         </div>
                         <div>
+                          <i class="fa-regular fa-user"></i>
                           {% if complaints.complaint.assigned_to == request.user %}
                             {% if complaints.complaint.status == 'Resolved' %}
                               <p class="text-center">--</p>
@@ -405,6 +406,7 @@
                           {% endif %}
                         </div>
                         <div>
+                          <i class="fa-solid fa-building"></i>
                           {% if complaints.complaint.assigned_to == request.user %}
                             {% if complaints.complaint.status == 'Resolved' %}
                               <p class="text-center">--</p>
@@ -425,6 +427,7 @@
                           {% endif %}
                         </div>
                         <div>
+                          <i class="fa-solid fa-pen"></i>
                           {% if complaints.complaint.status == 'Resolved' %}
                             <p class="text-center">--</p>
                           {% else %}
@@ -436,8 +439,8 @@
                         </div>
                         <div>
                           <a href="{% url 'cms:assigned_complaint_details' complaints.complaint.id %}"
-                             style="text-decoration: none;">
-                            <i class="fa-solid fa-eye"></i>
+                             style="text-decoration: none; color: #fff;">
+                            <i class="fa-solid fa-eye" style="color: #fff;"></i>
                             Details
                           </a>
                         </div>
