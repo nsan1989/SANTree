@@ -122,7 +122,7 @@ STATUS_CHOICES = (
 
 # Request Service Model.
 class Service(models.Model):
-    SERVICE_PRIORITY = [("Critical", "Critical"), ("High", "High"), ("Low", "Low")]
+    SERVICE_PRIORITY = [("Critical", "Critical"), ("Normal", "Normal")]
     service_number = models.CharField(max_length=20, unique=True, null=True, blank=True)
     service_type = models.ForeignKey(
         ServiceTypes, on_delete=models.SET_NULL, null=True, blank=True

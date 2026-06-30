@@ -26,9 +26,6 @@ class Facility(models.Model):
 class Block(models.Model):
     facility = models.ForeignKey(Facility, on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
-    block_admin = models.ForeignKey(
-        CustomUsers, on_delete=models.SET_NULL, null=True, blank=True
-    )
     is_active = models.BooleanField(default=True)
 
     class Meta:
@@ -36,6 +33,36 @@ class Block(models.Model):
 
     def __str__(self):
         return self.name
+
+
+# Block admin model.
+class DepartmentBlockAdmin(models.Model):
+    block = models.ForeignKey(Block, on_delete=models.CASCADE)
+    department = models.ForeignKey(Departments, on_delete=models.CASCADE)
+    department_admin = models.ForeignKey(
+        CustomUsers, on_delete=models.CASCADE, related_name="department_admins"
+    )
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        verbose_name = "Department Block Admin"
+        verbose_name_plural = "Department Block Admins"
+        constraints = [
+            models.UniqueConstraint(
+                fields=["block", "department"], name="unique_block_department_admin"
+            )
+        ]
+
+    def clean(self):
+        if self.department_admin.role != "Admin":
+            raise ValidationError("Selected user must have ADMIN role.")
+
+    def save(self, *args, **kwargs):
+        self.clean()
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"{self.block} - {self.department} - {self.department_admin}"
 
 
 # Complaint location model.

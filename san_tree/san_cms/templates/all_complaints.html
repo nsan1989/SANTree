@@ -91,16 +91,34 @@
           <h3 class="mb-0">Raised Complaints</h3>
           <p class="mb-0 text-light">List of all complaints raised by you.</p>
         </div>
-        <div class="complaint-link">
-          <p class="mb-0 text-light">
-            Raise a complaint &nbsp;<a
-              class="btn btn-primary fw-bold"
-              href="{% url 'cms:complaints' %}"
-              style="text-decoration: none"
-            >click here.</a
-              >
+        <div class="row d-flex gap-2 w-100">
+          <div class="col-12 col-md-4 complaint-link">
+            <p class="mb-0 text-light">
+              <a
+                class="btn btn-primary fw-bold"
+                href="{% url 'cms:complaints' %}"
+                style="text-decoration: none"
+              >Raise Complaint</a
+                >
             </p>
           </div>
+          <div class="col-12 col-md-4 filter-content">
+            <form method="GET" class="mb-0">
+                    <select name="status" class="form-select w-auto" onchange="this.form.submit()">
+                        <option value="ALL">All</option>
+                        <option value="Review" {% if selected_status == "Review" %}selected{% endif %}>Review</option>
+                        <option value="Rejected" {% if selected_status == "Rejected" %}selected{% endif %}>Rejected</option>
+                        <option value="Open" {% if selected_status == "Open" %}selected{% endif %}>Open</option>
+                        <option value="Cancelled" {% if selected_status == "Cancelled" %}selected{% endif %}>Cancelled</option>
+                        <option value="Acknowledged" {% if selected_status == "Acknowledged" %}selected{% endif %}>Acknowledged</option>
+                        <option value="In Progress" {% if selected_status == "In Progress" %}selected{% endif %}>In Progress</option>
+                        <option value="Resolved" {% if selected_status == "Resolved" %}selected{% endif %}>Resolved</option>
+                        <option value="Halt" {% if selected_status == "Halt" %}selected{% endif %}>Halt</option>
+                        <option value="Waiting" {% if selected_status == "Waiting" %}selected{% endif %}>Waiting</option>
+                    </select>
+                </form>
+          </div>
+        </div>
         </div>
       </div>
   <!--Paginator-->

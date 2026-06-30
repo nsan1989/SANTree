@@ -98,6 +98,13 @@ def AdminTripsView(request):
                 .exclude(status__in=[BookingStatus.WAITING, BookingStatus.CONFIRMED])
                 .order_by("-created_at")
             )
+
+        selected_status = request.GET.get("status")
+        if selected_status and selected_status != "ALL":
+            all_trips = all_trips.filter(status=selected_status)
+
+        context["selected_status"] = selected_status
+
     except Exception as e:
         context["error"] = str(e)
     view_name = request.resolver_match.view_name
@@ -141,7 +148,7 @@ def AdminUpdateBookingStatusView(request, booking_id):
             booking.driver = None
             booking.assigned_to = None
 
-        if booking.priority == "CRITICAL" and booking.vehicle:
+        if booking.priority == "URGENT" and booking.vehicle:
             HandleCriticalBooking(booking)
 
         booking.save()
@@ -228,7 +235,7 @@ def CabRequestView(request):
                 )
                 booking.save()
 
-            #                if booking.priority == BookingPriority.CRITICAL:
+            #                if booking.priority == BookingPriority.URGENT:
             #                    HandleCriticalBooking(booking)
 
             return redirect("vms:booking_success")

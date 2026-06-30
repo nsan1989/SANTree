@@ -61,6 +61,13 @@
         .request-body-content form {
             height: auto;
         }
+
+        .status-waiting > td   { background-color: #ffc107; color: #000; }
+        .status-acknowledged > td      { background-color: #0d6efd; color: #fff; }
+        .status-confirmed > td  { background-color: #17a2b8; color: #fff; }
+        .status-progress > td    { background-color: #6f42c1; color: #fff; }
+        .status-completed > td  { background-color: #198754; color: #fff; }
+        .status-cancelled > td { background-color: #fd7e14; color: #fff; }
     </style>
 
     {% if request.user.department.name|lower != "transport" %}
@@ -110,10 +117,26 @@
                                 <th scope="col">Status</th>
                             </tr>
                         </thead>
-                        <tbody class="table-info">
+                        <tbody>
                             {% if page_obj %}
                                 {% for request in page_obj %}
-                                    <tr>
+                                    <tr
+                                    class="
+                                    {% if request.status == 'WAITING' %}
+                                        status-waiting
+                                    {% elif request.status == 'ACKNOWLEDGED' %}
+                                        status-acknowledged
+                                    {% elif request.status == 'IN PROGRESS' %}
+                                        status-progress
+                                    {% elif request.status == 'CONFIRMED' %}
+                                        status-confirmed
+                                    {% elif request.status == 'COMPLETED' %}
+                                        status-completed
+                                    {% elif request.status == 'CANCELLED' %}
+                                        status-cancelled
+                                    {% endif %}
+                                    "
+                                >
                                         <td>{{ request.id }}</td>
                                         <td>{{ request.booking_type }}</td>
                                         <td>{{ request.pickup_location }}</td>

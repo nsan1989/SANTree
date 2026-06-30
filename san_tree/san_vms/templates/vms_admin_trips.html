@@ -56,30 +56,41 @@
 
     <div class="container-fluid">
         <div class="row content-header d-flex align-items-center mb-3">
-            <div class="col-6 left-content">
+            <div class="col-12 col-md-6 left-content">
                 <h3 class="mb-0">All Trips</h3>
                 <p class="mb-0 text-light">List of all trips</p>
             </div>
-            <div class="col-6 right-content">
+            <div class="col-12 col-md-6 right-content d-flex align-items-center gap-3">
                 <a href="{% url 'vms:booking_export' %}" class="btn btn-success">
                     Export CSV
                 </a>
+                <!--filter trip-->
+                <form method="GET" class="mb-0">
+                    <select name="status" class="form-select w-auto" onchange="this.form.submit()">
+                        <option value="ALL">All</option>
+                        <option value="ACKNOWLEDGED" {% if selected_status == "ACKNOWLEDGED" %}selected{% endif %}>Acknowledged</option>
+                        <option value="IN PROGRESS" {% if selected_status == "IN PROGRESS" %}selected{% endif %}>In Progress</option>
+                        <option value="CONFIRMED" {% if selected_status == "CONFIRMED" %}selected{% endif %}>Confirmed</option>
+                        <option value="COMPLETED" {% if selected_status == "COMPLETED" %}selected{% endif %}>Completed</option>
+                        <option value="CANCELLED" {% if selected_status == "CANCELLED" %}selected{% endif %}>Cancelled</option>
+                    </select>
+                </form>
             </div>
         </div>
         <!--Desktop view-->
         <div class="content-body d-none d-md-flex">
-            <div class="table-responsive">
+            <div class="table-responsive w-100">
                 <table class="table table-bordered">
                     <thead class="table-danger">
                         <tr>
                             <th scope="col">Type</th>
                             <th scope="col">Priority</th>
                             <th scope="col">Pick Up</th>
-                            <th scope="col">Drop Off</th>
                             <th scope="col">Pickup Time</th>
                             <th scope="col">Drop Time</th>
                             <th scope="col">Vehicle</th>
                             <th scope="col">Driver</th>
+                            <th scope="col">Driver Phone No.</th>
                             <th scope="col">Booked By</th>
                             <th scope="col">Assigned To</th>
                             <th scope="col">Status</th>
@@ -108,11 +119,11 @@
                                     <td>{{ trip.booking_type }}</td>
                                     <td>{{ trip.priority }}</td>
                                     <td>{{ trip.pickup_location }}</td>
-                                    <td>{{ trip.drop_location }}</td>
                                     <td>{{ trip.pickup_time }}</td>
                                     <td>{{ trip.drop_time }}</td>
                                     <td>{{ trip.vehicle }}</td>
                                     <td>{{ trip.driver }}</td>
+                                    <td>{{ trip.driver.user.phone_number }}</td>
                                     <td>{{ trip.booked_by }}</td>
                                     <td>{{ trip.assigned_to }}</td>
                                     <td>{{ trip.status }}</td>
@@ -215,6 +226,10 @@
                                         <div>
                                             <i class="fa-solid fa-user"></i>
                                             <p>{{ trip.driver }}</p>
+                                        </div>
+                                        <div>
+                                            <i class="fa-solid fa-phone"></i>
+                                            <p>{{ trip.driver.user.phone_number }}</p>
                                         </div>
                                         <div>
                                             <i class="fa-solid fa-user"></i>

@@ -50,8 +50,7 @@ class BookingTypes(models.TextChoices):
 # Booking priorities.
 class BookingPriority(models.TextChoices):
     NORMAL = "NORMAL", "Normal"
-    HIGH = "HIGH", "High"
-    CRITICAL = "CRITICAL", "Critical"
+    URGENT = "URGENT", "Urgent"
 
 
 # Vehicle model.

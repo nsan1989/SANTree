@@ -23,6 +23,7 @@ from .models import (
     ReassignedComplaint,
     ReassignDepartment,
     STATUS_CHOICES,
+    DepartmentBlockAdmin,
 )
 
 matplotlib.use("Agg")
@@ -384,15 +385,19 @@ def ComplaintView(request):
                 new_complaint.save()
 
             if user.role == "Admin":
-                block_admin = (
-                    new_complaint.block.block_admin if new_complaint.block else None
-                )
-                if (
-                    block_admin
-                    and block_admin.is_active
-                    and block_admin.department == new_complaint.department
-                ):
-                    new_complaint.assigned_to = block_admin
+                department_block_admin = None
+                if new_complaint.block:
+                    department_block_admin = (
+                        DepartmentBlockAdmin.objects.filter(
+                            block=new_complaint.block,
+                            department=new_complaint.department,
+                            is_active=True,
+                        )
+                        .select_related("department_admin")
+                        .first()
+                    )
+                if department_block_admin:
+                    new_complaint.assigned_to = department_block_admin.department_admin
                 else:
                     department_admin = (
                         CustomUsers.objects.filter(
@@ -403,7 +408,6 @@ def ComplaintView(request):
                         .exclude(id=user.id)
                         .first()
                     )
-
                     if not department_admin:
                         form.add_error(
                             None, "No active department admin available for assignment."
@@ -441,12 +445,14 @@ def AllComplaintsView(request):
     complaints = ComplaintHistory.objects.filter(complaint__created_by=user).order_by(
         "complaint__created_at"
     )
+    selected_status = request.GET.get("status")
+    if selected_status and selected_status != "ALL":
+        complaints = complaints.filter(complaint__status=selected_status)
+
     page_number = request.GET.get("page")
     paginator = Paginator(complaints, 10)
     page_obj = paginator.get_page(page_number)
-    context = {
-        "page_obj": page_obj,
-    }
+    context = {"page_obj": page_obj, "selected_status": selected_status}
     if path.startswith("/cms/staff/raised_complaints/") and user_role == "User":
         return render(request, "all_complaints.html", context)
     if path.startswith("/cms/incharge/raised_complaints/") and user_role == "Admin":
@@ -511,20 +517,20 @@ def ReviewComplaintUpdateView(request, id):
     if request.method == "POST":
         new_status = request.POST.get("status")
         if new_status == "Open":
-            block_admin = (
-                complaint.complaint.block.block_admin
-                if complaint.complaint.block
-                else None
-            )
-
             assignee = None
+            if complaint.complaint.block:
+                department_block_admin = (
+                    DepartmentBlockAdmin.objects.filter(
+                        block=complaint.complaint.block,
+                        department=complaint.complaint.department,
+                        is_active=True,
+                    )
+                    .select_related("department_admin")
+                    .first()
+                )
 
-            if (
-                block_admin
-                and block_admin.is_active
-                and block_admin.department_id == complaint.complaint.department_id
-            ):
-                assignee = block_admin
+                if department_block_admin:
+                    assignee = department_block_admin.department_admin
 
             if not assignee:
                 assignee = (
@@ -581,7 +587,7 @@ def AssignedComplaint(request):
     path = request.path
     try:
         user_role = user.role
-    except:
+    except AttributeError:
         raise PermissionDenied("User profile not found.")
 
     complaints = ComplaintHistory.objects.filter(
@@ -597,28 +603,28 @@ def AssignedComplaint(request):
     ).order_by("-complaint__created_at")
 
     # Halt the open tasks if it exceeds 24hr.
-    for complaint in complaints:
-        if (
-            complaint.complaint.status == "Open"
-            and complaint.complaint.created_at < timezone.now() - timedelta(hours=24)
-        ):
-            complaint.complaint.status = "Halt"
-            complaint.complaint.save()
+    #    for complaint in complaints:
+    #        if (
+    #            complaint.complaint.status == "Open"
+    #            and complaint.complaint.created_at < timezone.now() - timedelta(hours=24)
+    #        ):
+    #            complaint.complaint.status = "Halt"
+    #            complaint.complaint.save()
 
     # Vacant the user if it exceeds the assign duration.
-    now = timezone.now()
-    reassigned = ReassignedComplaint.objects.all()
-    for r in reassigned:
-        hours, minutes = map(int, r.duration.split(":"))
-        expiry_time = r.timestamp + timedelta(hours=hours, minutes=minutes)
+    #    now = timezone.now()
+    #    reassigned = ReassignedComplaint.objects.all()
+    #    for r in reassigned:
+    #        hours, minutes = map(int, r.duration.split(":"))
+    #        expiry_time = r.timestamp + timedelta(hours=hours, minutes=minutes)
 
-        if now >= expiry_time and r.complaint.status == "In Progress":
-            r.complaint.status = "Halt"
-            r.complaint.save()
-            new_user = r.reassigned_to
-            if new_user.status.strip().lower() != "vacant":
-                new_user.status = "vacant"
-                new_user.save()
+    #        if now >= expiry_time and r.complaint.status == "In Progress":
+    #            r.complaint.status = "Halt"
+    #            r.complaint.save()
+    #            new_user = r.reassigned_to
+    #            if new_user.status.strip().lower() != "vacant":
+    #                new_user.status = "vacant"
+    #                new_user.save()
 
     page_number = request.GET.get("page")
     paginator = Paginator(complaints, 10)
@@ -879,12 +885,16 @@ def AssignedTasks(request):
     assign_complaints = ComplaintHistory.objects.filter(
         complaint__assigned_to=user
     ).order_by("complaint__created_at")
+    selected_status = request.GET.get("status")
+    if selected_status:
+        assign_complaints = assign_complaints.filter(complaint__status=selected_status)
 
     page_number = request.GET.get("page")
     paginator = Paginator(assign_complaints, 10)
     page_obj = paginator.get_page(page_number)
     context = {
         "page_obj": page_obj,
+        "selected_status": selected_status,
     }
     if path.startswith("/cms/staff/assigned_tasks/") and user_role == "User":
         return render(request, "assigned_tasks.html", context)

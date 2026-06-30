@@ -209,18 +209,45 @@
                 <th scope="col">Detail</th>
               </tr>
             </thead>
-            <tbody class="table-info">
+            <tbody>
               {% if page_obj %}
                 {% for service in page_obj %}
                   <tr
-                    class="service-summary-row"
+                    class="service-summary-row
+                    {% if service.status == 'Open' %}
+                      status-open
+                    {% elif service.status == 'In Progress' %}
+                      status-progress
+                    {% elif service.status == 'Pending' %}
+                      status-pending
+                    {% elif service.status == 'Waiting' %}
+                      status-waiting
+                    {% elif service.status == 'Completed' %}
+                      status-completed
+                    {% elif service.status == 'On Hold' %}
+                      status-onhold
+                    {% endif %}"
                     onclick="toggleService(this)"
                   >
                     <td>{{service.service_number}}</td>
                     <td>{{service.status}}</td>
                     <td><i class="fa-solid fa-plus"></i></td>
                   </tr>
-                  <tr class="service-body">
+                  <tr class="service-body
+                      {% if service.status == 'Open' %}
+                        status-open
+                      {% elif service.status == 'In Progress' %}
+                        status-progress
+                      {% elif service.status == 'Pending' %}
+                        status-pending
+                      {% elif service.status == 'Waiting' %}
+                        status-waiting
+                      {% elif service.status == 'Completed' %}
+                        status-completed
+                      {% elif service.status == 'On Hold' %}
+                        status-onhold
+                      {% endif %}"
+                    >
                     <td
                       colspan="4"
                     >

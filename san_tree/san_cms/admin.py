@@ -23,14 +23,28 @@ class FacilityAdmin(ImportExportModelAdmin):
 class BlockResources(resources.ModelResource):
     class Meta:
         model = Block
-        fields = ("id", "facility", "name", "block_admin", "is_active")
+        fields = ("id", "facility", "name", "is_active")
 
 
 # block admin.
 @admin.register(Block)
 class BlockAdmin(ImportExportModelAdmin):
     resource_class = BlockResources
-    list_display = ("facility", "name", "block_admin", "is_active")
+    list_display = ("facility", "name", "is_active")
+
+
+# department block admin resources.
+class DepartmentBlockAdminResources(resources.ModelResource):
+    class Meta:
+        model = DepartmentBlockAdmin
+        fields = ("id", "block", "department", "department_admin", "is_active")
+
+
+# department block admin.
+@admin.register(DepartmentBlockAdmin)
+class DepartmentBlockAdminAdmin(ImportExportModelAdmin):
+    resource_class = DepartmentBlockAdminResources
+    list_display = ("block", "department", "department_admin", "is_active")
 
 
 # location resources.
