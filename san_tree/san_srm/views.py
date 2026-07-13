@@ -531,35 +531,82 @@ def assign_service_from_queue(vacant_staff):
             "service_request"
         ).order_by("created_at")
 
-        now = timezone.now()
+        critical_queue = [
+            q
+            for q in queue_services
+            if q.service_request.request_type.lower() == "critical"
+        ]
+
+        if critical_queue:
+            queue_services = critical_queue
+        else:
+            queue_services = list(queue_services)
 
         for queue_service in queue_services:
 
             service_obj = queue_service.service_request
 
-            eligible_shift = (
-                ShiftSchedule.objects.active_now()
-                .filter(
-                    shift_block_id=service_obj.service_block_id,
-                    shift_staffs_id=vacant_staff.id,
-                    is_active=True,
+            if service_obj.request_type.lower() == "critical":
+                eligible_shifts = list(
+                    ShiftSchedule.objects.active_now()
+                    .filter(
+                        shift_block_id=service_obj.service_block_id,
+                        is_active=True,
+                        shift_staffs__status__iexact="vacant",
+                        shift_staffs__role="User",
+                    )
+                    .filter(
+                        Q(shift_staffs__department__name="GDA")
+                        | Q(shift_staffs__department__name="General Duty Assistant")
+                    )
                 )
-                .first()
-            )
 
-            if not eligible_shift:
-                continue
+                engaged_shift_ids = Service.objects.filter(
+                    status="Open",
+                    assigned_to__isnull=False,
+                ).values_list("assigned_to_id", flat=True)
 
-            # assign
-            service_obj.assigned_to = eligible_shift
-            service_obj.status = "Open"
-            service_obj.save()
+                eligible_shifts = [
+                    s for s in eligible_shifts if s.id not in engaged_shift_ids
+                ]
 
-            vacant_staff.status = "vacant"
-            vacant_staff.save(update_fields=["status"])
+                if not eligible_shifts:
+                    continue
 
-            queue_service.delete()
-            return
+                selected_shift = random.choice(eligible_shifts)
+
+                service_obj.assigned_to = selected_shift
+                service_obj.status = "Open"
+                service_obj.save()
+
+                queue_service.delete()
+                return
+
+            else:
+
+                eligible_shift = (
+                    ShiftSchedule.objects.active_now()
+                    .filter(
+                        shift_block_id=service_obj.service_block_id,
+                        shift_staffs_id=vacant_staff.id,
+                        is_active=True,
+                    )
+                    .first()
+                )
+
+                if not eligible_shift:
+                    continue
+
+                # assign
+                service_obj.assigned_to = eligible_shift
+                service_obj.status = "Open"
+                service_obj.save()
+
+                vacant_staff.status = "vacant"
+                vacant_staff.save(update_fields=["status"])
+
+                queue_service.delete()
+                return
 
     except Exception as e:
         log.error("Error assigning service from queue", error=str(e))

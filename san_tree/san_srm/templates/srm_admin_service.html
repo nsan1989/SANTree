@@ -105,6 +105,7 @@
                             <th scope="col">Service No.</th>
                             <th scope="col">Service Type</th>
                             <th scope="col">Created By</th>
+                            <th scope="col">Priority</th>
                             <th scope="col">Assigned To</th>
                             <th scope="col">UHID</th>
                             <th scope="col">Description</th>
@@ -135,6 +136,7 @@
                                     <td>{{ service.service_number }}</td>
                                     <td>{{ service.service_type }}</td>
                                     <td>{{ service.created_by }}</td>
+                                    <td>{{ service.request_type }}</td>
                                     <td>{{ service.assigned_to }}</td>
                                     <td>{{ service.UHID }}</td>
                                     <td>{{ service.description }}</td>
@@ -220,6 +222,10 @@
                                             <p>{{ service.service_type }}</p>
                                         </div>
                                         <div>
+                                            <i class="fa-solid fa-flag"></i>
+                                            <p>{{ service.request_type }}</p>
+                                        </div>
+                                        <div>
                                             <i class="fa-solid fa-info"></i>
                                             <p>{{ service.description }}</p>
                                         </div>
@@ -228,7 +234,7 @@
                                             <p>{{ service.created_by }}</p>
                                         </div>
                                         <div>
-                                            <i class="fa-solid fa-people"></i>
+                                            <i class="fa-solid fa-users"></i>
                                             <p>{{ service.assigned_to }}</p>
                                         </div>
                                         <div>

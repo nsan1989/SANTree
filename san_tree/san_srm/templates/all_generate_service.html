@@ -49,6 +49,7 @@
                     <thead class="table-danger">
                         <tr>
                             <th scope="col">Service No.</th>
+                            <th scope="col">Priority</th>
                             <th scope="col">Type</th>
                             <th scope="col">From Loc.</th>
                             <th scope="col">To Loc.</th>
@@ -62,6 +63,7 @@
                             {% for gen in generate %}
                                 <tr>
                                     <td>{{gen.generate_number}}</td>
+                                    <td>{{gen.request_type}}</td>
                                     <td>{{gen.service_type}}</td>
                                     <td>{{gen.from_location}}</td>
                                     <td>{{gen.to_location}}</td>

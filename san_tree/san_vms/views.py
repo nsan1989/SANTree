@@ -142,8 +142,6 @@ def AdminUpdateBookingStatusView(request, booking_id):
             new_driver = Driver.objects.get(id=driver_id)
             booking.driver = new_driver
             booking.assigned_to = new_driver.user
-            new_driver.user.status = "engaged"
-            new_driver.user.save()
         else:
             booking.driver = None
             booking.assigned_to = None
@@ -364,7 +362,12 @@ def StaffUpdateBookingStatusView(request, booking_id):
         booking = get_object_or_404(Booking, id=booking_id)
         booking.status = request.POST.get("status")
 
+        if booking.status == "ACKNOWLEDGE":
+            booking.save()
+
         if booking.status == "IN_PROGRESS":
+            booking.driver.user.status = "engaged"
+            booking.driver.user.save()
             booking.save()
 
         if booking.status == "COMPLETED":
