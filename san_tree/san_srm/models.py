@@ -128,7 +128,7 @@ class Service(models.Model):
         ServiceTypes, on_delete=models.SET_NULL, null=True, blank=True
     )
     request_type = models.CharField(
-        max_length=20, choices=SERVICE_PRIORITY, default="Low"
+        max_length=20, choices=SERVICE_PRIORITY, default="Normal"
     )
     service_block = models.ForeignKey(
         Blocks,

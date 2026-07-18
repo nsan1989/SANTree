@@ -1005,10 +1005,14 @@ def AdminAllComplaints(request):
     selected_status = (request.GET.get("status") or "").strip()
     selected_priority = (request.GET.get("priority") or "").strip()
 
-    dept_comp = Complaint.objects.filter(
-        Q(created_by__department=user.department)
-        | Q(assigned_to__department=user.department)
-    ).distinct()
+    dept_comp = (
+        Complaint.objects.filter(
+            Q(created_by__department=user.department)
+            | Q(assigned_to__department=user.department)
+        )
+        .distinct()
+        .order_by("-created_at")
+    )
 
     if selected_status:
         dept_comp = dept_comp.filter(status__iexact=selected_status)

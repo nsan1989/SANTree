@@ -275,9 +275,8 @@ def load_service_types(request):
 def ServiceView(request):
 
     priorities = [
-        ("critical", "Critical"),
-        ("high", "High"),
-        ("low", "Low"),
+        ("Critical", "Critical"),
+        ("Normal", "Normal"),
     ]
 
     service_types = ServiceTypes.objects.all()
