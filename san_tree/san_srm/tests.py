@@ -5,7 +5,13 @@ from django.test import TestCase
 from django.utils import timezone
 
 from accounts.models import ADMIN, USER, CustomUsers, Departments, Location
-from san_srm.models import Blocks, Service, ServiceRequestQueue, ServiceTypes, ShiftSchedule
+from san_srm.models import (
+    Blocks,
+    Service,
+    ServiceRequestQueue,
+    ServiceTypes,
+    ShiftSchedule,
+)
 from san_srm.signals import service_notification
 from san_srm.views import free_up_staff
 
@@ -144,7 +150,7 @@ class SRMServiceFlowTests(TestCase):
         self.assertEqual(expired_service.status, "Pending")
         self.assertEqual(waiting_service.status, "Open")
         self.assertEqual(waiting_service.assigned_to_id, self.shift.id)
-        self.assertEqual(self.staff.status, "vacant")
+        self.assertEqual(self.staff.status, "engaged")
         self.assertFalse(
             ServiceRequestQueue.objects.filter(service_request=waiting_service).exists()
         )

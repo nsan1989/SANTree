@@ -1,5 +1,6 @@
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.db import transaction
 from webpush import send_user_notification
 from webpush.models import PushInformation
 
@@ -43,3 +44,21 @@ def service_notification(sender, instance, created, **kwargs):
             title="New Service Assigned",
             message=f"You have a new service: {instance.service_type}",
         )
+
+
+@receiver(post_save, sender=CustomUsers)
+def handle_staff_vacant_status(sender, instance, created, update_fields=None, **kwargs):
+    """
+    When a staff member's status is updated to 'vacant',
+    automatically try to assign a waiting service from the queue
+    AFTER the transaction has been successfully committed.
+    """
+    # To avoid circular import issues
+    from san_srm.views import assign_service_from_queue
+
+    # We only care about existing 'User' roles being updated to 'vacant'
+    if not created and instance.role == "User":
+        if (update_fields and "status" in update_fields) or update_fields is None:
+            if instance.status == "vacant":
+                # Defer the queue assignment until after the current transaction commits.
+                transaction.on_commit(lambda: assign_service_from_queue(instance))
