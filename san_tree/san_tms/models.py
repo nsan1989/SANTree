@@ -170,8 +170,8 @@ class Tasks(models.Model):
 
         # Assign tasks number only once when new
         if is_new and not self.tasks_number:
-            self.tasks_number = f"TMS{self.id}"
-            Tasks.objects.filter(pk=self.pk).update(tasks_number=self.tasks_number)
+            self.tasks_number = f"TMS{self.pk}"
+            super().save(update_fields=["tasks_number"])
 
     class Meta:
         verbose_name_plural = "Tasks"
