@@ -196,7 +196,7 @@
               <td>
                 <form
                   method="POST"
-                  action="{% url 'cms:cancel_complaint' complaint.id %}"
+                  action="{% url 'cms:cancel_complaint' complaint.complaint.id %}"
                 >
                   {% csrf_token %}
                   <input type="hidden" name="status" value="Cancelled" />
@@ -337,7 +337,7 @@
                       {% if complaint.status_changed_to != 'Cancelled' %} {% if complaint.complaint.status not in 'In Progress,Resolved,Closed,Review,Rejected' %}
                         <form
                           method="POST"
-                          action="{% url 'cms:cancel_complaint' complaint.id %}"
+                          action="{% url 'cms:cancel_complaint' complaint.complaint.id %}"
                         >
                           {% csrf_token %}
                           <input type="hidden" name="status" value="Cancelled" />

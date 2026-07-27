@@ -119,7 +119,9 @@ def complaint_image_path(instance, filename):
 
 # Complaint Model.
 class Complaint(models.Model):
-    complaint_number = models.CharField(max_length=20, unique=True, blank=True)
+    complaint_number = models.CharField(
+        max_length=20, unique=True, blank=True, null=True
+    )
     complaint_type = models.ForeignKey(
         ComplaintType, on_delete=models.SET_NULL, null=True, blank=True
     )
