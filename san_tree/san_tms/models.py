@@ -66,7 +66,7 @@ def task_image_path(instance, filename):
 
 # Tasks Model.
 class Tasks(models.Model):
-    tasks_number = models.CharField(max_length=20, unique=True, blank=True)
+    tasks_number = models.CharField(max_length=20, unique=True, blank=True, null=True)
     tasks_types = models.ForeignKey(
         TasksTypes, on_delete=models.SET_NULL, null=True, blank=True
     )

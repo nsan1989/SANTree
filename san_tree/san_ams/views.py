@@ -501,7 +501,7 @@ def AssignedAssetView(request, id):
         current_user_role = current_user.role
     except:
         raise PermissionDenied("User profile not found")
-    request_asset = get_object_or_404(AssetRequest, id=id)
+    request_asset = get_object_or_404(AssetRequest, asset_id=id)
     asset = request_asset.asset
     request_user = CustomUsers.objects.filter(
         username=request_asset.requested_by.username
@@ -890,7 +890,7 @@ def StaffUpdateStatus(request, id):
     except AttributeError:
         raise PermissionDenied("User profile not found.")
 
-    request_asset = get_object_or_404(AssetRequest, id=id)
+    request_asset = get_object_or_404(AssetRequest, asset_id=id)
 
     asset = request_asset.asset
 
@@ -901,26 +901,35 @@ def StaffUpdateStatus(request, id):
             request_asset.status = new_status
             request_asset.save(update_fields=["status"])
             asset.status = new_status
-            asset.save(update_fields=["status"])
+            asset.requestable = False
+            asset.save(update_fields=["status", "requestable"])
 
         if new_status == "ASSIGNED":
             request_asset.status = new_status
             request_asset.save(update_fields=["status"])
             asset.status = new_status
-            asset.save(update_fields=["status"])
+            asset.requestable = False
+            asset.save(update_fields=["status", "requestable"])
 
         if new_status == "FAULTY":
             request_asset.status = new_status
             request_asset.save(update_fields=["status"])
             asset.status = new_status
-            asset.save(update_fields=["status"])
+            asset.requestable = False
+            asset.save(update_fields=["status", "requestable"])
 
         if new_status == "REPAIR":
             request_asset.status = new_status
             request_asset.save(update_fields=["status"])
             asset.status = new_status
             asset.assigned_to = None
-            asset.save(update_fields=["status", "assigned_to"])
+            asset.requestable = False
+            asset.save(update_fields=["status", "assigned_to", "requestable"])
+
+        if new_status == "AVAILABLE":
+            asset.status = new_status
+            asset.requestable = True
+            asset.save(update_fields=["status", "requestable"])
 
         return redirect("ams:staff_assets")
 

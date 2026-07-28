@@ -214,7 +214,7 @@
                             <option value="Acknowledged" {% if complaints.status == 'Acknowledged' %} selected {% endif %}>Acknowledged</option>
                           {% elif complaints.complaint.status == "Acknowledged" %}
                             <option value="In Progress" {% if complaints.status == 'In Progress' %} selected {% endif %}>In Progress</option>
-                          {% elif complaints.complaint.status == "Review" %}
+                          {% elif complaints.complaint.status == "In Progress" or complaints.complaint.status == "Review" %}
                             <option value="Resolved" {% if complaints.status == 'Resolved' %} selected {% endif %}>Resolved</option>
                           {% endif %}
                         </select>
@@ -376,7 +376,7 @@
                                       <option value="Acknowledged" {% if complaints.status == 'Acknowledged' %} selected {% endif %}>Acknowledged</option>
                                     {% elif complaints.complaint.status == "Acknowledged" %}
                                       <option value="In Progress" {% if complaints.status == 'In Progress' %} selected {% endif %}>In Progress</option>
-                                    {% elif complaints.complaint.status == "Review" %}
+                                    {% elif complaints.complaint.status == "In Progress" or complaints.complaint.status == "Review" %}
                                       <option value="Resolved" {% if complaints.status == 'Resolved' %} selected {% endif %}>Resolved</option>
                                     {% endif %}
                                   </select>

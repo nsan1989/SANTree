@@ -21,7 +21,10 @@
       <div class="col-12 col-md-5 card shadow-lg p-3">
         <form id="servForm" class="service-form" method="post">
           {% csrf_token %}
-
+          <div class="text-center mb-3">
+            <span class="text-danger">fields marked with <span class="asteriskField">(*)</span> are mandatory fields.</span>
+          </div>
+          
         <!-- Service Type -->
           <div class="mb-3">
             <label for="id_service_type" class="form-label requiredField">

@@ -55,9 +55,11 @@
             </div>
         </div>
 
+        <!--Asset handle by me-->
         <div class="section-card">
             <h4 class="mb-3">Assets I Handle</h4>
 
+            <!--Desktop view-->
             <div class="row d-none d-md-flex">
                 <div class="col-12 table-responsive">
                     <table class="table table-bordered">
@@ -81,7 +83,7 @@
                                     <td>{% if asset.image %}{{ asset.image }}{% else %}NA{% endif %}</td>
                                     <td>{{ asset.status }}</td>
                                     <td>
-                                        {% if asset.status == "APPROVED" or asset.status == "FAULTY" %}
+                                        {% if asset.status in "APPROVED,FAULTY,REPAIR" %}
                                             <form action="{% url 'ams:staff_update_status' asset.id %}" method="POST">
                                                 {% csrf_token %}
                                                 <select class="status-select" name="status" required>
@@ -90,6 +92,8 @@
                                                         <option value="DEPLOYED">Deployed</option>
                                                     {% elif asset.status == "FAULTY" %}
                                                         <option value="REPAIR">Repair</option>
+                                                    {% elif asset.status == "REPAIR" %}
+                                                        <option value="AVAILABLE">Available</option>
                                                     {% endif %}
                                                 </select>
                                                 <button class="btn btn-sm btn-primary mt-2" type="submit">Update</button>
@@ -125,6 +129,7 @@
                 </div>
             </div>
 
+            <!--Mobile view-->
             <div class="row d-md-none">
                 <div class="col-12 table-responsive">
                     <table class="table table-bordered">
@@ -167,7 +172,7 @@
                                             </div>
                                             <div>
                                                 <i class="fa-solid fa-arrow-rotate-right"></i>
-                                                {% if asset.status == "APPROVED" or asset.status == "FAULTY" %}
+                                                {% if asset.status in "APPROVED,FAULTY,REPAIR" %}
                                                     <form action="{% url 'ams:staff_update_status' asset.id %}" method="POST">
                                                         {% csrf_token %}
                                                         <select class="status-select" name="status" required>
@@ -176,6 +181,8 @@
                                                                 <option value="DEPLOYED">Deployed</option>
                                                             {% elif asset.status == "FAULTY" %}
                                                                 <option value="REPAIR">Repair</option>
+                                                            {% elif asset.status == "REPAIR" %}
+                                                                <option value="AVAILABLE">Available</option>
                                                             {% endif %}
                                                         </select>
                                                         <button class="btn btn-sm btn-primary mt-2" type="submit">Update</button>
@@ -216,9 +223,11 @@
             </div>
         </div>
 
+        <!--Asset assigned to me-->
         <div class="section-card">
             <h4 class="mb-3">Assets Assigned To Me</h4>
 
+            <!--Desktop view-->
             <div class="row d-none d-md-flex">
                 <div class="col-12 table-responsive">
                     <table class="table table-bordered">
@@ -275,6 +284,7 @@
                 </div>
             </div>
 
+            <!--Mobile view-->
             <div class="row d-md-none">
                 <div class="col-12 table-responsive">
                     <table class="table table-bordered">
